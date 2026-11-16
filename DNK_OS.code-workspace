@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "DNK OS (Sovereign Core)",
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+		"python.analysis.extraPaths": [
+			"${workspaceFolder}"
+		],
+		"files.exclude": {
+			"**/.git": true,
+			"**/.pytest_cache": true,
+			"**/__pycache__": true
+		}
+	}
+}

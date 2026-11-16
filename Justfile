@@ -68,3 +68,15 @@ canvas-pipeline:
 # Execute a single canvas node through Sovereign Quad Runner
 run-node canvas node_id summary="":
     @uv run python3 core/orchestrator/quad_runner.py {{canvas}} {{node_id}} {{summary}}
+
+# -----------------------------------------------------------------------------
+# 🌐 API SERVER & FASTMCP
+# -----------------------------------------------------------------------------
+
+# Start the DNK OS Microkernel FastAPI server on port 8000
+api:
+    @uv run uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Run the Microkernel FastMCP server over STDIO (for Antigravity/Hermes/Claude)
+mcp-stdio:
+    @uv run python3 core/kernel.py

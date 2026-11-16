@@ -38,20 +38,20 @@ author: "DNK-e.com Maksym & Antigravity"
 
 1. **Role Division**:
    - **Antigravity**: Mentor / Architect / Head of Orchestration. Guides architecture, specifications, and quality gates.
-   - **Denchik (Денчік)**: Sovereign Master Developer & Chief Autonomous Builder of DNK OS (DEC-042, DEC-052). Physically constructs files, debugs, runs FastMCP in-memory Code Mode, and executes strictly inside `DNK_HUB`.
+   - **Denchik (Денчік)**: Sovereign Master Developer & Chief Autonomous Builder of DNK OS (DEC-042, DEC-052). Physically constructs files, debugs, runs FastMCP in-memory Code Mode, and executes strictly inside `DNK_OS`.
    - **Gerych (Герич)**: Cold Knowledge Archivist & Retrospective Historical Auditor (DEC-054). Transitioned to read-only archival and historical log inspection; active codebase construction is consolidated under Denchik.
 
-2. **Unified Workspace & Two-Tier Protocol**:
-   - The entire development and R&D hub lives in the unified root: `apps/`, `services/`, `core/`, `tests/`, `scripts/`.
-   - Legacy nested subfolders are DEPRECATED and COMPLETELY REMOVED. Everything resides directly at root.
-   - Clean standalone releases are generated via `scripts/export_standalone_app.py` per `docs/architecture/TWO_TIER_DEVELOPMENT_PROTOCOL.md`.
+2. **Unified Sovereign Workspace (DEC-110, DEC-117)**:
+   - `DNK_OS` is the sovereign, clean production workspace root: `apps/`, `services/`, `core/`, `tests/`, `scripts/`, `infra/`, `docs/`, `packages/`.
+   - `DNK_HUB` is permanently relegated to read-only historical R&D archive (`DEC-117 [🔒 LOCKED]`).
+   - Clean standalone releases are generated per `docs/architecture/100_PORTABILITY_STANDARD.md`.
 
 3. **Mandatory Invariants**:
    - Relative paths ONLY (`./`, `../`). Never construct or pass absolute `/Users/...` paths in tool calls, file searches, imports, or scripts.
    - All Python/YAML/Markdown files MUST include Machine-Readable Headers (MRH) per `DNK-STD-0075`.
    - Service names prefixed with `dnk_`.
    - **Canonical 8-Root Directory Invariant (Strictly Enforced)**:
-     Agents are STRICTLY FORBIDDEN from creating new top-level directories in `DNK_HUB`.
+     Agents are STRICTLY FORBIDDEN from creating new top-level directories in `DNK_OS`.
      The ONLY sanctioned top-level directories are: `apps/`, `core/`, `services/`, `packages/`, `infra/`, `docs/`, `tests/`, `scripts/`.
      All temporary artifacts, test outputs, or scratch files MUST be placed in designated directories (`artifacts/`, `cache/`, or pytest `tmp_path`), NEVER directly in the root directory.
    - Communication with Maxim in Ukrainian (🇺🇦), code in English (🇬🇧).
