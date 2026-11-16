@@ -1,0 +1,310 @@
+From 223649ad53f46e5f579dca48cb391919c4dfafe4 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Tue, 10 Nov 2026 14:04:31 +0200
+Subject: [PATCH 22/26] feat(banner): adaptive responsive layout for DNK OS
+ skin with compact art and resilient border wrapping
+
+---
+ dnk_patches/dnk-os.yaml                      | 11 ++-
+ hermes_cli/banner.py                         | 68 +++++++++++++++----
+ hermes_cli/skin_engine.py                    | 64 ++++++++++++++++++
+ tests/hermes_cli/test_dnk_adaptive_banner.py | 70 ++++++++++++++++++++
+ 4 files changed, 197 insertions(+), 16 deletions(-)
+ create mode 100644 tests/hermes_cli/test_dnk_adaptive_banner.py
+
+diff --git a/dnk_patches/dnk-os.yaml b/dnk_patches/dnk-os.yaml
+index e55ff9978a4..930cf3fc34b 100644
+--- a/dnk_patches/dnk-os.yaml
++++ b/dnk_patches/dnk-os.yaml
+@@ -42,12 +42,19 @@ branding:
+   goodbye: Сесію завершено. До зв'язку! ⚡
+   response_label: ' ⚡ Гєрич '
+ banner_hero: |
++  [bold #FF8C00]██████╗ ███╗   ██╗██╗  ██╗   ██████╗  ███████╗[/]
++  [bold #FF9D2E]██╔══██╗████╗  ██║██║ ██╔╝  ██╔═══██╗ ██╔════╝[/]
++  [bold #FFAF5C]██║  ██║██╔██╗ ██║█████╔╝   ██║   ██║ ███████╗[/]
++  [bold #FFC18A]██║  ██║██║╚██╗██║██╔═██╗   ██║   ██║ ╚════██║[/]
++  [bold #FFD2B8]██████╔╝██║ ╚████║██║  ██╗  ╚██████╔╝ ███████╗[/]
++  [bold #FFE4E6]╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═════╝  ╚══════╝[/]
++  [bold #FF8C00]             G E R Y C H   C O R E            [/]
++banner_hero_compact: |
+   [bold #FF8C00]██████╗ ███╗   ██╗██╗  ██╗[/]
+   [bold #FF9D2E]██╔══██╗████╗  ██║██║ ██╔╝[/]
+   [bold #FFAF5C]██║  ██║██╔██╗ ██║█████╔╝ [/]
+   [bold #FFC18A]██║  ██║██║╚██╗██║██╔═██╗ [/]
+   [bold #FFD2B8]██████╔╝██║ ╚████║██║  ██╗[/]
+   [bold #FFE4E6]╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝[/]
+-  [bold #FF8C00]        D N K   O S       [/]
+-  [bold #FFA733]     ⚡ G E R Y C H ⚡    [/]
++  [bold #FF8C00]     ⚡ G E R Y C H ⚡    [/]
+ banner_logo: ''
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index 21865e5dcb0..546a6cc040b 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -794,19 +794,33 @@ def build_welcome_banner(
+         }
+         provider_display = provider_labels.get(provider_val, provider.title() if provider else "Google Vertex AI")
+ 
+-        term_width = getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
+-        panel_padding = 0 if term_width < 88 else 1
+-        col_padding = 1 if term_width < 92 else 2
+-        left_w = 34
+-        max_right_w = max(24, term_width - (left_w + col_padding + (panel_padding * 2) + 2))
++        term_width = getattr(console, "_width", None) or getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
++        from rich.cells import cell_len
++
++        # Adaptive layout: choose wide hero art on >=120 cols, compact hero art on standard displays (<120)
++        is_wide = term_width >= 120
++        if is_wide:
++            hero_art = getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
++        else:
++            hero_art = getattr(_bskin, "banner_hero_compact", None) or getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
++        if hero_art:
++            hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
++
++        raw_art_lines = [re.sub(r'\[.*?\]', '', line) for line in hero_art.strip().splitlines()]
++        left_w = max((cell_len(line) for line in raw_art_lines), default=28)
++
++        panel_padding = 1 if term_width >= 86 else 0
++        col_padding = 2 if term_width >= 86 else 1
++        total_overhead = (panel_padding * 2) + 2 + col_padding
++        max_right_w = max(24, term_width - (left_w + total_overhead))
+ 
+         def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
+-            overhead = len(prefix) + len(sep)
+-            avail_desc = max_w - overhead - len(name)
++            overhead = cell_len(prefix) + cell_len(sep)
++            avail_desc = max_w - overhead - cell_len(name)
+             if avail_desc < 3:
+-                shortened_name = name[:max(3, max_w - len(prefix))]
++                shortened_name = name[:max(3, max_w - cell_len(prefix))]
+                 return f"{prefix}[{text}]{shortened_name}[/]"
+-            if len(desc) > avail_desc:
++            if cell_len(desc) > avail_desc:
+                 desc = desc[:max(0, avail_desc - 1)] + "…"
+             return f"{prefix}[{text}]{name}[/] [dim {dim}]{sep}[/] [{text}]{desc}[/]"
+ 
+@@ -1059,11 +1073,6 @@ def build_welcome_banner(
+         right_content = "\n".join([line.replace("\ufe0f", "") for line in right_lines])
+         left_content = "\n".join([line.replace("\ufe0f", "") for line in left_lines])
+ 
+-        dnk_table = Table.grid(padding=(0, col_padding))
+-        dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
+-        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
+-        dnk_table.add_row(left_content, right_content)
+-
+         is_denchik = (
+             os.environ.get("DENCHIK_MODE") == "1"
+             or os.environ.get("HERMES_AGENT_NAME") == "denchik"
+@@ -1072,11 +1081,42 @@ def build_welcome_banner(
+         v_str = version_label.replace("Hermes Agent ", "Hermes ").replace("Hermes Hermes ", "Hermes ")
+         agent_title = "Denchik (DNK OS)" if is_denchik else "Gerych (DNK OS)"
+         title_markup = f"[bold {title_color}]{agent_title} · {v_str}[/]"
++
++        if term_width < 76:
++            stack_table = Table.grid(padding=(0, 0))
++            stack_table.add_column("stack", justify="left", no_wrap=True)
++            stack_lines = [
++                hero_art,
++                f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
++                f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++                "",
++                f"[bold {accent}]🔧 {total_tools_count} інструментів[/] · [bold {accent}]🤖 {agents_count} агентів[/] · [bold {accent}]📚 {total_skills} навичок[/]",
++                f"[dim {dim}]Команди: /dashboard · /skills · /memory · /clear[/]",
++            ]
++            stack_table.add_row("\n".join(stack_lines))
++            outer_panel = Panel(
++                stack_table,
++                title=title_markup,
++                border_style=border_color,
++                padding=(0, 0),
++                width=max(40, term_width - 1),
++            )
++            console.print()
++            console.print(outer_panel)
++            return
++
++        dnk_table = Table.grid(padding=(0, col_padding))
++        dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
++        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
++        dnk_table.add_row(left_content, right_content)
++
++        panel_w = min(term_width, left_w + max_right_w + total_overhead)
+         outer_panel = Panel(
+             dnk_table,
+             title=title_markup,
+             border_style=border_color,
+             padding=(0, panel_padding),
++            width=panel_w,
+         )
+         console.print()
+         console.print(outer_panel)
+diff --git a/hermes_cli/skin_engine.py b/hermes_cli/skin_engine.py
+index 1a48919b103..e437a072470 100644
+--- a/hermes_cli/skin_engine.py
++++ b/hermes_cli/skin_engine.py
+@@ -27,6 +27,7 @@ class SkinConfig:
+     tool_emojis: dict[str, str] = field(default_factory=dict)  # per-tool emoji overrides
+     banner_logo: str = ""    # Rich-markup ASCII art logo (replaces HERMES_AGENT_LOGO)
+     banner_hero: str = ""    # Rich-markup hero art (replaces HERMES_CADUCEUS)
++    banner_hero_compact: str = ""  # Compact hero art for standard terminals (<105 cols)
+     custom_css: str = ""     # Raw CSS injected as a <style> tag on the desktop GUI (32 KiB cap)
+ 
+     def get_color(self, key: str, fallback: str = "") -> str:
+@@ -339,6 +340,68 @@ _BUILTIN_SKINS: dict[str, dict[str, Any]] = {
+ [#F29C38]⠀⠀⠀⠀⠀⠀⠀⠀⣰⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀[/]
+ [#F29C38]⠀⠀⠀⠀⠀⠀⠀⣼⡟⠀⠀⢻⣧⠀⠀⠀⠀⠀⠀⠀⠀[/]
+ [dim #7A3511]⠀⠀⠀⠀⠀⠀⠀tail flame lit⠀⠀⠀⠀⠀⠀⠀⠀[/]""",
++    },
++    "dnk-os": {
++        "name": "dnk-os",
++        "description": "DNK OS Official Skin — Gerych Core",
++        "colors": {
++            "banner_border": "#FF8C00",
++            "response_border": "#FF8C00",
++            "response_text": "#E0E0E0",
++            "banner_title": "#FFB347",
++            "banner_accent": "#FFA733",
++            "banner_dim": "#A0AEC0",
++            "banner_text": "#CBD5E1",
++            "ui_accent": "#FF8C00",
++            "ui_label": "#FFB347",
++            "ui_text": "#E0E0E0",
++            "ui_border": "#444444",
++            "ui_tool": "#FF8C00",
++            "ui_thinking": "#888888",
++            "ui_ok": "#00FF00",
++            "ui_warn": "#FFFF00",
++            "ui_error": "#FF0000",
++            "prompt": "#FFB347",
++            "status_bar_strong": "#FF8C00",
++            "status_bar_text": "#E0E0E0",
++            "status_bar_good": "#00FF00",
++            "status_bar_warn": "#FFFF00",
++            "status_bar_bad": "#FF0000",
++            "status_bar_critical": "#FF0000",
++            "diff_added": "#00FF00",
++            "diff_removed": "#FF0000",
++            "diff_added_word": "#00FF00",
++            "diff_removed_word": "#FF0000",
++            "syntax_string": "#00FF00",
++            "syntax_number": "#FFB347",
++            "syntax_keyword": "#FF8C00",
++            "syntax_comment": "#888888",
++            "completion_menu_bg": "#222222",
++            "completion_menu_current_bg": "#444444",
++            "completion_menu_meta_bg": "#333333",
++            "background": "#181818",
++        },
++        "branding": {
++            "agent_name": "Gerych (DNK OS)",
++            "welcome": "Вітаю, Максиме. DNK OS Gerych Core завантажено та готовий до роботи.",
++            "goodbye": "Сесію завершено. До зв'язку! ⚡",
++            "response_label": " ⚡ Гєрич ",
++        },
++        "banner_hero": """[bold #FF8C00]██████╗ ███╗   ██╗██╗  ██╗   ██████╗  ███████╗[/]
++[bold #FF9D2E]██╔══██╗████╗  ██║██║ ██╔╝  ██╔═══██╗ ██╔════╝[/]
++[bold #FFAF5C]██║  ██║██╔██╗ ██║█████╔╝   ██║   ██║ ███████╗[/]
++[bold #FFC18A]██║  ██║██║╚██╗██║██╔═██╗   ██║   ██║ ╚════██║[/]
++[bold #FFD2B8]██████╔╝██║ ╚████║██║  ██╗  ╚██████╔╝ ███████╗[/]
++[bold #FFE4E6]╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═════╝  ╚══════╝[/]
++[bold #FF8C00]             G E R Y C H   C O R E            [/]""",
++        "banner_hero_compact": """[bold #FF8C00]██████╗ ███╗   ██╗██╗  ██╗[/]
++[bold #FF9D2E]██╔══██╗████╗  ██║██║ ██╔╝[/]
++[bold #FFAF5C]██║  ██║██╔██╗ ██║█████╔╝ [/]
++[bold #FFC18A]██║  ██║██║╚██╗██║██╔═██╗ [/]
++[bold #FFD2B8]██████╔╝██║ ╚████║██║  ██╗[/]
++[bold #FFE4E6]╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝[/]
++[bold #FF8C00]     ⚡ G E R Y C H ⚡    [/]""",
++        "banner_logo": "",
+     }}
+ 
+ _active_skin: Optional[SkinConfig] = None
+@@ -405,6 +468,7 @@ def _build_skin_config(data: dict[str, Any]) -> SkinConfig:
+         tool_prefix=data.get("tool_prefix", default.get("tool_prefix", "┊")),
+         tool_emojis=section("tool_emojis"), banner_logo=data.get("banner_logo", ""),
+         banner_hero=data.get("banner_hero", ""),
++        banner_hero_compact=data.get("banner_hero_compact", ""),
+         custom_css=str(data.get("customCSS", "")).strip()[:32768])
+ 
+ 
+diff --git a/tests/hermes_cli/test_dnk_adaptive_banner.py b/tests/hermes_cli/test_dnk_adaptive_banner.py
+new file mode 100644
+index 00000000000..72531f9479a
+--- /dev/null
++++ b/tests/hermes_cli/test_dnk_adaptive_banner.py
+@@ -0,0 +1,70 @@
++import io
++import re
++from rich.console import Console
++from hermes_cli.banner import build_welcome_banner
++from hermes_cli.skin_engine import set_active_skin
++
++
++def test_dnk_banner_standard_width_uses_compact_art():
++    set_active_skin("dnk-os")
++    f = io.StringIO()
++    c = Console(file=f, width=88)
++    build_welcome_banner(
++        console=c,
++        model="google/gemini-4-argon",
++        cwd=".",
++        session_id="test1234",
++        provider="vertex",
++        tools=[],
++    )
++    output = f.getvalue().replace("\u00a0", " ")
++    # At 88 cols, it should use compact art with GERYCH, not wide 46-col art
++    assert "⚡ G E R Y C H ⚡" in output
++    # Check that panel borders close properly
++    lines = [line for line in output.splitlines() if line.strip()]
++    assert lines[0].startswith("╭─")
++    assert lines[-1].startswith("╰─")
++    for line in lines[1:-1]:
++        assert line.startswith("│") and line.endswith("│")
++
++
++def test_dnk_banner_wide_width_uses_wide_art():
++    set_active_skin("dnk-os")
++    f = io.StringIO()
++    c = Console(file=f, width=125)
++    build_welcome_banner(
++        console=c,
++        model="google/gemini-4-argon",
++        cwd=".",
++        session_id="test1234",
++        provider="vertex",
++        tools=[],
++    )
++    output = f.getvalue().replace("\u00a0", " ")
++    # At 125 cols, wide art includes G E R Y C H   C O R E
++    assert "G E R Y C H   C O R E" in output
++    lines = [line for line in output.splitlines() if line.strip()]
++    assert lines[0].startswith("╭─")
++    assert lines[-1].startswith("╰─")
++    for line in lines[1:-1]:
++        assert line.startswith("│") and line.endswith("│")
++
++
++def test_dnk_banner_narrow_width_stack():
++    set_active_skin("dnk-os")
++    f = io.StringIO()
++    c = Console(file=f, width=70)
++    build_welcome_banner(
++        console=c,
++        model="google/gemini-4-argon",
++        cwd=".",
++        session_id="test1234",
++        provider="vertex",
++        tools=[],
++    )
++    output = f.getvalue()
++    lines = [line for line in output.splitlines() if line.strip()]
++    assert lines[0].startswith("╭─")
++    assert lines[-1].startswith("╰─")
++    for line in lines[1:-1]:
++        assert line.startswith("│") and line.endswith("│")
+-- 
+2.50.1
+

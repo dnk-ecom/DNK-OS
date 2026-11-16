@@ -1,0 +1,29 @@
+From 597d10ba282b942f865c095da6f3a1d502ffc78a Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Fri, 6 Nov 2026 20:15:25 +0200
+Subject: [PATCH 05/26] feat(normalize): auto-prefix google/ for Gemini models
+ on Vertex AI
+
+---
+ hermes_cli/model_normalize.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hermes_cli/model_normalize.py b/hermes_cli/model_normalize.py
+index 66dfae00d4d..fac3bc80c5a 100644
+--- a/hermes_cli/model_normalize.py
++++ b/hermes_cli/model_normalize.py
+@@ -240,6 +240,11 @@ def normalize_model_for_provider(model_input: str, target_provider: str) -> str:
+     if normalized:
+         return normalized
+ 
++    if provider == "vertex":
++        if "/" not in name and name.startswith(("gemini-", "imagen-", "medlm-")):
++            return f"google/{name}"
++        return name
++
+     if provider in _STRIP_VENDOR_ONLY_PROVIDERS:
+         stripped = _strip_matching_provider_prefix(name, provider)
+         if stripped == name and name.startswith(("openai/", "openai:")):
+-- 
+2.50.1
+

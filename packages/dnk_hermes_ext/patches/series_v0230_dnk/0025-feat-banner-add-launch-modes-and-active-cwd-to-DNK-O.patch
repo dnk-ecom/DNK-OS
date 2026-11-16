@@ -1,0 +1,279 @@
+From 9fd030b9613aa22ef2ab04ff4c21b43295169458 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Wed, 11 Nov 2026 17:40:33 +0200
+Subject: [PATCH 25/26] feat(banner): add launch modes and active cwd to DNK OS
+ banner
+
+---
+ hermes_cli/banner.py                         | 117 ++++++++++++-------
+ tests/hermes_cli/test_dnk_adaptive_banner.py |  41 ++++++-
+ 2 files changed, 118 insertions(+), 40 deletions(-)
+
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index 546a6cc040b..1f268ee543a 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -807,12 +807,18 @@ def build_welcome_banner(
+             hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
+ 
+         raw_art_lines = [re.sub(r'\[.*?\]', '', line) for line in hero_art.strip().splitlines()]
+-        left_w = max((cell_len(line) for line in raw_art_lines), default=28)
++        art_w = max((cell_len(line) for line in raw_art_lines), default=28)
+ 
+         panel_padding = 1 if term_width >= 86 else 0
+         col_padding = 2 if term_width >= 86 else 1
+         total_overhead = (panel_padding * 2) + 2 + col_padding
+-        max_right_w = max(24, term_width - (left_w + total_overhead))
++        available_content_w = max(40, term_width - total_overhead)
++
++        # Balanced width allocation: left column holds art, launch presets, and folder path
++        left_w = max(art_w + col_padding, min(41, available_content_w // 2))
++        max_right_w = max(24, available_content_w - left_w)
++        effective_left_w = left_w - col_padding
++        effective_right_w = max_right_w - col_padding
+ 
+         def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
+             overhead = cell_len(prefix) + cell_len(sep)
+@@ -864,44 +870,61 @@ def build_welcome_banner(
+             except Exception:
+                 pass
+ 
+-        if active_mcps:
+-            sampled_mcp = random.sample(active_mcps, min(3, len(active_mcps)))
+-            mcp_lines = []
+-            for name, desc, connected in sampled_mcp:
+-                mcp_lines.append(_fit_line(name, desc, left_w))
+-            if len(active_mcps) > 3:
+-                mcp_lines.append(f"  [dim {dim}](і ще {len(active_mcps) - 3} налаштованих MCP...)[/]")
+-            elif len(mcp_lines) < 4:
+-                mcp_lines.append(f"  [dim {dim}]...[/]")
++        connected_mcp_count = len([x for x in active_mcps if x[2]])
++
++        # 2. Resolve active working directory cleanly
++        target_dir = Path(cwd).resolve() if cwd else Path.cwd()
++        home = Path.home()
++        try:
++            if target_dir == home:
++                display_dir = "~"
++            elif target_dir.is_relative_to(home):
++                display_dir = f"~/{target_dir.relative_to(home)}"
++            else:
++                display_dir = str(target_dir)
++        except Exception:
++            display_dir = str(target_dir)
++
++        base_dir_str = str(home / "Kuzmenko" / "MY_LIFE_WORK")
++        if str(target_dir) == base_dir_str:
++            dir_mode = " (root)"
++        elif str(target_dir) == f"{base_dir_str}/DNK_HUB":
++            dir_mode = " (hub)"
++        elif "SHOPIFY" in str(target_dir):
++            dir_mode = " (shop)"
+         else:
+-            mcp_lines = [
+-                f"  [dim {dim}]Немає підключених MCP серверів[/]",
+-                f"  [dim {dim}]...[/]",
+-                f"  [dim {dim}]...[/]",
+-                f"  [dim {dim}]...[/]",
+-            ]
++            dir_mode = ""
+ 
+-        # 2. Random sample useful commands
++        folder_prefix = "Папка: "
++        avail_path_w = effective_left_w - cell_len(folder_prefix) - cell_len(dir_mode)
++        if cell_len(display_dir) > avail_path_w and avail_path_w > 8:
++            short_dir = "…" + display_dir[-(avail_path_w - 1):]
++        else:
++            short_dir = display_dir
++        folder_line = f"[dim {dim}]{folder_prefix}{short_dir}{dir_mode}[/]"
++
++        # 3. CLI Launch Presets
++        launch_presets = [
++            ("gerych", "локальна папка"),
++            ("gerych root", "вся екосистема"),
++            ("gerych shop", "Shopify розробка"),
++            ("gerych hub", "системне ядро"),
++        ]
++        launch_lines = [_fit_line(cmd, desc, effective_left_w) for cmd, desc in launch_presets]
++
++        # 4. Useful commands
+         cmd_pool = [
+-            ("/model", "зміна моделі"),
+-            ("/memory", "когнітивна пам'ять"),
+             ("/dashboard", "панель управління"),
+             ("/skills", "бібліотека навичок"),
++            ("/model", "зміна моделі"),
++            ("/memory", "когнітивна пам'ять"),
+             ("/clear", "новий контекст"),
+-            ("/status", "стан рою агентів"),
+             ("/sessions", "історія сесій"),
++            ("/mcp", "статус MCP серверів"),
+             ("/rollback", "відкат змін коду"),
+         ]
+         sampled_cmds = random.sample(cmd_pool, min(3, len(cmd_pool)))
+-        cmd_lines = [_fit_line(cmd, desc, left_w) for cmd, desc in sampled_cmds]
+-
+-        connected_mcp_count = len([x for x in active_mcps if x[2]])
+-        if connected_mcp_count > 0:
+-            mcp_header_str = f"📡 MCP Сервери ({connected_mcp_count} активних)"
+-        elif active_mcps:
+-            mcp_header_str = f"📡 MCP Сервери ({len(active_mcps)} налаштовано)"
+-        else:
+-            mcp_header_str = "📡 MCP Сервери"
++        cmd_lines = [_fit_line(cmd, desc, effective_left_w) for cmd, desc in sampled_cmds]
+ 
+         left_lines = [
+             "",
+@@ -909,13 +932,20 @@ def build_welcome_banner(
+             "",
+             f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+             f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++            folder_line,
++        ]
++        if connected_mcp_count > 0:
++            connected_names = ", ".join([x[0] for x in active_mcps if x[2]][:2])
++            left_lines.append(f"[dim {dim}]📡 MCP: {connected_names}[/]")
++
++        left_lines.extend([
+             "",
+-            f"[bold {accent}]{mcp_header_str}[/]",
+-            *mcp_lines[:4],
++            f"[bold {accent}]🚀 Режими запуску CLI[/]",
++            *launch_lines,
+             "",
+             f"[bold {accent}]💡 Корисні Команди[/]",
+-            *cmd_lines[:3],
+-        ]
++            *cmd_lines,
++        ])
+ 
+         # 3. Dynamic Tools sampling
+         tool_desc_map = {
+@@ -958,7 +988,7 @@ def build_welcome_banner(
+             available_tool_items = list(tool_desc_map.items())
+ 
+         sampled_tools = random.sample(available_tool_items, min(3, len(available_tool_items)))
+-        dynamic_tool_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_tools]
++        dynamic_tool_lines = [_fit_line(name, desc, effective_right_w) for name, desc in sampled_tools]
+         total_tools_count = len(tools) if tools else len(active_tool_names) or 18
+         remaining_tools = max(total_tools_count - 3, 0)
+         tool_rem_text = f"(ще {remaining_tools} інструментів...)"
+@@ -1004,7 +1034,7 @@ def build_welcome_banner(
+         agents_count = len(real_agents)
+         agents_pool = [(name, agent_desc_map.get(name, "агент рою")) for name in real_agents]
+         sampled_agents = random.sample(agents_pool, min(3, len(agents_pool)))
+-        dynamic_agent_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_agents]
++        dynamic_agent_lines = [_fit_line(name, desc, effective_right_w) for name, desc in sampled_agents]
+         remaining_agents = max(agents_count - 3, 0)
+         agent_remaining_str = f"  [dim {dim}](ще {remaining_agents} агентів...)[/]" if remaining_agents else ""
+ 
+@@ -1043,7 +1073,7 @@ def build_welcome_banner(
+         if available_cats:
+             sampled_cats = random.sample(available_cats, min(3, len(available_cats)))
+             dynamic_skill_lines = [
+-                _fit_line(f"{cat[:14]} ({cnt})", desc, max_right_w)
++                _fit_line(f"{cat[:14]} ({cnt})", desc, effective_right_w)
+                 for cat, cnt, desc in sampled_cats
+             ]
+         else:
+@@ -1052,7 +1082,14 @@ def build_welcome_banner(
+         rem_cat_cnt = max(0, len(available_cats) - 3)
+         skill_rem_str = f"  [dim {dim}](ще {rem_cat_cnt} категорій...)[/]" if rem_cat_cnt else ""
+ 
+-        footer_text = f"{total_tools_count} інструментів · {agents_count} агентів · {total_skills} навичок"
++        footer_parts = [
++            f"{total_tools_count} інструментів",
++            f"{agents_count} агентів",
++            f"{total_skills} навичок",
++        ]
++        if connected_mcp_count > 0:
++            footer_parts.append(f"{connected_mcp_count} MCP")
++        footer_text = " · ".join(footer_parts)
+ 
+         right_lines = [
+             f"[bold {accent}]🔧 Інструменти ({total_tools_count})[/]",
+@@ -1089,9 +1126,11 @@ def build_welcome_banner(
+                 hero_art,
+                 f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+                 f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++                folder_line,
+                 "",
++                f"[bold {accent}]🚀 Режими:[/] [dim {dim}]gerych · gerych root · gerych shop · gerych hub[/]",
+                 f"[bold {accent}]🔧 {total_tools_count} інструментів[/] · [bold {accent}]🤖 {agents_count} агентів[/] · [bold {accent}]📚 {total_skills} навичок[/]",
+-                f"[dim {dim}]Команди: /dashboard · /skills · /memory · /clear[/]",
++                f"[dim {dim}]Команди: /dashboard · /skills · /model · /clear[/]",
+             ]
+             stack_table.add_row("\n".join(stack_lines))
+             outer_panel = Panel(
+diff --git a/tests/hermes_cli/test_dnk_adaptive_banner.py b/tests/hermes_cli/test_dnk_adaptive_banner.py
+index 72531f9479a..83acf9a01e5 100644
+--- a/tests/hermes_cli/test_dnk_adaptive_banner.py
++++ b/tests/hermes_cli/test_dnk_adaptive_banner.py
+@@ -1,8 +1,18 @@
+ import io
+ import re
++import pytest
+ from rich.console import Console
+ from hermes_cli.banner import build_welcome_banner
+-from hermes_cli.skin_engine import set_active_skin
++from hermes_cli.skin_engine import set_active_skin, get_active_skin_name
++
++
++@pytest.fixture(autouse=True)
++def restore_default_skin():
++    orig = get_active_skin_name()
++    try:
++        yield
++    finally:
++        set_active_skin(orig)
+ 
+ 
+ def test_dnk_banner_standard_width_uses_compact_art():
+@@ -20,6 +30,9 @@ def test_dnk_banner_standard_width_uses_compact_art():
+     output = f.getvalue().replace("\u00a0", " ")
+     # At 88 cols, it should use compact art with GERYCH, not wide 46-col art
+     assert "⚡ G E R Y C H ⚡" in output
++    assert "Режими запуску CLI" in output
++    assert "gerych root" in output
++    assert "Папка:" in output
+     # Check that panel borders close properly
+     lines = [line for line in output.splitlines() if line.strip()]
+     assert lines[0].startswith("╭─")
+@@ -63,8 +76,34 @@ def test_dnk_banner_narrow_width_stack():
+         tools=[],
+     )
+     output = f.getvalue()
++    assert "Режими:" in output
++    assert "Папка:" in output
+     lines = [line for line in output.splitlines() if line.strip()]
+     assert lines[0].startswith("╭─")
+     assert lines[-1].startswith("╰─")
+     for line in lines[1:-1]:
+         assert line.startswith("│") and line.endswith("│")
++
++
++def test_dnk_banner_shows_root_and_hub_modes():
++    set_active_skin("dnk-os")
++    import os
++    from pathlib import Path
++    home = Path.home()
++    root_path = home / "Kuzmenko" / "MY_LIFE_WORK"
++
++    f = io.StringIO()
++    c = Console(file=f, width=95)
++    build_welcome_banner(
++        console=c,
++        model="google/gemini-4-carbon",
++        cwd=str(root_path),
++        session_id="root_sess",
++        provider="vertex",
++        tools=[],
++    )
++    output = f.getvalue().replace("\u00a0", " ")
++    assert "(root)" in output
++    assert "gerych root" in output
++    assert "gerych shop" in output
++    assert "gerych hub" in output
+-- 
+2.50.1
+

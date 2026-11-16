@@ -1,0 +1,354 @@
+From 071632f7038c53c3e2d93168517581f34ec7b6d6 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Fri, 6 Nov 2026 20:04:51 +0200
+Subject: [PATCH 04/26] feat(banner): port approved DNK OS dynamic banner with
+ capability showcase
+
+---
+ hermes_cli/banner.py | 330 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 330 insertions(+)
+
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index 2b54c43fe31..3e1b22eba71 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -752,6 +752,336 @@ def build_welcome_banner(
+         elif behind is not None and behind != 0:
+             right_lines.append(_format_update_notice(behind))
+     _quiet(_update_line)  # Never break the banner over an update check
++
++    _is_dnk = (_bskin is not None and getattr(_bskin, "name", "") == "dnk-os")
++    title_color = _skin_color("banner_title", "#FFB347" if _is_dnk else "#FFD700")
++    border_color = _skin_color("banner_border", "#FF8C00" if _is_dnk else "#CD7F32")
++
++    if _is_dnk:
++        import random
++
++        model_short = model.split("/")[-1] if "/" in model else model
++        if not model_short or model_short.lower() == "unknown":
++            model_short = "gemini-3.8-flash"
++        if model_short.endswith(".gguf"):
++            model_short = model_short[:-5]
++        if len(model_short) > 28:
++            model_short = model_short[:25] + "..."
++
++        provider_val = (provider or "").strip().lower()
++        if not provider_val:
++            try:
++                from hermes_cli.config import load_config
++                _cfg = load_config() or {}
++                provider_val = (_cfg.get("provider") or _cfg.get("model_provider") or "").strip().lower()
++            except Exception:
++                provider_val = ""
++
++        provider_labels = {
++            "vertex": "Google Vertex AI",
++            "google": "Google AI Studio",
++            "anthropic": "Anthropic",
++            "openrouter": "OpenRouter",
++            "openai": "OpenAI",
++            "groq": "Groq",
++            "ollama": "Ollama (Local)",
++            "mistral": "Mistral AI",
++            "xai": "xAI",
++            "deepseek": "DeepSeek",
++            "bedrock": "AWS Bedrock",
++            "azure": "Azure OpenAI",
++            "moa": "Mixture of Agents",
++        }
++        provider_display = provider_labels.get(provider_val, provider.title() if provider else "Google Vertex AI")
++
++        term_width = getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
++        panel_padding = 0 if term_width < 88 else 1
++        col_padding = 1 if term_width < 92 else 2
++        left_w = 34
++        max_right_w = max(24, term_width - (left_w + col_padding + (panel_padding * 2) + 2))
++
++        def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
++            overhead = len(prefix) + len(sep)
++            avail_desc = max_w - overhead - len(name)
++            if avail_desc < 3:
++                shortened_name = name[:max(3, max_w - len(prefix))]
++                return f"{prefix}[{text}]{shortened_name}[/]"
++            if len(desc) > avail_desc:
++                desc = desc[:max(0, avail_desc - 1)] + "…"
++            return f"{prefix}[{text}]{name}[/] [dim {dim}]{sep}[/] [{text}]{desc}[/]"
++
++        # 1. MCP servers discovery
++        mcp_desc_map = {
++            "notion": "база знань Notion",
++            "github": "репозиторії та PR",
++            "context7": "індексація docs",
++            "postgresql": "SQL база даних",
++            "open-design": "UI Canvas макети",
++            "obsidian": "Vault знань",
++            "dnk_git_research": "дослідження GitHub",
++            "dnk_video_creator": "генерація медіа",
++            "dnk_orchestrator": "Swarm координація",
++            "dnk_analytics": "метрики рою",
++            "tandem": "відео монтаж Tandem",
++            "refero": "референси дизайну",
++            "chrome-devtools": "браузер та a11y",
++        }
++        active_mcps = []
++        try:
++            from tools.mcp_tool import get_mcp_status
++            raw_mcps = get_mcp_status() or []
++            for srv in raw_mcps:
++                s_name = srv.get("name", "")
++                if not s_name:
++                    continue
++                s_desc = mcp_desc_map.get(s_name, f"{srv.get('tools', 0)} інструментів")
++                s_connected = srv.get("connected", False)
++                active_mcps.append((s_name, s_desc, s_connected))
++        except Exception:
++            active_mcps = []
++
++        if not active_mcps:
++            try:
++                from hermes_cli.mcp_config import _get_mcp_servers
++                cfg_mcps = _get_mcp_servers()
++                for s_name in cfg_mcps.keys():
++                    s_desc = mcp_desc_map.get(s_name, "налаштований MCP")
++                    active_mcps.append((s_name, s_desc, False))
++            except Exception:
++                pass
++
++        if active_mcps:
++            sampled_mcp = random.sample(active_mcps, min(3, len(active_mcps)))
++            mcp_lines = []
++            for name, desc, connected in sampled_mcp:
++                mcp_lines.append(_fit_line(name, desc, left_w))
++            if len(active_mcps) > 3:
++                mcp_lines.append(f"  [dim {dim}](і ще {len(active_mcps) - 3} налаштованих MCP...)[/]")
++            elif len(mcp_lines) < 4:
++                mcp_lines.append(f"  [dim {dim}]...[/]")
++        else:
++            mcp_lines = [
++                f"  [dim {dim}]Немає підключених MCP серверів[/]",
++                f"  [dim {dim}]...[/]",
++                f"  [dim {dim}]...[/]",
++                f"  [dim {dim}]...[/]",
++            ]
++
++        # 2. Random sample useful commands
++        cmd_pool = [
++            ("/model", "зміна моделі"),
++            ("/memory", "когнітивна пам'ять"),
++            ("/dashboard", "панель управління"),
++            ("/skills", "бібліотека навичок"),
++            ("/clear", "новий контекст"),
++            ("/status", "стан рою агентів"),
++            ("/sessions", "історія сесій"),
++            ("/rollback", "відкат змін коду"),
++        ]
++        sampled_cmds = random.sample(cmd_pool, min(3, len(cmd_pool)))
++        cmd_lines = [_fit_line(cmd, desc, left_w) for cmd, desc in sampled_cmds]
++
++        connected_mcp_count = len([x for x in active_mcps if x[2]])
++        if connected_mcp_count > 0:
++            mcp_header_str = f"📡 MCP Сервери ({connected_mcp_count} активних)"
++        elif active_mcps:
++            mcp_header_str = f"📡 MCP Сервери ({len(active_mcps)} налаштовано)"
++        else:
++            mcp_header_str = "📡 MCP Сервери"
++
++        left_lines = [
++            "",
++            hero_art,
++            "",
++            f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
++            f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++            "",
++            f"[bold {accent}]{mcp_header_str}[/]",
++            *mcp_lines[:4],
++            "",
++            f"[bold {accent}]💡 Корисні Команди[/]",
++            *cmd_lines[:3],
++        ]
++
++        # 3. Dynamic Tools sampling
++        tool_desc_map = {
++            "computer_use": "керування Mac",
++            "cronjob": "фонові задачі",
++            "execute_code": "запуск коду",
++            "read_file": "читання файлів",
++            "write_file": "запис файлів",
++            "patch": "модифікація коду",
++            "search_files": "пошук по проекту",
++            "browser": "керування браузером",
++            "web_search": "пошук в Інтернеті",
++            "terminal": "виконання команд",
++            "memory": "контекст & знання",
++            "vision_analyze": "аналіз зображень",
++            "delegate_task": "делегування в Swarm",
++            "todo": "менеджер чеклістів",
++            "clarify": "діалог з користувачем",
++            "skill_view": "перегляд навичок",
++            "skill_manage": "управління навичками",
++            "text_to_speech": "синтез голосу",
++            "session_search": "пошук сесій",
++            "dnk_swarm_dispatch": "маршрутизація Swarm",
++            "dnk_swarm_parallel": "паралельні воркери",
++            "dnk_triage_task": "класифікатор задач",
++        }
++        active_tool_names = set()
++        for t in (tools or []):
++            if isinstance(t, dict):
++                t_fn = t.get("function") or {}
++                t_name = t_fn.get("name") if isinstance(t_fn, dict) else t.get("name")
++                if t_name:
++                    active_tool_names.add(t_name)
++
++        available_tool_items = [
++            (name, desc) for name, desc in tool_desc_map.items()
++            if name in active_tool_names
++        ]
++        if not available_tool_items:
++            available_tool_items = list(tool_desc_map.items())
++
++        sampled_tools = random.sample(available_tool_items, min(3, len(available_tool_items)))
++        dynamic_tool_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_tools]
++        total_tools_count = len(tools) if tools else len(active_tool_names) or 18
++        remaining_tools = max(total_tools_count - 3, 0)
++        tool_rem_text = f"(ще {remaining_tools} інструментів...)"
++
++        # 4. Registered Swarm Agents
++        agent_desc_map = {
++            "gerych_prime": "Swarm координатор",
++            "gerych_builder": "UI & Canvas фронтенд",
++            "gerych_researcher": "GitHub & SOTA аналіз",
++            "gerych_auditor": "аудит & тест-гейти",
++            "dnk_dev_fullstack": "бекенд, FastAPI & ORM",
++            "dnk_shopify": "Shopify & Liquid",
++            "dnk_video_ai_creator": "медіа & Remotion",
++            "dnk_scones_memory": "пам'ять & RAG",
++            "dnk_security_guard": "безпека & Vault",
++            "dnk_analytics": "метрики рою",
++            "dnk_mentor": "менторство & гайди",
++            "dnk_brand_typostyle": "бренд & типографіка",
++            "herich_librarian": "Obsidian & знання",
++            "strategist": "стратегія & дорожні карти",
++            "auditor": "контроль інваріантів",
++            "denchik": "автономний агент Mac",
++        }
++        real_agents = []
++        for candidate_path in [
++            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
++            Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
++        ]:
++            try:
++                if candidate_path.exists():
++                    real_agents = sorted([
++                        d.name for d in candidate_path.iterdir()
++                        if d.is_dir() and not d.name.startswith((".", "_"))
++                    ])
++                    if real_agents:
++                        break
++            except Exception:
++                pass
++
++        if not real_agents:
++            real_agents = list(agent_desc_map.keys())
++
++        agents_count = len(real_agents)
++        agents_pool = [(name, agent_desc_map.get(name, "агент рою")) for name in real_agents]
++        sampled_agents = random.sample(agents_pool, min(3, len(agents_pool)))
++        dynamic_agent_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_agents]
++        remaining_agents = max(agents_count - 3, 0)
++        agent_remaining_str = f"  [dim {dim}](ще {remaining_agents} агентів...)[/]" if remaining_agents else ""
++
++        # 5. Dynamic Skills categories
++        skill_cats = skills_by_category
++        if not skill_cats:
++            try:
++                skill_cats = get_available_skills()
++            except Exception:
++                skill_cats = {}
++
++        skill_cat_desc_map = {
++            "software-development": "розробка & CI",
++            "productivity": "автоматизація",
++            "creative": "UI & дизайн",
++            "autonomous-ai-agents": "рої агентів",
++            "research": "SOTA ресьорч",
++            "github": "CI/CD & PR",
++            "mlops": "моделі & LLM",
++            "devops": "деплой & інфра",
++            "note-taking": "Obsidian & нотатки",
++            "apple": "macOS & Apple",
++            "media": "медіа & аудіо",
++            "email": "пошта & inbox",
++            "smart-home": "розумний дім",
++            "social-media": "соцмережі & API",
++            "canvas_ui_ux": "інтерфейси Canvas",
++        }
++
++        total_skills = sum(len(v) for v in skill_cats.values()) if skill_cats else 0
++        available_cats = [
++            (cat, len(s_list), skill_cat_desc_map.get(cat, "навички"))
++            for cat, s_list in (skill_cats or {}).items()
++            if s_list
++        ]
++        if available_cats:
++            sampled_cats = random.sample(available_cats, min(3, len(available_cats)))
++            dynamic_skill_lines = [
++                _fit_line(f"{cat[:14]} ({cnt})", desc, max_right_w)
++                for cat, cnt, desc in sampled_cats
++            ]
++        else:
++            dynamic_skill_lines = [f"  [dim {dim}]Навички завантажуються...[/]"]
++
++        rem_cat_cnt = max(0, len(available_cats) - 3)
++        skill_rem_str = f"  [dim {dim}](ще {rem_cat_cnt} категорій...)[/]" if rem_cat_cnt else ""
++
++        footer_text = f"{total_tools_count} інструментів · {agents_count} агентів · {total_skills} навичок"
++
++        right_lines = [
++            f"[bold {accent}]🔧 Інструменти ({total_tools_count})[/]",
++            *dynamic_tool_lines,
++            f"  [dim {dim}]{tool_rem_text}[/]",
++            "",
++            f"[bold {accent}]🤖 Агенти рою ({agents_count})[/]",
++            *dynamic_agent_lines,
++            *([agent_remaining_str] if agent_remaining_str else []),
++            "",
++            f"[bold {accent}]📚 Навички ({total_skills})[/]",
++            *dynamic_skill_lines,
++            *([skill_rem_str] if skill_rem_str else []),
++            "",
++            f"[dim {dim}]{footer_text}[/]",
++        ]
++
++        right_content = "\n".join([line.replace("\ufe0f", "") for line in right_lines])
++        left_content = "\n".join([line.replace("\ufe0f", "") for line in left_lines])
++
++        dnk_table = Table.grid(padding=(0, col_padding))
++        dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
++        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
++        dnk_table.add_row(left_content, right_content)
++
++        is_denchik = (
++            os.environ.get("DENCHIK_MODE") == "1"
++            or os.environ.get("HERMES_AGENT_NAME") == "denchik"
++        )
++        version_label = format_banner_version_label()
++        v_str = version_label.replace("Hermes Agent ", "Hermes ").replace("Hermes Hermes ", "Hermes ")
++        agent_title = "Denchik (DNK OS)" if is_denchik else "Gerych (DNK OS)"
++        title_markup = f"[bold {title_color}]{agent_title} · {v_str}[/]"
++        outer_panel = Panel(
++            dnk_table,
++            title=title_markup,
++            border_style=border_color,
++            padding=(0, panel_padding),
++        )
++        console.print()
++        console.print(outer_panel)
++        return
++
+     layout_table = Table.grid(padding=(0, 2))
+     layout_table.add_column("left", justify="left")
+     layout_table.add_column("right", justify="left")
+-- 
+2.50.1
+

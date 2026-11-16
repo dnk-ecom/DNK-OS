@@ -1,0 +1,80 @@
+From 2450f646de89f903cd242aea37818d6b7c4873b4 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Fri, 6 Nov 2026 18:34:08 +0000
+Subject: [PATCH 07/26] fix(banner): read swarm agents dir from DNK_AGENTS_DIR
+ instead of absolute path
+
+Removes the hardcoded /Users/... path to DNK_HUB so the banner survives the
+move of agents into DNK-OS. Regenerated patch 0004 and the cumulative patch;
+both apply cleanly on upstream 2bd378ed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_019ggJJv6TCw5L8trqXPcBAw
+---
+ ...4-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch | 2 +-
+ dnk_patches/README.md                                           | 1 +
+ dnk_patches/dnk_os_full_hermes_v0230.patch                      | 2 +-
+ dnk_patches/install_dnk_enhancements.sh                         | 1 +
+ hermes_cli/banner.py                                            | 2 +-
+ 5 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch b/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
+index 69d4ad7b5a7..489fd4d2f0c 100644
+--- a/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
++++ b/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
+@@ -234,7 +234,7 @@ index 2b54c43fe3..3e1b22eba7 100644
+ +        }
+ +        real_agents = []
+ +        for candidate_path in [
+-+            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
+++            *([Path(os.environ["DNK_AGENTS_DIR"])] if os.environ.get("DNK_AGENTS_DIR") else []),
+ +            Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
+ +        ]:
+ +            try:
+diff --git a/dnk_patches/README.md b/dnk_patches/README.md
+index 12128e9e67e..b6afa2a26be 100644
+--- a/dnk_patches/README.md
++++ b/dnk_patches/README.md
+@@ -77,3 +77,4 @@ print('Model Normalization: OK')
+ # 2. Контрольний запит через Vertex AI
+ ./.venv/bin/python cli.py --provider vertex --model gemini-4-argon -q "Say: DNK OS Enhancements Verified" --oneshot
+ ```
++
+diff --git a/dnk_patches/dnk_os_full_hermes_v0230.patch b/dnk_patches/dnk_os_full_hermes_v0230.patch
+index 672d2250a14..45b938485f3 100644
+--- a/dnk_patches/dnk_os_full_hermes_v0230.patch
++++ b/dnk_patches/dnk_os_full_hermes_v0230.patch
+@@ -423,7 +423,7 @@ index e324f66e..3e1b22eb 100644
+ +        }
+ +        real_agents = []
+ +        for candidate_path in [
+-+            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
+++            *([Path(os.environ["DNK_AGENTS_DIR"])] if os.environ.get("DNK_AGENTS_DIR") else []),
+ +            Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
+ +        ]:
+ +            try:
+diff --git a/dnk_patches/install_dnk_enhancements.sh b/dnk_patches/install_dnk_enhancements.sh
+index 7204663ff04..650276a3b97 100755
+--- a/dnk_patches/install_dnk_enhancements.sh
++++ b/dnk_patches/install_dnk_enhancements.sh
+@@ -117,3 +117,4 @@ echo "=================================================================="
+ echo "🎉 Встановлення завершено! Hermes Agent готовий до роботи в DNK OS."
+ echo "   Запуск: ./.venv/bin/python cli.py --provider vertex --model gemini-4-argon"
+ echo "=================================================================="
++
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index 3e1b22eba71..21865e5dcb0 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -970,7 +970,7 @@ def build_welcome_banner(
+         }
+         real_agents = []
+         for candidate_path in [
+-            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
++            *([Path(os.environ["DNK_AGENTS_DIR"])] if os.environ.get("DNK_AGENTS_DIR") else []),
+             Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
+         ]:
+             try:
+-- 
+2.50.1
+

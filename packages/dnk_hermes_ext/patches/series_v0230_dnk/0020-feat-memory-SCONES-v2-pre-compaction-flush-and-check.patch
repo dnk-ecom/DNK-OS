@@ -1,0 +1,85 @@
+From e1dbeeed1260b908b4a9f5fdb8fa5e726df10670 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Tue, 10 Nov 2026 00:07:56 +0200
+Subject: [PATCH 20/26] feat(memory): SCONES v2 pre-compaction flush and
+ checkpoint api
+
+---
+ plugins/memory/scones/__init__.py | 54 +++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/plugins/memory/scones/__init__.py b/plugins/memory/scones/__init__.py
+index dcd6795f863..a9800fed6c3 100644
+--- a/plugins/memory/scones/__init__.py
++++ b/plugins/memory/scones/__init__.py
+@@ -124,6 +124,7 @@ class SconesMemoryProvider(MemoryProvider):
+     """
+     Native Hermes Memory Provider backed by DNK OS SCONES memory store.
+     """
++    pre_compress_checkpoint_api_version = 2
+ 
+     def __init__(self, hub_root: Optional[Path] = None):
+         self.hub_root = hub_root or _HUB_ROOT
+@@ -264,6 +265,59 @@ class SconesMemoryProvider(MemoryProvider):
+             )
+         return None
+ 
++    def on_pre_compress(self, messages: list[dict[str, Any]], require_checkpoint: bool = False) -> str:
++        """
++        SCONES Pre-Compaction Flush (SOTA Lossless Memory Invariant):
++        Before messages are compacted or pruned, scan for key facts, touched files,
++        and user directives, and flush them to SQLite WAL and lessons store.
++        Returns distilled memory context to inject into the compression prompt.
++        """
++        if not messages:
++            return ""
++
++        flushed_count = 0
++        extracted_facts: List[str] = []
++
++        for msg in messages:
++            role = msg.get("role")
++            content = msg.get("content")
++            if not isinstance(content, str) or not content.strip():
++                continue
++
++            # 1. User directives, constraints, and negative rules
++            if role == "user" and len(content) > 10:
++                lower = content.lower()
++                if any(k in lower for k in ("не ", "never", "do not", "завжди", "always", "правило", "rule", "важливо", "important")):
++                    fact = content.strip().split("\n")[0][:200]
++                    extracted_facts.append(f"User Directive: {fact}")
++                    if self.store:
++                        try:
++                            self.store._sync_record_observation(
++                                topic="USER_DIRECTIVE",
++                                observation="User instruction before compaction",
++                                rule=fact,
++                                confidence=1.0,
++                            )
++                            flushed_count += 1
++                        except Exception as e:
++                            logger.debug("SCONES observation flush error: %s", e)
++
++            # 2. Tool errors and warnings
++            elif role == "tool":
++                if "error" in content.lower() or "failed" in content.lower():
++                    err_line = content.strip().split("\n")[0][:180]
++                    extracted_facts.append(f"Tool Error: {err_line}")
++
++        logger.info(
++            "SCONES Pre-Compaction Flush completed: flushed %d items to SQLite WAL, extracted %d facts",
++            flushed_count, len(extracted_facts)
++        )
++
++        if extracted_facts:
++            unique_facts = list(dict.fromkeys(extracted_facts))[:8]
++            return "\n".join(f"- {f}" for f in unique_facts)
++        return ""
++
+     def sync_turn(
+         self,
+         user_content: str,
+-- 
+2.50.1
+

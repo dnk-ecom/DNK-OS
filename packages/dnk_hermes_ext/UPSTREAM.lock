@@ -1,0 +1,17 @@
+# DNK-MRH-HEADER
+# mrh_id: "packages/dnk_hermes_ext/UPSTREAM.lock"
+# purpose: "Pinned upstream and fork for Gerych Agent (external dependency). Re-pinned to dnk-ecom/Gerych-Agent 2026-11-14."
+# status: "Active"
+# --- END DNK-MRH-HEADER ---
+repo=https://github.com/dnk-ecom/Gerych-Agent
+upstream_original=https://github.com/NousResearch/hermes-agent
+base_tag=v0.23.0
+base_commit=2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19
+head_commit=d4cedc4946638f1332b4c27f9c9996ce72bf25cf
+dnk_commits_count=26
+commit_date=2026-11-14
+package_version=0.23.0-dnk
+requires_python=>=3.11,<3.15
+local_dir=../Gerych-Agent
+dnk_patches_series=packages/dnk_hermes_ext/patches/series_v0230_dnk
+previous_pin=2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19

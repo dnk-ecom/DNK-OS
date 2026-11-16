@@ -1,0 +1,30 @@
+From 440cc94f2cc9887db8784cc43e4bead364a8beb8 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Fri, 6 Nov 2026 19:55:34 +0200
+Subject: [PATCH 3/5] fix(banner): sanitize whitespace in hero art to prevent
+ internal line-wrapping
+
+---
+ hermes_cli/banner.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index ac5cef8e04..2b54c43fe3 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -699,7 +699,11 @@ def build_welcome_banner(
+     text = _skin_color("banner_text", "#FFF8DC")
+     # Use skin's custom caduceus art if provided
+     _bskin = _quiet(_active_skin)
+-    left_lines = ["", getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS, ""]
++    hero_art = getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
++    if hero_art:
++        # Prevent ASCII art lines from wrapping internally on spaces in narrow terminals
++        hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
++    left_lines = ["", hero_art, ""]
+     left_lines += _banner_left_lines(model, cwd, session_id, context_length, provider, accent=accent, dim=dim,
+                                      context_pinned=context_pinned, context_marker=context_marker)
+     right_lines = _banner_tool_lines(
+-- 
+2.50.1
+

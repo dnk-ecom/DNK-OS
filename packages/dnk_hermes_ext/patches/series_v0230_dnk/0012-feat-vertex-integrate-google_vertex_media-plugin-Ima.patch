@@ -1,0 +1,2283 @@
+From 48f3b7f5abb013e45ba065b48db6ab3471acbd47 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Mon, 9 Nov 2026 19:35:59 +0200
+Subject: [PATCH 12/26] feat(vertex): integrate google_vertex_media plugin
+ (Imagen 3 & Veo 2/3.1) and ADC refresh
+
+- Add plugins/google_vertex_media for native Imagen 3 and Veo 2/3.1 generation via Vertex ADC
+- Integrate gcloud auth token refresh fallback and UTF-8-SIG parsing in agent/vertex_adapter.py
+- Add full test coverage in tests/plugins/test_google_vertex_media.py (15/15 passing)
+---
+ agent/vertex_adapter.py                       | 127 +++--
+ plugins/google_vertex_media/README.md         | 179 +++++++
+ plugins/google_vertex_media/__init__.py       |  89 ++++
+ plugins/google_vertex_media/cli.py            | 191 ++++++++
+ plugins/google_vertex_media/client.py         | 462 ++++++++++++++++++
+ plugins/google_vertex_media/harness.py        | 238 +++++++++
+ plugins/google_vertex_media/image_provider.py | 165 +++++++
+ plugins/google_vertex_media/plugin.yaml       |  21 +
+ plugins/google_vertex_media/tools.py          | 217 ++++++++
+ plugins/google_vertex_media/video_provider.py | 178 +++++++
+ tests/plugins/test_google_vertex_media.py     | 262 ++++++++++
+ 11 files changed, 2087 insertions(+), 42 deletions(-)
+ create mode 100644 plugins/google_vertex_media/README.md
+ create mode 100644 plugins/google_vertex_media/__init__.py
+ create mode 100644 plugins/google_vertex_media/cli.py
+ create mode 100644 plugins/google_vertex_media/client.py
+ create mode 100644 plugins/google_vertex_media/harness.py
+ create mode 100644 plugins/google_vertex_media/image_provider.py
+ create mode 100644 plugins/google_vertex_media/plugin.yaml
+ create mode 100644 plugins/google_vertex_media/tools.py
+ create mode 100644 plugins/google_vertex_media/video_provider.py
+ create mode 100644 tests/plugins/test_google_vertex_media.py
+
+diff --git a/agent/vertex_adapter.py b/agent/vertex_adapter.py
+index 828f1a396f1..7698dafc18f 100644
+--- a/agent/vertex_adapter.py
++++ b/agent/vertex_adapter.py
+@@ -10,6 +10,7 @@ import hashlib
+ import json
+ import logging
+ import os
++import subprocess
+ import time
+ from pathlib import Path
+ from typing import Any, Optional, Tuple
+@@ -73,11 +74,15 @@ def _reload_dnk_active_env() -> None:
+         from core.config.gcp_config import load_dnk_active_env
+         load_dnk_active_env(force_reload=True)
+         return
+-    except Exception:
++    except Exception:  # health: allow BLE001, S110 -- optional dnk config probe
+         pass
+ 
+     from pathlib import Path
+-    hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
++    try:
++        from hermes_constants import get_hermes_home
++        hermes_home = get_hermes_home()
++    except ImportError:
++        hermes_home = Path.home() / ".hermes"  # health: allow HX001 -- fallback when outside Hermes
+     candidate_paths = [
+         Path.cwd() / ".dnk_active_project.env",
+         Path.cwd().parent / ".dnk_active_project.env",
+@@ -88,13 +93,13 @@ def _reload_dnk_active_env() -> None:
+     for p in candidate_paths:
+         try:
+             if p.is_file():
+-                for line in p.read_text(encoding="utf-8").splitlines():
++                for line in p.read_text(encoding="utf-8-sig").splitlines():
+                     line = line.strip()
+                     if "=" in line and not line.startswith("#"):
+                         k, v = line.split("=", 1)
+                         os.environ[k.strip()] = v.strip().strip("\"'")
+                 break
+-        except Exception:
++        except Exception:  # health: allow BLE001, S110 -- optional env file parsing fallback
+             pass
+ 
+ 
+@@ -207,42 +212,45 @@ def _cached_credentials(resolved_path: Optional[str], sa_raw: Optional[bytes], c
+     return cached
+ 
+ 
+-def get_vertex_credentials(
+-    credentials_path: Optional[str] = None,
+-    force_refresh: bool = False,
+-) -> tuple[Optional[str], Optional[str]]:
+-    """Return (fresh access_token, project_id) or (None, None); Credentials cached per file content."""
+-    _reload_dnk_active_env()
+-    if force_refresh:
+-        _creds_cache.clear()
+-
+-    project_override = _resolve_project_override()
++def _refresh_gcloud_token(project_override: Optional[str] = None) -> tuple[Optional[str], Optional[str]]:
++    """Re-mint token via gcloud / ADC."""
++    try:
++        account = os.getenv("GCP_ACTIVE_ACCOUNT")
++        cmd = ["gcloud", "auth", "print-access-token"]
++        if account:
++            cmd.append(account)
++        proc = subprocess.run(
++            cmd,
++            capture_output=True,
++            text=True,
++            timeout=10,
++            check=False,
++            encoding="utf-8",
++            errors="replace",
++        )
++        if proc.returncode == 0 and proc.stdout.strip().startswith("ya29."):
++            fresh_tok = proc.stdout.strip()
++            os.environ["VERTEX_API_KEY"] = fresh_tok
++            os.environ["VERTEX_TOKEN"] = fresh_tok
++            _env_token_written_at[fresh_tok[:20]] = time.time()
++            try:
++                from hermes_constants import get_hermes_home
++                token_file = get_hermes_home() / "vertex_token.txt"
++            except ImportError:
++                token_file = Path.home() / ".hermes" / "vertex_token.txt"  # health: allow HX001 -- fallback when outside Hermes
++            try:
++                with open(token_file, "w", encoding="utf-8") as f:
++                    f.write(fresh_tok)
++            except OSError:
++                pass
++            return fresh_tok, project_override
++    except (subprocess.SubprocessError, OSError):
++        pass
++    return None, None
+ 
+-    # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
+-    if force_refresh:
+-        try:
+-            import subprocess
+-            account = os.getenv("GCP_ACTIVE_ACCOUNT")
+-            cmd = ["gcloud", "auth", "print-access-token"]
+-            if account:
+-                cmd.append(account)
+-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+-            if proc.returncode == 0 and proc.stdout.strip().startswith("ya29."):
+-                fresh_tok = proc.stdout.strip()
+-                os.environ["VERTEX_API_KEY"] = fresh_tok
+-                os.environ["VERTEX_TOKEN"] = fresh_tok
+-                _env_token_written_at[fresh_tok[:20]] = time.time()
+-                token_file = os.path.expanduser("~/.hermes/vertex_token.txt")
+-                try:
+-                    with open(token_file, "w") as f:
+-                        f.write(fresh_tok)
+-                except Exception:
+-                    pass
+-                return fresh_tok, project_override
+-        except Exception:
+-            pass
+ 
+-    # Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)
++def _check_direct_bearer_token(force_refresh: bool, project_override: Optional[str]) -> tuple[Optional[str], Optional[str]]:
++    """Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)."""
+     direct_token = (
+         _get_secret("VERTEX_API_KEY")
+         or _get_secret("GEMINI_API_KEY")
+@@ -263,19 +271,54 @@ def get_vertex_credentials(
+             age_sec,
+             _TOKEN_BEARER_MAX_AGE_SEC,
+         )
++    return None, None
++
+ 
++def _read_local_cached_token(force_refresh: bool, project_override: Optional[str]) -> tuple[Optional[str], Optional[str]]:
++    """Read cached bearer token from vertex_token.txt."""
+     if not is_multiplex_active() and not force_refresh and not os.environ.get("PYTEST_CURRENT_TEST"):
+-        hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+-        token_file = hermes_home / "vertex_token.txt"
++        try:
++            from hermes_constants import get_hermes_home
++            token_file = get_hermes_home() / "vertex_token.txt"
++        except ImportError:
++            token_file = Path.home() / ".hermes" / "vertex_token.txt"  # health: allow HX001 -- fallback when outside Hermes
+         if token_file.is_file():
+             try:
+                 file_age_sec = time.time() - token_file.stat().st_mtime
+                 if file_age_sec < _TOKEN_FILE_MAX_AGE_SEC:
+-                    cached_tok = token_file.read_text(encoding="utf-8").strip()
++                    cached_tok = token_file.read_text(encoding="utf-8-sig").strip()
+                     if cached_tok.startswith("ya29."):
+                         return cached_tok, project_override
+-            except Exception:
++            except Exception:  # health: allow BLE001, S110 -- cached token read fallback
+                 pass
++    return None, None
++
++
++def get_vertex_credentials(
++    credentials_path: Optional[str] = None,
++    force_refresh: bool = False,
++) -> tuple[Optional[str], Optional[str]]:
++    """Return (fresh access_token, project_id) or (None, None); Credentials cached per file content."""
++    _reload_dnk_active_env()
++    if force_refresh:
++        _creds_cache.clear()
++
++    project_override = _resolve_project_override()
++
++    # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
++    if force_refresh:
++        refreshed_tok, refreshed_proj = _refresh_gcloud_token(project_override)
++        if refreshed_tok:
++            return refreshed_tok, refreshed_proj
++
++    # Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)
++    direct_tok, direct_proj = _check_direct_bearer_token(force_refresh, project_override)
++    if direct_tok:
++        return direct_tok, direct_proj
++
++    cached_tok, cached_proj = _read_local_cached_token(force_refresh, project_override)
++    if cached_tok:
++        return cached_tok, cached_proj
+ 
+     if not _ensure_google_auth():
+         return None, None
+diff --git a/plugins/google_vertex_media/README.md b/plugins/google_vertex_media/README.md
+new file mode 100644
+index 00000000000..8041b64ceb8
+--- /dev/null
++++ b/plugins/google_vertex_media/README.md
+@@ -0,0 +1,179 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/README.md"
++# purpose: "Comprehensive architecture, configuration, and reverse-engineering guide for Google Cloud Vertex Media."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++# Google Cloud Vertex AI Media Plugin (Imagen 3/4 & Veo 3.1)
++
++A unified, self-contained media generation plugin for Hermes Agent and external agent harnesses (LangChain, CrewAI, AutoGen, OpenAI/LiteLLM, Anthropic).
++
++## 🌟 Key Highlights
++
++1. **Dual Media Engine**:
++   - **Google Imagen 3 / Imagen 4**: High-resolution image generation, studio aesthetics, photorealism, and typography.
++   - **Google Veo 3.1**: Cinematic video generation (Text-to-Video and Image-to-Video) with native synchronized audio generation and realistic physics.
++2. **First-Class Hermes Agent Integration**:
++   - Registers as standard `image_gen` provider (`image_gen.provider: vertex`).
++   - Registers as standard `video_gen` provider (`video_gen.provider: vertex`).
++   - Provides direct standalone tools `google_imagen` and `google_veo` (usable regardless of default provider).
++   - Provides CLI commands `hermes vertex-media {image|video|status|export|serve|install-user}`.
++3. **Decoupled Architecture & Reverse-Engineering Ready**:
++   - Clean, zero-dependency client (`client.py`) that can be used completely outside Hermes Agent.
++   - Built-in schema exporters: OpenAI Function Calling, Anthropic Claude Tools, LangChain StructuredTools, and CrewAI Tools.
++   - Built-in HTTP REST bridge (`hermes vertex-media serve`) providing OpenAI-compatible endpoints (`/v1/images/generations`, `/v1/videos/generations`, `/v1/tools/call`).
++4. **Update-Proof Persistence**:
++   - Supports user-profile deployment in `~/.hermes/plugins/google-vertex-media/`.
++   - Running `hermes vertex-media install-user` installs the plugin outside the git repository, ensuring subsequent git pulls or `hermes update` runs never overwrite your plugin.
++
++---
++
++## 🔑 Authentication & Configuration
++
++The plugin automatically resolves Google Cloud credentials in the following order:
++
++1. **Hermes Native Adapter**: Reads `vertex.project_id`, `vertex.region`, `vertex.credentials_path` from `~/.hermes/config.yaml`.
++2. **Environment Variables**:
++   - `GOOGLE_APPLICATION_CREDENTIALS`: Path to Service Account JSON.
++   - `GOOGLE_CLOUD_PROJECT` or `GCP_PROJECT`: Project ID.
++   - `VERTEX_REGION`: Target region (default: `us-central1`).
++   - `VERTEX_BEARER_TOKEN`: Pre-generated OAuth2 access token.
++3. **Google ADC (Application Default Credentials)**: Auto-detected via `google.auth.default()`.
++4. **gcloud CLI Fallback**: Uses `gcloud auth print-access-token` if installed.
++
++### Quick Verification
++```bash
++hermes vertex-media status
++```
++
++---
++
++## ⚙️ Hermes Agent Configuration
++
++To use Vertex AI as your default provider for `image_generate` and `video_generate`, add the following to `~/.hermes/config.yaml`:
++
++```yaml
++image_gen:
++  provider: vertex
++
++video_gen:
++  provider: vertex
++
++vertex:
++  project_id: "your-gcp-project-id"
++  region: "us-central1"
++```
++
++---
++
++## 🛠️ Direct Tools
++
++### 1. `google_imagen`
++```json
++{
++  "prompt": "Cinematic portrait of a cybersecurity architect in a neon server room, 35mm lens, photorealistic",
++  "model": "imagen-3.0-generate-002",
++  "aspect_ratio": "16:9",
++  "number_of_images": 1
++}
++```
++
++### 2. `google_veo`
++```json
++{
++  "prompt": "Drone shot flying over snow-covered pine forests at sunset, cinematic lighting, 4k",
++  "model": "veo-3.1-generate-001",
++  "aspect_ratio": "16:9",
++  "resolution": "720p",
++  "duration": 6,
++  "audio": true
++}
++```
++
++---
++
++## 💻 CLI Commands
++
++```bash
++# Generate image
++hermes vertex-media image "Futuristic electric sports car in Kyiv" --aspect-ratio 16:9
++
++# Generate video with Veo 3.1
++hermes vertex-media video "Ocean waves crashing against volcanic rocks" --duration 6
++
++# Export tools for other harnesses
++hermes vertex-media export --format openai
++hermes vertex-media export --format anthropic
++
++# Run local HTTP bridge server
++hermes vertex-media serve --port 8190
++
++# Install to ~/.hermes/plugins/ (survives updates)
++hermes vertex-media install-user
++```
++
++---
++
++## 🔄 Reverse-Engineering for External Agent Harnesses
++
++### Using in LangChain / LangGraph
++```python
++from plugins.google_vertex_media.harness import to_langchain_tools
++
++tools = to_langchain_tools()
++# Bind directly to your LangChain agent / model
++agent_executor = create_react_agent(model, tools)
++```
++
++### Using with OpenAI SDK / LiteLLM
++```python
++import openai
++from plugins.google_vertex_media.harness import dispatch_tool, to_openai_tools
++
++client = openai.OpenAI()
++tools = to_openai_tools()
++
++response = client.chat.completions.create(
++    model="gpt-4o",
++    messages=[{"role": "user", "content": "Generate a video of a sunrise over the mountains"}],
++    tools=tools,
++)
++
++tool_call = response.choices[0].message.tool_calls[0]
++result = dispatch_tool(tool_call.function.name, tool_call.function.arguments)
++print(result)
++```
++
++### Using with Anthropic Claude API
++```python
++import anthropic
++from plugins.google_vertex_media.harness import dispatch_tool, to_anthropic_tools
++
++client = anthropic.Anthropic()
++tools = to_anthropic_tools()
++
++response = client.messages.create(
++    model="claude-3-7-sonnet-20250219",
++    max_tokens=1024,
++    messages=[{"role": "user", "content": "Draw an abstract logo for DNK OS"}],
++    tools=tools,
++)
++```
++
++### Using via Standalone REST API (cURL / Any Language)
++Start the bridge:
++```bash
++hermes vertex-media serve --port 8190
++```
++
++Call from cURL:
++```bash
++curl -X POST http://127.0.0.1:8190/v1/images/generations \
++  -H "Content-Type: application/json" \
++  -d '{"prompt": "Ukrainian cybernetic kozak in high-tech armor", "size": "1792x1024"}'
++```
+diff --git a/plugins/google_vertex_media/__init__.py b/plugins/google_vertex_media/__init__.py
+new file mode 100644
+index 00000000000..582749e4eb4
+--- /dev/null
++++ b/plugins/google_vertex_media/__init__.py
+@@ -0,0 +1,89 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/__init__.py"
++# purpose: "Unified entrypoint and registry lifecycle for Google Cloud Vertex Media plugin."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++"""Google Cloud Vertex Media Plugin for Hermes Agent.
++
++Provides:
++- GoogleVertexImageGenProvider for 'image_generate' tool (Imagen 3 / 4)
++- GoogleVertexVideoGenProvider for 'video_generate' tool (Veo 3.1)
++- Direct tools: 'google_imagen' and 'google_veo'
++- CLI commands: 'hermes vertex-media'
++- Multi-harness reverse engineering exports: OpenAI, Anthropic, LangChain, CrewAI, AutoGen
++"""
++
++from __future__ import annotations
++
++import logging
++from typing import Any
++
++from .cli import handle_vertex_media_cli, register_vertex_media_cli
++from .client import VertexMediaClient
++from .image_provider import GoogleVertexImageGenProvider
++from .tools import MEDIA_TOOLS
++from .video_provider import GoogleVertexVideoGenProvider
++
++logger = logging.getLogger("hermes.plugins.vertex_media")
++
++
++def register(ctx: Any) -> None:
++    """Register ImageGenProvider, VideoGenProvider, direct tools, and CLI commands."""
++    logger.info("Registering Google Cloud Vertex Media plugin...")
++
++    # 1. Register Image Generation Provider for 'image_generate' tool
++    if hasattr(ctx, "register_image_gen_provider"):
++        try:
++            ctx.register_image_gen_provider(GoogleVertexImageGenProvider())
++            logger.debug("Registered GoogleVertexImageGenProvider ('vertex')")
++        except Exception as e:  # health: allow BLE001 -- graceful registration fallback
++            logger.warning("Failed to register GoogleVertexImageGenProvider: %s", e)
++
++    # 2. Register Video Generation Provider for 'video_generate' tool
++    if hasattr(ctx, "register_video_gen_provider"):
++        try:
++            ctx.register_video_gen_provider(GoogleVertexVideoGenProvider())
++            logger.debug("Registered GoogleVertexVideoGenProvider ('vertex')")
++        except Exception as e:  # health: allow BLE001 -- graceful registration fallback
++            logger.warning("Failed to register GoogleVertexVideoGenProvider: %s", e)
++
++    # 3. Register standalone direct tools (google_imagen, google_veo)
++    if hasattr(ctx, "register_tool"):
++        for name, schema, handler, emoji in MEDIA_TOOLS:
++            try:
++                ctx.register_tool(
++                    name=name,
++                    toolset="google_vertex_media",
++                    schema=schema,
++                    handler=handler,
++                    emoji=emoji,
++                    description=schema.get("description", ""),
++                )
++                logger.debug("Registered standalone tool: %s", name)
++            except Exception as e:  # health: allow BLE001 -- graceful registration fallback
++                logger.warning("Failed to register tool %s: %s", name, e)
++
++    # 4. Register CLI command: 'hermes vertex-media'
++    if hasattr(ctx, "register_cli_command"):
++        try:
++            ctx.register_cli_command(
++                name="vertex-media",
++                help="Google Cloud Vertex AI media generation (Imagen 3/4 & Veo 3.1)",
++                setup_fn=register_vertex_media_cli,
++                handler_fn=handle_vertex_media_cli,
++                description=(
++                    "Generate high-resolution images (Imagen 3/4) and cinematic videos (Veo 3.1), "
++                    "verify Google Cloud credentials, and export adapters for external agent harnesses."
++                ),
++            )
++            logger.debug("Registered CLI command: hermes vertex-media")
++        except Exception as e:  # health: allow BLE001 -- graceful registration fallback
++            logger.warning("Failed to register CLI command vertex-media: %s", e)
++
++    logger.info("Google Cloud Vertex Media plugin registered successfully.")
+diff --git a/plugins/google_vertex_media/cli.py b/plugins/google_vertex_media/cli.py
+new file mode 100644
+index 00000000000..4ec85f0c406
+--- /dev/null
++++ b/plugins/google_vertex_media/cli.py
+@@ -0,0 +1,191 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/cli.py"
++# purpose: "CLI command handlers for 'hermes vertex-media' (generate, test-auth, export-harness, install-user)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import argparse
++import json
++import logging
++import shutil
++import sys
++from pathlib import Path
++from typing import Any, Optional
++
++try:
++    from .client import DEFAULT_IMAGEN_MODEL, DEFAULT_VEO_MODEL, VertexMediaClient
++    from .harness import serve_harness_bridge, to_anthropic_tools, to_openai_tools
++except (ImportError, ValueError):
++    from client import DEFAULT_IMAGEN_MODEL, DEFAULT_VEO_MODEL, VertexMediaClient  # type: ignore
++    from harness import serve_harness_bridge, to_anthropic_tools, to_openai_tools  # type: ignore
++
++logger = logging.getLogger("hermes.plugins.vertex_media.cli")
++
++
++def register_vertex_media_cli(subparser: argparse.ArgumentParser) -> None:
++    """Setup arguments for 'hermes vertex-media'."""
++    cmd_subs = subparser.add_subparsers(dest="vertex_subcommand", help="Vertex Media subcommands")
++
++    # 1. status
++    cmd_subs.add_parser("status", help="Check Google Cloud Vertex AI credentials, project, and connectivity")
++
++    # 2. image
++    img_parser = cmd_subs.add_parser("image", help="Generate an image using Imagen 3 / 4")
++    img_parser.add_argument("prompt", help="Text description of the image")
++    img_parser.add_argument("--model", default=DEFAULT_IMAGEN_MODEL, help="Imagen model ID")
++    img_parser.add_argument("--aspect-ratio", default="1:1", choices=["1:1", "16:9", "9:16", "4:3", "3:4"])
++    img_parser.add_argument("-n", "--number", type=int, default=1, help="Number of images (1-4)")
++    img_parser.add_argument("--negative-prompt", help="Elements to avoid")
++
++    # 3. video
++    vid_parser = cmd_subs.add_parser("video", help="Generate a video using Veo 3.1")
++    vid_parser.add_argument("prompt", help="Text description and camera direction")
++    vid_parser.add_argument("--model", default=DEFAULT_VEO_MODEL, help="Veo model ID")
++    vid_parser.add_argument("--image", help="Starting frame path or URL (Image-to-Video)")
++    vid_parser.add_argument("--aspect-ratio", default="16:9", choices=["16:9", "9:16"])
++    vid_parser.add_argument("--resolution", default="720p", choices=["720p", "1080p", "4k"])
++    vid_parser.add_argument("--duration", type=int, default=6, choices=[4, 6, 8], help="Duration in seconds")
++    vid_parser.add_argument("--no-audio", action="store_true", help="Disable audio synthesis")
++    vid_parser.add_argument("--negative-prompt", help="Elements to avoid")
++
++    # 4. export
++    exp_parser = cmd_subs.add_parser("export", help="Export tool schemas for other harnesses (OpenAI, Anthropic)")
++    exp_parser.add_argument("--format", choices=["openai", "anthropic"], default="openai", help="Output schema standard")
++
++    # 5. serve
++    srv_parser = cmd_subs.add_parser("serve", help="Run local HTTP bridge server for external agent harnesses")
++    srv_parser.add_argument("--host", default="127.0.0.1", help="Host interface")
++    srv_parser.add_argument("--port", type=int, default=8190, help="Port to listen on")
++
++    # 6. install-user
++    cmd_subs.add_parser("install-user", help="Copy plugin to ~/.hermes/plugins/ so it survives repository updates")
++
++
++_SUBCOMMAND_HANDLERS = {
++    "status": lambda args: _handle_status(),
++    "image": lambda args: _handle_image(args),
++    "video": lambda args: _handle_video(args),
++    "export": lambda args: _handle_export(args),
++    "serve": lambda args: _handle_serve(args),
++    "install-user": lambda args: _handle_install_user(),
++}
++
++
++def handle_vertex_media_cli(args: argparse.Namespace) -> None:
++    """Execute 'hermes vertex-media' command."""
++    subcmd = str(getattr(args, "vertex_subcommand", "") or "")
++    handler = _SUBCOMMAND_HANDLERS.get(subcmd)
++    if handler:
++        handler(args)
++    else:
++        print("Usage: hermes vertex-media {status|image|video|export|serve|install-user} ...")
++
++
++def _handle_status() -> None:
++    client = VertexMediaClient()
++    print("Checking Google Cloud Vertex AI configuration...")
++    try:
++        token, project_id, region = client.resolve_credentials()
++        print(f"✓ Project ID:  {project_id}")
++        print(f"✓ Region:      {region}")
++        masked_tok = token[:8] + "..." + token[-6:] if len(token) > 20 else "***"
++        print(f"✓ OAuth Token: {masked_tok}")
++        print("✓ Available Media Models:")
++        print("    Images: imagen-3.0-generate-002, imagen-4.0-generate-001, imagen-4.0-fast-generate-001")
++        print("    Videos: veo-3.1-generate-001, veo-3.1-fast-generate-001, veo-2.0-generate-001")
++    except Exception as e:  # health: allow BLE001 -- CLI user error boundary
++        print(f"✗ Authentication / Configuration Failed: {e}", file=sys.stderr)
++        sys.exit(1)
++
++
++def _handle_image(args: argparse.Namespace) -> None:
++    client = VertexMediaClient()
++    print(f"Generating image with {args.model} (aspect_ratio={args.aspect_ratio})...")
++    try:
++        res = client.generate_image(
++            prompt=args.prompt,
++            model=args.model,
++            aspect_ratio=args.aspect_ratio,
++            number_of_images=args.number,
++            negative_prompt=args.negative_prompt,
++        )
++        print("✓ Generation successful!")
++        for i, path in enumerate(res.get("images", [])):
++            print(f"  [{i + 1}] {path}")
++    except Exception as e:  # health: allow BLE001 -- CLI user error boundary
++        print(f"✗ Image generation failed: {e}", file=sys.stderr)
++        sys.exit(1)
++
++
++def _handle_video(args: argparse.Namespace) -> None:
++    client = VertexMediaClient()
++    print(f"Generating video with {args.model} ({args.resolution}, {args.duration}s)...")
++    try:
++        res = client.generate_video(
++            prompt=args.prompt,
++            model=args.model,
++            image_url=args.image,
++            aspect_ratio=args.aspect_ratio,
++            resolution=args.resolution,
++            duration_seconds=args.duration,
++            generate_audio=not args.no_audio,
++            negative_prompt=args.negative_prompt,
++        )
++        print("✓ Video generation successful!")
++        print(f"  Path: {res.get('video')}")
++    except Exception as e:  # health: allow BLE001 -- CLI user error boundary
++        print(f"✗ Video generation failed: {e}", file=sys.stderr)
++        sys.exit(1)
++
++
++def _handle_export(args: argparse.Namespace) -> None:
++    fmt = getattr(args, "format", "openai")
++    if fmt == "openai":
++        tools = to_openai_tools()
++    else:
++        tools = to_anthropic_tools()
++    print(json.dumps(tools, indent=2))
++
++
++def _handle_serve(args: argparse.Namespace) -> None:
++    serve_harness_bridge(host=args.host, port=args.port)
++
++
++def _handle_install_user() -> None:
++    """Copy the plugin to ~/.hermes/plugins/google_vertex_media/ for immutable persistence across updates."""
++    try:
++        from hermes_constants import get_hermes_home
++        target_root = get_hermes_home() / "plugins" / "google_vertex_media"
++    except ImportError:
++        target_root = Path.home() / ".hermes" / "plugins" / "google_vertex_media"  # health: allow HX001 -- fallback when outside Hermes
++
++    source_dir = Path(__file__).resolve().parent
++
++    print(f"Installing Google Vertex Media plugin to user profile: {target_root}")
++    target_root.parent.mkdir(parents=True, exist_ok=True)
++
++    # Copy all files
++    for item in source_dir.iterdir():
++        if item.name in ("__pycache__", ".pytest_cache") or item.name.endswith(".pyc"):
++            continue
++        dest = target_root / item.name
++        if item.is_dir():
++            shutil.copytree(item, dest, dirs_exist_ok=True)
++        else:
++            shutil.copy2(item, dest)
++
++    print("✓ Successfully installed to user profile!")
++    print("This installation will survive git pull / hermes update operations automatically.")
++
++
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser(description="Google Vertex Media CLI")
++    register_vertex_media_cli(parser)
++    handle_vertex_media_cli(parser.parse_args())
+diff --git a/plugins/google_vertex_media/client.py b/plugins/google_vertex_media/client.py
+new file mode 100644
+index 00000000000..36bb5da638b
+--- /dev/null
++++ b/plugins/google_vertex_media/client.py
+@@ -0,0 +1,462 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/client.py"
++# purpose: "Standalone, zero-overhead Google Cloud Vertex AI Media Client for Imagen 3/4 and Veo 3.1."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import base64
++import json
++import logging
++import os
++import subprocess
++import time
++from pathlib import Path
++from typing import Any, Dict, List, Optional, Tuple, Union
++
++logger = logging.getLogger("hermes.plugins.vertex_media.client")
++
++DEFAULT_REGION = "us-central1"
++DEFAULT_IMAGEN_MODEL = "imagen-3.0-generate-002"
++DEFAULT_VEO_MODEL = "veo-3.1-generate-001"
++
++
++class VertexMediaAuthError(RuntimeError):
++    """Raised when Vertex AI credentials or project cannot be resolved."""
++
++
++class VertexMediaAPIError(RuntimeError):
++    """Raised when Vertex AI returns an API error."""
++    def __init__(self, message: str, status_code: Optional[int] = None, details: Optional[Any] = None) -> None:
++        super().__init__(message)
++        self.status_code = status_code
++        self.details = details
++
++
++class VertexMediaClient:
++    """Core Google Cloud Vertex AI Client for Imagen (Image) and Veo (Video).
++    
++    Operates in two modes:
++    1. Native Hermes runtime: Leverages ``agent.vertex_adapter`` for seamless token caching.
++    2. Decoupled / External harness: Resolves credentials via ``google.auth``, ADC, service account
++       JSON, or ``gcloud auth print-access-token`` for complete portability.
++    """
++
++    def __init__(
++        self,
++        project_id: str | None = None,
++        region: str | None = None,
++        credentials_path: str | None = None,
++        bearer_token: str | None = None,
++        cache_dir: str | Path | None = None,
++    ) -> None:
++        self._project_id = project_id
++        env_region = os.environ.get("VERTEX_MEDIA_REGION") or (
++            os.environ.get("VERTEX_REGION") if os.environ.get("VERTEX_REGION") != "global" else None
++        )
++        self._region = region or env_region or DEFAULT_REGION
++        self._credentials_path = credentials_path or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
++        self._bearer_token = bearer_token or os.environ.get("VERTEX_BEARER_TOKEN")
++        self._cache_dir = Path(cache_dir) if cache_dir else self._resolve_default_cache_dir()
++
++    def _resolve_default_cache_dir(self) -> Path:
++        """Resolve caching directory under Hermes Home or local cache."""
++        try:
++            from hermes_constants import get_hermes_home
++            return get_hermes_home() / "cache" / "generated"
++        except ImportError:
++            return Path.home() / ".cache" / "vertex_media"
++
++    def resolve_credentials(self, force_refresh: bool = False) -> tuple[str, str, str]:
++        """Resolve (token, project_id, region).
++        
++        Returns:
++            Tuple of (access_token, project_id, region)
++        """
++        token = self._bearer_token
++        project_id = self._project_id
++        region = self._region
++
++        # 1. Hermes internal adapter path
++        if not token or not project_id:
++            try:
++                from agent.vertex_adapter import get_vertex_credentials, _resolve_region
++                adapter_token, adapter_project = get_vertex_credentials(
++                    credentials_path=self._credentials_path,
++                    force_refresh=force_refresh,
++                )
++                if adapter_token:
++                    token = token or adapter_token
++                if adapter_project:
++                    project_id = project_id or adapter_project
++                resolved_reg = _resolve_region(region)
++                if resolved_reg and resolved_reg != "global":
++                    region = resolved_reg
++            except (ImportError, Exception) as exc:  # health: allow BLE001 -- probe fallback
++                logger.debug("Hermes vertex_adapter fallback: %s", exc)
++
++        # 2. Service Account JSON file path
++        if (not token or not project_id) and self._credentials_path and os.path.exists(self._credentials_path):
++            try:
++                with open(self._credentials_path, "r", encoding="utf-8-sig") as f:
++                    sa_data = json.load(f)
++                    if not project_id and "project_id" in sa_data:
++                        project_id = sa_data["project_id"]
++            except Exception as e:  # health: allow BLE001 -- malformed JSON fallback
++                logger.debug("Failed reading service account JSON for project_id: %s", e)
++
++        # 3. Environment variables
++        if not project_id:
++            project_id = (
++                os.environ.get("GOOGLE_CLOUD_PROJECT")
++                or os.environ.get("GCP_PROJECT")
++                or os.environ.get("VERTEX_PROJECT_ID")
++            )
++
++        # 4. google.auth ADC fallback
++        if not token:
++            try:
++                import google.auth
++                import google.auth.transport.requests
++                creds, default_proj = google.auth.default(
++                    scopes=["https://www.googleapis.com/auth/cloud-platform"]
++                )
++                if not project_id:
++                    project_id = default_proj
++                req = google.auth.transport.requests.Request()
++                creds.refresh(req)
++                token = creds.token
++            except Exception as e:  # health: allow BLE001 -- ADC probe fallback
++                logger.debug("google.auth ADC resolution failed: %s", e)
++
++        # 5. gcloud CLI fallback
++        if not token:
++            try:
++                proc = subprocess.run(
++                    ["gcloud", "auth", "print-access-token"],
++                    capture_output=True,
++                    text=True,
++                    timeout=10,
++                    check=False,
++                    encoding="utf-8",
++                    errors="replace",
++                )
++                if proc.returncode == 0 and proc.stdout.strip():
++                    token = proc.stdout.strip()
++            except Exception as e:  # health: allow BLE001 -- CLI probe fallback
++                logger.debug("gcloud CLI token resolution failed: %s", e)
++
++        if not token:
++            raise VertexMediaAuthError(
++                "Unable to obtain Google Cloud OAuth2 token. Configure GOOGLE_APPLICATION_CREDENTIALS, "
++                "VERTEX_BEARER_TOKEN, or run 'gcloud auth application-default login'."
++            )
++        if not project_id:
++            raise VertexMediaAuthError(
++                "Google Cloud Project ID is not resolved. Set GOOGLE_CLOUD_PROJECT, "
++                "or configure vertex.project_id in config.yaml."
++            )
++
++        if not region or region == "global":
++            region = DEFAULT_REGION
++
++        return token, project_id, region
++
++    def _headers(self, token: str) -> dict[str, str]:
++        return {
++            "Authorization": f"Bearer {token}",
++            "Content-Type": "application/json; charset=utf-8",
++            "User-Agent": "DNK-VertexMedia/1.0.0",
++        }
++
++    def _get_http_client(self):
++        try:
++            import httpx
++            return httpx.Client(timeout=180.0)
++        except ImportError:
++            import urllib.request
++            return None
++
++    def _send_request(self, method: str, url: str, headers: dict[str, str], payload: dict | None = None) -> dict:
++        """Execute HTTP request using httpx or fallback standard library."""
++        try:
++            import httpx
++            with httpx.Client(timeout=180.0) as client:
++                res = client.request(method=method, url=url, headers=headers, json=payload)
++                if res.status_code >= 400:
++                    raise VertexMediaAPIError(
++                        f"Vertex AI API error [{res.status_code}]: {res.text}",
++                        status_code=res.status_code,
++                        details=res.text,
++                    )
++                return res.json()
++        except ImportError:
++            import urllib.error
++            import urllib.request
++            req_data = json.dumps(payload).encode("utf-8") if payload is not None else None
++            req = urllib.request.Request(url, data=req_data, headers=headers, method=method)
++            try:
++                with urllib.request.urlopen(req, timeout=180.0) as resp:
++                    return json.loads(resp.read().decode("utf-8"))
++            except urllib.error.HTTPError as he:
++                err_text = he.read().decode("utf-8", errors="replace")
++                raise VertexMediaAPIError(
++                    f"Vertex AI API error [{he.code}]: {err_text}",
++                    status_code=he.code,
++                    details=err_text,
++                )
++
++    # -------------------------------------------------------------------------
++    # Image Generation (Imagen 3 / 4)
++    # -------------------------------------------------------------------------
++    def generate_image(
++        self,
++        prompt: str,
++        *,
++        model: str = DEFAULT_IMAGEN_MODEL,
++        aspect_ratio: str = "1:1",
++        number_of_images: int = 1,
++        person_generation: str = "ALLOW_ADULT",
++        safety_setting: str = "block_medium_and_above",
++        add_watermark: bool = True,
++        negative_prompt: str | None = None,
++    ) -> dict[str, Any]:
++        """Generate images using Google Cloud Vertex AI Imagen models.
++
++        Args:
++            prompt: Text prompt describing the desired image.
++            model: Imagen model ID (e.g. 'imagen-3.0-generate-002', 'imagen-4.0-generate-001').
++            aspect_ratio: '1:1', '16:9', '9:16', '4:3', '3:4'.
++            number_of_images: 1 to 4.
++            person_generation: 'ALLOW_ADULT', 'DONT_ALLOW', 'ALLOW_ALL'.
++            safety_setting: Content moderation filter level.
++            add_watermark: Embed SynthID digital watermark.
++            negative_prompt: Content to avoid.
++
++        Returns:
++            Dictionary with 'images' (list of saved file paths), 'model', 'prompt', 'aspect_ratio'.
++        """
++        token, project_id, region = self.resolve_credentials()
++        endpoint_url = (
++            f"https://{region}-aiplatform.googleapis.com/v1/projects/{project_id}/"
++            f"locations/{region}/publishers/google/models/{model}:predict"
++        )
++
++        parameters: dict[str, Any] = {
++            "sampleCount": min(max(1, number_of_images), 4),
++            "aspectRatio": aspect_ratio,
++            "personGeneration": person_generation,
++            "safetySetting": safety_setting,
++            "addWatermark": add_watermark,
++        }
++        if negative_prompt:
++            parameters["negativePrompt"] = negative_prompt
++
++        request_body = {
++            "instances": [{"prompt": prompt}],
++            "parameters": parameters,
++        }
++
++        resp_data = self._send_request("POST", endpoint_url, self._headers(token), request_body)
++        predictions = resp_data.get("predictions", [])
++        if not predictions:
++            raise VertexMediaAPIError(f"No image predictions returned by Vertex AI: {resp_data}")
++
++        out_dir = self._cache_dir / "images"
++        out_dir.mkdir(parents=True, exist_ok=True)
++
++        saved_files: list[str] = []
++        for idx, pred in enumerate(predictions):
++            b64_bytes = pred.get("bytesBase64Encoded")
++            mime_type = pred.get("mimeType", "image/jpeg")
++            ext = "png" if "png" in mime_type else "jpg"
++            if not b64_bytes:
++                continue
++
++            raw_bytes = base64.b64decode(b64_bytes)
++            timestamp = int(time.time() * 1000)
++            file_name = f"vertex_imagen_{timestamp}_{idx}.{ext}"
++            target_path = out_dir / file_name
++            target_path.write_bytes(raw_bytes)
++            saved_files.append(str(target_path.resolve()))
++
++        return {
++            "success": True,
++            "images": saved_files,
++            "image": saved_files[0] if saved_files else "",
++            "model": model,
++            "prompt": prompt,
++            "aspect_ratio": aspect_ratio,
++            "provider": "vertex",
++            "metadata": {"predictions_count": len(predictions)},
++        }
++
++    # -------------------------------------------------------------------------
++    # Video Generation (Google Veo 3.1)
++    # -------------------------------------------------------------------------
++    def generate_video(
++        self,
++        prompt: str,
++        *,
++        model: str = DEFAULT_VEO_MODEL,
++        image_url: str | None = None,
++        aspect_ratio: str = "16:9",
++        resolution: str = "720p",
++        duration_seconds: int = 6,
++        person_generation: str = "ALLOW_ADULT",
++        generate_audio: bool = True,
++        negative_prompt: str | None = None,
++        poll_interval_s: float = 12.0,
++        max_wait_s: float = 240.0,
++    ) -> dict[str, Any]:
++        """Generate videos using Google Cloud Vertex AI Veo models via LRO polling.
++
++        Args:
++            prompt: Text prompt describing the scene and camera direction.
++            model: Veo model ID (e.g. 'veo-3.1-generate-001', 'veo-3.1-fast-generate-001').
++            image_url: Optional initial image path or URL for Image-to-Video.
++            aspect_ratio: '16:9' or '9:16'.
++            resolution: '720p', '1080p', or '4k'.
++            duration_seconds: 4, 6, or 8 seconds.
++            person_generation: 'ALLOW_ADULT' or 'DONT_ALLOW'.
++            generate_audio: Synthesize synchronized sound & atmosphere.
++            negative_prompt: Content to avoid.
++            poll_interval_s: Polling interval in seconds.
++            max_wait_s: Maximum operation timeout.
++
++        Returns:
++            Dictionary with 'video' (path to saved mp4), 'model', 'prompt', 'duration', 'success'.
++        """
++        token, project_id, region = self.resolve_credentials()
++        endpoint_url = (
++            f"https://{region}-aiplatform.googleapis.com/v1/projects/{project_id}/"
++            f"locations/{region}/publishers/google/models/{model}:predictLongRunning"
++        )
++
++        instance: dict[str, Any] = {"prompt": prompt}
++
++        # Handle reference image if provided (Image-to-Video)
++        if image_url:
++            img_b64 = self._load_image_base64(image_url)
++            if img_b64:
++                instance["image"] = {"bytesBase64Encoded": img_b64}
++
++        # Normalize duration (Veo 3.1 accepts 4, 6, 8)
++        valid_durations = [4, 6, 8]
++        duration = min(valid_durations, key=lambda d: abs(d - duration_seconds))
++
++        parameters: dict[str, Any] = {
++            "aspectRatio": aspect_ratio if aspect_ratio in ("16:9", "9:16") else "16:9",
++            "resolution": resolution if resolution in ("720p", "1080p", "4k") else "720p",
++            "durationSeconds": duration,
++            "personGeneration": person_generation,
++            "generateAudio": generate_audio,
++            "sampleCount": 1,
++        }
++        if negative_prompt:
++            parameters["negativePrompt"] = negative_prompt
++
++        request_body = {
++            "instances": [instance],
++            "parameters": parameters,
++        }
++
++        # 1. Start Long Running Operation
++        start_resp = self._send_request("POST", endpoint_url, self._headers(token), request_body)
++        operation_name = start_resp.get("name")
++        if not operation_name:
++            raise VertexMediaAPIError(f"Failed to initiate Veo video generation: {start_resp}")
++
++        logger.info("Vertex Veo video generation operation started: %s", operation_name)
++
++        # 2. Poll until completion
++        op_url = f"https://{region}-aiplatform.googleapis.com/v1/{operation_name}"
++        elapsed = 0.0
++        start_time = time.time()
++
++        while elapsed < max_wait_s:
++            time.sleep(poll_interval_s)
++            elapsed = time.time() - start_time
++
++            # Refresh token if long-running
++            token, _, _ = self.resolve_credentials()
++            op_data = self._send_request("GET", op_url, self._headers(token))
++
++            if op_data.get("done"):
++                if "error" in op_data:
++                    raise VertexMediaAPIError(
++                        f"Veo video generation failed: {op_data['error']}",
++                        details=op_data["error"]
++                    )
++
++                response_content = op_data.get("response", {})
++                gen_videos = response_content.get("generatedVideos", [])
++                if not gen_videos:
++                    raise VertexMediaAPIError(f"Operation done but generatedVideos is empty: {op_data}")
++
++                video_item = gen_videos[0].get("video", {})
++                b64_video = video_item.get("bytesBase64Encoded")
++                video_uri = video_item.get("uri")
++
++                out_dir = self._cache_dir / "videos"
++                out_dir.mkdir(parents=True, exist_ok=True)
++                timestamp = int(time.time() * 1000)
++                out_path = out_dir / f"vertex_veo_{timestamp}.mp4"
++
++                if b64_video:
++                    out_path.write_bytes(base64.b64decode(b64_video))
++                elif video_uri:
++                    # Download from Google Cloud Storage or mirror URI
++                    self._download_gcs_or_url(video_uri, out_path, token)
++                else:
++                    raise VertexMediaAPIError(f"No video bytes or URI in operation response: {video_item}")
++
++                return {
++                    "success": True,
++                    "video": str(out_path.resolve()),
++                    "model": model,
++                    "prompt": prompt,
++                    "modality": "image" if image_url else "text",
++                    "aspect_ratio": aspect_ratio,
++                    "duration": duration,
++                    "provider": "vertex",
++                    "metadata": {"operation_name": operation_name, "elapsed_seconds": round(elapsed, 1)},
++                }
++
++        raise VertexMediaAPIError(f"Timed out waiting for Veo video generation after {max_wait_s}s.")
++
++    def _load_image_base64(self, path_or_url: str) -> Optional[str]:
++        """Load image bytes into Base64 from local file or HTTP URL."""
++        try:
++            if path_or_url.startswith(("http://", "https://")):
++                import httpx
++                with httpx.Client(timeout=30.0) as client:
++                    resp = client.get(path_or_url)
++                    if resp.status_code == 200:
++                        return base64.b64encode(resp.content).decode("utf-8")
++            else:
++                p = Path(path_or_url).expanduser()
++                if p.exists() and p.is_file():
++                    return base64.b64encode(p.read_bytes()).decode("utf-8")
++        except Exception as e:  # health: allow BLE001 -- reference image load fallback
++            logger.warning("Failed to load reference image '%s': %s", path_or_url, e)
++        return None
++
++    def _download_gcs_or_url(self, uri: str, target: Path, token: str) -> None:
++        """Download file from GCS or HTTPS URI."""
++        try:
++            import httpx
++            headers = {"Authorization": f"Bearer {token}"}
++            with httpx.Client(timeout=120.0) as client:
++                r = client.get(uri, headers=headers)
++                r.raise_for_status()
++                target.write_bytes(r.content)
++        except Exception as e:
++            logger.error("Failed downloading video from %s: %s", uri, e)
++            raise
+diff --git a/plugins/google_vertex_media/harness.py b/plugins/google_vertex_media/harness.py
+new file mode 100644
+index 00000000000..d109d8e0b61
+--- /dev/null
++++ b/plugins/google_vertex_media/harness.py
+@@ -0,0 +1,238 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/harness.py"
++# purpose: "Reverse engineering & multi-harness adapter for Google Cloud Vertex Media (OpenAI, Anthropic, LangChain, CrewAI, AutoGen)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import json
++import logging
++from http.server import BaseHTTPRequestHandler, HTTPServer
++from typing import Any, Callable
++
++try:
++    from .client import VertexMediaClient
++    from .tools import GOOGLE_IMAGEN_SCHEMA, GOOGLE_VEO_SCHEMA, handle_google_imagen, handle_google_veo
++except (ImportError, ValueError):
++    from client import VertexMediaClient  # type: ignore
++    from tools import GOOGLE_IMAGEN_SCHEMA, GOOGLE_VEO_SCHEMA, handle_google_imagen, handle_google_veo  # type: ignore
++
++logger = logging.getLogger("hermes.plugins.vertex_media.harness")
++
++
++# =============================================================================
++# 1. Multi-Harness Tool Schema Exporters
++# =============================================================================
++
++def to_openai_tools() -> list[dict[str, Any]]:
++    """Export tool schemas for OpenAI Chat Completions API / LiteLLM / Ollama."""
++    return [
++        {
++            "type": "function",
++            "function": {
++                "name": GOOGLE_IMAGEN_SCHEMA["name"],
++                "description": GOOGLE_IMAGEN_SCHEMA["description"],
++                "parameters": GOOGLE_IMAGEN_SCHEMA["parameters"],
++            },
++        },
++        {
++            "type": "function",
++            "function": {
++                "name": GOOGLE_VEO_SCHEMA["name"],
++                "description": GOOGLE_VEO_SCHEMA["description"],
++                "parameters": GOOGLE_VEO_SCHEMA["parameters"],
++            },
++        },
++    ]
++
++
++def to_anthropic_tools() -> list[dict[str, Any]]:
++    """Export tool schemas for Anthropic Claude Tools API."""
++    return [
++        {
++            "name": GOOGLE_IMAGEN_SCHEMA["name"],
++            "description": GOOGLE_IMAGEN_SCHEMA["description"],
++            "input_schema": GOOGLE_IMAGEN_SCHEMA["parameters"],
++        },
++        {
++            "name": GOOGLE_VEO_SCHEMA["name"],
++            "description": GOOGLE_VEO_SCHEMA["description"],
++            "input_schema": GOOGLE_VEO_SCHEMA["parameters"],
++        },
++    ]
++
++
++def to_langchain_tools() -> list[Any]:
++    """Export tools as LangChain StructuredTool instances (if langchain is installed)."""
++    try:
++        from langchain_core.tools import StructuredTool  # type: ignore
++        tools = [
++            StructuredTool.from_function(
++                func=lambda **kwargs: json.loads(handle_google_imagen(kwargs)),
++                name=GOOGLE_IMAGEN_SCHEMA["name"],
++                description=GOOGLE_IMAGEN_SCHEMA["description"],
++            ),
++            StructuredTool.from_function(
++                func=lambda **kwargs: json.loads(handle_google_veo(kwargs)),
++                name=GOOGLE_VEO_SCHEMA["name"],
++                description=GOOGLE_VEO_SCHEMA["description"],
++            ),
++        ]
++        return tools
++    except ImportError:
++        logger.info("langchain_core is not installed; returning standard python callable dictionaries")
++        return [
++            {
++                "name": GOOGLE_IMAGEN_SCHEMA["name"],
++                "description": GOOGLE_IMAGEN_SCHEMA["description"],
++                "func": lambda **kwargs: json.loads(handle_google_imagen(kwargs)),
++            },
++            {
++                "name": GOOGLE_VEO_SCHEMA["name"],
++                "description": GOOGLE_VEO_SCHEMA["description"],
++                "func": lambda **kwargs: json.loads(handle_google_veo(kwargs)),
++            },
++        ]
++
++
++def to_crewai_tools() -> list[Any]:
++    """Export tools for CrewAI agent integration."""
++    try:
++        from crewai.tools import tool  # type: ignore
++
++        @tool("Google Imagen Generator")
++        def crewai_imagen(prompt: str, aspect_ratio: str = "1:1", model: str = "imagen-3.0-generate-002") -> str:
++            """Generate high-resolution product photos and artwork using Google Imagen."""
++            return handle_google_imagen({"prompt": prompt, "aspect_ratio": aspect_ratio, "model": model})
++
++        @tool("Google Veo Video Creator")
++        def crewai_veo(prompt: str, aspect_ratio: str = "16:9", resolution: str = "720p", duration: int = 6) -> str:
++            """Generate realistic cinematic videos with audio using Google Veo 3.1."""
++            return handle_google_veo({"prompt": prompt, "aspect_ratio": aspect_ratio, "resolution": resolution, "duration": duration})
++
++        return [crewai_imagen, crewai_veo]
++    except ImportError:
++        logger.info("crewai is not installed; returning dictionary functions")
++        return to_langchain_tools()
++
++
++# =============================================================================
++# 2. Universal Tool Dispatcher
++# =============================================================================
++
++def dispatch_tool(tool_name: str, arguments: str | dict[str, Any]) -> dict[str, Any]:
++    """Universal dispatch endpoint for any agent harness calling our tools.
++
++    Args:
++        tool_name: 'google_imagen' or 'google_veo'.
++        arguments: Arguments dictionary or JSON-encoded string.
++
++    Returns:
++        Structured result dictionary.
++    """
++    if isinstance(arguments, str):
++        try:
++            args = json.loads(arguments)
++        except json.JSONDecodeError as err:
++            return {"success": False, "error": f"Invalid JSON arguments: {err}"}
++    else:
++        args = arguments or {}
++
++    if tool_name in ("google_imagen", "imagen_generate", "image_generate"):
++        res_str = handle_google_imagen(args)
++        return json.loads(res_str)
++    elif tool_name in ("google_veo", "veo_generate", "video_generate"):
++        res_str = handle_google_veo(args)
++        return json.loads(res_str)
++    else:
++        return {"success": False, "error": f"Unknown tool '{tool_name}'. Available: google_imagen, google_veo."}
++
++
++# =============================================================================
++# 3. Standalone Zero-Dependency HTTP Bridge Server
++# =============================================================================
++
++class HarnessBridgeHTTPHandler(BaseHTTPRequestHandler):
++    """Zero-dependency HTTP server bridge for curl, webhooks, or external microservices."""
++
++    def _send_json(self, status_code: int, data: dict[str, Any]) -> None:
++        payload = json.dumps(data, indent=2).encode("utf-8")
++        self.send_response(status_code)
++        self.send_header("Content-Type", "application/json; charset=utf-8")
++        self.send_header("Content-Length", str(len(payload)))
++        self.end_headers()
++        self.wfile.write(payload)
++
++    def do_GET(self) -> None:
++        if self.path in ("/health", "/v1/health", "/status"):
++            client = VertexMediaClient()
++            try:
++                _, proj, reg = client.resolve_credentials()
++                self._send_json(200, {
++                    "status": "healthy",
++                    "project_id": proj,
++                    "region": reg,
++                    "supported_models": {
++                        "images": ["imagen-3.0-generate-002", "imagen-4.0-generate-001", "imagen-4.0-fast-generate-001"],
++                        "videos": ["veo-3.1-generate-001", "veo-3.1-fast-generate-001", "veo-2.0-generate-001"],
++                    },
++                })
++            except Exception as e:  # health: allow BLE001 -- HTTP bridge error boundary
++                self._send_json(500, {"status": "unhealthy", "error": str(e)})
++        elif self.path == "/v1/tools":
++            self._send_json(200, {"openai_tools": to_openai_tools(), "anthropic_tools": to_anthropic_tools()})
++        else:
++            self._send_json(404, {"error": f"Path '{self.path}' not found."})
++
++    def do_POST(self) -> None:
++        content_len = int(self.headers.get("Content-Length", 0))
++        raw_body = self.rfile.read(content_len).decode("utf-8") if content_len > 0 else "{}"
++        try:
++            body = json.loads(raw_body)
++        except Exception as e:  # health: allow BLE001 -- HTTP bridge error boundary
++            self._send_json(400, {"error": f"Invalid JSON payload: {e}"})
++            return
++
++        if self.path in ("/v1/images/generations", "/v1/imagen"):
++            prompt = body.get("prompt", "")
++            size = body.get("size", "1024x1024")
++            ratio = "16:9" if size == "1792x1024" else ("9:16" if size == "1024x1792" else "1:1")
++            result = dispatch_tool("google_imagen", {
++                "prompt": prompt,
++                "model": body.get("model", "imagen-3.0-generate-002"),
++                "aspect_ratio": body.get("aspect_ratio", ratio),
++                "number_of_images": body.get("n", 1),
++            })
++            self._send_json(200 if result.get("success") else 500, result)
++
++        elif self.path in ("/v1/videos/generations", "/v1/veo"):
++            result = dispatch_tool("google_veo", body)
++            self._send_json(200 if result.get("success") else 500, result)
++
++        elif self.path == "/v1/tools/call":
++            tool_name = body.get("tool", body.get("name", ""))
++            args = body.get("arguments", body.get("args", {}))
++            result = dispatch_tool(tool_name, args)
++            self._send_json(200 if result.get("success") else 500, result)
++
++        else:
++            self._send_json(404, {"error": f"Endpoint '{self.path}' not supported."})
++
++
++def serve_harness_bridge(host: str = "127.0.0.1", port: int = 8190) -> None:
++    """Run a local HTTP microservice bridge so other harnesses can invoke Google Vertex Media."""
++    server = HTTPServer((host, port), HarnessBridgeHTTPHandler)
++    logger.info("Google Vertex Media Harness Bridge serving at http://%s:%d", host, port)
++    print(f"Vertex Media Bridge active at http://{host}:{port} (GET /v1/tools, POST /v1/images/generations, POST /v1/videos/generations)")
++    try:
++        server.serve_forever()
++    except KeyboardInterrupt:
++        logger.info("Bridge stopped by user.")
++    finally:
++        server.server_close()
+diff --git a/plugins/google_vertex_media/image_provider.py b/plugins/google_vertex_media/image_provider.py
+new file mode 100644
+index 00000000000..b7cf5d52894
+--- /dev/null
++++ b/plugins/google_vertex_media/image_provider.py
+@@ -0,0 +1,165 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/image_provider.py"
++# purpose: "Hermes Agent ImageGenProvider implementation for Google Cloud Vertex AI (Imagen 3/4)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import logging
++from typing import Any, Dict, List, Optional
++
++from agent.image_gen_provider import (
++    DEFAULT_ASPECT_RATIO,
++    ImageGenProvider,
++    error_response,
++    resolve_aspect_ratio,
++    success_response,
++)
++try:
++    from .client import (
++        DEFAULT_IMAGEN_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++except (ImportError, ValueError):
++    from client import (  # type: ignore
++        DEFAULT_IMAGEN_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++
++logger = logging.getLogger("hermes.plugins.vertex_media.image_provider")
++
++_ASPECT_RATIO_MAP = {
++    "landscape": "16:9",
++    "square": "1:1",
++    "portrait": "9:16",
++}
++
++
++class GoogleVertexImageGenProvider(ImageGenProvider):
++    """Google Vertex AI (Imagen 3 / 4) image generation backend for Hermes."""
++
++    def __init__(self, client: Optional[VertexMediaClient] = None) -> None:
++        self._client = client or VertexMediaClient()
++
++    @property
++    def name(self) -> str:
++        return "vertex"
++
++    @property
++    def display_name(self) -> str:
++        return "Google Vertex AI (Imagen)"
++
++    def is_available(self) -> bool:
++        """Check if Vertex AI credentials or project are present."""
++        try:
++            from agent.vertex_adapter import has_vertex_credentials
++            if has_vertex_credentials():
++                return True
++        except (ImportError, KeyError, AttributeError, OSError):
++            pass
++
++        import os
++        return bool(
++            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
++            or os.environ.get("VERTEX_BEARER_TOKEN")
++            or os.environ.get("GOOGLE_CLOUD_PROJECT")
++            or os.environ.get("GCP_PROJECT")
++        )
++
++    def list_models(self) -> list[dict[str, Any]]:
++        return [
++            {
++                "id": "imagen-3.0-generate-002",
++                "display": "Imagen 3 (Standard SOTA)",
++                "speed": "~5-8s",
++                "strengths": "Photorealism, typography, high prompt adherence",
++            },
++            {
++                "id": "imagen-4.0-generate-001",
++                "display": "Imagen 4 Preview",
++                "speed": "~4-7s",
++                "strengths": "Next-gen aesthetics, rich lighting, 2K outputs",
++            },
++            {
++                "id": "imagen-4.0-fast-generate-001",
++                "display": "Imagen 4 Fast",
++                "speed": "~2-4s",
++                "strengths": "Ultra-low latency generation for rapid iterations",
++            },
++        ]
++
++    def default_model(self) -> Optional[str]:
++        return DEFAULT_IMAGEN_MODEL
++
++    def capabilities(self) -> dict[str, Any]:
++        return {
++            "modalities": ["text"],
++            "max_reference_images": 0,
++            "creative_controls": ["resolution"],
++        }
++
++    def generate(
++        self,
++        prompt: str,
++        aspect_ratio: str = DEFAULT_ASPECT_RATIO,
++        *,
++        image_url: Optional[str] = None,
++        reference_image_urls: Optional[list[str]] = None,
++        model: Optional[str] = None,
++        **kwargs: Any,
++    ) -> dict[str, Any]:
++        resolved_ratio_key = resolve_aspect_ratio(aspect_ratio)
++        api_aspect_ratio = _ASPECT_RATIO_MAP.get(resolved_ratio_key, "1:1")
++        target_model = model or DEFAULT_IMAGEN_MODEL
++
++        try:
++            result = self._client.generate_image(
++                prompt=prompt,
++                model=target_model,
++                aspect_ratio=api_aspect_ratio,
++                number_of_images=1,
++            )
++            return success_response(
++                image=result["image"],
++                model=result["model"],
++                prompt=result["prompt"],
++                aspect_ratio=resolved_ratio_key,
++                provider=self.name,
++                modality="text",
++                extra={"images": result["images"], "api_aspect_ratio": api_aspect_ratio},
++            )
++        except VertexMediaAuthError as e:
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Google Vertex AI authentication error: {e}",
++                error_type="auth_error",
++            )
++        except VertexMediaAPIError as e:
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Google Vertex AI API error: {e}",
++                error_type="api_error",
++            )
++        except Exception as e:
++            logger.exception("Unexpected error in Vertex image generation")
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Unexpected error: {e}",
++                error_type="internal_error",
++            )
+diff --git a/plugins/google_vertex_media/plugin.yaml b/plugins/google_vertex_media/plugin.yaml
+new file mode 100644
+index 00000000000..4cabc7aec46
+--- /dev/null
++++ b/plugins/google_vertex_media/plugin.yaml
+@@ -0,0 +1,21 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/plugin.yaml"
++# purpose: "Plugin manifest for Google Cloud Vertex AI Image & Video Generation (Imagen 3/4 & Veo 3.1)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++name: google-vertex-media
++version: 1.0.0
++description: "Unified Google Cloud Vertex AI media generation plugin: Imagen 3/4 (images) and Veo 3.1 (videos) with cross-harness reverse engineering exports."
++author: "Maxim Kuzmenko & Gerych Core"
++kind: general
++provides_tools:
++  - google_imagen
++  - google_veo
++provides_cli:
++  - vertex-media
+diff --git a/plugins/google_vertex_media/tools.py b/plugins/google_vertex_media/tools.py
+new file mode 100644
+index 00000000000..375ab8f0976
+--- /dev/null
++++ b/plugins/google_vertex_media/tools.py
+@@ -0,0 +1,217 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/tools.py"
++# purpose: "Direct tool schemas and execution handlers for Google Cloud Imagen 3/4 and Veo 3.1."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import json
++import logging
++from typing import Any
++
++try:
++    from .client import (
++        DEFAULT_IMAGEN_MODEL,
++        DEFAULT_VEO_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++except (ImportError, ValueError):
++    from client import (  # type: ignore
++        DEFAULT_IMAGEN_MODEL,
++        DEFAULT_VEO_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++
++logger = logging.getLogger("hermes.plugins.vertex_media.tools")
++
++_client_instance: VertexMediaClient | None = None
++
++
++def _get_client() -> VertexMediaClient:
++    global _client_instance
++    if _client_instance is None:
++        _client_instance = VertexMediaClient()
++    return _client_instance
++
++
++# -----------------------------------------------------------------------------
++# Tool: google_imagen
++# -----------------------------------------------------------------------------
++GOOGLE_IMAGEN_SCHEMA = {
++    "name": "google_imagen",
++    "description": (
++        "Generate high-resolution professional images using Google Cloud Vertex AI Imagen 3 / Imagen 4. "
++        "Supports studio product photography, photorealistic scenes, typography, and concept art."
++    ),
++    "parameters": {
++        "type": "object",
++        "properties": {
++            "prompt": {
++                "type": "string",
++                "description": "Detailed text description of the image to generate.",
++            },
++            "model": {
++                "type": "string",
++                "description": "Model ID to use. Defaults to 'imagen-3.0-generate-002'. Options: 'imagen-3.0-generate-002', 'imagen-4.0-generate-001', 'imagen-4.0-fast-generate-001'.",
++                "default": DEFAULT_IMAGEN_MODEL,
++            },
++            "aspect_ratio": {
++                "type": "string",
++                "description": "Output aspect ratio. Supported: '1:1' (square), '16:9' (landscape), '9:16' (portrait/story), '4:3', '3:4'.",
++                "default": "1:1",
++                "enum": ["1:1", "16:9", "9:16", "4:3", "3:4"],
++            },
++            "number_of_images": {
++                "type": "integer",
++                "description": "Number of images to generate (1 to 4). Defaults to 1.",
++                "default": 1,
++                "minimum": 1,
++                "maximum": 4,
++            },
++            "negative_prompt": {
++                "type": "string",
++                "description": "Elements or artifacts to avoid in the generation.",
++            },
++        },
++        "required": ["prompt"],
++    },
++}
++
++
++def handle_google_imagen(args: dict[str, Any], **kwargs: Any) -> str:
++    """Execute direct Google Imagen generation."""
++    prompt = args.get("prompt", "").strip()
++    if not prompt:
++        return json.dumps({"success": False, "error": "Prompt must not be empty."})
++
++    model = args.get("model") or DEFAULT_IMAGEN_MODEL
++    aspect_ratio = args.get("aspect_ratio") or "1:1"
++    number_of_images = int(args.get("number_of_images") or 1)
++    negative_prompt = args.get("negative_prompt")
++
++    client = _get_client()
++    try:
++        res = client.generate_image(
++            prompt=prompt,
++            model=model,
++            aspect_ratio=aspect_ratio,
++            number_of_images=number_of_images,
++            negative_prompt=negative_prompt,
++        )
++        return json.dumps(res, indent=2)
++    except (VertexMediaAuthError, VertexMediaAPIError) as e:
++        return json.dumps({"success": False, "error": str(e)})
++    except Exception as e:  # health: allow BLE001 -- tool execution error boundary
++        logger.exception("google_imagen execution error")
++        return json.dumps({"success": False, "error": f"Internal execution error: {e}"})
++
++
++# -----------------------------------------------------------------------------
++# Tool: google_veo
++# -----------------------------------------------------------------------------
++GOOGLE_VEO_SCHEMA = {
++    "name": "google_veo",
++    "description": (
++        "Generate cinematic, high-definition videos with native synchronized audio using Google Cloud Vertex AI Veo 3.1. "
++        "Supports Text-to-Video and Image-to-Video with realistic physics and camera movement controls."
++    ),
++    "parameters": {
++        "type": "object",
++        "properties": {
++            "prompt": {
++                "type": "string",
++                "description": (
++                    "Text prompt describing scene, action, visual style, and camera movement "
++                    "(e.g., 'dolly shot', 'drone shot', 'macro lens', 'golden hour')."
++                ),
++            },
++            "model": {
++                "type": "string",
++                "description": "Veo model ID. Defaults to 'veo-3.1-generate-001'. Options: 'veo-3.1-generate-001', 'veo-3.1-fast-generate-001', 'veo-2.0-generate-001'.",
++                "default": DEFAULT_VEO_MODEL,
++            },
++            "image_url": {
++                "type": "string",
++                "description": "Optional local file path or HTTP URL for starting frame (Image-to-Video).",
++            },
++            "aspect_ratio": {
++                "type": "string",
++                "description": "Output aspect ratio. Supported: '16:9' (landscape), '9:16' (vertical/reels).",
++                "default": "16:9",
++                "enum": ["16:9", "9:16"],
++            },
++            "resolution": {
++                "type": "string",
++                "description": "Video resolution. Options: '720p', '1080p', '4k'. Defaults to '720p'.",
++                "default": "720p",
++                "enum": ["720p", "1080p", "4k"],
++            },
++            "duration": {
++                "type": "integer",
++                "description": "Duration in seconds (Veo 3.1 supports 4, 6, or 8 seconds). Defaults to 6.",
++                "default": 6,
++                "enum": [4, 6, 8],
++            },
++            "audio": {
++                "type": "boolean",
++                "description": "Generate synchronized background audio and sound effects. Defaults to true.",
++                "default": True,
++            },
++            "negative_prompt": {
++                "type": "string",
++                "description": "Content, styles, or camera jitter to avoid.",
++            },
++        },
++        "required": ["prompt"],
++    },
++}
++
++
++def handle_google_veo(args: dict[str, Any], **kwargs: Any) -> str:
++    """Execute direct Google Veo video generation."""
++    prompt = args.get("prompt", "").strip()
++    if not prompt:
++        return json.dumps({"success": False, "error": "Prompt must not be empty."})
++
++    model = args.get("model") or DEFAULT_VEO_MODEL
++    image_url = args.get("image_url")
++    aspect_ratio = args.get("aspect_ratio") or "16:9"
++    resolution = args.get("resolution") or "720p"
++    duration = int(args.get("duration") or 6)
++    audio = True if args.get("audio") is None else bool(args.get("audio"))
++    negative_prompt = args.get("negative_prompt")
++
++    client = _get_client()
++    try:
++        res = client.generate_video(
++            prompt=prompt,
++            model=model,
++            image_url=image_url,
++            aspect_ratio=aspect_ratio,
++            resolution=resolution,
++            duration_seconds=duration,
++            generate_audio=audio,
++            negative_prompt=negative_prompt,
++        )
++        return json.dumps(res, indent=2)
++    except (VertexMediaAuthError, VertexMediaAPIError) as e:
++        return json.dumps({"success": False, "error": str(e)})
++    except Exception as e:  # health: allow BLE001 -- tool execution error boundary
++        logger.exception("google_veo execution error")
++        return json.dumps({"success": False, "error": f"Internal execution error: {e}"})
++
++
++MEDIA_TOOLS = [
++    ("google_imagen", GOOGLE_IMAGEN_SCHEMA, handle_google_imagen, "🎨"),
++    ("google_veo", GOOGLE_VEO_SCHEMA, handle_google_veo, "🎬"),
++]
+diff --git a/plugins/google_vertex_media/video_provider.py b/plugins/google_vertex_media/video_provider.py
+new file mode 100644
+index 00000000000..43523673c99
+--- /dev/null
++++ b/plugins/google_vertex_media/video_provider.py
+@@ -0,0 +1,178 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "plugins/google-vertex-media/video_provider.py"
++# purpose: "Hermes Agent VideoGenProvider implementation for Google Cloud Vertex AI (Veo 3.1)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import logging
++from typing import Any, Dict, List, Optional
++
++from agent.video_gen_provider import (
++    COMMON_ASPECT_RATIOS,
++    COMMON_RESOLUTIONS,
++    DEFAULT_ASPECT_RATIO,
++    DEFAULT_RESOLUTION,
++    VideoGenProvider,
++    error_response,
++    success_response,
++)
++
++try:
++    from .client import (
++        DEFAULT_VEO_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++except (ImportError, ValueError):
++    from client import (  # type: ignore
++        DEFAULT_VEO_MODEL,
++        VertexMediaAPIError,
++        VertexMediaAuthError,
++        VertexMediaClient,
++    )
++
++logger = logging.getLogger("hermes.plugins.vertex_media.video_provider")
++
++
++class GoogleVertexVideoGenProvider(VideoGenProvider):
++    """Google Vertex AI (Veo 3.1 / Veo 2.0) video generation backend for Hermes."""
++
++    def __init__(self, client: Optional[VertexMediaClient] = None) -> None:
++        self._client = client or VertexMediaClient()
++
++    @property
++    def name(self) -> str:
++        return "vertex"
++
++    @property
++    def display_name(self) -> str:
++        return "Google Vertex AI (Veo)"
++
++    def is_available(self) -> bool:
++        """Check if Vertex AI credentials or project are present."""
++        try:
++            from agent.vertex_adapter import has_vertex_credentials
++            if has_vertex_credentials():
++                return True
++        except (ImportError, KeyError, AttributeError, OSError):
++            pass
++
++        import os
++        return bool(
++            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
++            or os.environ.get("VERTEX_BEARER_TOKEN")
++            or os.environ.get("GOOGLE_CLOUD_PROJECT")
++            or os.environ.get("GCP_PROJECT")
++        )
++
++    def list_models(self) -> list[dict[str, Any]]:
++        return [
++            {
++                "id": "veo-3.1-generate-001",
++                "display": "Veo 3.1 (Cinematic SOTA + Native Audio)",
++                "speed": "~60-90s",
++                "strengths": "Deep language understanding, lighting/physics, cinematic camera, native audio",
++            },
++            {
++                "id": "veo-3.1-fast-generate-001",
++                "display": "Veo 3.1 Fast (Low-latency)",
++                "speed": "~30-45s",
++                "strengths": "High throughput, cost-effective, optimized for ads and social media",
++            },
++            {
++                "id": "veo-2.0-generate-001",
++                "display": "Veo 2.0 (Legacy)",
++                "speed": "~60s",
++                "strengths": "Previous generation video model (no audio)",
++            },
++        ]
++
++    def default_model(self) -> Optional[str]:
++        return DEFAULT_VEO_MODEL
++
++    def capabilities(self) -> dict[str, Any]:
++        return {
++            "modalities": ["text", "image"],
++            "aspect_ratios": ["16:9", "9:16"],
++            "resolutions": ["720p", "1080p", "4k"],
++            "max_duration": 8,
++            "min_duration": 4,
++            "supports_audio": True,
++            "supports_negative_prompt": True,
++            "max_reference_images": 1,
++        }
++
++    def generate(
++        self,
++        prompt: str,
++        *,
++        model: Optional[str] = None,
++        image_url: Optional[str] = None,
++        reference_image_urls: Optional[list[str]] = None,
++        duration: Optional[int] = None,
++        aspect_ratio: str = DEFAULT_ASPECT_RATIO,
++        resolution: str = DEFAULT_RESOLUTION,
++        negative_prompt: Optional[str] = None,
++        audio: Optional[bool] = None,
++        seed: Optional[int] = None,
++        **kwargs: Any,
++    ) -> dict[str, Any]:
++        target_model = model or DEFAULT_VEO_MODEL
++        target_duration = duration if duration in (4, 6, 8) else 6
++        target_audio = True if audio is None else bool(audio)
++        effective_image = image_url or (reference_image_urls[0] if reference_image_urls else None)
++
++        try:
++            result = self._client.generate_video(
++                prompt=prompt,
++                model=target_model,
++                image_url=effective_image,
++                aspect_ratio=aspect_ratio,
++                resolution=resolution,
++                duration_seconds=target_duration,
++                generate_audio=target_audio,
++                negative_prompt=negative_prompt,
++            )
++            return success_response(
++                video=result["video"],
++                model=result["model"],
++                prompt=result["prompt"],
++                modality=result.get("modality", "text"),
++                aspect_ratio=aspect_ratio,
++                duration=target_duration,
++                provider=self.name,
++                extra=result.get("metadata"),
++            )
++        except VertexMediaAuthError as e:
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Google Vertex AI authentication error: {e}",
++                error_type="auth_error",
++            )
++        except VertexMediaAPIError as e:
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Google Vertex AI API error: {e}",
++                error_type="api_error",
++            )
++        except Exception as e:
++            logger.exception("Unexpected error in Vertex video generation")
++            return error_response(
++                prompt=prompt,
++                model=target_model,
++                provider=self.name,
++                error=f"Unexpected error: {e}",
++                error_type="internal_error",
++            )
+diff --git a/tests/plugins/test_google_vertex_media.py b/tests/plugins/test_google_vertex_media.py
+new file mode 100644
+index 00000000000..485988f90ec
+--- /dev/null
++++ b/tests/plugins/test_google_vertex_media.py
+@@ -0,0 +1,262 @@
++# --- DNK-MRH-HEADER ---
++# mrh_id: "tests/plugins/test_google_vertex_media.py"
++# purpose: "Comprehensive tests for Google Cloud Vertex Media plugin (Imagen 3/4 & Veo 3.1)."
++# canonical_source: true
++# alters_files: []
++# triggers_tasks: []
++# status: "Active"
++# version: "1.0.0"
++# updated_at: "2026-11-08"
++# --- END DNK-MRH-HEADER ---
++
++from __future__ import annotations
++
++import json
++from pathlib import Path
++from unittest.mock import MagicMock, patch
++
++import pytest
++
++from plugins.google_vertex_media import register
++from plugins.google_vertex_media.client import (
++    DEFAULT_IMAGEN_MODEL,
++    DEFAULT_VEO_MODEL,
++    VertexMediaAPIError,
++    VertexMediaAuthError,
++    VertexMediaClient,
++)
++from plugins.google_vertex_media.harness import (
++    dispatch_tool,
++    to_anthropic_tools,
++    to_langchain_tools,
++    to_openai_tools,
++)
++from plugins.google_vertex_media.image_provider import GoogleVertexImageGenProvider
++from plugins.google_vertex_media.tools import (
++    GOOGLE_IMAGEN_SCHEMA,
++    GOOGLE_VEO_SCHEMA,
++    handle_google_imagen,
++    handle_google_veo,
++)
++from plugins.google_vertex_media.video_provider import GoogleVertexVideoGenProvider
++
++
++class TestVertexMediaClient:
++    def test_init_defaults(self, monkeypatch):
++        monkeypatch.delenv("VERTEX_REGION", raising=False)
++        client = VertexMediaClient(project_id="test-proj")
++        assert client._project_id == "test-proj"
++        assert client._region == "us-central1"
++
++    def test_resolve_credentials_from_params(self):
++        client = VertexMediaClient(
++            project_id="my-custom-project",
++            region="europe-west1",
++            bearer_token="ya29.test-bearer-token",
++        )
++        token, project_id, region = client.resolve_credentials()
++        assert token == "ya29.test-bearer-token"
++        assert project_id == "my-custom-project"
++        assert region == "europe-west1"
++
++    def test_resolve_credentials_missing_raises_auth_error(self, monkeypatch):
++        monkeypatch.delenv("GOOGLE_APPLICATION_CREDENTIALS", raising=False)
++        monkeypatch.delenv("VERTEX_BEARER_TOKEN", raising=False)
++        monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
++        monkeypatch.delenv("GCP_PROJECT", raising=False)
++        monkeypatch.delenv("VERTEX_PROJECT_ID", raising=False)
++
++        client = VertexMediaClient()
++        with patch.object(client, "_bearer_token", None), patch.object(client, "_project_id", None):
++            with patch("subprocess.run") as mock_run:
++                mock_run.return_value = MagicMock(returncode=1, stdout="")
++                with pytest.raises(VertexMediaAuthError):
++                    client.resolve_credentials()
++
++    def test_generate_image_success(self, tmp_path):
++        client = VertexMediaClient(
++            project_id="test-proj",
++            bearer_token="token",
++            cache_dir=tmp_path,
++        )
++        fake_b64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
++        fake_api_response = {
++            "predictions": [
++                {"bytesBase64Encoded": fake_b64, "mimeType": "image/png"}
++            ]
++        }
++        with patch.object(client, "_send_request", return_value=fake_api_response):
++            res = client.generate_image("A cute blue robot", model="imagen-3.0-generate-002")
++            assert res["success"] is True
++            assert len(res["images"]) == 1
++            saved_path = Path(res["images"][0])
++            assert saved_path.exists()
++            assert saved_path.stat().st_size > 0
++
++    def test_generate_video_success(self, tmp_path):
++        client = VertexMediaClient(
++            project_id="test-proj",
++            bearer_token="token",
++            cache_dir=tmp_path,
++        )
++        fake_video_b64 = "AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAACBtZGF0"
++        fake_start_op = {"name": "projects/test-proj/locations/us-central1/operations/op-12345"}
++        fake_poll_op = {
++            "done": True,
++            "response": {
++                "generatedVideos": [
++                    {"video": {"bytesBase64Encoded": fake_video_b64}}
++                ]
++            }
++        }
++
++        with patch.object(client, "_send_request", side_effect=[fake_start_op, fake_poll_op]):
++            with patch("time.sleep"):
++                res = client.generate_video("A drone shot over forests", duration_seconds=6)
++                assert res["success"] is True
++                assert res["duration"] == 6
++                saved_path = Path(res["video"])
++                assert saved_path.exists()
++                assert saved_path.stat().st_size > 0
++
++
++class TestGoogleVertexImageGenProvider:
++    def test_metadata_and_capabilities(self):
++        provider = GoogleVertexImageGenProvider()
++        assert provider.name == "vertex"
++        assert "Google Vertex AI" in provider.display_name
++        models = provider.list_models()
++        assert len(models) >= 3
++        assert any(m["id"] == "imagen-3.0-generate-002" for m in models)
++        caps = provider.capabilities()
++        assert "text" in caps["modalities"]
++
++    def test_generate_success_mock(self, tmp_path):
++        mock_client = MagicMock(spec=VertexMediaClient)
++        fake_image = str(tmp_path / "img.png")
++        Path(fake_image).write_bytes(b"dummy")
++        mock_client.generate_image.return_value = {
++            "success": True,
++            "image": fake_image,
++            "images": [fake_image],
++            "model": "imagen-3.0-generate-002",
++            "prompt": "Solar punk city",
++        }
++
++        provider = GoogleVertexImageGenProvider(client=mock_client)
++        resp = provider.generate("Solar punk city", aspect_ratio="landscape")
++        assert resp["success"] is True
++        assert resp["image"] == fake_image
++        assert resp["provider"] == "vertex"
++
++
++class TestGoogleVertexVideoGenProvider:
++    def test_metadata_and_capabilities(self):
++        provider = GoogleVertexVideoGenProvider()
++        assert provider.name == "vertex"
++        assert "Veo" in provider.display_name
++        models = provider.list_models()
++        assert len(models) >= 3
++        assert any("veo-3.1" in m["id"] for m in models)
++        caps = provider.capabilities()
++        assert caps["supports_audio"] is True
++        assert "16:9" in caps["aspect_ratios"]
++
++    def test_generate_success_mock(self, tmp_path):
++        mock_client = MagicMock(spec=VertexMediaClient)
++        fake_video = str(tmp_path / "vid.mp4")
++        Path(fake_video).write_bytes(b"dummy_video")
++        mock_client.generate_video.return_value = {
++            "success": True,
++            "video": fake_video,
++            "model": "veo-3.1-generate-001",
++            "prompt": "Volcano eruption",
++            "modality": "text",
++            "metadata": {"duration": 6},
++        }
++
++        provider = GoogleVertexVideoGenProvider(client=mock_client)
++        resp = provider.generate("Volcano eruption", duration=6)
++        assert resp["success"] is True
++        assert resp["video"] == fake_video
++        assert resp["duration"] == 6
++
++
++class TestDirectTools:
++    def test_handle_google_imagen_empty_prompt(self):
++        res = json.loads(handle_google_imagen({"prompt": "   "}))
++        assert res["success"] is False
++
++    def test_handle_google_imagen_success(self, tmp_path):
++        fake_path = str(tmp_path / "art.png")
++        with patch("plugins.google_vertex_media.tools._get_client") as mock_get:
++            mock_client = MagicMock()
++            mock_client.generate_image.return_value = {
++                "success": True,
++                "image": fake_path,
++                "images": [fake_path],
++                "model": "imagen-3.0-generate-002",
++                "prompt": "Pixel art",
++            }
++            mock_get.return_value = mock_client
++
++            res = json.loads(handle_google_imagen({"prompt": "Pixel art"}))
++            assert res["success"] is True
++            assert res["image"] == fake_path
++
++    def test_handle_google_veo_success(self, tmp_path):
++        fake_video = str(tmp_path / "clip.mp4")
++        with patch("plugins.google_vertex_media.tools._get_client") as mock_get:
++            mock_client = MagicMock()
++            mock_client.generate_video.return_value = {
++                "success": True,
++                "video": fake_video,
++                "model": "veo-3.1-generate-001",
++                "prompt": "Underwater reef",
++            }
++            mock_get.return_value = mock_client
++
++            res = json.loads(handle_google_veo({"prompt": "Underwater reef"}))
++            assert res["success"] is True
++            assert res["video"] == fake_video
++
++
++class TestMultiHarnessAdapters:
++    def test_schema_exporters(self):
++        openai_tools = to_openai_tools()
++        assert len(openai_tools) == 2
++        assert openai_tools[0]["function"]["name"] == "google_imagen"
++        assert openai_tools[1]["function"]["name"] == "google_veo"
++
++        anthropic_tools = to_anthropic_tools()
++        assert len(anthropic_tools) == 2
++        assert anthropic_tools[0]["name"] == "google_imagen"
++        assert anthropic_tools[1]["name"] == "google_veo"
++
++        langchain_tools = to_langchain_tools()
++        assert len(langchain_tools) == 2
++
++    def test_dispatch_tool(self):
++        with patch("plugins.google_vertex_media.harness.handle_google_imagen", return_value=json.dumps({"success": True, "image": "test.png"})):
++            res = dispatch_tool("google_imagen", {"prompt": "A test"})
++            assert res["success"] is True
++            assert res["image"] == "test.png"
++
++        unknown = dispatch_tool("non_existent_tool", {})
++        assert unknown["success"] is False
++
++
++class TestPluginRegistration:
++    def test_register_lifecycle(self):
++        mock_ctx = MagicMock()
++        mock_ctx.register_image_gen_provider = MagicMock()
++        mock_ctx.register_video_gen_provider = MagicMock()
++        mock_ctx.register_tool = MagicMock()
++        mock_ctx.register_cli_command = MagicMock()
++
++        register(mock_ctx)
++
++        mock_ctx.register_image_gen_provider.assert_called_once()
++        mock_ctx.register_video_gen_provider.assert_called_once()
++        assert mock_ctx.register_tool.call_count == 2
++        mock_ctx.register_cli_command.assert_called_once()
+-- 
+2.50.1
+

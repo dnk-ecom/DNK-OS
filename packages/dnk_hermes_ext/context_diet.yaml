@@ -1,0 +1,47 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "packages/dnk_hermes_ext/context_diet.yaml"
+# purpose: "Context-diet settings for Gerych on Hermes 0.23 (1M-window Gemini): native 0.23 keys only, verified against hermes_cli/config_defaults.py @ 2bd378ed."
+# canonical_source: true
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-08"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+# Applied by context_diet.py (deep merge; lists under agent.disabled_toolsets are unioned).
+# Why not the old Denchik values: on a 1M window a ratio threshold of 0.25 fires only at ~250k
+# tokens, and hygiene_hard_message_limit is gateway-only (no effect in CLI).
+
+compression:
+  enabled: true
+  threshold_tokens: 64000          # absolute trigger; wins over the ratio on big windows
+  proactive_prune_tokens: 32000    # no-LLM prune of old tool output before full compaction
+  proactive_prune_min_result_chars: 4000
+  protect_last_n: 8
+  tail_mode: lean
+  max_attempts: 4
+
+file_read_max_chars: 24000         # default 100000 (~25-35k tokens per read)
+
+tool_output:
+  max_bytes: 20000                 # default 50000
+  max_lines: 400                   # default 2000
+  max_line_length: 2000
+
+tool_search:
+  enabled: "on"                    # lazy tool schemas
+
+agent:
+  disabled_toolsets:               # unioned with existing; kanban duplicates ThoughtDAG
+    - kanban
+    - discord
+    - discord_admin
+    - yuanbao
+    - feishu_doc
+    - feishu_drive
+
+sessions:                          # replaces scripts/system/prune_agent_state_db.py for DB growth
+  auto_prune: true
+  retention_days: 30
+  vacuum_after_prune: true
+  auto_archive: true
+  auto_archive_days: 7

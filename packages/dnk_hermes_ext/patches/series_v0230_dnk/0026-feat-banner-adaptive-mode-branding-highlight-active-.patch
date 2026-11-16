@@ -1,0 +1,221 @@
+From d4cedc4946638f1332b4c27f9c9996ce72bf25cf Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Wed, 11 Nov 2026 17:56:17 +0200
+Subject: [PATCH 26/26] feat(banner): adaptive mode branding, highlight active
+ preset, and snug layout
+
+---
+ hermes_cli/banner.py                         | 107 +++++++++++++------
+ tests/hermes_cli/test_dnk_adaptive_banner.py |   4 +-
+ 2 files changed, 80 insertions(+), 31 deletions(-)
+
+diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
+index 1f268ee543a..f8a914a0521 100644
+--- a/hermes_cli/banner.py
++++ b/hermes_cli/banner.py
+@@ -797,28 +797,63 @@ def build_welcome_banner(
+         term_width = getattr(console, "_width", None) or getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
+         from rich.cells import cell_len
+ 
++        # Resolve active mode & working directory cleanly
++        target_dir = Path(cwd).resolve() if cwd else Path.cwd()
++        home = Path.home()
++        base_dir = home / "Kuzmenko" / "MY_LIFE_WORK"
++
++        active_mode = os.environ.get("GERYCH_MODE", "").strip().lower()
++        if not active_mode:
++            if target_dir == base_dir:
++                active_mode = "root"
++            elif target_dir == (base_dir / "DNK_HUB"):
++                active_mode = "hub"
++            elif "SHOPIFY" in str(target_dir):
++                active_mode = "shop"
++            else:
++                active_mode = "local"
++
+         # Adaptive layout: choose wide hero art on >=120 cols, compact hero art on standard displays (<120)
+         is_wide = term_width >= 120
+         if is_wide:
+             hero_art = getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
+         else:
+             hero_art = getattr(_bskin, "banner_hero_compact", None) or getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
++
++        if hero_art and active_mode in ("root", "hub", "shop"):
++            tag = active_mode.upper()
++            hero_art = re.sub(
++                r'⚡[\s\u00a0]*G[\s\u00a0]*E[\s\u00a0]*R[\s\u00a0]*Y[\s\u00a0]*C[\s\u00a0]*H[\s\u00a0]*⚡',
++                f"⚡ G E R Y C H · {tag} ⚡",
++                hero_art
++            )
++            hero_art = re.sub(
++                r'G[\s\u00a0]+E[\s\u00a0]+R[\s\u00a0]+Y[\s\u00a0]+C[\s\u00a0]+H[\s\u00a0]+C[\s\u00a0]+O[\s\u00a0]+R[\s\u00a0]+E',
++                f"G E R Y C H   {tag}",
++                hero_art
++            )
++
+         if hero_art:
+             hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
+ 
+         raw_art_lines = [re.sub(r'\[.*?\]', '', line) for line in hero_art.strip().splitlines()]
+         art_w = max((cell_len(line) for line in raw_art_lines), default=28)
+ 
++        # Sizing and layout: snug, balanced width allocation (no awkward dead gaps)
+         panel_padding = 1 if term_width >= 86 else 0
+         col_padding = 2 if term_width >= 86 else 1
+         total_overhead = (panel_padding * 2) + 2 + col_padding
+-        available_content_w = max(40, term_width - total_overhead)
+ 
+-        # Balanced width allocation: left column holds art, launch presets, and folder path
+-        left_w = max(art_w + col_padding, min(41, available_content_w // 2))
+-        max_right_w = max(24, available_content_w - left_w)
++        if is_wide:
++            target_panel_w = min(term_width, 108)
++        else:
++            target_panel_w = min(term_width, 86)
++
++        avail_w = max(40, target_panel_w - total_overhead)
++        left_w = max(art_w + col_padding, avail_w // 2)
++        right_w = avail_w - left_w
+         effective_left_w = left_w - col_padding
+-        effective_right_w = max_right_w - col_padding
++        effective_right_w = right_w - col_padding
+ 
+         def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
+             overhead = cell_len(prefix) + cell_len(sep)
+@@ -872,9 +907,7 @@ def build_welcome_banner(
+ 
+         connected_mcp_count = len([x for x in active_mcps if x[2]])
+ 
+-        # 2. Resolve active working directory cleanly
+-        target_dir = Path(cwd).resolve() if cwd else Path.cwd()
+-        home = Path.home()
++        # 2. Format working directory and active mode metadata
+         try:
+             if target_dir == home:
+                 display_dir = "~"
+@@ -885,32 +918,37 @@ def build_welcome_banner(
+         except Exception:
+             display_dir = str(target_dir)
+ 
+-        base_dir_str = str(home / "Kuzmenko" / "MY_LIFE_WORK")
+-        if str(target_dir) == base_dir_str:
+-            dir_mode = " (root)"
+-        elif str(target_dir) == f"{base_dir_str}/DNK_HUB":
+-            dir_mode = " (hub)"
+-        elif "SHOPIFY" in str(target_dir):
+-            dir_mode = " (shop)"
+-        else:
+-            dir_mode = ""
++        mode_meta = {
++            "root": ("[bold #FFD700]ROOT[/]", "вся екосистема"),
++            "hub": ("[bold #00E5FF]HUB[/]", "системне ядро"),
++            "shop": ("[bold #00FF7F]SHOP[/]", "Shopify розробка"),
++            "local": ("[bold #FFA500]LOCAL[/]", "локальна папка"),
++        }
++        badge, badge_desc = mode_meta.get(active_mode, (f"[bold]{active_mode.upper()}[/]", "активний"))
++        mode_display_line = f"🎯 Режим: {badge} [dim {dim}]({badge_desc})[/]"
+ 
+-        folder_prefix = "Папка: "
+-        avail_path_w = effective_left_w - cell_len(folder_prefix) - cell_len(dir_mode)
++        folder_prefix = "📁 Папка: "
++        avail_path_w = effective_left_w - cell_len(folder_prefix)
+         if cell_len(display_dir) > avail_path_w and avail_path_w > 8:
+             short_dir = "…" + display_dir[-(avail_path_w - 1):]
+         else:
+             short_dir = display_dir
+-        folder_line = f"[dim {dim}]{folder_prefix}{short_dir}{dir_mode}[/]"
++        folder_line = f"[dim {dim}]{folder_prefix}{short_dir}[/]"
+ 
+-        # 3. CLI Launch Presets
++        # 3. CLI Launch Presets with active mode highlight
+         launch_presets = [
+-            ("gerych", "локальна папка"),
+-            ("gerych root", "вся екосистема"),
+-            ("gerych shop", "Shopify розробка"),
+-            ("gerych hub", "системне ядро"),
++            ("local", "gerych", "локальна папка"),
++            ("root", "gerych root", "вся екосистема"),
++            ("shop", "gerych shop", "Shopify розробка"),
++            ("hub", "gerych hub", "системне ядро"),
+         ]
+-        launch_lines = [_fit_line(cmd, desc, effective_left_w) for cmd, desc in launch_presets]
++        launch_lines = []
++        for m_key, cmd, desc in launch_presets:
++            if m_key == active_mode:
++                prefix = "[bold #00FFAA]▶[/] "
++                launch_lines.append(f"{prefix}[bold white]{cmd}[/] [dim {dim}]—[/] [{text}]{desc}[/] [bold #00FFAA]●[/]")
++            else:
++                launch_lines.append(_fit_line(cmd, desc, effective_left_w, prefix="    "))
+ 
+         # 4. Useful commands
+         cmd_pool = [
+@@ -932,6 +970,7 @@ def build_welcome_banner(
+             "",
+             f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+             f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++            mode_display_line,
+             folder_line,
+         ]
+         if connected_mcp_count > 0:
+@@ -1116,7 +1155,15 @@ def build_welcome_banner(
+         )
+         version_label = format_banner_version_label()
+         v_str = version_label.replace("Hermes Agent ", "Hermes ").replace("Hermes Hermes ", "Hermes ")
+-        agent_title = "Denchik (DNK OS)" if is_denchik else "Gerych (DNK OS)"
++        mode_titles = {
++            "root": "Gerych Root (DNK OS)",
++            "hub": "Gerych Hub (DNK OS)",
++            "shop": "Gerych Shop (DNK OS)",
++            "local": "Gerych (DNK OS)",
++        }
++        agent_title = mode_titles.get(active_mode, "Gerych (DNK OS)")
++        if is_denchik:
++            agent_title = "Denchik (DNK OS)"
+         title_markup = f"[bold {title_color}]{agent_title} · {v_str}[/]"
+ 
+         if term_width < 76:
+@@ -1126,6 +1173,7 @@ def build_welcome_banner(
+                 hero_art,
+                 f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+                 f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
++                mode_display_line,
+                 folder_line,
+                 "",
+                 f"[bold {accent}]🚀 Режими:[/] [dim {dim}]gerych · gerych root · gerych shop · gerych hub[/]",
+@@ -1146,16 +1194,15 @@ def build_welcome_banner(
+ 
+         dnk_table = Table.grid(padding=(0, col_padding))
+         dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
+-        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
++        dnk_table.add_column("right", justify="left", no_wrap=True, width=right_w)
+         dnk_table.add_row(left_content, right_content)
+ 
+-        panel_w = min(term_width, left_w + max_right_w + total_overhead)
+         outer_panel = Panel(
+             dnk_table,
+             title=title_markup,
+             border_style=border_color,
+             padding=(0, panel_padding),
+-            width=panel_w,
++            width=target_panel_w,
+         )
+         console.print()
+         console.print(outer_panel)
+diff --git a/tests/hermes_cli/test_dnk_adaptive_banner.py b/tests/hermes_cli/test_dnk_adaptive_banner.py
+index 83acf9a01e5..2eab4d3ded6 100644
+--- a/tests/hermes_cli/test_dnk_adaptive_banner.py
++++ b/tests/hermes_cli/test_dnk_adaptive_banner.py
+@@ -103,7 +103,9 @@ def test_dnk_banner_shows_root_and_hub_modes():
+         tools=[],
+     )
+     output = f.getvalue().replace("\u00a0", " ")
+-    assert "(root)" in output
++    assert "ROOT" in output
++    assert "Gerych Root" in output
+     assert "gerych root" in output
+     assert "gerych shop" in output
+     assert "gerych hub" in output
++    assert "▶ gerych root" in output
+-- 
+2.50.1
+

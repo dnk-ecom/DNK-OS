@@ -1,0 +1,43 @@
+From e4e2e4baf4c0c5d2e5a038c18d2e8f6a57addc67 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Mon, 9 Nov 2026 19:42:01 +0200
+Subject: [PATCH 14/26] feat(tools): enforce 120-line bounded reads and tight
+ tool output budget
+
+- Clamp DEFAULT_READ_LIMIT to 120 lines (down from 2000)
+- Update read_file tool schema maximum and default limit to 120
+- Guard context token inflation during repetitive code exploration
+---
+ tools/file_operations_common.py | 2 +-
+ tools/file_tools.py             | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/file_operations_common.py b/tools/file_operations_common.py
+index afecf09eb86..0bab334f124 100644
+--- a/tools/file_operations_common.py
++++ b/tools/file_operations_common.py
+@@ -283,7 +283,7 @@ def _has_bom(text: Optional[str]) -> bool:
+ # ---------------------------------------------------------------------------
+ 
+ DEFAULT_READ_OFFSET = 1
+-DEFAULT_READ_LIMIT = 2000
++DEFAULT_READ_LIMIT = 120
+ DEFAULT_SEARCH_OFFSET = 0
+ DEFAULT_SEARCH_LIMIT = 50
+ 
+diff --git a/tools/file_tools.py b/tools/file_tools.py
+index ae718bb2cba..b817f1ca0de 100644
+--- a/tools/file_tools.py
++++ b/tools/file_tools.py
+@@ -1165,7 +1165,7 @@ READ_FILE_SCHEMA = {
+         "properties": {
+             "path": {"type": "string", "description": "Path to the file to read (absolute, relative, or ~/path)"},
+             "offset": {"type": "integer", "description": "Line number to start reading from (1-indexed, default: 1)", "default": 1, "minimum": 1},
+-            "limit": {"type": "integer", "description": "Maximum number of lines to read (default: 2000, max: 2000). Reads are additionally capped at a ~100K-character budget with a next_offset continuation.", "default": DEFAULT_READ_LIMIT, "maximum": 2000}
++            "limit": {"type": "integer", "description": "Maximum number of lines to read (default: 120, max: 120). Reads are additionally capped with a next_offset continuation.", "default": DEFAULT_READ_LIMIT, "maximum": 120}
+         },
+         "required": ["path"]
+     }
+-- 
+2.50.1
+

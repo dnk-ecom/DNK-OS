@@ -80,3 +80,7 @@ api:
 # Run the Microkernel FastMCP server over STDIO (for Antigravity/Hermes/Claude)
 mcp-stdio:
     @uv run python3 core/kernel.py
+
+# Launch Denchik Sovereign Master Developer (Hermes Agent Runtime)
+denchik *args:
+    @bash scripts/system/denchik.sh {{args}}

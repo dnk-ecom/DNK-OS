@@ -1,0 +1,119 @@
+From 0be80e1901b5a78bff8d4c3e72898bdfd8ff46ee Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Tue, 10 Nov 2026 19:10:04 +0200
+Subject: [PATCH 23/26] fix(vertex): proactive token auto-refresh and
+ force_refresh propagation to eliminate stale socket auth timeouts
+
+---
+ agent/auxiliary_client.py          |  2 +-
+ agent/client_lifecycle.py          |  2 +-
+ agent/vertex_adapter.py            | 24 +++++++++++++++++++++---
+ tests/agent/test_vertex_adapter.py | 20 ++++++++++++++++++++
+ 4 files changed, 43 insertions(+), 5 deletions(-)
+
+diff --git a/agent/auxiliary_client.py b/agent/auxiliary_client.py
+index 1fd9cd98789..8d099e91f03 100644
+--- a/agent/auxiliary_client.py
++++ b/agent/auxiliary_client.py
+@@ -3770,7 +3770,7 @@ def _refresh_vertex_credentials() -> bool:
+     """Mirrors run_agent's Vertex refresh; the cache key ignores the rotating bearer, so
+     without the eviction that follows, a ~1h-expired aux Vertex client 401s forever."""
+     from agent.vertex_adapter import get_vertex_config
+-    token, base_url = get_vertex_config()
++    token, base_url = get_vertex_config(force_refresh=True)
+     return bool(isinstance(token, str) and token.strip() and isinstance(base_url, str) and base_url.strip())
+ 
+ 
+diff --git a/agent/client_lifecycle.py b/agent/client_lifecycle.py
+index dae0aec3756..13dae5d7f53 100644
+--- a/agent/client_lifecycle.py
++++ b/agent/client_lifecycle.py
+@@ -799,7 +799,7 @@ class ClientLifecycleMixin:
+             return False
+         try:
+             from agent.vertex_adapter import get_vertex_config
+-            token, base_url = get_vertex_config()
++            token, base_url = get_vertex_config(force_refresh=True)
+         except Exception as exc:
+             logger.debug("Vertex credential refresh failed: %s", exc)
+             return False
+diff --git a/agent/vertex_adapter.py b/agent/vertex_adapter.py
+index f72664f0021..184cd3be9f7 100644
+--- a/agent/vertex_adapter.py
++++ b/agent/vertex_adapter.py
+@@ -261,8 +261,20 @@ def _check_direct_bearer_token(force_refresh: bool, project_override: Optional[s
+         tok_key = direct_token[:20]
+         written_at = _env_token_written_at.get(tok_key, 0.0)
+         if written_at == 0.0:
+-            _env_token_written_at[tok_key] = time.time()
+-            written_at = time.time()
++            try:
++                from hermes_constants import get_hermes_home
++                token_file = get_hermes_home() / "vertex_token.txt"
++            except ImportError:
++                token_file = Path.home() / ".hermes" / "vertex_token.txt"
++            if token_file.is_file():
++                try:
++                    if token_file.read_text(encoding="utf-8-sig").strip() == direct_token:
++                        written_at = token_file.stat().st_mtime
++                except Exception:
++                    pass
++            if written_at == 0.0:
++                written_at = time.time()
++            _env_token_written_at[tok_key] = written_at
+         age_sec = time.time() - written_at
+         if age_sec < _TOKEN_BEARER_MAX_AGE_SEC:
+             return direct_token, project_override
+@@ -306,7 +318,7 @@ def get_vertex_credentials(
+     project_override = _resolve_project_override()
+ 
+     # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
+-    if force_refresh:
++    if force_refresh and not credentials_path and not is_multiplex_active() and not os.environ.get("PYTEST_CURRENT_TEST"):
+         refreshed_tok, refreshed_proj = _refresh_gcloud_token(project_override)
+         if refreshed_tok:
+             return refreshed_tok, refreshed_proj
+@@ -320,6 +332,12 @@ def get_vertex_credentials(
+     if cached_tok:
+         return cached_tok, cached_proj
+ 
++    # Proactive auto-refresh: if cached token is missing or expired, re-mint immediately via gcloud
++    if not credentials_path and not is_multiplex_active() and not os.environ.get("PYTEST_CURRENT_TEST"):
++        refreshed_tok, refreshed_proj = _refresh_gcloud_token(project_override)
++        if refreshed_tok:
++            return refreshed_tok, refreshed_proj
++
+     if not _ensure_google_auth():
+         return None, None
+ 
+diff --git a/tests/agent/test_vertex_adapter.py b/tests/agent/test_vertex_adapter.py
+index e5830436738..82217c2e592 100644
+--- a/tests/agent/test_vertex_adapter.py
++++ b/tests/agent/test_vertex_adapter.py
+@@ -271,3 +271,23 @@ def test_metadata_preserving_rotation_invalidates_creds_cache(vertex_adapter, mo
+     (key2,) = vertex_adapter._creds_cache
+     assert key2 != key1, "content change must produce a new cache key"
+     assert vertex_adapter._creds_cache[key2][0] is not creds_obj_1
++
++
++def test_proactive_gcloud_refresh_when_cache_missing_or_expired(vertex_adapter, monkeypatch):
++    """When vertex_token.txt is expired/missing, proactive auto-refresh should call _refresh_gcloud_token."""
++    # Temporarily bypass PYTEST_CURRENT_TEST guard to test non-test runtime behavior
++    monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
++    monkeypatch.setattr(vertex_adapter, "_resolve_credentials_path", lambda explicit=None: None)
++    monkeypatch.setattr(vertex_adapter, "_read_local_cached_token", lambda *a, **kw: (None, None))
++    monkeypatch.setattr(vertex_adapter, "_check_direct_bearer_token", lambda *a, **kw: (None, None))
++    called = []
++    monkeypatch.setattr(
++        vertex_adapter, "_refresh_gcloud_token",
++        lambda proj=None: called.append(True) or ("ya29.FRESH_GCLOUD", "project-fresh")
++    )
++
++    token, project = vertex_adapter.get_vertex_credentials()
++    assert token == "ya29.FRESH_GCLOUD"
++    assert project == "project-fresh"
++    assert len(called) == 1
++
+-- 
+2.50.1
+

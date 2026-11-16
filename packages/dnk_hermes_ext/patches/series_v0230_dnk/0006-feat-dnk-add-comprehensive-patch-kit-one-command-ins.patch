@@ -1,0 +1,1554 @@
+From c78d4afabd268902f5ef9e425ba6cb97f708a0de Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Fri, 6 Nov 2026 20:28:17 +0200
+Subject: [PATCH 06/26] feat(dnk): add comprehensive patch kit, one-command
+ installer, and documentation
+
+---
+ ...t-Google-Cloud-Vertex-ADC-token-rota.patch | 199 ++++++
+ ...strict-column-width-bounds-and-honor.patch |  34 ++
+ ...ize-whitespace-in-hero-art-to-preven.patch |  30 +
+ ...-approved-DNK-OS-dynamic-banner-with.patch | 354 +++++++++++
+ ...uto-prefix-google-for-Gemini-models-.patch |  29 +
+ dnk_patches/README.md                         |  79 +++
+ dnk_patches/dnk-os.yaml                       |  53 ++
+ dnk_patches/dnk_os_full_hermes_v0230.patch    | 573 ++++++++++++++++++
+ dnk_patches/install_dnk_enhancements.sh       | 119 ++++
+ 9 files changed, 1470 insertions(+)
+ create mode 100644 dnk_patches/0001-feat-vertex-adapt-Google-Cloud-Vertex-ADC-token-rota.patch
+ create mode 100644 dnk_patches/0002-fix-cli-enforce-strict-column-width-bounds-and-honor.patch
+ create mode 100644 dnk_patches/0003-fix-banner-sanitize-whitespace-in-hero-art-to-preven.patch
+ create mode 100644 dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
+ create mode 100644 dnk_patches/0005-feat-normalize-auto-prefix-google-for-Gemini-models-.patch
+ create mode 100644 dnk_patches/README.md
+ create mode 100644 dnk_patches/dnk-os.yaml
+ create mode 100644 dnk_patches/dnk_os_full_hermes_v0230.patch
+ create mode 100755 dnk_patches/install_dnk_enhancements.sh
+
+diff --git a/dnk_patches/0001-feat-vertex-adapt-Google-Cloud-Vertex-ADC-token-rota.patch b/dnk_patches/0001-feat-vertex-adapt-Google-Cloud-Vertex-ADC-token-rota.patch
+new file mode 100644
+index 00000000000..5f756b55079
+--- /dev/null
++++ b/dnk_patches/0001-feat-vertex-adapt-Google-Cloud-Vertex-ADC-token-rota.patch
+@@ -0,0 +1,199 @@
++From d26f528cd3fbe929d5631a0484d9fef11a8dab17 Mon Sep 17 00:00:00 2001
++From: Kuzmenko-top <reburn.craft@gmail.com>
++Date: Wed, 4 Nov 2026 02:22:46 +0200
++Subject: [PATCH 1/5] feat(vertex): adapt Google Cloud Vertex ADC & token
++ rotation to Hermes v0.23.0 architecture
++
++---
++ agent/vertex_adapter.py | 130 +++++++++++++++++++++++++++++++++++++---
++ 1 file changed, 123 insertions(+), 7 deletions(-)
++
++diff --git a/agent/vertex_adapter.py b/agent/vertex_adapter.py
++index 212e498bbf..828f1a396f 100644
++--- a/agent/vertex_adapter.py
+++++ b/agent/vertex_adapter.py
++@@ -11,6 +11,7 @@ import json
++ import logging
++ import os
++ import time
+++from pathlib import Path
++ from typing import Any, Optional, Tuple
++ 
++ from agent.credential_source import VERTEX_OAUTH, tag_credential_source
++@@ -55,6 +56,47 @@ _CLOUD_PLATFORM_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
++ 
++ _creds_cache: dict = {}
++ 
+++# Google OAuth tokens expire in 3600s. Reject env-var / token-file tokens
+++# older than this to force ADC auto-refresh. 3000s = 50 min (safe margin).
+++_TOKEN_BEARER_MAX_AGE_SEC: int = 3000
+++_TOKEN_FILE_MAX_AGE_SEC: int = 3000
+++
+++# Tracks when VERTEX_API_KEY env-var was last written by gerych.sh / force_refresh.
+++_env_token_written_at: dict = {}
+++
+++
+++def _reload_dnk_active_env() -> None:
+++    """Reload active GCP project credentials from SSOT .dnk_active_project.env or HERMES_HOME/.env."""
+++    if os.environ.get("PYTEST_CURRENT_TEST"):
+++        return
+++    try:
+++        from core.config.gcp_config import load_dnk_active_env
+++        load_dnk_active_env(force_reload=True)
+++        return
+++    except Exception:
+++        pass
+++
+++    from pathlib import Path
+++    hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+++    candidate_paths = [
+++        Path.cwd() / ".dnk_active_project.env",
+++        Path.cwd().parent / ".dnk_active_project.env",
+++        Path.cwd().parent.parent / ".dnk_active_project.env",
+++        hermes_home / ".env",
+++        hermes_home / ".dnk_active_project.env",
+++    ]
+++    for p in candidate_paths:
+++        try:
+++            if p.is_file():
+++                for line in p.read_text(encoding="utf-8").splitlines():
+++                    line = line.strip()
+++                    if "=" in line and not line.startswith("#"):
+++                        k, v = line.split("=", 1)
+++                        os.environ[k.strip()] = v.strip().strip("\"'")
+++                break
+++        except Exception:
+++            pass
+++
++ 
++ def _vertex_config() -> dict:
++     """Return the ``vertex:`` section of config.yaml, or {} on any failure."""
++@@ -78,8 +120,12 @@ def _resolve_region(explicit: Optional[str] = None) -> str:
++ 
++ 
++ def _resolve_project_override() -> Optional[str]:
++-    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml), or None to use the creds' embedded project_id."""
++-    return _env_or_config("VERTEX_PROJECT_ID", "project_id") or None
+++    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml > GOOGLE_CLOUD_PROJECT), or None."""
+++    explicit = _env_or_config("VERTEX_PROJECT_ID", "project_id")
+++    if explicit:
+++        return explicit
+++    gcp_proj = (_get_secret("GOOGLE_CLOUD_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT") or "").strip()
+++    return gcp_proj or None
++ 
++ 
++ def _resolve_credentials_path(explicit: Optional[str]) -> Optional[str]:
++@@ -161,8 +207,76 @@ def _cached_credentials(resolved_path: Optional[str], sa_raw: Optional[bytes], c
++     return cached
++ 
++ 
++-def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Optional[str], Optional[str]]:
+++def get_vertex_credentials(
+++    credentials_path: Optional[str] = None,
+++    force_refresh: bool = False,
+++) -> tuple[Optional[str], Optional[str]]:
++     """Return (fresh access_token, project_id) or (None, None); Credentials cached per file content."""
+++    _reload_dnk_active_env()
+++    if force_refresh:
+++        _creds_cache.clear()
+++
+++    project_override = _resolve_project_override()
+++
+++    # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
+++    if force_refresh:
+++        try:
+++            import subprocess
+++            account = os.getenv("GCP_ACTIVE_ACCOUNT")
+++            cmd = ["gcloud", "auth", "print-access-token"]
+++            if account:
+++                cmd.append(account)
+++            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+++            if proc.returncode == 0 and proc.stdout.strip().startswith("ya29."):
+++                fresh_tok = proc.stdout.strip()
+++                os.environ["VERTEX_API_KEY"] = fresh_tok
+++                os.environ["VERTEX_TOKEN"] = fresh_tok
+++                _env_token_written_at[fresh_tok[:20]] = time.time()
+++                token_file = os.path.expanduser("~/.hermes/vertex_token.txt")
+++                try:
+++                    with open(token_file, "w") as f:
+++                        f.write(fresh_tok)
+++                except Exception:
+++                    pass
+++                return fresh_tok, project_override
+++        except Exception:
+++            pass
+++
+++    # Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)
+++    direct_token = (
+++        _get_secret("VERTEX_API_KEY")
+++        or _get_secret("GEMINI_API_KEY")
+++        or _get_secret("GOOGLE_API_KEY")
+++        or ""
+++    ).strip()
+++    if direct_token.startswith("ya29.") and not force_refresh:
+++        tok_key = direct_token[:20]
+++        written_at = _env_token_written_at.get(tok_key, 0.0)
+++        if written_at == 0.0:
+++            _env_token_written_at[tok_key] = time.time()
+++            written_at = time.time()
+++        age_sec = time.time() - written_at
+++        if age_sec < _TOKEN_BEARER_MAX_AGE_SEC:
+++            return direct_token, project_override
+++        logger.info(
+++            "VERTEX_API_KEY bearer token is %.0fs old (max %ds) — falling through to ADC auto-refresh.",
+++            age_sec,
+++            _TOKEN_BEARER_MAX_AGE_SEC,
+++        )
+++
+++    if not is_multiplex_active() and not force_refresh and not os.environ.get("PYTEST_CURRENT_TEST"):
+++        hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+++        token_file = hermes_home / "vertex_token.txt"
+++        if token_file.is_file():
+++            try:
+++                file_age_sec = time.time() - token_file.stat().st_mtime
+++                if file_age_sec < _TOKEN_FILE_MAX_AGE_SEC:
+++                    cached_tok = token_file.read_text(encoding="utf-8").strip()
+++                    if cached_tok.startswith("ya29."):
+++                        return cached_tok, project_override
+++            except Exception:
+++                pass
+++
++     if not _ensure_google_auth():
++         return None, None
++ 
++@@ -177,7 +291,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
++         creds, project_id = cached
++         if _needs_refresh(creds):
++             creds.refresh(google.auth.transport.requests.Request())
++-        return creds.token, _resolve_project_override() or project_id
+++        return creds.token, project_override or project_id
++     except Exception as e:
++         logger.error(f"Failed to resolve Vertex AI credentials: {e}")
++         _creds_cache.pop(cache_key, None)
++@@ -186,7 +300,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
++         sa_path = None if resolved_path else _resolve_credentials_path(credentials_path)
++         if sa_path:
++             logger.info("ADC failed, retrying with service account: %s", sa_path)
++-            return get_vertex_credentials(sa_path)
+++            return get_vertex_credentials(sa_path, force_refresh=force_refresh)
++         return None, None
++ 
++ 
++@@ -197,10 +311,12 @@ def build_vertex_base_url(project_id: str, region: str = DEFAULT_REGION) -> str:
++ 
++ 
++ def get_vertex_config(
++-    credentials_path: Optional[str] = None, region: Optional[str] = None
+++    credentials_path: Optional[str] = None,
+++    region: Optional[str] = None,
+++    force_refresh: bool = False,
++ ) -> tuple[Optional[str], Optional[str]]:
++     """Resolve (access_token, base_url) for Vertex AI, or (None, None) on failure."""
++-    token, project_id = get_vertex_credentials(credentials_path)
+++    token, project_id = get_vertex_credentials(credentials_path, force_refresh=force_refresh)
++     if not token or not project_id:
++         return None, None
++     return token, build_vertex_base_url(project_id, _resolve_region(region))
++-- 
++2.50.1
++
+diff --git a/dnk_patches/0002-fix-cli-enforce-strict-column-width-bounds-and-honor.patch b/dnk_patches/0002-fix-cli-enforce-strict-column-width-bounds-and-honor.patch
+new file mode 100644
+index 00000000000..3eadaa56524
+--- /dev/null
++++ b/dnk_patches/0002-fix-cli-enforce-strict-column-width-bounds-and-honor.patch
+@@ -0,0 +1,34 @@
++From eaa497a7a1dc1527845fb0e3b6026c27334d3550 Mon Sep 17 00:00:00 2001
++From: Kuzmenko-top <reburn.craft@gmail.com>
++Date: Fri, 6 Nov 2026 19:48:30 +0200
++Subject: [PATCH 2/5] fix(cli): enforce strict column width bounds and honor
++ empty banner_logo in skins
++
++---
++ hermes_cli/banner.py | 12 +++++++++---
++ 1 file changed, 9 insertions(+), 3 deletions(-)
++
++diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
++index e324f66e5f..ac5cef8e04 100644
++--- a/hermes_cli/banner.py
+++++ b/hermes_cli/banner.py
++@@ -760,7 +760,13 @@ def build_welcome_banner(
++         layout_table, title=f"[bold {_skin_color('banner_title', '#FFD700')}]{version_label}[/]",
++         border_style=_skin_color("banner_border", "#CD7F32"), padding=(0, 2))
++     console.print()
++-    if shutil.get_terminal_size().columns >= 95:
++-        console.print(getattr(_bskin, "banner_logo", None) or HERMES_AGENT_LOGO)
++-        console.print()
+++    logo = getattr(_bskin, "banner_logo", None)
+++    if logo is None:
+++        logo = HERMES_AGENT_LOGO
+++    if logo:
+++        raw_lines = [re.sub(r'\[.*?\]', '', line) for line in logo.strip().splitlines()]
+++        req_width = max(len(line) for line in raw_lines) if raw_lines else 0
+++        if shutil.get_terminal_size().columns >= req_width + 4:
+++            console.print(logo)
+++            console.print()
++     console.print(outer_panel)
++-- 
++2.50.1
++
+diff --git a/dnk_patches/0003-fix-banner-sanitize-whitespace-in-hero-art-to-preven.patch b/dnk_patches/0003-fix-banner-sanitize-whitespace-in-hero-art-to-preven.patch
+new file mode 100644
+index 00000000000..f6734538a5c
+--- /dev/null
++++ b/dnk_patches/0003-fix-banner-sanitize-whitespace-in-hero-art-to-preven.patch
+@@ -0,0 +1,30 @@
++From 440cc94f2cc9887db8784cc43e4bead364a8beb8 Mon Sep 17 00:00:00 2001
++From: Kuzmenko-top <reburn.craft@gmail.com>
++Date: Fri, 6 Nov 2026 19:55:34 +0200
++Subject: [PATCH 3/5] fix(banner): sanitize whitespace in hero art to prevent
++ internal line-wrapping
++
++---
++ hermes_cli/banner.py | 6 +++++-
++ 1 file changed, 5 insertions(+), 1 deletion(-)
++
++diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
++index ac5cef8e04..2b54c43fe3 100644
++--- a/hermes_cli/banner.py
+++++ b/hermes_cli/banner.py
++@@ -699,7 +699,11 @@ def build_welcome_banner(
++     text = _skin_color("banner_text", "#FFF8DC")
++     # Use skin's custom caduceus art if provided
++     _bskin = _quiet(_active_skin)
++-    left_lines = ["", getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS, ""]
+++    hero_art = getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
+++    if hero_art:
+++        # Prevent ASCII art lines from wrapping internally on spaces in narrow terminals
+++        hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
+++    left_lines = ["", hero_art, ""]
++     left_lines += _banner_left_lines(model, cwd, session_id, context_length, provider, accent=accent, dim=dim,
++                                      context_pinned=context_pinned, context_marker=context_marker)
++     right_lines = _banner_tool_lines(
++-- 
++2.50.1
++
+diff --git a/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch b/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
+new file mode 100644
+index 00000000000..69d4ad7b5a7
+--- /dev/null
++++ b/dnk_patches/0004-feat-banner-port-approved-DNK-OS-dynamic-banner-with.patch
+@@ -0,0 +1,354 @@
++From 071632f7038c53c3e2d93168517581f34ec7b6d6 Mon Sep 17 00:00:00 2001
++From: Kuzmenko-top <reburn.craft@gmail.com>
++Date: Fri, 6 Nov 2026 20:04:51 +0200
++Subject: [PATCH 4/5] feat(banner): port approved DNK OS dynamic banner with
++ capability showcase
++
++---
++ hermes_cli/banner.py | 330 +++++++++++++++++++++++++++++++++++++++++++
++ 1 file changed, 330 insertions(+)
++
++diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
++index 2b54c43fe3..3e1b22eba7 100644
++--- a/hermes_cli/banner.py
+++++ b/hermes_cli/banner.py
++@@ -752,6 +752,336 @@ def build_welcome_banner(
++         elif behind is not None and behind != 0:
++             right_lines.append(_format_update_notice(behind))
++     _quiet(_update_line)  # Never break the banner over an update check
+++
+++    _is_dnk = (_bskin is not None and getattr(_bskin, "name", "") == "dnk-os")
+++    title_color = _skin_color("banner_title", "#FFB347" if _is_dnk else "#FFD700")
+++    border_color = _skin_color("banner_border", "#FF8C00" if _is_dnk else "#CD7F32")
+++
+++    if _is_dnk:
+++        import random
+++
+++        model_short = model.split("/")[-1] if "/" in model else model
+++        if not model_short or model_short.lower() == "unknown":
+++            model_short = "gemini-3.8-flash"
+++        if model_short.endswith(".gguf"):
+++            model_short = model_short[:-5]
+++        if len(model_short) > 28:
+++            model_short = model_short[:25] + "..."
+++
+++        provider_val = (provider or "").strip().lower()
+++        if not provider_val:
+++            try:
+++                from hermes_cli.config import load_config
+++                _cfg = load_config() or {}
+++                provider_val = (_cfg.get("provider") or _cfg.get("model_provider") or "").strip().lower()
+++            except Exception:
+++                provider_val = ""
+++
+++        provider_labels = {
+++            "vertex": "Google Vertex AI",
+++            "google": "Google AI Studio",
+++            "anthropic": "Anthropic",
+++            "openrouter": "OpenRouter",
+++            "openai": "OpenAI",
+++            "groq": "Groq",
+++            "ollama": "Ollama (Local)",
+++            "mistral": "Mistral AI",
+++            "xai": "xAI",
+++            "deepseek": "DeepSeek",
+++            "bedrock": "AWS Bedrock",
+++            "azure": "Azure OpenAI",
+++            "moa": "Mixture of Agents",
+++        }
+++        provider_display = provider_labels.get(provider_val, provider.title() if provider else "Google Vertex AI")
+++
+++        term_width = getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
+++        panel_padding = 0 if term_width < 88 else 1
+++        col_padding = 1 if term_width < 92 else 2
+++        left_w = 34
+++        max_right_w = max(24, term_width - (left_w + col_padding + (panel_padding * 2) + 2))
+++
+++        def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
+++            overhead = len(prefix) + len(sep)
+++            avail_desc = max_w - overhead - len(name)
+++            if avail_desc < 3:
+++                shortened_name = name[:max(3, max_w - len(prefix))]
+++                return f"{prefix}[{text}]{shortened_name}[/]"
+++            if len(desc) > avail_desc:
+++                desc = desc[:max(0, avail_desc - 1)] + "…"
+++            return f"{prefix}[{text}]{name}[/] [dim {dim}]{sep}[/] [{text}]{desc}[/]"
+++
+++        # 1. MCP servers discovery
+++        mcp_desc_map = {
+++            "notion": "база знань Notion",
+++            "github": "репозиторії та PR",
+++            "context7": "індексація docs",
+++            "postgresql": "SQL база даних",
+++            "open-design": "UI Canvas макети",
+++            "obsidian": "Vault знань",
+++            "dnk_git_research": "дослідження GitHub",
+++            "dnk_video_creator": "генерація медіа",
+++            "dnk_orchestrator": "Swarm координація",
+++            "dnk_analytics": "метрики рою",
+++            "tandem": "відео монтаж Tandem",
+++            "refero": "референси дизайну",
+++            "chrome-devtools": "браузер та a11y",
+++        }
+++        active_mcps = []
+++        try:
+++            from tools.mcp_tool import get_mcp_status
+++            raw_mcps = get_mcp_status() or []
+++            for srv in raw_mcps:
+++                s_name = srv.get("name", "")
+++                if not s_name:
+++                    continue
+++                s_desc = mcp_desc_map.get(s_name, f"{srv.get('tools', 0)} інструментів")
+++                s_connected = srv.get("connected", False)
+++                active_mcps.append((s_name, s_desc, s_connected))
+++        except Exception:
+++            active_mcps = []
+++
+++        if not active_mcps:
+++            try:
+++                from hermes_cli.mcp_config import _get_mcp_servers
+++                cfg_mcps = _get_mcp_servers()
+++                for s_name in cfg_mcps.keys():
+++                    s_desc = mcp_desc_map.get(s_name, "налаштований MCP")
+++                    active_mcps.append((s_name, s_desc, False))
+++            except Exception:
+++                pass
+++
+++        if active_mcps:
+++            sampled_mcp = random.sample(active_mcps, min(3, len(active_mcps)))
+++            mcp_lines = []
+++            for name, desc, connected in sampled_mcp:
+++                mcp_lines.append(_fit_line(name, desc, left_w))
+++            if len(active_mcps) > 3:
+++                mcp_lines.append(f"  [dim {dim}](і ще {len(active_mcps) - 3} налаштованих MCP...)[/]")
+++            elif len(mcp_lines) < 4:
+++                mcp_lines.append(f"  [dim {dim}]...[/]")
+++        else:
+++            mcp_lines = [
+++                f"  [dim {dim}]Немає підключених MCP серверів[/]",
+++                f"  [dim {dim}]...[/]",
+++                f"  [dim {dim}]...[/]",
+++                f"  [dim {dim}]...[/]",
+++            ]
+++
+++        # 2. Random sample useful commands
+++        cmd_pool = [
+++            ("/model", "зміна моделі"),
+++            ("/memory", "когнітивна пам'ять"),
+++            ("/dashboard", "панель управління"),
+++            ("/skills", "бібліотека навичок"),
+++            ("/clear", "новий контекст"),
+++            ("/status", "стан рою агентів"),
+++            ("/sessions", "історія сесій"),
+++            ("/rollback", "відкат змін коду"),
+++        ]
+++        sampled_cmds = random.sample(cmd_pool, min(3, len(cmd_pool)))
+++        cmd_lines = [_fit_line(cmd, desc, left_w) for cmd, desc in sampled_cmds]
+++
+++        connected_mcp_count = len([x for x in active_mcps if x[2]])
+++        if connected_mcp_count > 0:
+++            mcp_header_str = f"📡 MCP Сервери ({connected_mcp_count} активних)"
+++        elif active_mcps:
+++            mcp_header_str = f"📡 MCP Сервери ({len(active_mcps)} налаштовано)"
+++        else:
+++            mcp_header_str = "📡 MCP Сервери"
+++
+++        left_lines = [
+++            "",
+++            hero_art,
+++            "",
+++            f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+++            f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
+++            "",
+++            f"[bold {accent}]{mcp_header_str}[/]",
+++            *mcp_lines[:4],
+++            "",
+++            f"[bold {accent}]💡 Корисні Команди[/]",
+++            *cmd_lines[:3],
+++        ]
+++
+++        # 3. Dynamic Tools sampling
+++        tool_desc_map = {
+++            "computer_use": "керування Mac",
+++            "cronjob": "фонові задачі",
+++            "execute_code": "запуск коду",
+++            "read_file": "читання файлів",
+++            "write_file": "запис файлів",
+++            "patch": "модифікація коду",
+++            "search_files": "пошук по проекту",
+++            "browser": "керування браузером",
+++            "web_search": "пошук в Інтернеті",
+++            "terminal": "виконання команд",
+++            "memory": "контекст & знання",
+++            "vision_analyze": "аналіз зображень",
+++            "delegate_task": "делегування в Swarm",
+++            "todo": "менеджер чеклістів",
+++            "clarify": "діалог з користувачем",
+++            "skill_view": "перегляд навичок",
+++            "skill_manage": "управління навичками",
+++            "text_to_speech": "синтез голосу",
+++            "session_search": "пошук сесій",
+++            "dnk_swarm_dispatch": "маршрутизація Swarm",
+++            "dnk_swarm_parallel": "паралельні воркери",
+++            "dnk_triage_task": "класифікатор задач",
+++        }
+++        active_tool_names = set()
+++        for t in (tools or []):
+++            if isinstance(t, dict):
+++                t_fn = t.get("function") or {}
+++                t_name = t_fn.get("name") if isinstance(t_fn, dict) else t.get("name")
+++                if t_name:
+++                    active_tool_names.add(t_name)
+++
+++        available_tool_items = [
+++            (name, desc) for name, desc in tool_desc_map.items()
+++            if name in active_tool_names
+++        ]
+++        if not available_tool_items:
+++            available_tool_items = list(tool_desc_map.items())
+++
+++        sampled_tools = random.sample(available_tool_items, min(3, len(available_tool_items)))
+++        dynamic_tool_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_tools]
+++        total_tools_count = len(tools) if tools else len(active_tool_names) or 18
+++        remaining_tools = max(total_tools_count - 3, 0)
+++        tool_rem_text = f"(ще {remaining_tools} інструментів...)"
+++
+++        # 4. Registered Swarm Agents
+++        agent_desc_map = {
+++            "gerych_prime": "Swarm координатор",
+++            "gerych_builder": "UI & Canvas фронтенд",
+++            "gerych_researcher": "GitHub & SOTA аналіз",
+++            "gerych_auditor": "аудит & тест-гейти",
+++            "dnk_dev_fullstack": "бекенд, FastAPI & ORM",
+++            "dnk_shopify": "Shopify & Liquid",
+++            "dnk_video_ai_creator": "медіа & Remotion",
+++            "dnk_scones_memory": "пам'ять & RAG",
+++            "dnk_security_guard": "безпека & Vault",
+++            "dnk_analytics": "метрики рою",
+++            "dnk_mentor": "менторство & гайди",
+++            "dnk_brand_typostyle": "бренд & типографіка",
+++            "herich_librarian": "Obsidian & знання",
+++            "strategist": "стратегія & дорожні карти",
+++            "auditor": "контроль інваріантів",
+++            "denchik": "автономний агент Mac",
+++        }
+++        real_agents = []
+++        for candidate_path in [
+++            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
+++            Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
+++        ]:
+++            try:
+++                if candidate_path.exists():
+++                    real_agents = sorted([
+++                        d.name for d in candidate_path.iterdir()
+++                        if d.is_dir() and not d.name.startswith((".", "_"))
+++                    ])
+++                    if real_agents:
+++                        break
+++            except Exception:
+++                pass
+++
+++        if not real_agents:
+++            real_agents = list(agent_desc_map.keys())
+++
+++        agents_count = len(real_agents)
+++        agents_pool = [(name, agent_desc_map.get(name, "агент рою")) for name in real_agents]
+++        sampled_agents = random.sample(agents_pool, min(3, len(agents_pool)))
+++        dynamic_agent_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_agents]
+++        remaining_agents = max(agents_count - 3, 0)
+++        agent_remaining_str = f"  [dim {dim}](ще {remaining_agents} агентів...)[/]" if remaining_agents else ""
+++
+++        # 5. Dynamic Skills categories
+++        skill_cats = skills_by_category
+++        if not skill_cats:
+++            try:
+++                skill_cats = get_available_skills()
+++            except Exception:
+++                skill_cats = {}
+++
+++        skill_cat_desc_map = {
+++            "software-development": "розробка & CI",
+++            "productivity": "автоматизація",
+++            "creative": "UI & дизайн",
+++            "autonomous-ai-agents": "рої агентів",
+++            "research": "SOTA ресьорч",
+++            "github": "CI/CD & PR",
+++            "mlops": "моделі & LLM",
+++            "devops": "деплой & інфра",
+++            "note-taking": "Obsidian & нотатки",
+++            "apple": "macOS & Apple",
+++            "media": "медіа & аудіо",
+++            "email": "пошта & inbox",
+++            "smart-home": "розумний дім",
+++            "social-media": "соцмережі & API",
+++            "canvas_ui_ux": "інтерфейси Canvas",
+++        }
+++
+++        total_skills = sum(len(v) for v in skill_cats.values()) if skill_cats else 0
+++        available_cats = [
+++            (cat, len(s_list), skill_cat_desc_map.get(cat, "навички"))
+++            for cat, s_list in (skill_cats or {}).items()
+++            if s_list
+++        ]
+++        if available_cats:
+++            sampled_cats = random.sample(available_cats, min(3, len(available_cats)))
+++            dynamic_skill_lines = [
+++                _fit_line(f"{cat[:14]} ({cnt})", desc, max_right_w)
+++                for cat, cnt, desc in sampled_cats
+++            ]
+++        else:
+++            dynamic_skill_lines = [f"  [dim {dim}]Навички завантажуються...[/]"]
+++
+++        rem_cat_cnt = max(0, len(available_cats) - 3)
+++        skill_rem_str = f"  [dim {dim}](ще {rem_cat_cnt} категорій...)[/]" if rem_cat_cnt else ""
+++
+++        footer_text = f"{total_tools_count} інструментів · {agents_count} агентів · {total_skills} навичок"
+++
+++        right_lines = [
+++            f"[bold {accent}]🔧 Інструменти ({total_tools_count})[/]",
+++            *dynamic_tool_lines,
+++            f"  [dim {dim}]{tool_rem_text}[/]",
+++            "",
+++            f"[bold {accent}]🤖 Агенти рою ({agents_count})[/]",
+++            *dynamic_agent_lines,
+++            *([agent_remaining_str] if agent_remaining_str else []),
+++            "",
+++            f"[bold {accent}]📚 Навички ({total_skills})[/]",
+++            *dynamic_skill_lines,
+++            *([skill_rem_str] if skill_rem_str else []),
+++            "",
+++            f"[dim {dim}]{footer_text}[/]",
+++        ]
+++
+++        right_content = "\n".join([line.replace("\ufe0f", "") for line in right_lines])
+++        left_content = "\n".join([line.replace("\ufe0f", "") for line in left_lines])
+++
+++        dnk_table = Table.grid(padding=(0, col_padding))
+++        dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
+++        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
+++        dnk_table.add_row(left_content, right_content)
+++
+++        is_denchik = (
+++            os.environ.get("DENCHIK_MODE") == "1"
+++            or os.environ.get("HERMES_AGENT_NAME") == "denchik"
+++        )
+++        version_label = format_banner_version_label()
+++        v_str = version_label.replace("Hermes Agent ", "Hermes ").replace("Hermes Hermes ", "Hermes ")
+++        agent_title = "Denchik (DNK OS)" if is_denchik else "Gerych (DNK OS)"
+++        title_markup = f"[bold {title_color}]{agent_title} · {v_str}[/]"
+++        outer_panel = Panel(
+++            dnk_table,
+++            title=title_markup,
+++            border_style=border_color,
+++            padding=(0, panel_padding),
+++        )
+++        console.print()
+++        console.print(outer_panel)
+++        return
+++
++     layout_table = Table.grid(padding=(0, 2))
++     layout_table.add_column("left", justify="left")
++     layout_table.add_column("right", justify="left")
++-- 
++2.50.1
++
+diff --git a/dnk_patches/0005-feat-normalize-auto-prefix-google-for-Gemini-models-.patch b/dnk_patches/0005-feat-normalize-auto-prefix-google-for-Gemini-models-.patch
+new file mode 100644
+index 00000000000..be480b16b30
+--- /dev/null
++++ b/dnk_patches/0005-feat-normalize-auto-prefix-google-for-Gemini-models-.patch
+@@ -0,0 +1,29 @@
++From 597d10ba282b942f865c095da6f3a1d502ffc78a Mon Sep 17 00:00:00 2001
++From: Kuzmenko-top <reburn.craft@gmail.com>
++Date: Fri, 6 Nov 2026 20:15:25 +0200
++Subject: [PATCH 5/5] feat(normalize): auto-prefix google/ for Gemini models on
++ Vertex AI
++
++---
++ hermes_cli/model_normalize.py | 5 +++++
++ 1 file changed, 5 insertions(+)
++
++diff --git a/hermes_cli/model_normalize.py b/hermes_cli/model_normalize.py
++index 66dfae00d4..fac3bc80c5 100644
++--- a/hermes_cli/model_normalize.py
+++++ b/hermes_cli/model_normalize.py
++@@ -240,6 +240,11 @@ def normalize_model_for_provider(model_input: str, target_provider: str) -> str:
++     if normalized:
++         return normalized
++ 
+++    if provider == "vertex":
+++        if "/" not in name and name.startswith(("gemini-", "imagen-", "medlm-")):
+++            return f"google/{name}"
+++        return name
+++
++     if provider in _STRIP_VENDOR_ONLY_PROVIDERS:
++         stripped = _strip_matching_provider_prefix(name, provider)
++         if stripped == name and name.startswith(("openai/", "openai:")):
++-- 
++2.50.1
++
+diff --git a/dnk_patches/README.md b/dnk_patches/README.md
+new file mode 100644
+index 00000000000..12128e9e67e
+--- /dev/null
++++ b/dnk_patches/README.md
+@@ -0,0 +1,79 @@
++# 🛡️ DNK OS: Hermes Agent Enhancements & Adaptation Kit
++
++Ця директорія містить повний набір архітектурних доробок, патчів та утиліт для безшовної адаптації офіційного **NousResearch/hermes-agent** під стандарти **DNK OS**.
++
++Будь-який агент (Гєрич, Денчик, Антігравіті, Codex, Claude) або розробник може розгорнути всі доопрацювання на свіжу версію Hermes **однією командою**:
++
++```bash
++bash dnk_patches/install_dnk_enhancements.sh
++```
++
++---
++
++## ⚡ Що вирішують наші доопрацювання (Architecture Matrix)
++
++| Підсистема | Файл | Що було в Upstream | Що додано в DNK OS |
++| :--- | :--- | :--- | :--- |
++| **Google Cloud Vertex AI ADC** | `agent/vertex_adapter.py` | Жорстко очікував `GOOGLE_APPLICATION_CREDENTIALS` (файл сервісного акаунта). При роботі через gcloud auth / ADC часто падав або мав застарілий токен. | Додано SSOT-синхронізацію проекту (`_reload_dnk_active_env`), захист від протухання токена (`_TOKEN_BEARER_MAX_AGE_SEC = 3000s`) та авто-генерацію токена через `gcloud auth print-access-token`. |
++| **Model Normalization** | `hermes_cli/model_normalize.py` | Передавав моделі на ендпоінт Vertex AI як `gemini-4-argon` або `gemini-3.7-flash`, що викликало помилку `HTTP 400 Malformed publisher model`. | Автоматичне префіксування `google/` для всіх моделей Gemini/Imagen на Vertex AI OpenAPI ендпоінті. Тепер можна вказувати модель як з префіксом, так і без нього. |
++| **Адаптивність банера (Width Guard)** | `hermes_cli/banner.py` | Upstream друкував ASCII-логотип при ширині `>= 95`, хоча сам логотип мав 101+ символ. У спліт-панелях VS Code (80–90 колонок) графіка розсипалася на "кашу". | Жорсткий розрахунок реальної ширини рядків (`req_width + 4`) та підтримка порожнього логотипу `banner_logo: ''` для скінів. |
++| **Захист від розриву слів в ASCII-арті** | `hermes_cli/banner.py` | Rich переносив рядки ASCII-малюнка по звичайних пробілах між символами. | Автоматична заміна звичайних пробілів у hero-блоці на нерозривні (`\u00a0`), що гарантує 100% збереження геометрії малюнка. |
++| **Динамічна вітрина можливостей DNK OS** | `hermes_cli/banner.py` | Статичний список інструментів англійською, повідомлення "Skills toolset disabled", нуль контексту про рої агентів та MCP. | Повноцінний фірмовий банер: живий статус MCP-серверів з українськими описами, ротація корисних команд, випадкова вибірка активних інструментів, динамічне сканування 7+ агентів рою (`core/orchestrator/agents`) та вітрина навичок. |
++| **Zero-Local-Env Hygiene** | `.venv` | Репозиторій міг створити важкий локальний `.venv` на 1–3 ГБ. | Автоматичне монтування симлінка `.venv -> ~/.dnk_runtime/venvs/hermes-agent` (0 байт дублікатів на диску). |
++
++---
++
++## 📦 Склад директорії `dnk_patches/`
++
++```text
++dnk_patches/
++├── README.md                      # Цей документ (Single Source of Truth для агентів)
++├── install_dnk_enhancements.sh    # Автоматичний скрипт встановлення в 1 команду
++├── dnk_os_full_hermes_v0230.patch # Єдиний кумулятивний патч для v0.23.0+
++├── dnk-os.yaml                    # Фірмовий скін DNK OS з адаптивним hero-логотипом
++├── 0001-feat-vertex-adapt-...     # Окремий патч 1: Vertex AI ADC & Token Rotation
++├── 0002-fix-cli-enforce-...       # Окремий патч 2: Banner Column Bounds & Skin Empty Logo
++├── 0003-fix-banner-sanitize-...   # Окремий патч 3: ASCII Hero Whitespace Non-Breaking Guard
++├── 0004-feat-banner-port-...      # Окремий патч 4: Dynamic Capabilities Showcase
++└── 0005-feat-normalize-auto-...   # Окремий патч 5: Auto-prefix google/ on Vertex AI
++```
++
++---
++
++## 🚀 Як застосовувати на нових версіях Hermes (v0.24.0+)
++
++Коли виходить новий реліз `NousResearch/hermes-agent`:
++
++1. Оновлюємо або викачуємо репозиторій:
++   ```bash
++   cd /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/hermes-agent
++   git checkout -b feature/v0240-dnk-gcp
++   ```
++
++2. Запускаємо єдину команду інсталяції:
++   ```bash
++   bash dnk_patches/install_dnk_enhancements.sh
++   ```
++
++3. Якщо в новій версії суттєво змінилися номери рядків у файлах, скрипт автоматично спробує `git apply -3` (3-way merge). Якщо виникне конфлікт, скористайтеся описом вище для ручного внесення 3 ключових блоків:
++   - `_reload_dnk_active_env` та `_TOKEN_BEARER_MAX_AGE_SEC` у [agent/vertex_adapter.py](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/hermes-agent/agent/vertex_adapter.py)
++   - `if provider == "vertex": return f"google/{name}"` у [hermes_cli/model_normalize.py](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/hermes-agent/hermes_cli/model_normalize.py)
++   - Блок `if _is_dnk:` у [hermes_cli/banner.py](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/hermes-agent/hermes_cli/banner.py)
++
++---
++
++## 🧪 Валідація та перевірка працездатності
++
++Після запуску переконайтеся, що всі модулі функціонують:
++
++```bash
++# 1. Перевірка нормалізації моделей
++./.venv/bin/python -c "
++from hermes_cli.model_normalize import normalize_model_for_provider
++assert normalize_model_for_provider('gemini-4-argon', 'vertex') == 'google/gemini-4-argon'
++print('Model Normalization: OK')
++"
++
++# 2. Контрольний запит через Vertex AI
++./.venv/bin/python cli.py --provider vertex --model gemini-4-argon -q "Say: DNK OS Enhancements Verified" --oneshot
++```
+diff --git a/dnk_patches/dnk-os.yaml b/dnk_patches/dnk-os.yaml
+new file mode 100644
+index 00000000000..e55ff9978a4
+--- /dev/null
++++ b/dnk_patches/dnk-os.yaml
+@@ -0,0 +1,53 @@
++name: dnk-os
++description: DNK OS Official Skin — Gerych Core
++colors:
++  banner_border: '#FF8C00'
++  response_border: '#FF8C00'
++  response_text: '#E0E0E0'
++  banner_title: '#FFB347'
++  banner_accent: '#FFA733'
++  banner_dim: '#A0AEC0'
++  banner_text: '#CBD5E1'
++  ui_accent: '#FF8C00'
++  ui_label: '#FFB347'
++  ui_text: '#E0E0E0'
++  ui_border: '#444444'
++  ui_tool: '#FF8C00'
++  ui_thinking: '#888888'
++  ui_ok: '#00FF00'
++  ui_warn: '#FFFF00'
++  ui_error: '#FF0000'
++  prompt: '#FFB347'
++  status_bar_strong: '#FF8C00'
++  status_bar_text: '#E0E0E0'
++  status_bar_good: '#00FF00'
++  status_bar_warn: '#FFFF00'
++  status_bar_bad: '#FF0000'
++  status_bar_critical: '#FF0000'
++  diff_added: '#00FF00'
++  diff_removed: '#FF0000'
++  diff_added_word: '#00FF00'
++  diff_removed_word: '#FF0000'
++  syntax_string: '#00FF00'
++  syntax_number: '#FFB347'
++  syntax_keyword: '#FF8C00'
++  syntax_comment: '#888888'
++  completion_menu_bg: '#222222'
++  completion_menu_current_bg: '#444444'
++  completion_menu_meta_bg: '#333333'
++  background: '#181818'
++branding:
++  agent_name: Gerych (DNK OS)
++  welcome: Вітаю, Максиме. DNK OS Gerych Core завантажено та готовий до роботи.
++  goodbye: Сесію завершено. До зв'язку! ⚡
++  response_label: ' ⚡ Гєрич '
++banner_hero: |
++  [bold #FF8C00]██████╗ ███╗   ██╗██╗  ██╗[/]
++  [bold #FF9D2E]██╔══██╗████╗  ██║██║ ██╔╝[/]
++  [bold #FFAF5C]██║  ██║██╔██╗ ██║█████╔╝ [/]
++  [bold #FFC18A]██║  ██║██║╚██╗██║██╔═██╗ [/]
++  [bold #FFD2B8]██████╔╝██║ ╚████║██║  ██╗[/]
++  [bold #FFE4E6]╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝[/]
++  [bold #FF8C00]        D N K   O S       [/]
++  [bold #FFA733]     ⚡ G E R Y C H ⚡    [/]
++banner_logo: ''
+diff --git a/dnk_patches/dnk_os_full_hermes_v0230.patch b/dnk_patches/dnk_os_full_hermes_v0230.patch
+new file mode 100644
+index 00000000000..672d2250a14
+--- /dev/null
++++ b/dnk_patches/dnk_os_full_hermes_v0230.patch
+@@ -0,0 +1,573 @@
++diff --git a/agent/vertex_adapter.py b/agent/vertex_adapter.py
++index 212e498b..828f1a39 100644
++--- a/agent/vertex_adapter.py
+++++ b/agent/vertex_adapter.py
++@@ -11,6 +11,7 @@ import json
++ import logging
++ import os
++ import time
+++from pathlib import Path
++ from typing import Any, Optional, Tuple
++ 
++ from agent.credential_source import VERTEX_OAUTH, tag_credential_source
++@@ -55,6 +56,47 @@ _CLOUD_PLATFORM_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
++ 
++ _creds_cache: dict = {}
++ 
+++# Google OAuth tokens expire in 3600s. Reject env-var / token-file tokens
+++# older than this to force ADC auto-refresh. 3000s = 50 min (safe margin).
+++_TOKEN_BEARER_MAX_AGE_SEC: int = 3000
+++_TOKEN_FILE_MAX_AGE_SEC: int = 3000
+++
+++# Tracks when VERTEX_API_KEY env-var was last written by gerych.sh / force_refresh.
+++_env_token_written_at: dict = {}
+++
+++
+++def _reload_dnk_active_env() -> None:
+++    """Reload active GCP project credentials from SSOT .dnk_active_project.env or HERMES_HOME/.env."""
+++    if os.environ.get("PYTEST_CURRENT_TEST"):
+++        return
+++    try:
+++        from core.config.gcp_config import load_dnk_active_env
+++        load_dnk_active_env(force_reload=True)
+++        return
+++    except Exception:
+++        pass
+++
+++    from pathlib import Path
+++    hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+++    candidate_paths = [
+++        Path.cwd() / ".dnk_active_project.env",
+++        Path.cwd().parent / ".dnk_active_project.env",
+++        Path.cwd().parent.parent / ".dnk_active_project.env",
+++        hermes_home / ".env",
+++        hermes_home / ".dnk_active_project.env",
+++    ]
+++    for p in candidate_paths:
+++        try:
+++            if p.is_file():
+++                for line in p.read_text(encoding="utf-8").splitlines():
+++                    line = line.strip()
+++                    if "=" in line and not line.startswith("#"):
+++                        k, v = line.split("=", 1)
+++                        os.environ[k.strip()] = v.strip().strip("\"'")
+++                break
+++        except Exception:
+++            pass
+++
++ 
++ def _vertex_config() -> dict:
++     """Return the ``vertex:`` section of config.yaml, or {} on any failure."""
++@@ -78,8 +120,12 @@ def _resolve_region(explicit: Optional[str] = None) -> str:
++ 
++ 
++ def _resolve_project_override() -> Optional[str]:
++-    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml), or None to use the creds' embedded project_id."""
++-    return _env_or_config("VERTEX_PROJECT_ID", "project_id") or None
+++    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml > GOOGLE_CLOUD_PROJECT), or None."""
+++    explicit = _env_or_config("VERTEX_PROJECT_ID", "project_id")
+++    if explicit:
+++        return explicit
+++    gcp_proj = (_get_secret("GOOGLE_CLOUD_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT") or "").strip()
+++    return gcp_proj or None
++ 
++ 
++ def _resolve_credentials_path(explicit: Optional[str]) -> Optional[str]:
++@@ -161,8 +207,76 @@ def _cached_credentials(resolved_path: Optional[str], sa_raw: Optional[bytes], c
++     return cached
++ 
++ 
++-def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Optional[str], Optional[str]]:
+++def get_vertex_credentials(
+++    credentials_path: Optional[str] = None,
+++    force_refresh: bool = False,
+++) -> tuple[Optional[str], Optional[str]]:
++     """Return (fresh access_token, project_id) or (None, None); Credentials cached per file content."""
+++    _reload_dnk_active_env()
+++    if force_refresh:
+++        _creds_cache.clear()
+++
+++    project_override = _resolve_project_override()
+++
+++    # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
+++    if force_refresh:
+++        try:
+++            import subprocess
+++            account = os.getenv("GCP_ACTIVE_ACCOUNT")
+++            cmd = ["gcloud", "auth", "print-access-token"]
+++            if account:
+++                cmd.append(account)
+++            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+++            if proc.returncode == 0 and proc.stdout.strip().startswith("ya29."):
+++                fresh_tok = proc.stdout.strip()
+++                os.environ["VERTEX_API_KEY"] = fresh_tok
+++                os.environ["VERTEX_TOKEN"] = fresh_tok
+++                _env_token_written_at[fresh_tok[:20]] = time.time()
+++                token_file = os.path.expanduser("~/.hermes/vertex_token.txt")
+++                try:
+++                    with open(token_file, "w") as f:
+++                        f.write(fresh_tok)
+++                except Exception:
+++                    pass
+++                return fresh_tok, project_override
+++        except Exception:
+++            pass
+++
+++    # Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)
+++    direct_token = (
+++        _get_secret("VERTEX_API_KEY")
+++        or _get_secret("GEMINI_API_KEY")
+++        or _get_secret("GOOGLE_API_KEY")
+++        or ""
+++    ).strip()
+++    if direct_token.startswith("ya29.") and not force_refresh:
+++        tok_key = direct_token[:20]
+++        written_at = _env_token_written_at.get(tok_key, 0.0)
+++        if written_at == 0.0:
+++            _env_token_written_at[tok_key] = time.time()
+++            written_at = time.time()
+++        age_sec = time.time() - written_at
+++        if age_sec < _TOKEN_BEARER_MAX_AGE_SEC:
+++            return direct_token, project_override
+++        logger.info(
+++            "VERTEX_API_KEY bearer token is %.0fs old (max %ds) — falling through to ADC auto-refresh.",
+++            age_sec,
+++            _TOKEN_BEARER_MAX_AGE_SEC,
+++        )
+++
+++    if not is_multiplex_active() and not force_refresh and not os.environ.get("PYTEST_CURRENT_TEST"):
+++        hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
+++        token_file = hermes_home / "vertex_token.txt"
+++        if token_file.is_file():
+++            try:
+++                file_age_sec = time.time() - token_file.stat().st_mtime
+++                if file_age_sec < _TOKEN_FILE_MAX_AGE_SEC:
+++                    cached_tok = token_file.read_text(encoding="utf-8").strip()
+++                    if cached_tok.startswith("ya29."):
+++                        return cached_tok, project_override
+++            except Exception:
+++                pass
+++
++     if not _ensure_google_auth():
++         return None, None
++ 
++@@ -177,7 +291,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
++         creds, project_id = cached
++         if _needs_refresh(creds):
++             creds.refresh(google.auth.transport.requests.Request())
++-        return creds.token, _resolve_project_override() or project_id
+++        return creds.token, project_override or project_id
++     except Exception as e:
++         logger.error(f"Failed to resolve Vertex AI credentials: {e}")
++         _creds_cache.pop(cache_key, None)
++@@ -186,7 +300,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
++         sa_path = None if resolved_path else _resolve_credentials_path(credentials_path)
++         if sa_path:
++             logger.info("ADC failed, retrying with service account: %s", sa_path)
++-            return get_vertex_credentials(sa_path)
+++            return get_vertex_credentials(sa_path, force_refresh=force_refresh)
++         return None, None
++ 
++ 
++@@ -197,10 +311,12 @@ def build_vertex_base_url(project_id: str, region: str = DEFAULT_REGION) -> str:
++ 
++ 
++ def get_vertex_config(
++-    credentials_path: Optional[str] = None, region: Optional[str] = None
+++    credentials_path: Optional[str] = None,
+++    region: Optional[str] = None,
+++    force_refresh: bool = False,
++ ) -> tuple[Optional[str], Optional[str]]:
++     """Resolve (access_token, base_url) for Vertex AI, or (None, None) on failure."""
++-    token, project_id = get_vertex_credentials(credentials_path)
+++    token, project_id = get_vertex_credentials(credentials_path, force_refresh=force_refresh)
++     if not token or not project_id:
++         return None, None
++     return token, build_vertex_base_url(project_id, _resolve_region(region))
++diff --git a/hermes_cli/banner.py b/hermes_cli/banner.py
++index e324f66e..3e1b22eb 100644
++--- a/hermes_cli/banner.py
+++++ b/hermes_cli/banner.py
++@@ -699,7 +699,11 @@ def build_welcome_banner(
++     text = _skin_color("banner_text", "#FFF8DC")
++     # Use skin's custom caduceus art if provided
++     _bskin = _quiet(_active_skin)
++-    left_lines = ["", getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS, ""]
+++    hero_art = getattr(_bskin, "banner_hero", None) or HERMES_CADUCEUS
+++    if hero_art:
+++        # Prevent ASCII art lines from wrapping internally on spaces in narrow terminals
+++        hero_art = "\n".join(line.replace(" ", "\u00a0") for line in hero_art.splitlines())
+++    left_lines = ["", hero_art, ""]
++     left_lines += _banner_left_lines(model, cwd, session_id, context_length, provider, accent=accent, dim=dim,
++                                      context_pinned=context_pinned, context_marker=context_marker)
++     right_lines = _banner_tool_lines(
++@@ -748,6 +752,336 @@ def build_welcome_banner(
++         elif behind is not None and behind != 0:
++             right_lines.append(_format_update_notice(behind))
++     _quiet(_update_line)  # Never break the banner over an update check
+++
+++    _is_dnk = (_bskin is not None and getattr(_bskin, "name", "") == "dnk-os")
+++    title_color = _skin_color("banner_title", "#FFB347" if _is_dnk else "#FFD700")
+++    border_color = _skin_color("banner_border", "#FF8C00" if _is_dnk else "#CD7F32")
+++
+++    if _is_dnk:
+++        import random
+++
+++        model_short = model.split("/")[-1] if "/" in model else model
+++        if not model_short or model_short.lower() == "unknown":
+++            model_short = "gemini-3.8-flash"
+++        if model_short.endswith(".gguf"):
+++            model_short = model_short[:-5]
+++        if len(model_short) > 28:
+++            model_short = model_short[:25] + "..."
+++
+++        provider_val = (provider or "").strip().lower()
+++        if not provider_val:
+++            try:
+++                from hermes_cli.config import load_config
+++                _cfg = load_config() or {}
+++                provider_val = (_cfg.get("provider") or _cfg.get("model_provider") or "").strip().lower()
+++            except Exception:
+++                provider_val = ""
+++
+++        provider_labels = {
+++            "vertex": "Google Vertex AI",
+++            "google": "Google AI Studio",
+++            "anthropic": "Anthropic",
+++            "openrouter": "OpenRouter",
+++            "openai": "OpenAI",
+++            "groq": "Groq",
+++            "ollama": "Ollama (Local)",
+++            "mistral": "Mistral AI",
+++            "xai": "xAI",
+++            "deepseek": "DeepSeek",
+++            "bedrock": "AWS Bedrock",
+++            "azure": "Azure OpenAI",
+++            "moa": "Mixture of Agents",
+++        }
+++        provider_display = provider_labels.get(provider_val, provider.title() if provider else "Google Vertex AI")
+++
+++        term_width = getattr(console, "width", None) or shutil.get_terminal_size().columns or 85
+++        panel_padding = 0 if term_width < 88 else 1
+++        col_padding = 1 if term_width < 92 else 2
+++        left_w = 34
+++        max_right_w = max(24, term_width - (left_w + col_padding + (panel_padding * 2) + 2))
+++
+++        def _fit_line(name: str, desc: str, max_w: int, prefix: str = "  ", sep: str = " — ") -> str:
+++            overhead = len(prefix) + len(sep)
+++            avail_desc = max_w - overhead - len(name)
+++            if avail_desc < 3:
+++                shortened_name = name[:max(3, max_w - len(prefix))]
+++                return f"{prefix}[{text}]{shortened_name}[/]"
+++            if len(desc) > avail_desc:
+++                desc = desc[:max(0, avail_desc - 1)] + "…"
+++            return f"{prefix}[{text}]{name}[/] [dim {dim}]{sep}[/] [{text}]{desc}[/]"
+++
+++        # 1. MCP servers discovery
+++        mcp_desc_map = {
+++            "notion": "база знань Notion",
+++            "github": "репозиторії та PR",
+++            "context7": "індексація docs",
+++            "postgresql": "SQL база даних",
+++            "open-design": "UI Canvas макети",
+++            "obsidian": "Vault знань",
+++            "dnk_git_research": "дослідження GitHub",
+++            "dnk_video_creator": "генерація медіа",
+++            "dnk_orchestrator": "Swarm координація",
+++            "dnk_analytics": "метрики рою",
+++            "tandem": "відео монтаж Tandem",
+++            "refero": "референси дизайну",
+++            "chrome-devtools": "браузер та a11y",
+++        }
+++        active_mcps = []
+++        try:
+++            from tools.mcp_tool import get_mcp_status
+++            raw_mcps = get_mcp_status() or []
+++            for srv in raw_mcps:
+++                s_name = srv.get("name", "")
+++                if not s_name:
+++                    continue
+++                s_desc = mcp_desc_map.get(s_name, f"{srv.get('tools', 0)} інструментів")
+++                s_connected = srv.get("connected", False)
+++                active_mcps.append((s_name, s_desc, s_connected))
+++        except Exception:
+++            active_mcps = []
+++
+++        if not active_mcps:
+++            try:
+++                from hermes_cli.mcp_config import _get_mcp_servers
+++                cfg_mcps = _get_mcp_servers()
+++                for s_name in cfg_mcps.keys():
+++                    s_desc = mcp_desc_map.get(s_name, "налаштований MCP")
+++                    active_mcps.append((s_name, s_desc, False))
+++            except Exception:
+++                pass
+++
+++        if active_mcps:
+++            sampled_mcp = random.sample(active_mcps, min(3, len(active_mcps)))
+++            mcp_lines = []
+++            for name, desc, connected in sampled_mcp:
+++                mcp_lines.append(_fit_line(name, desc, left_w))
+++            if len(active_mcps) > 3:
+++                mcp_lines.append(f"  [dim {dim}](і ще {len(active_mcps) - 3} налаштованих MCP...)[/]")
+++            elif len(mcp_lines) < 4:
+++                mcp_lines.append(f"  [dim {dim}]...[/]")
+++        else:
+++            mcp_lines = [
+++                f"  [dim {dim}]Немає підключених MCP серверів[/]",
+++                f"  [dim {dim}]...[/]",
+++                f"  [dim {dim}]...[/]",
+++                f"  [dim {dim}]...[/]",
+++            ]
+++
+++        # 2. Random sample useful commands
+++        cmd_pool = [
+++            ("/model", "зміна моделі"),
+++            ("/memory", "когнітивна пам'ять"),
+++            ("/dashboard", "панель управління"),
+++            ("/skills", "бібліотека навичок"),
+++            ("/clear", "новий контекст"),
+++            ("/status", "стан рою агентів"),
+++            ("/sessions", "історія сесій"),
+++            ("/rollback", "відкат змін коду"),
+++        ]
+++        sampled_cmds = random.sample(cmd_pool, min(3, len(cmd_pool)))
+++        cmd_lines = [_fit_line(cmd, desc, left_w) for cmd, desc in sampled_cmds]
+++
+++        connected_mcp_count = len([x for x in active_mcps if x[2]])
+++        if connected_mcp_count > 0:
+++            mcp_header_str = f"📡 MCP Сервери ({connected_mcp_count} активних)"
+++        elif active_mcps:
+++            mcp_header_str = f"📡 MCP Сервери ({len(active_mcps)} налаштовано)"
+++        else:
+++            mcp_header_str = "📡 MCP Сервери"
+++
+++        left_lines = [
+++            "",
+++            hero_art,
+++            "",
+++            f"[{accent}]{model_short}[/] [dim {dim}]·[/] [dim {dim}]{provider_display}[/]",
+++            f"[dim {dim}]Сесія: {session_id or 'live'}[/]",
+++            "",
+++            f"[bold {accent}]{mcp_header_str}[/]",
+++            *mcp_lines[:4],
+++            "",
+++            f"[bold {accent}]💡 Корисні Команди[/]",
+++            *cmd_lines[:3],
+++        ]
+++
+++        # 3. Dynamic Tools sampling
+++        tool_desc_map = {
+++            "computer_use": "керування Mac",
+++            "cronjob": "фонові задачі",
+++            "execute_code": "запуск коду",
+++            "read_file": "читання файлів",
+++            "write_file": "запис файлів",
+++            "patch": "модифікація коду",
+++            "search_files": "пошук по проекту",
+++            "browser": "керування браузером",
+++            "web_search": "пошук в Інтернеті",
+++            "terminal": "виконання команд",
+++            "memory": "контекст & знання",
+++            "vision_analyze": "аналіз зображень",
+++            "delegate_task": "делегування в Swarm",
+++            "todo": "менеджер чеклістів",
+++            "clarify": "діалог з користувачем",
+++            "skill_view": "перегляд навичок",
+++            "skill_manage": "управління навичками",
+++            "text_to_speech": "синтез голосу",
+++            "session_search": "пошук сесій",
+++            "dnk_swarm_dispatch": "маршрутизація Swarm",
+++            "dnk_swarm_parallel": "паралельні воркери",
+++            "dnk_triage_task": "класифікатор задач",
+++        }
+++        active_tool_names = set()
+++        for t in (tools or []):
+++            if isinstance(t, dict):
+++                t_fn = t.get("function") or {}
+++                t_name = t_fn.get("name") if isinstance(t_fn, dict) else t.get("name")
+++                if t_name:
+++                    active_tool_names.add(t_name)
+++
+++        available_tool_items = [
+++            (name, desc) for name, desc in tool_desc_map.items()
+++            if name in active_tool_names
+++        ]
+++        if not available_tool_items:
+++            available_tool_items = list(tool_desc_map.items())
+++
+++        sampled_tools = random.sample(available_tool_items, min(3, len(available_tool_items)))
+++        dynamic_tool_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_tools]
+++        total_tools_count = len(tools) if tools else len(active_tool_names) or 18
+++        remaining_tools = max(total_tools_count - 3, 0)
+++        tool_rem_text = f"(ще {remaining_tools} інструментів...)"
+++
+++        # 4. Registered Swarm Agents
+++        agent_desc_map = {
+++            "gerych_prime": "Swarm координатор",
+++            "gerych_builder": "UI & Canvas фронтенд",
+++            "gerych_researcher": "GitHub & SOTA аналіз",
+++            "gerych_auditor": "аудит & тест-гейти",
+++            "dnk_dev_fullstack": "бекенд, FastAPI & ORM",
+++            "dnk_shopify": "Shopify & Liquid",
+++            "dnk_video_ai_creator": "медіа & Remotion",
+++            "dnk_scones_memory": "пам'ять & RAG",
+++            "dnk_security_guard": "безпека & Vault",
+++            "dnk_analytics": "метрики рою",
+++            "dnk_mentor": "менторство & гайди",
+++            "dnk_brand_typostyle": "бренд & типографіка",
+++            "herich_librarian": "Obsidian & знання",
+++            "strategist": "стратегія & дорожні карти",
+++            "auditor": "контроль інваріантів",
+++            "denchik": "автономний агент Mac",
+++        }
+++        real_agents = []
+++        for candidate_path in [
+++            Path("/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/core/orchestrator/agents"),
+++            Path(__file__).resolve().parents[2] / "orchestrator" / "agents",
+++        ]:
+++            try:
+++                if candidate_path.exists():
+++                    real_agents = sorted([
+++                        d.name for d in candidate_path.iterdir()
+++                        if d.is_dir() and not d.name.startswith((".", "_"))
+++                    ])
+++                    if real_agents:
+++                        break
+++            except Exception:
+++                pass
+++
+++        if not real_agents:
+++            real_agents = list(agent_desc_map.keys())
+++
+++        agents_count = len(real_agents)
+++        agents_pool = [(name, agent_desc_map.get(name, "агент рою")) for name in real_agents]
+++        sampled_agents = random.sample(agents_pool, min(3, len(agents_pool)))
+++        dynamic_agent_lines = [_fit_line(name, desc, max_right_w) for name, desc in sampled_agents]
+++        remaining_agents = max(agents_count - 3, 0)
+++        agent_remaining_str = f"  [dim {dim}](ще {remaining_agents} агентів...)[/]" if remaining_agents else ""
+++
+++        # 5. Dynamic Skills categories
+++        skill_cats = skills_by_category
+++        if not skill_cats:
+++            try:
+++                skill_cats = get_available_skills()
+++            except Exception:
+++                skill_cats = {}
+++
+++        skill_cat_desc_map = {
+++            "software-development": "розробка & CI",
+++            "productivity": "автоматизація",
+++            "creative": "UI & дизайн",
+++            "autonomous-ai-agents": "рої агентів",
+++            "research": "SOTA ресьорч",
+++            "github": "CI/CD & PR",
+++            "mlops": "моделі & LLM",
+++            "devops": "деплой & інфра",
+++            "note-taking": "Obsidian & нотатки",
+++            "apple": "macOS & Apple",
+++            "media": "медіа & аудіо",
+++            "email": "пошта & inbox",
+++            "smart-home": "розумний дім",
+++            "social-media": "соцмережі & API",
+++            "canvas_ui_ux": "інтерфейси Canvas",
+++        }
+++
+++        total_skills = sum(len(v) for v in skill_cats.values()) if skill_cats else 0
+++        available_cats = [
+++            (cat, len(s_list), skill_cat_desc_map.get(cat, "навички"))
+++            for cat, s_list in (skill_cats or {}).items()
+++            if s_list
+++        ]
+++        if available_cats:
+++            sampled_cats = random.sample(available_cats, min(3, len(available_cats)))
+++            dynamic_skill_lines = [
+++                _fit_line(f"{cat[:14]} ({cnt})", desc, max_right_w)
+++                for cat, cnt, desc in sampled_cats
+++            ]
+++        else:
+++            dynamic_skill_lines = [f"  [dim {dim}]Навички завантажуються...[/]"]
+++
+++        rem_cat_cnt = max(0, len(available_cats) - 3)
+++        skill_rem_str = f"  [dim {dim}](ще {rem_cat_cnt} категорій...)[/]" if rem_cat_cnt else ""
+++
+++        footer_text = f"{total_tools_count} інструментів · {agents_count} агентів · {total_skills} навичок"
+++
+++        right_lines = [
+++            f"[bold {accent}]🔧 Інструменти ({total_tools_count})[/]",
+++            *dynamic_tool_lines,
+++            f"  [dim {dim}]{tool_rem_text}[/]",
+++            "",
+++            f"[bold {accent}]🤖 Агенти рою ({agents_count})[/]",
+++            *dynamic_agent_lines,
+++            *([agent_remaining_str] if agent_remaining_str else []),
+++            "",
+++            f"[bold {accent}]📚 Навички ({total_skills})[/]",
+++            *dynamic_skill_lines,
+++            *([skill_rem_str] if skill_rem_str else []),
+++            "",
+++            f"[dim {dim}]{footer_text}[/]",
+++        ]
+++
+++        right_content = "\n".join([line.replace("\ufe0f", "") for line in right_lines])
+++        left_content = "\n".join([line.replace("\ufe0f", "") for line in left_lines])
+++
+++        dnk_table = Table.grid(padding=(0, col_padding))
+++        dnk_table.add_column("left", justify="left", no_wrap=True, width=left_w)
+++        dnk_table.add_column("right", justify="left", no_wrap=True, width=max_right_w)
+++        dnk_table.add_row(left_content, right_content)
+++
+++        is_denchik = (
+++            os.environ.get("DENCHIK_MODE") == "1"
+++            or os.environ.get("HERMES_AGENT_NAME") == "denchik"
+++        )
+++        version_label = format_banner_version_label()
+++        v_str = version_label.replace("Hermes Agent ", "Hermes ").replace("Hermes Hermes ", "Hermes ")
+++        agent_title = "Denchik (DNK OS)" if is_denchik else "Gerych (DNK OS)"
+++        title_markup = f"[bold {title_color}]{agent_title} · {v_str}[/]"
+++        outer_panel = Panel(
+++            dnk_table,
+++            title=title_markup,
+++            border_style=border_color,
+++            padding=(0, panel_padding),
+++        )
+++        console.print()
+++        console.print(outer_panel)
+++        return
+++
++     layout_table = Table.grid(padding=(0, 2))
++     layout_table.add_column("left", justify="left")
++     layout_table.add_column("right", justify="left")
++@@ -760,7 +1094,13 @@ def build_welcome_banner(
++         layout_table, title=f"[bold {_skin_color('banner_title', '#FFD700')}]{version_label}[/]",
++         border_style=_skin_color("banner_border", "#CD7F32"), padding=(0, 2))
++     console.print()
++-    if shutil.get_terminal_size().columns >= 95:
++-        console.print(getattr(_bskin, "banner_logo", None) or HERMES_AGENT_LOGO)
++-        console.print()
+++    logo = getattr(_bskin, "banner_logo", None)
+++    if logo is None:
+++        logo = HERMES_AGENT_LOGO
+++    if logo:
+++        raw_lines = [re.sub(r'\[.*?\]', '', line) for line in logo.strip().splitlines()]
+++        req_width = max(len(line) for line in raw_lines) if raw_lines else 0
+++        if shutil.get_terminal_size().columns >= req_width + 4:
+++            console.print(logo)
+++            console.print()
++     console.print(outer_panel)
++diff --git a/hermes_cli/model_normalize.py b/hermes_cli/model_normalize.py
++index 66dfae00..fac3bc80 100644
++--- a/hermes_cli/model_normalize.py
+++++ b/hermes_cli/model_normalize.py
++@@ -240,6 +240,11 @@ def normalize_model_for_provider(model_input: str, target_provider: str) -> str:
++     if normalized:
++         return normalized
++ 
+++    if provider == "vertex":
+++        if "/" not in name and name.startswith(("gemini-", "imagen-", "medlm-")):
+++            return f"google/{name}"
+++        return name
+++
++     if provider in _STRIP_VENDOR_ONLY_PROVIDERS:
++         stripped = _strip_matching_provider_prefix(name, provider)
++         if stripped == name and name.startswith(("openai/", "openai:")):
+diff --git a/dnk_patches/install_dnk_enhancements.sh b/dnk_patches/install_dnk_enhancements.sh
+new file mode 100755
+index 00000000000..7204663ff04
+--- /dev/null
++++ b/dnk_patches/install_dnk_enhancements.sh
+@@ -0,0 +1,119 @@
++#!/usr/bin/env bash
++# ==============================================================================
++# DNK OS :: Hermes Agent Enhancement Installer & Migration Script
++# ==============================================================================
++# Purpose: Applies all DNK OS adaptations (Vertex AI ADC, adaptive responsive
++#          banner, dynamic capabilities showcase, Gemini model auto-prefixing,
++#          and Zero-Local-Env symlink hygiene) to any Hermes Agent release in 1 command.
++# ==============================================================================
++
++set -euo pipefail
++
++SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
++TARGET_DIR="${1:-$(pwd)}"
++
++cd "$TARGET_DIR"
++
++echo "=================================================================="
++echo "⚡ [DNK OS] Installing Hermes Agent Enhancements in: $TARGET_DIR"
++echo "=================================================================="
++
++# 1. Verification
++if [ ! -f "$TARGET_DIR/cli.py" ] || [ ! -d "$TARGET_DIR/hermes_cli" ]; then
++    echo "❌ Помилка: Директорія $TARGET_DIR не схожа на hermes-agent (не знайдено cli.py або hermes_cli)."
++    exit 1
++fi
++
++# 2. Runtime Environment Hygiene (Zero Local Environments)
++RUNTIME_VENV="${HOME}/.dnk_runtime/venvs/hermes-agent"
++if [ ! -d "$RUNTIME_VENV" ]; then
++    RUNTIME_VENV="${HOME}/.dnk_runtime/venv"
++fi
++
++if [ -d "$RUNTIME_VENV" ]; then
++    if [ ! -L "$TARGET_DIR/.venv" ]; then
++        if [ -d "$TARGET_DIR/.venv" ]; then
++            echo "⚠️  Знайдено фізичний .venv у репозиторії. Видаляємо дублікат згідно з DNK_Vibe/GEMINI.md..."
++            rm -rf "$TARGET_DIR/.venv"
++        fi
++        echo "🔗 Створюємо симлінк: .venv -> $RUNTIME_VENV"
++        ln -s "$RUNTIME_VENV" "$TARGET_DIR/.venv"
++    else
++        echo "✅ Симлінк .venv вже налаштовано на: $(readlink "$TARGET_DIR/.venv")"
++    fi
++else
++    echo "⚠️  Увага: Центральне середовище $RUNTIME_VENV не знайдено."
++fi
++
++# 3. Apply DNK Patches
++PATCH_FILE="$SCRIPT_DIR/dnk_os_full_hermes_v0230.patch"
++
++if [ -f "$PATCH_FILE" ]; then
++    echo "📦 Перевірка та застосування патча DNK OS..."
++    if git apply --check "$PATCH_FILE" 2>/dev/null; then
++        git apply "$PATCH_FILE"
++        echo "✅ Патч успішно застосовано через git apply!"
++    elif git apply --check -3 "$PATCH_FILE" 2>/dev/null; then
++        git apply -3 "$PATCH_FILE"
++        echo "✅ Патч застосовано з 3-way merge!"
++    else
++        echo "ℹ️  Файли вже містять зміни або мають конфлікти. Перевіряємо окремі маркери..."
++        # Fallback check if changes already exist
++        if grep -q "_TOKEN_BEARER_MAX_AGE_SEC" "$TARGET_DIR/agent/vertex_adapter.py" 2>/dev/null && \
++           grep -q "_is_dnk" "$TARGET_DIR/hermes_cli/banner.py" 2>/dev/null && \
++           grep -q "provider == \"vertex\"" "$TARGET_DIR/hermes_cli/model_normalize.py" 2>/dev/null; then
++            echo "✅ Всі доопрацювання DNK OS вже присутні в коді."
++        else
++            echo "⚠️  Спроба пофайлового накатування окремих патчів..."
++            for p in "$SCRIPT_DIR"/00*.patch; do
++                if [ -f "$p" ]; then
++                    pname=$(basename "$p")
++                    if git apply --check "$p" 2>/dev/null; then
++                        git apply "$p"
++                        echo "  + Застосовано: $pname"
++                    else
++                        echo "  - Пропущено або вже в коді: $pname"
++                    fi
++                fi
++            done
++        fi
++    fi
++else
++    echo "❌ Помилка: Файл патча $PATCH_FILE не знайдено!"
++    exit 1
++fi
++
++# 4. Skin & Config Sync
++HERMES_DIR="${HOME}/.hermes"
++mkdir -p "$HERMES_DIR/skins"
++
++if [ -f "$SCRIPT_DIR/dnk-os.yaml" ]; then
++    cp "$SCRIPT_DIR/dnk-os.yaml" "$HERMES_DIR/skins/dnk-os.yaml"
++    echo "🎨 Оновлено фірмовий скін: ~/.hermes/skins/dnk-os.yaml"
++fi
++
++# 5. Quick Health Test
++echo "🧪 Виконання перевірки цілісності рантайму..."
++PYTHON_EXEC="$TARGET_DIR/.venv/bin/python"
++if [ ! -x "$PYTHON_EXEC" ]; then
++    PYTHON_EXEC="python3"
++fi
++
++if "$PYTHON_EXEC" -c "
++import sys
++sys.path.insert(0, '$TARGET_DIR')
++from agent.vertex_adapter import has_vertex_credentials
++from hermes_cli.model_normalize import normalize_model_for_provider
++assert normalize_model_for_provider('gemini-4-argon', 'vertex') == 'google/gemini-4-argon'
++print('  ✅ Model Normalization Test: OK')
++print('  ✅ Vertex Adapter Import Test: OK')
++" 2>/dev/null; then
++    echo "✅ Всі внутрішні тести DNK OS пройдено успішно!"
++else
++    echo "⚠️  Тест рантайму видав зауваження (перевірте наявність необхідних залежностей у рантаймі)."
++fi
++
++echo "=================================================================="
++echo "🎉 Встановлення завершено! Hermes Agent готовий до роботи в DNK OS."
++echo "   Запуск: ./.venv/bin/python cli.py --provider vertex --model gemini-4-argon"
++echo "=================================================================="
+-- 
+2.50.1
+

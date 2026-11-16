@@ -1,0 +1,138 @@
+From 3acb9e52913a497fd0ee75ed01fd4a2cdf3ea69d Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Tue, 10 Nov 2026 00:03:19 +0200
+Subject: [PATCH 18/26] feat(compression): lossless pointer stubs and balanced
+ head-tail digest
+
+---
+ agent/context_compressor.py             | 22 ++++++++++++++++++----
+ tests/agent/test_context_compressor.py  | 18 ++++++++++++++++++
+ tests/tools/test_tool_result_storage.py | 10 ++++++++++
+ tools/tool_result_storage.py            | 22 ++++++++++++++++++++--
+ 4 files changed, 66 insertions(+), 6 deletions(-)
+
+diff --git a/agent/context_compressor.py b/agent/context_compressor.py
+index b5fd2125871..6a08edb8068 100644
+--- a/agent/context_compressor.py
++++ b/agent/context_compressor.py
+@@ -840,7 +840,7 @@ _PRUNED_TOOL_PLACEHOLDER = "[Old tool output cleared to save context space]"
+ 
+ def _is_summary_stub(content: str) -> bool:
+     """True for a ``[tool] ... (N chars)`` summary (a prune-only one may carry the rule) or a lean-tail demotion stub."""
+-    return (s := without_skill_safety_rule(content)).startswith("[") and " chars)" in s and len(s) < 400 or is_demoted_stub(s)
++    return (s := without_skill_safety_rule(content)).startswith("[") and (" chars)" in s or " lines output" in s or "[archive:" in s) and len(s) < 600 or is_demoted_stub(s)
+ 
+ 
+ # Shared floor; the clarify summary cap must stay strictly BELOW it so a preserved
+@@ -2019,9 +2019,23 @@ def _summarize_tool_result_unguarded(tool_name: str, tool_args: str, tool_conten
+     line_count = content.count("\n") + 1 if content.strip() else 0
+     summarizer = _TOOL_RESULT_SUMMARIZERS.get(tool_name)
+     if summarizer is not None:
+-        return summarizer(tool_name, args, content, content_len, line_count)
+-    first_arg = "".join(f" {k}={str(v)[:40]}" for k, v in list(args.items())[:2])
+-    return f"[{tool_name}]{first_arg} ({content_len:,} chars result)" + _result_failure_suffix(content)
++        base = summarizer(tool_name, args, content, content_len, line_count)
++    else:
++        first_arg = "".join(f" {k}={str(v)[:40]}" for k, v in list(args.items())[:2])
++        base = f"[{tool_name}]{first_arg} ({content_len:,} chars result)" + _result_failure_suffix(content)
++
++    # Lossless pointer stub: preserve spillover or full_output_path pointer across compaction
++    archive_path = None
++    if "<persisted-output>" in content:
++        from tools.tool_result_storage import extract_persisted_path
++        archive_path = extract_persisted_path(content)
++    elif "full_output_path" in content:
++        m = re.search(r'"full_output_path"\s*:\s*"([^"]+)"', content)
++        if m:
++            archive_path = m.group(1).replace("\\\\", "/")
++    if archive_path and f"[archive: {archive_path}]" not in base:
++        base += f" [archive: {archive_path}]"
++    return base
+ 
+ 
+ def _model_threshold_key_rank(key: str, model: str, provider: str) -> tuple[int, int] | None:
+diff --git a/tests/agent/test_context_compressor.py b/tests/agent/test_context_compressor.py
+index 1828f6730ab..48815dbfa6b 100644
+--- a/tests/agent/test_context_compressor.py
++++ b/tests/agent/test_context_compressor.py
+@@ -3715,3 +3715,21 @@ class TestSanitizeToolPairsWhitespace:
+         tool_call_ids = [m.get("tool_call_id") for m in out if m.get("role") == "tool"]
+         assert "call_orphan" not in tool_call_ids, "genuinely orphaned result must be removed"
+         assert " call_orphan " not in tool_call_ids, "original whitespace form must also be gone"
++
++
++def test_summarize_tool_result_preserves_lossless_archive_pointers():
++    from agent.context_compressor import _summarize_tool_result
++    persisted_content = (
++        "<persisted-output>\n"
++        "This tool result was too large (50,000 characters).\n"
++        "Full output saved to: /home/user/.hermes/cache/spillover/call_123.txt\n"
++        "Preview:\nsome output\n"
++        "</persisted-output>"
++    )
++    summary = _summarize_tool_result("terminal", '{"command": "pytest"}', persisted_content)
++    assert "[archive: /home/user/.hermes/cache/spillover/call_123.txt]" in summary
++
++    terminal_json = '{"output": "trace...", "exit_code": 1, "full_output_path": "/home/user/.hermes/cache/terminal-output/out-1.log"}'
++    summary2 = _summarize_tool_result("terminal", '{"command": "make test"}', terminal_json)
++    assert "[archive: /home/user/.hermes/cache/terminal-output/out-1.log]" in summary2
++
+diff --git a/tests/tools/test_tool_result_storage.py b/tests/tools/test_tool_result_storage.py
+index e0ef3542d28..62e273da976 100644
+--- a/tests/tools/test_tool_result_storage.py
++++ b/tests/tools/test_tool_result_storage.py
+@@ -44,6 +44,16 @@ class TestGeneratePreview:
+         assert preview == text
+         assert has_more is False
+ 
++    def test_balanced_digest_preserves_head_and_tail(self):
++        lines = ["header start"] + [f"row {i}" for i in range(500)] + ["footer end with error code 1"]
++        content = "\n".join(lines)
++        preview, has_more = generate_preview(content, max_chars=800, balanced=True)
++        assert has_more is True
++        assert "header start" in preview
++        assert "footer end with error code 1" in preview
++        assert "elided" in preview
++
++
+ # ── _write_to_sandbox ─────────────────────────────────────────────────
+ 
+ class TestWriteToSandbox:
+diff --git a/tools/tool_result_storage.py b/tools/tool_result_storage.py
+index 39407dc51af..d79403b243b 100644
+--- a/tools/tool_result_storage.py
++++ b/tools/tool_result_storage.py
+@@ -271,10 +271,28 @@ def _safe_result_filename(tool_use_id: str) -> str:
+     return f"{safe_stem}.txt"
+ 
+ 
+-def generate_preview(content: str, max_chars: int = DEFAULT_PREVIEW_SIZE_CHARS) -> tuple[str, bool]:
+-    """Truncate at last newline within max_chars. Returns (preview, has_more)."""
++def generate_preview(content: str, max_chars: int = DEFAULT_PREVIEW_SIZE_CHARS, *, balanced: bool = True) -> tuple[str, bool]:
++    """Digest large content within max_chars. Returns (preview, has_more).
++    When balanced=True and max_chars is substantial, produces a balanced head/tail digest
++    with line/byte elision counts so neither setup nor trailing error logs/exit statuses are lost."""
+     if len(content) <= max_chars:
+         return content, False
++    if balanced and max_chars >= 500 and len(content) > max_chars:
++        head_budget = int(max_chars * 0.45)
++        tail_budget = int(max_chars * 0.45)
++        head_nl = content.rfind("\n", 0, head_budget)
++        head_end = head_nl + 1 if head_nl > head_budget // 3 else head_budget
++        tail_start = len(content) - tail_budget
++        tail_nl = content.find("\n", tail_start)
++        if tail_nl != -1 and tail_nl < tail_start + (tail_budget // 3):
++            tail_start = tail_nl + 1
++        head_part = content[:head_end]
++        tail_part = content[tail_start:]
++        elided_chars = len(content) - len(head_part) - len(tail_part)
++        elided_lines = content[head_end:tail_start].count("\n")
++        marker = f"\n\n... [{elided_lines:,} lines, {elided_chars:,} chars elided] ...\n\n"
++        return f"{head_part}{marker}{tail_part}", True
++
+     last_nl = content.rfind("\n", 0, max_chars)
+     return content[:last_nl + 1 if last_nl > max_chars // 2 else max_chars], True
+ 
+-- 
+2.50.1
+

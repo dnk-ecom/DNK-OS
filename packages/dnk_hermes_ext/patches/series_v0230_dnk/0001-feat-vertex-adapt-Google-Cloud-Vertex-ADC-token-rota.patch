@@ -1,0 +1,199 @@
+From d26f528cd3fbe929d5631a0484d9fef11a8dab17 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Wed, 4 Nov 2026 02:22:46 +0200
+Subject: [PATCH 01/26] feat(vertex): adapt Google Cloud Vertex ADC & token
+ rotation to Hermes v0.23.0 architecture
+
+---
+ agent/vertex_adapter.py | 130 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 123 insertions(+), 7 deletions(-)
+
+diff --git a/agent/vertex_adapter.py b/agent/vertex_adapter.py
+index 212e498bbfa..828f1a396f1 100644
+--- a/agent/vertex_adapter.py
++++ b/agent/vertex_adapter.py
+@@ -11,6 +11,7 @@ import json
+ import logging
+ import os
+ import time
++from pathlib import Path
+ from typing import Any, Optional, Tuple
+ 
+ from agent.credential_source import VERTEX_OAUTH, tag_credential_source
+@@ -55,6 +56,47 @@ _CLOUD_PLATFORM_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
+ 
+ _creds_cache: dict = {}
+ 
++# Google OAuth tokens expire in 3600s. Reject env-var / token-file tokens
++# older than this to force ADC auto-refresh. 3000s = 50 min (safe margin).
++_TOKEN_BEARER_MAX_AGE_SEC: int = 3000
++_TOKEN_FILE_MAX_AGE_SEC: int = 3000
++
++# Tracks when VERTEX_API_KEY env-var was last written by gerych.sh / force_refresh.
++_env_token_written_at: dict = {}
++
++
++def _reload_dnk_active_env() -> None:
++    """Reload active GCP project credentials from SSOT .dnk_active_project.env or HERMES_HOME/.env."""
++    if os.environ.get("PYTEST_CURRENT_TEST"):
++        return
++    try:
++        from core.config.gcp_config import load_dnk_active_env
++        load_dnk_active_env(force_reload=True)
++        return
++    except Exception:
++        pass
++
++    from pathlib import Path
++    hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
++    candidate_paths = [
++        Path.cwd() / ".dnk_active_project.env",
++        Path.cwd().parent / ".dnk_active_project.env",
++        Path.cwd().parent.parent / ".dnk_active_project.env",
++        hermes_home / ".env",
++        hermes_home / ".dnk_active_project.env",
++    ]
++    for p in candidate_paths:
++        try:
++            if p.is_file():
++                for line in p.read_text(encoding="utf-8").splitlines():
++                    line = line.strip()
++                    if "=" in line and not line.startswith("#"):
++                        k, v = line.split("=", 1)
++                        os.environ[k.strip()] = v.strip().strip("\"'")
++                break
++        except Exception:
++            pass
++
+ 
+ def _vertex_config() -> dict:
+     """Return the ``vertex:`` section of config.yaml, or {} on any failure."""
+@@ -78,8 +120,12 @@ def _resolve_region(explicit: Optional[str] = None) -> str:
+ 
+ 
+ def _resolve_project_override() -> Optional[str]:
+-    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml), or None to use the creds' embedded project_id."""
+-    return _env_or_config("VERTEX_PROJECT_ID", "project_id") or None
++    """Project-ID override (VERTEX_PROJECT_ID env > config.yaml > GOOGLE_CLOUD_PROJECT), or None."""
++    explicit = _env_or_config("VERTEX_PROJECT_ID", "project_id")
++    if explicit:
++        return explicit
++    gcp_proj = (_get_secret("GOOGLE_CLOUD_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT") or "").strip()
++    return gcp_proj or None
+ 
+ 
+ def _resolve_credentials_path(explicit: Optional[str]) -> Optional[str]:
+@@ -161,8 +207,76 @@ def _cached_credentials(resolved_path: Optional[str], sa_raw: Optional[bytes], c
+     return cached
+ 
+ 
+-def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Optional[str], Optional[str]]:
++def get_vertex_credentials(
++    credentials_path: Optional[str] = None,
++    force_refresh: bool = False,
++) -> tuple[Optional[str], Optional[str]]:
+     """Return (fresh access_token, project_id) or (None, None); Credentials cached per file content."""
++    _reload_dnk_active_env()
++    if force_refresh:
++        _creds_cache.clear()
++
++    project_override = _resolve_project_override()
++
++    # If force_refresh is requested (e.g. on 401/403 retry), re-mint token via gcloud / ADC
++    if force_refresh:
++        try:
++            import subprocess
++            account = os.getenv("GCP_ACTIVE_ACCOUNT")
++            cmd = ["gcloud", "auth", "print-access-token"]
++            if account:
++                cmd.append(account)
++            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
++            if proc.returncode == 0 and proc.stdout.strip().startswith("ya29."):
++                fresh_tok = proc.stdout.strip()
++                os.environ["VERTEX_API_KEY"] = fresh_tok
++                os.environ["VERTEX_TOKEN"] = fresh_tok
++                _env_token_written_at[fresh_tok[:20]] = time.time()
++                token_file = os.path.expanduser("~/.hermes/vertex_token.txt")
++                try:
++                    with open(token_file, "w") as f:
++                        f.write(fresh_tok)
++                except Exception:
++                    pass
++                return fresh_tok, project_override
++        except Exception:
++            pass
++
++    # Direct OAuth2 bearer token injection support (DNK OS / ADC token cache)
++    direct_token = (
++        _get_secret("VERTEX_API_KEY")
++        or _get_secret("GEMINI_API_KEY")
++        or _get_secret("GOOGLE_API_KEY")
++        or ""
++    ).strip()
++    if direct_token.startswith("ya29.") and not force_refresh:
++        tok_key = direct_token[:20]
++        written_at = _env_token_written_at.get(tok_key, 0.0)
++        if written_at == 0.0:
++            _env_token_written_at[tok_key] = time.time()
++            written_at = time.time()
++        age_sec = time.time() - written_at
++        if age_sec < _TOKEN_BEARER_MAX_AGE_SEC:
++            return direct_token, project_override
++        logger.info(
++            "VERTEX_API_KEY bearer token is %.0fs old (max %ds) — falling through to ADC auto-refresh.",
++            age_sec,
++            _TOKEN_BEARER_MAX_AGE_SEC,
++        )
++
++    if not is_multiplex_active() and not force_refresh and not os.environ.get("PYTEST_CURRENT_TEST"):
++        hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
++        token_file = hermes_home / "vertex_token.txt"
++        if token_file.is_file():
++            try:
++                file_age_sec = time.time() - token_file.stat().st_mtime
++                if file_age_sec < _TOKEN_FILE_MAX_AGE_SEC:
++                    cached_tok = token_file.read_text(encoding="utf-8").strip()
++                    if cached_tok.startswith("ya29."):
++                        return cached_tok, project_override
++            except Exception:
++                pass
++
+     if not _ensure_google_auth():
+         return None, None
+ 
+@@ -177,7 +291,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
+         creds, project_id = cached
+         if _needs_refresh(creds):
+             creds.refresh(google.auth.transport.requests.Request())
+-        return creds.token, _resolve_project_override() or project_id
++        return creds.token, project_override or project_id
+     except Exception as e:
+         logger.error(f"Failed to resolve Vertex AI credentials: {e}")
+         _creds_cache.pop(cache_key, None)
+@@ -186,7 +300,7 @@ def get_vertex_credentials(credentials_path: Optional[str] = None) -> tuple[Opti
+         sa_path = None if resolved_path else _resolve_credentials_path(credentials_path)
+         if sa_path:
+             logger.info("ADC failed, retrying with service account: %s", sa_path)
+-            return get_vertex_credentials(sa_path)
++            return get_vertex_credentials(sa_path, force_refresh=force_refresh)
+         return None, None
+ 
+ 
+@@ -197,10 +311,12 @@ def build_vertex_base_url(project_id: str, region: str = DEFAULT_REGION) -> str:
+ 
+ 
+ def get_vertex_config(
+-    credentials_path: Optional[str] = None, region: Optional[str] = None
++    credentials_path: Optional[str] = None,
++    region: Optional[str] = None,
++    force_refresh: bool = False,
+ ) -> tuple[Optional[str], Optional[str]]:
+     """Resolve (access_token, base_url) for Vertex AI, or (None, None) on failure."""
+-    token, project_id = get_vertex_credentials(credentials_path)
++    token, project_id = get_vertex_credentials(credentials_path, force_refresh=force_refresh)
+     if not token or not project_id:
+         return None, None
+     return token, build_vertex_base_url(project_id, _resolve_region(region))
+-- 
+2.50.1
+

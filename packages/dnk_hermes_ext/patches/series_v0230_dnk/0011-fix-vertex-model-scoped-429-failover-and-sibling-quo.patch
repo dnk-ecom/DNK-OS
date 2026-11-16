@@ -1,0 +1,215 @@
+From a19c36ef1db4bd3256f547f41249c53f70d9ebb1 Mon Sep 17 00:00:00 2001
+From: Kuzmenko-top <reburn.craft@gmail.com>
+Date: Mon, 9 Nov 2026 19:35:35 +0200
+Subject: [PATCH 11/26] fix(vertex): model-scoped 429 failover and sibling
+ quota cooldown isolation
+
+- Add vertex to _is_model_scoped_failure so 429 RESOURCE_EXHAUSTED isolates cooldown to the rate-limited model rather than exhausting the entire ADC credential
+- Ensure PooledCredential.runtime_api_key resolves live Vertex ADC/OAuth tokens for unhydrated store entries
+- Normalize and match model variants in model_cooldown_until (e.g. google/gemini-3.8-flash vs gemini-3.8-flash)
+- Refine _candidate_pool_exhausted to allow sibling Vertex models to seamlessly receive failover requests
+- Add comprehensive unit test suite in tests/agent/test_vertex_model_cooldowns.py
+---
+ agent/chat_completion_helpers.py           |  14 ++-
+ agent/credential_pool.py                   |  11 +++
+ agent/credential_pool_model_cooldowns.py   |  12 ++-
+ tests/agent/test_vertex_model_cooldowns.py | 103 +++++++++++++++++++++
+ 4 files changed, 136 insertions(+), 4 deletions(-)
+ create mode 100644 tests/agent/test_vertex_model_cooldowns.py
+
+diff --git a/agent/chat_completion_helpers.py b/agent/chat_completion_helpers.py
+index d7f37496d7c..fcae2b630ad 100644
+--- a/agent/chat_completion_helpers.py
++++ b/agent/chat_completion_helpers.py
+@@ -1936,7 +1936,19 @@ def _candidate_pool_exhausted(agent, fb_provider: str, fb_model: str) -> bool:
+             pool = load_pool(fb_provider)
+         except Exception:
+             return False
+-    if pool is None or not pool.has_credentials() or pool.has_available(model=fb_model):
++    if pool is None or not pool.has_credentials():
++        if fb_provider == "vertex":
++            from agent.vertex_adapter import has_vertex_credentials
++            return not has_vertex_credentials()
++        return False
++    if pool.has_available(model=fb_model):
++        return False
++    if fb_provider == "vertex":
++        from agent.credential_pool_model_cooldowns import model_cooldown_until
++        for entry in pool.entries():
++            until = model_cooldown_until(entry, fb_model)
++            if until is not None and until - time.time() > 600:
++                return True
+         return False
+     until = pool.next_available_at(model=fb_model)
+     return until is None or until - time.time() > 600
+diff --git a/agent/credential_pool.py b/agent/credential_pool.py
+index 0d057f991e7..05345280cbd 100644
+--- a/agent/credential_pool.py
++++ b/agent/credential_pool.py
+@@ -302,6 +302,17 @@ class PooledCredential:
+                 ):
+                     return token.strip()
+             return ""
++        if self.provider == "vertex":
++            if self.access_token:
++                return str(self.access_token)
++            try:
++                from agent.vertex_adapter import get_vertex_credentials
++                tok, _ = get_vertex_credentials()
++                if tok:
++                    return tok
++            except Exception:
++                pass
++            return str(self.access_token or "")
+         return str(self.access_token or "")
+ 
+     @property
+diff --git a/agent/credential_pool_model_cooldowns.py b/agent/credential_pool_model_cooldowns.py
+index 9e511868562..82509715006 100644
+--- a/agent/credential_pool_model_cooldowns.py
++++ b/agent/credential_pool_model_cooldowns.py
+@@ -41,7 +41,13 @@ def model_cooldown_until(entry: PooledCredential, model: Optional[str]) -> Optio
+     cooldown blocks them, so an unscoped route cannot reuse the credential.
+     """
+     cooldowns = entry.model_cooldowns or {}
+-    values = cooldowns.values() if not model else (cooldowns.get(model),)
++    if not model:
++        values = list(cooldowns.values())
++    else:
++        model_variants = {model, model.split("/")[-1]}
++        if "/" not in model:
++            model_variants.add(f"google/{model}")
++        values = [v for k, v in cooldowns.items() if k in model_variants or (k.split("/")[-1] in model_variants)]
+     now = time.time()
+     active = [float(until) for until in values if isinstance(until, (int, float)) and until > now]
+     return max(active) if active else None
+@@ -76,7 +82,7 @@ class CredentialPoolModelCooldownMixin:
+     def _is_model_scoped_failure(
+         self, status_code: Optional[int], model: Optional[str], failure_reason: Optional[str],
+     ) -> bool:
+-        """Anthropic per-model 429s, and a Codex ChatGPT-account model entitlement 400: the
++        """Anthropic and Vertex per-model 429s, and a Codex ChatGPT-account model entitlement 400: the
+         account cannot use *model*, but the credential stays valid for every other model (#71970)."""
+         from agent.credential_pool import FAILURE_REASON_BILLING, FAILURE_REASON_BILLING_UNVERIFIED
+ 
+@@ -85,7 +91,7 @@ class CredentialPoolModelCooldownMixin:
+         if failure_reason in ("model_entitlement", FAILURE_REASON_USAGE_WINDOW):
+             return True
+         return (
+-            self.provider == "anthropic" and status_code == 429
++            self.provider in ("anthropic", "vertex") and status_code == 429
+             and failure_reason not in (FAILURE_REASON_BILLING, FAILURE_REASON_BILLING_UNVERIFIED)
+         )
+ 
+diff --git a/tests/agent/test_vertex_model_cooldowns.py b/tests/agent/test_vertex_model_cooldowns.py
+new file mode 100644
+index 00000000000..5541c6fa3df
+--- /dev/null
++++ b/tests/agent/test_vertex_model_cooldowns.py
+@@ -0,0 +1,103 @@
++"""Vertex AI per-model 429 rate limit cooldown tests.
++
++Ensures that when a Gemini model (e.g. gemini-3.8-flash) hits HTTP 429 on Vertex AI,
++only that model is cooled down in the credential pool, while sibling models
++(gemini-4-argon, gemini-3.7-flash) remain available for immediate in-stream failover.
++"""
++import json
++import time
++import pytest
++
++KEY = "ya29.synthetic-vertex-oauth-token-for-test"
++MODEL_A = "gemini-3.8-flash"
++MODEL_A_PREFIXED = "google/gemini-3.8-flash"
++MODEL_B = "gemini-4-argon"
++MODEL_B_PREFIXED = "google/gemini-4-argon"
++MODEL_C = "gemini-3.7-flash"
++
++
++@pytest.fixture
++def vertex_pool(tmp_path, monkeypatch):
++    root = tmp_path / "hermes-root"
++    root.mkdir()
++    (tmp_path / "fakehome").mkdir()
++    monkeypatch.setenv("HOME", str(tmp_path / "fakehome"))
++    monkeypatch.setenv("VERTEX_API_KEY", KEY)
++    monkeypatch.setenv("VERTEX_PROJECT_ID", "test-project-dnk")
++    monkeypatch.setenv("HERMES_HOME", str(root))
++    import hermes_constants
++    hermes_constants._default_hermes_root_memo = None
++    (root / "auth.json").write_text(json.dumps({"credential_pool": {"vertex": [{
++        "id": "vtx-primary", "label": "VERTEX_API_KEY", "auth_type": "api_key", "priority": 0,
++        "source": "env:VERTEX_API_KEY", "access_token": KEY,
++    }]}}))
++    from agent.credential_pool import load_pool
++    return load_pool("vertex")
++
++
++def test_vertex_429_benches_only_rate_limited_model(vertex_pool):
++    ctx = {"message": "Resource has been exhausted (e.g. check quota). 429 RESOURCE_EXHAUSTED"}
++    
++    # Model A hits 429
++    res = vertex_pool.mark_exhausted_and_rotate(
++        status_code=429,
++        error_context=ctx,
++        api_key_hint=KEY,
++        failure_reason="rate_limit",
++        model=MODEL_A,
++    )
++    assert res is None  # Sole credential cannot rotate to another entry for Model A
++
++    # Credential-wide state is NOT exhausted
++    assert vertex_pool.entries()[0].last_status is None
++
++    # Model A is in cooldown, but Model B and Model C are available
++    assert vertex_pool.select(model=MODEL_A) is None
++    assert vertex_pool.select(model=MODEL_A_PREFIXED) is None
++    assert vertex_pool.select(model=MODEL_B) is not None
++    assert vertex_pool.select(model=MODEL_B_PREFIXED) is not None
++    assert vertex_pool.select(model=MODEL_C) is not None
++
++    # next_available_at checks
++    assert vertex_pool.next_available_at(model=MODEL_A) is not None
++    assert vertex_pool.next_available_at(model=MODEL_B) is None
++
++
++def test_vertex_candidate_pool_exhausted_allows_sibling_models(vertex_pool):
++    from agent.chat_completion_helpers import _candidate_pool_exhausted
++
++    class DummyAgent:
++        _credential_pool = vertex_pool
++
++    agent = DummyAgent()
++
++    # Bench Model A with a long cooldown (>600s)
++    long_ctx = {"reset_at": time.time() + 900}
++    vertex_pool.mark_exhausted_and_rotate(
++        status_code=429,
++        error_context=long_ctx,
++        api_key_hint=KEY,
++        failure_reason="rate_limit",
++        model=MODEL_A_PREFIXED,
++    )
++
++    # Candidate pool for Model A is exhausted due to >600s cooldown
++    assert _candidate_pool_exhausted(agent, "vertex", MODEL_A) is True
++    assert _candidate_pool_exhausted(agent, "vertex", MODEL_A_PREFIXED) is True
++
++    # Candidate pool for Model B and Model C MUST NOT be exhausted
++    assert _candidate_pool_exhausted(agent, "vertex", MODEL_B) is False
++    assert _candidate_pool_exhausted(agent, "vertex", MODEL_B_PREFIXED) is False
++    assert _candidate_pool_exhausted(agent, "vertex", MODEL_C) is False
++
++
++@pytest.mark.parametrize("status_code, failure_reason", [(401, None), (402, "billing"), (429, "billing")])
++def test_vertex_auth_and_billing_failures_stay_credential_wide(vertex_pool, status_code, failure_reason):
++    from agent.credential_pool import STATUS_EXHAUSTED
++
++    vertex_pool.mark_exhausted_and_rotate(
++        status_code=status_code, api_key_hint=KEY, failure_reason=failure_reason, model=MODEL_A,
++    )
++    assert vertex_pool.entries()[0].last_status == STATUS_EXHAUSTED
++    assert not vertex_pool.entries()[0].model_cooldowns
++    assert vertex_pool.select(model=MODEL_B) is None
+-- 
+2.50.1
+
