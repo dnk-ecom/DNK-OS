@@ -111,7 +111,7 @@ class DNKShopifyService:
             local_apex = Path(__file__).resolve().parent.parent / "DNK_Sovereign_Apex"
             # 2. Canonical Git Bare Mirror worktree
             git_mirrow_main = (
-                Path(__file__).resolve().parent.parent.parent.parent
+                Path(__file__).resolve().parent.parent.parent.parent.parent
                 / "DNKEcom"
                 / "DNK-Ecom_git_mirrow"
                 / "main"

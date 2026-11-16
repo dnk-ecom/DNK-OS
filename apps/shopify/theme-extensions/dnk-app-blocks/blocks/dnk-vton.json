@@ -1,0 +1,31 @@
+{
+  "name": "DNK AI Fitting Room (VTON)",
+  "target": "section",
+  "schema": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Текст кнопки",
+      "default": "Приміряти онлайн (AI VTON)"
+    },
+    {
+      "type": "select",
+      "id": "slot",
+      "label": "Слот одягу",
+      "default": "upper",
+      "options": [
+        { "value": "upper", "label": "Верх (Top/Shirt/Jacket)" },
+        { "value": "bottom", "label": "Низ (Pants/Skirt)" },
+        { "value": "full_body", "label": "Повний зріст (Dress/Overall)" },
+        { "value": "shoes", "label": "Взуття (Shoes/Boots)" },
+        { "value": "accessory", "label": "Аксесуари (Bag/Hat)" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "api_endpoint",
+      "label": "API Шлюз",
+      "default": "/apps/dnk-vton/generate"
+    }
+  ]
+}

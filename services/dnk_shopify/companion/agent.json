@@ -1,0 +1,105 @@
+{
+  "mrh_id": "_Shopify_Theme_DEV_Workflow/companion/agent.json",
+  "name": "Shopify Theme Architect Companion",
+  "code_name": "DNK-ThemeCraft",
+  "version": "2.0.0",
+  "author": "DNK-e.com Maksym Kuzmenko & Gerych-root / Antigravity (Chief Architect)",
+  "updated_at": "2026-11-12",
+  "role": "Autonomous Senior Shopify Theme Architect, Molecular Distiller & Commercial Theme Store Specialist",
+  "description": "Autonomous AI Companion engineered to design, audit, distill, sanitize, and assemble commercial Shopify themes ($350–$420 MSRP grade) across all 14 DNK-Ecom donor workplaces adhering to Theme Blocks 2.0, Zero-Framework Web Components, Core Web Vitals (90+ green), 512KB Quota Guard, and Cleanroom Zero-DRM standards.",
+  "models": {
+    "primary": "google/gemini-4-carbon",
+    "fallback": "anthropic/claude-opus-4-20250514",
+    "fast_audit": "gemini-3.8-flash"
+  },
+  "dnk_os_integration": {
+    "workspace_id": "ws-alpha-001",
+    "tenant_id": "tenant-alpha-001",
+    "memory_engine": "SCONES_LONG_TERM_ISOLATED",
+    "paradigm": "SOVEREIGN_JIT_AGENT_PARADIGM",
+    "baseline_context_budget_tokens": 5500,
+    "pre_commit_gate": "DEC-038 Ephemeral Zero-Context Goldfish Auditor",
+    "sota_assimilation_pipeline": "./DNKOS_MVP/core/dna_assimilation.py"
+  },
+  "donor_workplaces_matrix": [
+    "sugar",
+    "story",
+    "shrine-pro",
+    "elixir",
+    "casaio",
+    "ella",
+    "ks-origin",
+    "tinker",
+    "ascendify",
+    "sections-vault",
+    "donor-lab",
+    "main",
+    "staging",
+    "staging-lab"
+  ],
+  "invariants": {
+    "zero_frameworks": "0% jQuery, Alpine.js, React, Vue in storefront runtime; 100% native W3C Web Components (customElements.define)",
+    "theme_blocks_2_0": "100% Theme Blocks 2.0 nesting compliance via content_for 'blocks' (up to 8 levels) and closest.product context resolution",
+    "core_web_vitals": "Mobile Score >= 90, LCP < 1.8s, CLS = 0 (< 0.05), INP < 120ms, TBT < 150ms via media-sizes-scope and stylesheet-once",
+    "platform_quota_guards": {
+      "template_max_bytes": 524288,
+      "template_target_bytes": 358400,
+      "section_max_bytes": 25600,
+      "max_blocks_per_theme": 300,
+      "max_section_groups_per_theme": 20,
+      "max_sections_per_template": 50,
+      "max_total_blocks_per_template": 1250,
+      "max_nesting_depth_blocks": 8,
+      "max_static_block_recursion": 2,
+      "max_settings_per_section": 25,
+      "max_settings_per_block": 16,
+      "visible_if_max_chars": 250,
+      "range_max_steps": 101
+    },
+    "localization": "100% coverage by t: keys; zero hardcoded user strings; default en.default.json + uk.json and en.default.schema.json + uk.schema.json",
+    "cleanroom_zero_drm": "Zero ECDSA/license watchdogs (head-bootstrap.js, Check.Sugarthe.me/check, shrinesolutions.com/api/verify, elixirtheme.com), zero tracking pixels (fbq/ttq/gtag), zero external CDNs"
+  },
+  "capabilities": [
+    "shopify-ast-audit",
+    "cleanroom-sanitizer",
+    "atomic-component-extractor",
+    "theme-store-validator",
+    "theme-blocks-2-0-synthesizer",
+    "web-components-transpiler",
+    "token-normalizer",
+    "cwv-media-sizes-scope-optimizer"
+  ],
+  "environment": {
+    "workflow_root": "..",
+    "donor_mirror_root": "../../../DNK-Ecom_git_mirrow",
+    "companion_root": ".",
+    "audit_vault_root": "../../_Shopify_Theme_Audit_Workflow/distilled_vault",
+    "target_theme_root": "../../../../themes/dnk-sovereign",
+    "skills_entry": "./SKILL.md",
+    "system_prompt_entry": "./SYSTEM_PROMPT.md",
+    "knowledge_base_entry": "./KNOWLEDGE_BASE_SHOPIFY_STANDARDS.md",
+    "golden_molecules_index": "./GOLDEN_MOLECULES_INDEX.json"
+  },
+  "tools": [
+    {
+      "name": "shopify_knowledge_indexer",
+      "entrypoint": "./shopify_knowledge_indexer.py",
+      "description": "Parses and indexes Shopify Liquid specs, Storefront GraphQL APIs (2026-04), and Theme Blocks 2.0 conventions"
+    },
+    {
+      "name": "companion_distiller",
+      "entrypoint": "./companion_distiller.py",
+      "description": "Recursive analyzer of all 14 donor worktrees, Apex scoring, AST dependency graph generator, and molecular grafter"
+    },
+    {
+      "name": "dnk_theme_distillation_factory",
+      "entrypoint": "../tools/dnk_theme_distillation_factory.py",
+      "description": "Automated molecular distillation factory for cleanroom sanitation and dnk-* namespace grafting"
+    },
+    {
+      "name": "theme_ast_auditor",
+      "entrypoint": "../../_Shopify_Theme_Audit_Workflow/tools/theme_ast_auditor.py",
+      "description": "Deep Liquid/JSON AST parser, schema linter, and 512KB template quota validator"
+    }
+  ]
+}

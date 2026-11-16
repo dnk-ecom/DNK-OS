@@ -32,6 +32,26 @@ test-fitness:
 test-shopify:
     @uv run pytest services/dnk_shopify/tests -v
 
+# -----------------------------------------------------------------------------
+# 🛍️ SHOPIFY THEME DEV & MOLECULAR GRAFTING
+# -----------------------------------------------------------------------------
+
+# Run 7-Gate Anti-Regression Theme Integrity Gate on DNK Sovereign Apex or donor
+shopify-7gate theme="":
+    @uv run python3 -c "from services.dnk_shopify.src.service import DNKShopifyService; from pathlib import Path; s = DNKShopifyService(default_theme_path=Path('{{theme}}') if '{{theme}}' else None); r = s.run_7gate_integrity(); print(r['stdout']); exit(r['exit_code'])"
+
+# Synchronize Donor Genome Map and update live audited donor catalog
+shopify-donor-map:
+    @python3 ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/tools/sync_donor_genome_map.py
+
+# Run molecular graft tool against DNK-Ecom donor worktrees
+shopify-graft *args:
+    @cd ../DNKEcom/DNK-Ecom_git_mirrow && ./graft.sh {{args}}
+
+# Run offline sub-millisecond local-storefront Liquid runtime check
+shopify-lsf-check theme="":
+    @uv run python3 -c "from services.dnk_shopify.runtime.local_storefront import LocalStorefrontManager; from services.dnk_shopify.src.service import DNKShopifyService; from pathlib import Path; s = DNKShopifyService(default_theme_path=Path('{{theme}}') if '{{theme}}' else None); m = LocalStorefrontManager(); res = m.run_check(s.default_theme_path); print(res.get('stdout') or res.get('stderr')); exit(res['returncode'])"
+
 # Run Spatial Canvas per-node isolation and context surgery tests
 test-canvas:
     @uv run pytest tests/core/test_spatial_canvas.py -v

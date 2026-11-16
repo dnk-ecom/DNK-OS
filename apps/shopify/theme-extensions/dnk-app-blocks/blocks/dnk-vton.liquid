@@ -1,0 +1,111 @@
+<!-- --- DNK-MRH-HEADER ---
+# mrh_id: "apps/shopify/theme-extensions/dnk-app-blocks/blocks/dnk-vton.liquid"
+# purpose: "DNK AI Virtual Try-On App Extension Block"
+# canonical_source: true
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER --- -->
+
+{{ 'dnk-vton.css' | asset_url | stylesheet_tag }}
+
+<div class="dnk-vton-app-block" data-product-id="{{ product.id }}">
+  <button
+    type="button"
+    class="dnk-vton-btn dnk-vton-btn--accent"
+    data-dnk-vton-trigger
+    data-vton-slot="{{ block.settings.slot | default: 'upper' }}"
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-product-title="{{ product.title | escape }}"
+    data-product-image="{{ product.featured_image | image_url: width: 800 }}"
+    aria-label="{{ block.settings.button_text | default: 'Приміряти онлайн' }}"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+    </svg>
+    <span>{{ block.settings.button_text | default: "Приміряти онлайн (AI VTON)" }}</span>
+  </button>
+</div>
+
+<!-- Floating Dock Launcher -->
+<button
+  type="button"
+  id="dnk-vton-launcher"
+  class="dnk-vton-launcher"
+  aria-label="Відкрити DNK Віртуальну Примірочну"
+  title="DNK AI Примірочна"
+>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+  </svg>
+  <span id="dnk-vton-badge" class="dnk-vton-badge">0</span>
+</button>
+
+<!-- Drawer Markup -->
+<div id="dnk-vton-backdrop" class="dnk-vton-backdrop" aria-hidden="true"></div>
+<aside id="dnk-vton-drawer" class="dnk-vton-drawer" role="dialog" aria-modal="true" aria-labelledby="dnk-vton-title">
+  <header class="dnk-vton-header">
+    <div class="dnk-vton-brand-title" id="dnk-vton-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+      </svg>
+      <span>DNK Примірочна</span>
+      <span class="dnk-vton-brand-badge">AI VTON</span>
+    </div>
+    <button type="button" id="dnk-vton-close" class="dnk-vton-close-btn" aria-label="Закрити">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </header>
+  <div class="dnk-vton-body">
+    <div class="dnk-vton-section">
+      <div class="dnk-vton-section-title">
+        <span>1. Ваше фото</span>
+        <span style="font-size: 11px; text-transform: none; color: #10b981;">🔒 100% приватність</span>
+      </div>
+      <div id="dnk-vton-dropzone" class="dnk-vton-dropzone">
+        <svg class="dnk-vton-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <div class="dnk-vton-dropzone-text">Завантажте фото на повний зріст</div>
+        <div class="dnk-vton-dropzone-subtext">JPG, PNG або WebP. Обличчя та фігура зберігаються</div>
+        <input type="file" id="dnk-vton-file-input" accept="image/jpeg,image/png,image/webp">
+      </div>
+      <div id="dnk-vton-photo-preview" class="dnk-vton-photo-preview" style="display: none;">
+        <img id="dnk-vton-photo-img" src="" alt="Ваше фото">
+        <button type="button" id="dnk-vton-photo-remove" class="dnk-vton-photo-remove">Змінити фото</button>
+      </div>
+    </div>
+    <div class="dnk-vton-section">
+      <div class="dnk-vton-section-title"><span>2. Обрані речі</span></div>
+      <div id="dnk-vton-slots" class="dnk-vton-slots-grid"></div>
+    </div>
+    <div class="dnk-vton-section">
+      <div class="dnk-vton-section-title"><span>3. Результат примірки</span></div>
+      <div id="dnk-vton-result-container" class="dnk-vton-result-card" style="display: none;">
+        <img id="dnk-vton-result-img" class="dnk-vton-result-img" src="" alt="Результат">
+      </div>
+      <div id="dnk-vton-loader" class="dnk-vton-loader" style="display: none;">
+        <div class="dnk-vton-spinner"></div>
+        <div id="dnk-vton-loader-text" class="dnk-vton-loader-text">Аналіз пропорцій та освітлення...</div>
+        <div class="dnk-vton-loader-subtext">DNK Neural Engine</div>
+      </div>
+    </div>
+  </div>
+  <footer class="dnk-vton-footer">
+    <button type="button" id="dnk-vton-btn-generate" class="dnk-vton-action-generate" disabled>Згенерувати примірку</button>
+    <button type="button" id="dnk-vton-btn-cart" class="dnk-vton-action-cart" style="display: none;">Купити весь образ</button>
+  </footer>
+</aside>
+<div id="dnk-vton-toast" class="dnk-vton-toast"></div>
+
+<script>
+  window.DNK_VTON_CONFIG = {
+    endpoint: {{ block.settings.api_endpoint | default: '/apps/dnk-vton/generate' | json }},
+    locale: {{ request.locale.iso_code | default: 'uk' | json }}
+  };
+</script>
+<script src="{{ 'dnk-vton.js' | asset_url }}" defer="defer"></script>

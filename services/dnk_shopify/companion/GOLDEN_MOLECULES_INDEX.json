@@ -1,0 +1,967 @@
+[
+  {
+    "rank": 1,
+    "donor": "shrine-pro",
+    "type": "snippet",
+    "rel_path": "snippets/cart-drawer.liquid",
+    "destination_rel_path": "snippets/cart-drawer.liquid",
+    "apex_score": 100,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 4.25,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "cart-drawer"
+    ],
+    "rendered_snippets": [
+      "card-collection",
+      "icon-close"
+    ]
+  },
+  {
+    "rank": 2,
+    "donor": "ella",
+    "type": "section",
+    "rel_path": "sections/main-cart.liquid",
+    "destination_rel_path": "sections/main-cart.liquid",
+    "apex_score": 100,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 5.06,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "cart-items-component"
+    ],
+    "rendered_snippets": [
+      "spacing-style"
+    ]
+  },
+  {
+    "rank": 3,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_header-drawer.liquid",
+    "destination_rel_path": "blocks/_header-drawer.liquid",
+    "apex_score": 100,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 8.11,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "story-drawer"
+    ],
+    "rendered_snippets": [
+      "header-icon",
+      "script"
+    ]
+  },
+  {
+    "rank": 4,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_lookbook-item-all.liquid",
+    "destination_rel_path": "blocks/_lookbook-item-all.liquid",
+    "apex_score": 100,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 9.1,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "swiper-component"
+    ],
+    "rendered_snippets": [
+      "gap-style",
+      "size-style",
+      "swiper-button",
+      "swiper-data",
+      "swiper-style"
+    ]
+  },
+  {
+    "rank": 5,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_color-comparison.liquid",
+    "destination_rel_path": "blocks/_color-comparison.liquid",
+    "apex_score": 100,
+    "commercial_role": "Advertorial Comparison Table ('Us vs Competitors')",
+    "size_kb": 17.04,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "compare-color",
+      "side-drawer",
+      "side-drawer-opener"
+    ],
+    "rendered_snippets": [
+      "spacing-style",
+      "typography-style"
+    ]
+  },
+  {
+    "rank": 6,
+    "donor": "sugar",
+    "type": "block",
+    "rel_path": "blocks/custom-sticky-mobile.liquid",
+    "destination_rel_path": "blocks/custom-sticky-mobile.liquid",
+    "apex_score": 95,
+    "commercial_role": "Specialized Theme Element",
+    "size_kb": 23.32,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "sticky-custom"
+    ],
+    "rendered_snippets": [
+      "custom-sticky-styles"
+    ]
+  },
+  {
+    "rank": 7,
+    "donor": "sugar",
+    "type": "block",
+    "rel_path": "blocks/custom-sticky-desktop.liquid",
+    "destination_rel_path": "blocks/custom-sticky-desktop.liquid",
+    "apex_score": 95,
+    "commercial_role": "Specialized Theme Element",
+    "size_kb": 24.11,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "sticky-custom"
+    ],
+    "rendered_snippets": [
+      "custom-sticky-styles"
+    ]
+  },
+  {
+    "rank": 8,
+    "donor": "story",
+    "type": "section",
+    "rel_path": "sections/cart-notification.liquid",
+    "destination_rel_path": "sections/cart-notification.liquid",
+    "apex_score": 95,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 26.45,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "cart-notification"
+    ],
+    "rendered_snippets": [
+      "button-style",
+      "icon-checkmark",
+      "icon-close",
+      "script"
+    ]
+  },
+  {
+    "rank": 9,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/bundle-builder.liquid",
+    "destination_rel_path": "blocks/bundle-builder.liquid",
+    "apex_score": 95,
+    "commercial_role": "D2C Tiered Pricing & Bundle Booster",
+    "size_kb": 35.05,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "story-bundle-builder"
+    ],
+    "rendered_snippets": [
+      "block-sizing",
+      "block-visibility",
+      "bundle-builder-variant",
+      "list",
+      "script"
+    ]
+  },
+  {
+    "rank": 10,
+    "donor": "vault-shrine-pro-2.0.0",
+    "type": "block",
+    "rel_path": "blocks/product_quantity-breaks-v2.liquid",
+    "destination_rel_path": "blocks/product_quantity-breaks-v2.liquid",
+    "apex_score": 95,
+    "commercial_role": "D2C Tiered Pricing & Bundle Booster",
+    "size_kb": 48.58,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "quantity-breaks",
+      "quantity-breaks-v2"
+    ],
+    "rendered_snippets": [
+      "qb-v2-fallback-qty",
+      "qb-v2-product-json",
+      "qb-v2-setup",
+      "qb-v2-text"
+    ]
+  },
+  {
+    "rank": 11,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_cart-page-main.liquid",
+    "destination_rel_path": "blocks/_cart-page-main.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.33,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 12,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_cart-drawer-body.liquid",
+    "destination_rel_path": "blocks/_cart-drawer-body.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.46,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 13,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-timeline.liquid",
+    "destination_rel_path": "sections/dnk-timeline.liquid",
+    "apex_score": 90,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 3.8,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "timeline-slider"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 14,
+    "donor": "shrine-pro",
+    "type": "block",
+    "rel_path": "blocks/timeline.liquid",
+    "destination_rel_path": "blocks/timeline.liquid",
+    "apex_score": 90,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 3.8,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "timeline-slider"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 15,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_cart-items.liquid",
+    "destination_rel_path": "blocks/_cart-items.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.89,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "border-override",
+      "color-scheme-style"
+    ]
+  },
+  {
+    "rank": 16,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_cart-drawer-footer.liquid",
+    "destination_rel_path": "blocks/_cart-drawer-footer.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 4.09,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 17,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_cart-page-aside.liquid",
+    "destination_rel_path": "blocks/_cart-page-aside.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 4.21,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 18,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_header-drawer-panel.liquid",
+    "destination_rel_path": "blocks/_header-drawer-panel.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 5.38,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 19,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_cart-summary.liquid",
+    "destination_rel_path": "blocks/_cart-summary.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 5.78,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "border-override",
+      "color-scheme-style"
+    ]
+  },
+  {
+    "rank": 20,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_cart-drawer-header.liquid",
+    "destination_rel_path": "blocks/_cart-drawer-header.liquid",
+    "apex_score": 90,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 9.38,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "cart-icon",
+      "icon-close",
+      "icon-heart"
+    ]
+  },
+  {
+    "rank": 21,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_lookbook-row.liquid",
+    "destination_rel_path": "blocks/_lookbook-row.liquid",
+    "apex_score": 90,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 12.19,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "swiper-component"
+    ],
+    "rendered_snippets": [
+      "layout-panel-style",
+      "size-style",
+      "spacing-style",
+      "swiper-data",
+      "swiper-style"
+    ]
+  },
+  {
+    "rank": 22,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_bundle-summary.liquid",
+    "destination_rel_path": "blocks/_bundle-summary.liquid",
+    "apex_score": 90,
+    "commercial_role": "D2C Tiered Pricing & Bundle Booster",
+    "size_kb": 12.31,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "button-style"
+    ]
+  },
+  {
+    "rank": 23,
+    "donor": "story",
+    "type": "block",
+    "rel_path": "blocks/_timeline-step.liquid",
+    "destination_rel_path": "blocks/_timeline-step.liquid",
+    "apex_score": 90,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 16.02,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "cart-icon"
+    ]
+  },
+  {
+    "rank": 24,
+    "donor": "ella",
+    "type": "section",
+    "rel_path": "sections/lookbook.liquid",
+    "destination_rel_path": "sections/lookbook.liquid",
+    "apex_score": 90,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 17.29,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "section",
+      "swiper-button"
+    ]
+  },
+  {
+    "rank": 25,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-custom-columns-new.liquid",
+    "destination_rel_path": "sections/dnk-custom-columns-new.liquid",
+    "apex_score": 90,
+    "commercial_role": "Universal 12-Column Theme Blocks 2.0 Canvas",
+    "size_kb": 17.95,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "copy-button"
+    ],
+    "rendered_snippets": [
+      "pattern-background"
+    ]
+  },
+  {
+    "rank": 26,
+    "donor": "shrine-pro",
+    "type": "section",
+    "rel_path": "sections/custom-columns-new.liquid",
+    "destination_rel_path": "sections/custom-columns-new.liquid",
+    "apex_score": 90,
+    "commercial_role": "Universal 12-Column Theme Blocks 2.0 Canvas",
+    "size_kb": 17.95,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "copy-button"
+    ],
+    "rendered_snippets": [
+      "pattern-background"
+    ]
+  },
+  {
+    "rank": 27,
+    "donor": "sugar",
+    "type": "block",
+    "rel_path": "blocks/sticky-buy-button.liquid",
+    "destination_rel_path": "blocks/sticky-buy-button.liquid",
+    "apex_score": 90,
+    "commercial_role": "Specialized Theme Element",
+    "size_kb": 18.46,
+    "blocks_2_0": true,
+    "custom_elements": [
+      "sticky-product"
+    ],
+    "rendered_snippets": [
+      "currency-code-enabled",
+      "loading-spinner"
+    ]
+  },
+  {
+    "rank": 28,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_lookbook-group.liquid",
+    "destination_rel_path": "blocks/_lookbook-group.liquid",
+    "apex_score": 90,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 19.68,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "group"
+    ]
+  },
+  {
+    "rank": 29,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_lookbook-item.liquid",
+    "destination_rel_path": "blocks/_lookbook-item.liquid",
+    "apex_score": 90,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 21.95,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "border-override",
+      "button-style",
+      "image",
+      "size-style",
+      "spacing-style",
+      "typography-style"
+    ]
+  },
+  {
+    "rank": 30,
+    "donor": "ella",
+    "type": "block",
+    "rel_path": "blocks/_product-bundle-information.liquid",
+    "destination_rel_path": "blocks/_product-bundle-information.liquid",
+    "apex_score": 90,
+    "commercial_role": "D2C Tiered Pricing & Bundle Booster",
+    "size_kb": 22.96,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "group"
+    ]
+  },
+  {
+    "rank": 31,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/cart-note.liquid",
+    "destination_rel_path": "snippets/cart-note.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 0.58,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-note"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 32,
+    "donor": "ks-origin",
+    "type": "snippet",
+    "rel_path": "snippets/cart-feedback.liquid",
+    "destination_rel_path": "snippets/cart-feedback.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 0.63,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-feedback"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 33,
+    "donor": "story",
+    "type": "asset",
+    "rel_path": "assets/progress-bar.min.js",
+    "destination_rel_path": "assets/progress-bar.min.js",
+    "apex_score": 85,
+    "commercial_role": "Specialized Theme Element",
+    "size_kb": 1.06,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "story-progress"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 34,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/lookbook-modal.liquid",
+    "destination_rel_path": "snippets/lookbook-modal.liquid",
+    "apex_score": 85,
+    "commercial_role": "Editorial Storytelling & Interactive Hotspot Pinning",
+    "size_kb": 1.17,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "lookbook-modal"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 35,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/edit-cart-popup.liquid",
+    "destination_rel_path": "snippets/edit-cart-popup.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 1.32,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "edit-cart-modal",
+      "side-drawer"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 36,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-timeline-content.liquid",
+    "destination_rel_path": "sections/dnk-timeline-content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.38,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 37,
+    "donor": "shrine-pro",
+    "type": "block",
+    "rel_path": "blocks/timeline-content.liquid",
+    "destination_rel_path": "blocks/timeline-content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.38,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 38,
+    "donor": "shrine-pro",
+    "type": "snippet",
+    "rel_path": "snippets/facets-drawer-pills.liquid",
+    "destination_rel_path": "snippets/facets-drawer-pills.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 1.39,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "facet-filters-form",
+      "facet-remove"
+    ],
+    "rendered_snippets": [
+      "facet-price-active-button",
+      "icon-close-small"
+    ]
+  },
+  {
+    "rank": 39,
+    "donor": "vault-shrine-pro-2.0.0",
+    "type": "block",
+    "rel_path": "blocks/comparison-table_content.liquid",
+    "destination_rel_path": "blocks/comparison-table_content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Advertorial Comparison Table ('Us vs Competitors')",
+    "size_kb": 1.39,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 40,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/quantity-input.liquid",
+    "destination_rel_path": "snippets/quantity-input.liquid",
+    "apex_score": 85,
+    "commercial_role": "D2C Tiered Pricing & Bundle Booster",
+    "size_kb": 1.74,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "quantity-input"
+    ],
+    "rendered_snippets": [
+      "progress-bar",
+      "quantity-input"
+    ]
+  },
+  {
+    "rank": 41,
+    "donor": "shrine-pro",
+    "type": "snippet",
+    "rel_path": "snippets/facets-drawer-sort.liquid",
+    "destination_rel_path": "snippets/facets-drawer-sort.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 1.76,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "facet-filters-form"
+    ],
+    "rendered_snippets": [
+      "icon-caret"
+    ]
+  },
+  {
+    "rank": 42,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-timeline-item_content.liquid",
+    "destination_rel_path": "sections/dnk-timeline-item_content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.82,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 43,
+    "donor": "shrine-pro",
+    "type": "block",
+    "rel_path": "blocks/timeline-item_content.liquid",
+    "destination_rel_path": "blocks/timeline-item_content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.82,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 44,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-timeline-item_header.liquid",
+    "destination_rel_path": "sections/dnk-timeline-item_header.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.91,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 45,
+    "donor": "shrine-pro",
+    "type": "block",
+    "rel_path": "blocks/timeline-item_header.liquid",
+    "destination_rel_path": "blocks/timeline-item_header.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 1.91,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 46,
+    "donor": "story",
+    "type": "asset",
+    "rel_path": "assets/cart-countdown.min.js",
+    "destination_rel_path": "assets/cart-countdown.min.js",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 1.92,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-countdown"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 47,
+    "donor": "ks-origin",
+    "type": "snippet",
+    "rel_path": "snippets/cart-dialog.liquid",
+    "destination_rel_path": "snippets/cart-dialog.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 1.94,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "s-view-event",
+      "theme-dialog"
+    ],
+    "rendered_snippets": [
+      "cart-discount",
+      "cart-items",
+      "cart-note",
+      "cart-summary",
+      "svg-icons"
+    ]
+  },
+  {
+    "rank": 48,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/cart-gift-card.liquid",
+    "destination_rel_path": "snippets/cart-gift-card.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 2.09,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "gift-wrap-button"
+    ],
+    "rendered_snippets": [
+      "icon",
+      "loading-spinner"
+    ]
+  },
+  {
+    "rank": 49,
+    "donor": "main",
+    "type": "snippet",
+    "rel_path": "snippets/add-to-cart-button.liquid",
+    "destination_rel_path": "snippets/add-to-cart-button.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 2.15,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "add-to-cart-component"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 50,
+    "donor": "vault-shrine-pro-2.0.0",
+    "type": "block",
+    "rel_path": "blocks/cart-page_main.liquid",
+    "destination_rel_path": "blocks/cart-page_main.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 2.16,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 51,
+    "donor": "sections-vault",
+    "type": "section",
+    "rel_path": "sections/dnk-timeline-item_active-content.liquid",
+    "destination_rel_path": "sections/dnk-timeline-item_active-content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 2.81,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 52,
+    "donor": "shrine-pro",
+    "type": "block",
+    "rel_path": "blocks/timeline-item_active-content.liquid",
+    "destination_rel_path": "blocks/timeline-item_active-content.liquid",
+    "apex_score": 85,
+    "commercial_role": "Brand Narrative & Chronological Scroller",
+    "size_kb": 2.81,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 53,
+    "donor": "sugar",
+    "type": "snippet",
+    "rel_path": "snippets/media-sizes-scope.liquid",
+    "destination_rel_path": "snippets/media-sizes-scope.liquid",
+    "apex_score": 85,
+    "commercial_role": "Core Web Vitals Dynamic LCP Sizing Optimizer",
+    "size_kb": 3.0,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "media-sizes-scope"
+    ]
+  },
+  {
+    "rank": 54,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/cart-discounts.liquid",
+    "destination_rel_path": "snippets/cart-discounts.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.4,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-discount-component"
+    ],
+    "rendered_snippets": [
+      "loading-spinner"
+    ]
+  },
+  {
+    "rank": 55,
+    "donor": "vault-shrine-pro-2.0.0",
+    "type": "block",
+    "rel_path": "blocks/cart-page_summary.liquid",
+    "destination_rel_path": "blocks/cart-page_summary.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.42,
+    "blocks_2_0": true,
+    "custom_elements": [],
+    "rendered_snippets": [
+      "cart-color-scheme",
+      "cart-editor-notice"
+    ]
+  },
+  {
+    "rank": 56,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/cart-shipping-calculator.liquid",
+    "destination_rel_path": "snippets/cart-shipping-calculator.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.49,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "country-province-component"
+    ],
+    "rendered_snippets": []
+  },
+  {
+    "rank": 57,
+    "donor": "ks-origin",
+    "type": "snippet",
+    "rel_path": "snippets/cart-discount.liquid",
+    "destination_rel_path": "snippets/cart-discount.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.6,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-discount",
+      "theme-collapse"
+    ],
+    "rendered_snippets": [
+      "svg-icons"
+    ]
+  },
+  {
+    "rank": 58,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/custom-drawer.liquid",
+    "destination_rel_path": "snippets/custom-drawer.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 3.66,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "side-drawer"
+    ],
+    "rendered_snippets": [
+      "language-country-localization"
+    ]
+  },
+  {
+    "rank": 59,
+    "donor": "ella",
+    "type": "snippet",
+    "rel_path": "snippets/predictive-search-drawer.liquid",
+    "destination_rel_path": "snippets/predictive-search-drawer.liquid",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 4.01,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "predictive-search",
+      "search-form",
+      "side-drawer"
+    ],
+    "rendered_snippets": [
+      "predictive-search-empty-state"
+    ]
+  },
+  {
+    "rank": 60,
+    "donor": "story",
+    "type": "asset",
+    "rel_path": "assets/cart-shipping.min.js",
+    "destination_rel_path": "assets/cart-shipping.min.js",
+    "apex_score": 85,
+    "commercial_role": "High-CRO AJAX Cart Drawer & Rewards Engine",
+    "size_kb": 4.04,
+    "blocks_2_0": false,
+    "custom_elements": [
+      "cart-shipping"
+    ],
+    "rendered_snippets": []
+  }
+]
