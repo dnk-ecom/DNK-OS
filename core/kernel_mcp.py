@@ -214,4 +214,45 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
         )
         return json.dumps(res.to_dict(), ensure_ascii=False)
 
+    @mcp.tool()
+    def media_cut_silence(
+        words_json: str, total_duration_ms: int, min_silence_ms: int = 400, padding_ms: int = 70
+    ) -> str:
+        """Detects dead-air pauses and generates jump-cut interval plan and FFmpeg filters for short-form retention."""
+        from services.dnk_media.src.service import cut_silence
+        words = json.loads(words_json) if isinstance(words_json, str) else words_json
+        plan = cut_silence(words=words, total_duration_ms=total_duration_ms, min_silence_ms=min_silence_ms, padding_ms=padding_ms)
+        return json.dumps(plan.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def media_smart_reframe(
+        original_width: int = 1920, original_height: int = 1080, duration_ms: int = 5000
+    ) -> str:
+        """Calculates dynamic 9:16 vertical crop coordinates with smooth speaker face centering."""
+        from services.dnk_media.src.service import reframe_smart
+        plan = reframe_smart(original_width=original_width, original_height=original_height, duration_ms=duration_ms)
+        return json.dumps(plan.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def media_kinetic_subtitles(
+        transcript: str, total_duration_ms: int = 0, style_preset: str = "hormozi_bold"
+    ) -> str:
+        """Generates word-level Hormozi kinetic subtitles (ASS and SRT) with emoji triggers."""
+        from services.dnk_media.src.service import generate_kinetic_subtitles
+        track = generate_kinetic_subtitles(
+            transcript=transcript, total_duration_ms=total_duration_ms if total_duration_ms > 0 else None, style_preset=style_preset
+        )
+        return json.dumps(track.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def media_sound_design(video_duration_s: float, music_preset: str = "electronic_pulse") -> str:
+        """Composes automatic audio ducking keyframes and synchronous SFX cues."""
+        from services.dnk_media.src.service import compose_sound_design
+        from services.dnk_media.src.sound_design import DuckingSettings
+        plan = compose_sound_design(
+            video_duration_s=video_duration_s,
+            custom_settings=DuckingSettings(music_preset=music_preset)
+        )
+        return json.dumps(plan.model_dump(), ensure_ascii=False)
+
     return mcp
