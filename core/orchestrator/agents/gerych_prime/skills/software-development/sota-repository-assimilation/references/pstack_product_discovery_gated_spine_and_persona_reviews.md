@@ -1,0 +1,68 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/pstack_product_discovery_gated_spine_and_persona_reviews.md"
+# purpose: "Assimilation notes and architectural patterns from BhaskarManam/pstack: Gated Spine, Product Discovery Rubrics, and Adversarial Persona Reviews."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-08"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# 🎯 pstack: Gated Spine, Discovery Rubrics & Adversarial Persona Reviews
+
+## 1. Executive Summary & Source
+- **Repository**: `BhaskarManam/pstack` (inspired by Garry Tan's `gstack`)
+- **Domain**: AI-native Product Discovery, Gated Artifact Spines, and Multi-Persona Adversarial Reviews.
+- **Value for DNK OS**: Prevents premature engineering by imposing a structured, rubric-gated sequence (`Vision → Strategy → PRD → Design Brief`) and deep adversarial CPO/CMO audit lenses before a single line of backend/frontend code is generated.
+
+---
+
+## 2. Core Architectural Patterns
+
+### A. The Gated Spine (Sequential Quality Gates)
+Unlike ad-hoc document generation, `pstack` enforces a strict linear dependency chain where downstream documents cannot be authored until upstream bets pass an objective rubric score threshold (typically $\ge 2.5 / 5.0$):
+1. **Vision** (`skills/vision`): Target customer, emotional resonance, long-term state.
+2. **Strategy** (`skills/strategy`): Strategic bet, moat, trade-offs, non-goals.
+3. **Opportunity Assessment** (`skills/opportunity`): Problem sizing, customer pain intensity, willingness to pay.
+4. **PRD** (`skills/prd`): Functional scope, user stories, non-functional requirements, failure modes.
+5. **Design Brief** (`skills/design-brief`): Interaction design requirements, user mental models, wireframe specs.
+
+### B. Adversarial Product Personas (Multi-Lens Audit)
+Provides dedicated adversarial lenses across world-class product leadership frameworks:
+- **Marty Cagan Review** (`skills/cagan-review`): Rigorous interrogation of the 4 Product Risks:
+  - *Value Risk*: Will customers buy/use it?
+  - *Usability Risk*: Can users figure out how to use it?
+  - *Feasibility Risk*: Can engineers build it with current tech/time?
+  - *Viability Risk*: Does it work for business model, legal, compliance, and sales?
+- **Shreyas Doshi Review** (`skills/shreyas-review`): LNO framework (Leverage, Neutral, Overhead), High Agency validation, and Product Sense stress-testing.
+- **Lenny Rachitsky Review** (`skills/lenny-review`): Growth loops, activation mechanics, retention engines, and virality loops.
+- **Ravi Mehta Review** (`skills/ravi-review`): 12 Product Competencies, Strategy Stack alignment, and outcome-oriented execution.
+- **Julie Zhuo Review** (`skills/julie-review`): Problem-first UX critique, cognitive simplicity, and eliminating design bloat.
+
+### C. Objective Calibration & Rubrics Engine
+- All rubrics (`knowledge/rubrics/*.yaml`) define explicit criteria for scores from 1 (Unacceptable/Vague) to 5 (Exemplary/Defensible).
+- Eliminates subjective LLM sycophancy ("Looks great!") by requiring score anchoring against concrete examples.
+
+---
+
+## 3. Fast Zero-Clone Remote Inspection Protocol
+When auditing public repositories or raw markdown snippets:
+- `web_extract` on `raw.githubusercontent.com` may return `403 Forbidden` due to scraper bot protection.
+- **SOTA Inspection Pattern**: Always use native GitHub CLI with pre-authenticated credentials:
+  ```bash
+  # Directory listing
+  gh api repos/<owner>/<repo>/contents/<path>
+
+  # Direct file content retrieval (decoded from Base64)
+  gh api repos/<owner>/<repo>/contents/<path>/<file> --jq .content | base64 -d
+  ```
+- This executes in <2s, avoids full repo cloning overhead, and bypasses Cloudflare/WAF scrapers.
+
+---
+
+## 4. Adaptation to DNK OS Swarm Architecture
+- **Inception Routing**: Integrate discovery gates into `dnk-intent-discovery` and `dnk_mentor` (Antigravity).
+- **Adversarial Gate**: Extend `gerych_auditor` beyond code/security to run Cagan 4-risk and UX viability audits on proposed PRDs before task decomposition (`dnk_decompose_task_dna`).
+- **Knowledge Ingestion**: Port YAML rubrics into SCONES memory (`ws-alpha-001`) for automated score gating.

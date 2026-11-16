@@ -1,0 +1,142 @@
+---
+title: "Chrome Bookmark Ai Structuring And Transactional Tree Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/chrome_bookmark_ai_structuring_and_transactional_tree_patterns.md"
+> purpose: "Document: Chrome Bookmark Ai Structuring And Transactional Tree Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# Chrome Bookmark AI Structuring & Transactional Tree Architecture
+
+Condensed engineering patterns distilled from SOTA Chrome extensions (`bcollard/chrome-advanced-bookmarks`, `migsilva89/MarkMind`, `PanHywel/TidyMark`, `Fannon/search-bookmarks-history-and-tabs`, `isandrel/bookmark-scout`).
+
+---
+
+## 1. Fast Fuzzy Subsequence Search & Folder Guessing
+*Source: `bcollard/chrome-advanced-bookmarks`*
+
+### Fuzzy Subsequence Scoring
+```typescript
+export function fuzzyScore(pattern: string, text: string): number {
+  const p = pattern.toLowerCase();
+  const t = text.toLowerCase();
+  let score = 0, pIdx = 0, prevMatchIdx = -2;
+
+  for (let i = 0; i < t.length && pIdx < p.length; i++) {
+    if (t[i] === p[pIdx]) {
+      score += 10;
+      if (prevMatchIdx === i - 1) score += 15; // Consecutive match bonus
+      if (i === 0 || t[i - 1] === ' ' || t[i - 1] === '/' || t[i - 1] === '-') score += 20; // Word start bonus
+      prevMatchIdx = i;
+      pIdx++;
+    } else {
+      score -= 1; // Gap penalty
+    }
+  }
+  return pIdx === p.length ? Math.max(1, score) : 0;
+}
+```
+
+### Folder Auto-Detection (`findBestFolderForTitle`)
+- Split bookmark title into meaningful tokens (stopword filtered, length > 2).
+- Score each folder path against title tokens.
+- Select highest scoring folder (above threshold) as default target when `Alt+D` is triggered.
+
+---
+
+## 2. Safe LLM Batching & Two-Tier Triage
+*Sources: `migsilva89/MarkMind`, `PanHywel/TidyMark`*
+
+### Two-Tier Triage
+1. **Tier 1 (Instant Offline Rules)**: Fast deterministic matching by domain/regex (e.g. `github.com` -> `Dev/Repositories`, `figma.com` -> `Design/Workspaces`).
+2. **Tier 2 (Batched LLM Reorganization)**: Unmatched bookmarks are chunked into batches of 25–40 items to stay safely within prompt token limits.
+
+### Schema Constrained Prompt Contract
+```typescript
+export interface OrganizeSuggestion {
+  bookmarkId: string;
+  url: string;
+  title: string;
+  suggestedPath: string[]; // e.g. ["Engineering", "Rust", "Crates"]
+  confidence: number;      // 0.0 - 1.0
+  reasoning: string;
+}
+```
+**Constraint Prompt Rules**:
+- Limit tree depth: `suggestedPath.length <= 3`.
+- Do not create single-item leaf folders; group into existing categories when possible.
+- Require JSON array response matching schema.
+
+---
+
+## 3. Transactional Undo/Rollback & Collision-Free Path Builder
+*Source: `migsilva89/MarkMind`, `PanHywel/TidyMark`*
+
+### In-Memory Diff & Dry-Run Preview
+- Never mutate `chrome.bookmarks` immediately.
+- Generate a visual diff modal with per-bookmark toggles (`apply: boolean`).
+- Store pre-mutation snapshot in session state:
+```typescript
+interface UndoTransaction {
+  sessionId: string;
+  timestamp: number;
+  mutations: Array<{
+    bookmarkId: string;
+    originalParentId: string;
+    originalIndex: number;
+    newParentId: string;
+  }>;
+}
+```
+
+### Collision-Free Recursive Folder Creation (`ensureFolderPath`)
+```typescript
+async function ensureFolderPath(rootFolderId: string, pathParts: string[]): Promise<string> {
+  let currentParentId = rootFolderId;
+  for (const folderName of pathParts) {
+    const children = await chrome.bookmarks.getChildren(currentParentId);
+    const existing = children.find(c => !c.url && c.title.toLowerCase() === folderName.toLowerCase());
+    if (existing) {
+      currentParentId = existing.id;
+    } else {
+      const created = await chrome.bookmarks.create({
+        parentId: currentParentId,
+        title: folderName
+      });
+      currentParentId = created.id;
+    }
+  }
+  return currentParentId;
+}
+```
+
+### Rollback Execution
+Iterate `UndoTransaction.mutations` in **reverse order**, calling `chrome.bookmarks.move(bookmarkId, { parentId: originalParentId, index: originalIndex })` with a 15ms queue throttle to prevent internal Chrome SQLite database lockouts.
+
+---
+
+## 4. Multi-Signal Query Parsing & Taxonomy Weights
+*Source: `Fannon/search-bookmarks-history-and-tabs`*
+
+- **Prefix Tokens**:
+  - `~folder` -> restricts candidate pool to matching folder titles.
+  - `#tag` -> matches extracted keywords or hash tokens.
+  - `b ` / `h ` / `t ` -> filters source (Bookmarks, History, Active Tabs).
+- **Composite Score Formula**:
+  $$\text{FinalScore} = (1.5 \times S_{\text{titleExact}}) + (1.2 \times S_{\text{titlePrefix}}) + (0.8 \times S_{\text{urlMatch}}) + (0.5 \times S_{\text{taxonomy}}) + S_{\text{recencyBoost}}$$

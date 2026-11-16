@@ -1,0 +1,79 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/heterogeneous_batch_audit_and_workflow_architecture_clustering.md"
+# purpose: "Heterogeneous multi-target repository audit, high-velocity GitHub REST collection, and workflow architecture clustering."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-06"
+# author: "DNK-e.com Maksym & Gerych"
+# --- END DNK-MRH-HEADER ---
+
+# 🌐 Heterogeneous Batch Audit & Workflow Architecture Clustering Protocol
+
+## 🎯 Context & Challenge
+When handling user requests to audit large heterogeneous batches of external sources (e.g. 50-100+ targets), inputs rarely consist solely of clean `github.com/owner/repo` strings. Real batches frequently mix:
+1. Standard repositories (`github.com/org/repo`)
+2. GitHub Organization roots (`github.com/orgs/orgname/repositories`)
+3. User profile repo listings (`github.com/user?tab=repositories`)
+4. Documentation sites and guides (e.g., GitHub Pages, GitBook, custom domains)
+5. Package registry listings (e.g., `npmjs.com/package/...`)
+6. Research newsletters and deep-dives (e.g., Substack, Medium)
+
+Attempting to run git clones sequentially on such a list results in timeout, context bloat, and rate-limit lockouts.
+
+---
+
+## ⚡ 1. High-Velocity Intake & REST Resolution Pipeline
+
+### Step 1.1: URL Classification & Decomposition
+- **Clean Repos:** Extract `owner/repo` via regex `github\.com/([^/\s]+)/([^/\s?#]+)`. Exclude reserved words (`orgs`, `topics`, `search`, `settings`, `explore`).
+- **Organizations & Profiles:** Match `/orgs/([^/]+)` or `github\.com/([^/?#]+)\?tab=repositories`. Probe the GitHub API:
+  `GET https://api.github.com/orgs/{org}/repos?per_page=100&sort=pushed`
+  or
+  `GET https://api.github.com/users/{user}/repos?per_page=100&sort=pushed`
+- **External Specifications & Docs:** Keep as contextual reference targets with domain tags (`E-Commerce Standard`, `GenAI UI Spec`, `Cinematic Video Pipeline`).
+
+### Step 1.2: Authenticated Headless GitHub API Harvesting
+- **Token Invariant:** Always forward `$GITHUB_TOKEN` or `$GH_TOKEN` in `Authorization: token {TOKEN}`. Unauthenticated rate limits are 60 req/hr (breaks at repo #61); authenticated is 5,000 req/hr.
+- **Zero-Clone Metadata & README Extraction:**
+  - Metadata: `GET https://api.github.com/repos/{owner}/{repo}` (stars, forks, open issues, license SPDX, language, topics, description).
+  - README: `GET https://api.github.com/repos/{owner}/{repo}/readme` with `Accept: application/vnd.github.v3.raw` (first 2,000 characters extract architectural summary without cloning multi-GB git histories).
+
+---
+
+## 🧬 2. Six-Domain Workflow Architecture Clustering
+
+Audited systems must be categorized into functional clusters matching the DNK OS Swarm Workhorses:
+
+1. **AI Agent Systems & Autonomous Loops (`core/orchestrator` / Gerych Prime):**
+   - *Architectural Markers:* Cyclic execution loops (`ouroboros`), contract typing at agent boundaries (`contractplane`), agent-readiness scoring (`fern-api/agent-score`), collaborative canvas protocols (`CopilotKit/openmuse`, `OpenDots`).
+   - *Key Tradeoff:* Replace one-shot prompt execution with bounded state machines and formal schemas.
+
+2. **Video Generation & AI Cinema (`dnk_media` / `dnk_video_ai_creator`):**
+   - *Architectural Markers:* Programmatic React/TS rendering (`dmtrKovalenko/fframes`), GPU-accelerated Rust vector rendering (`linebender/vello`, `linebender/resvg`), shot-based script decomposition (`taruma/SceneFlow`, `taruma/shotbase`), automated timeline slicing (`SeeCut`, `SynthCut`).
+   - *Key Tradeoff:* Offload heavy headless browser video compilation to native GPU vector engines where possible.
+
+3. **E-Commerce & Shopify Architecture (`services/dnk_shopify`):**
+   - *Architectural Markers:* Shopify OS 2.0 sections/blocks (`Saabbir/shopify-theme-handbook`), Theme Store compliance gating (`Saabbir/shopify-theme-store-checklist`), conversion-rate optimization components (`ecom-and-cro`), official baseline themes (`Shopify/skeleton-theme`).
+   - *Key Tradeoff:* Zero runtime dependencies, native Liquid schema validation, and strict performance budgets.
+
+4. **UI Systems, Spatial Canvas & GenAI UX (`apps/web` / `gerych_builder`):**
+   - *Architectural Markers:* Design systems of GenAI interaction primitives (`quietloudlab/ai-interaction-atlas` — Steering Bars, Confidence Meters, Suggestion Chips), real-time component generation (`thesysdev/openui`), design system baselines (`aws/aws-northstar`).
+   - *Key Tradeoff:* Transparent agent state and human steering over opaque text chats.
+
+5. **Developer Tooling, Compilers & Systems (`dnk_dev_fullstack` / `gerych_auditor`):**
+   - *Architectural Markers:* Multi-language SDK compilers (`fern-api/fern`), fast scrapers (`flyscrape`, `dna`), high-performance caches (`dbx`), token-budget code trimmers (`haircut`).
+
+6. **Knowledge Systems & Deep Audio (`herich_librarian` / `dnk_scones_memory`):**
+   - *Architectural Markers:* Hierarchical page-level document indexing (`VectifyAI/PageIndex`, `OpenKB`), agent memory trace engines (`vectorize-io/hindsight`), low-latency streaming STT (`deepgram/recipes`).
+
+---
+
+## 📋 3. Dual-Artifact Synthesis Gate
+
+To ensure both automated agents and human operators can leverage the results:
+1. **Machine-Readable DB (`sota_batch_audit.json`):** Full JSON dictionary keyed by `owner/repo` with stars, language, license, topics, and summarized README excerpts.
+2. **Human-Readable Master Catalog (`SOTA_MASTER_BATCH_AUDIT_YYYY.md`):** Markdown with DNK-MRH header, executive summary table, detailed catalog by domain, and concrete workflow integration proposals for team discussion.
+3. **Quality Validation:** Execute `python3 scripts/system/markdown_schema_gate.py` on the resulting markdown artifact to verify MRH compliance, valid links, and structural integrity.

@@ -1,0 +1,89 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/desktop_ai_agent_architectures_and_binary_audit_patterns.md"
+# purpose: "Reverse engineering, binary auditing of Electron/macOS desktop AI apps (Claude.dmg, AgentsRoom), and Tauri v2 spatial architecture blueprints."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-20"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# 🖥️ Desktop AI Agent Architectures & Binary Audit Patterns
+
+This reference documents the deterministic methodology for auditing macOS DMG bundles, Electron ASAR packages, and evaluating commercial AI desktop clients (Claude Desktop, Agents Room) versus local-first Tauri v2 architectures for DNK OS.
+
+---
+
+## 1. Deterministic macOS DMG & ASAR Binary Audit Pipeline
+
+When auditing desktop application bundles (`.dmg`, `.app`):
+
+### 1.1 Non-Intrusive Mounting & Ejection
+```bash
+# Mount DMG read-only in background without opening Finder windows
+hdiutil attach "<dmg_path>" -nobrowse -readonly
+
+# Always verify mounted volume name under /Volumes/
+ls -la /Volumes/<VolumeName>/<App>.app/Contents/Resources/
+
+# Clean ejection after audit
+diskutil eject /Volumes/<VolumeName>
+```
+
+### 1.2 Electron ASAR Inspection & Node-Native Extraction
+Direct `npx asar extract-file` often fails on complex path segments or root leading slashes. Use inline Node.js with the `asar` library:
+
+```javascript
+// Reliable extraction of package.json and manifests from app.asar
+node -e '
+const fs = require("fs");
+const asar = require("asar"); // or path to npx cached asar module
+const content = asar.extractFile("/Volumes/App/App.app/Contents/Resources/app.asar", "package.json");
+console.log(content.toString("utf8"));
+'
+```
+
+---
+
+## 2. Comparative Deconstruction: SOTA Desktop AI Clients
+
+### 2.1 Claude Desktop (`@ant/desktop` v2.2553.1)
+* **Stack**: Electron + Vite + React + Tailwind CSS + macOS Swift native helpers (`@ant/claude-swift`).
+* **Core Subsystems**:
+  - **MCP Host**: `@modelcontextprotocol/sdk` orchestrating local tools via stdio/SSE.
+  - **MicroVM Sandboxing**: Bundles a 24MB lightweight ARM64 virtual machine image (`smol-bin.arm64.img`) and sandbox profiles (`claude-ios-sim.sb`) for isolating bash/computer-use execution on Apple Silicon.
+  - **PTY Terminal Host**: `node-pty` (v1.2.0-beta) + `ssh2` for remote/local agent execution.
+  - **Dual-Pane Artifacts**: `coworkArtifact.js` splitting agent dialogue from live rendered previews.
+* **Limitation**: Thin client over `claude.ai`. Chat rendering, conversation persistence, and model routing are remote-first via `@ant/private-api-client`. Cannot be converted into an offline/self-hosted engine.
+
+### 2.2 Agents Room (v1.182.0)
+* **Stack**: Electron + Vite + React + `node-pty` terminal multiplexer.
+* **Core Subsystems**:
+  - **Multi-Agent Workspace**: Manages parallel coding agent processes with attached xterm terminals.
+  - **Tiering / Limits**: Obfuscated in bundle assets (e.g. `pZe` config: `free: { projects: 2, agentParallel: 6 }` vs `pro: { projects: 1/0, agentParallel: 1/0 }` where `1/0 === Infinity`).
+  - **Proxy / BYOK Pattern**: Standard OpenAI endpoints (`/api/ai/...`) redirected via LiteLLM to Google Cloud Vertex AI (`gemini-2.5-pro`) using Application Default Credentials (ADC).
+* **Limitation**: Linear terminal-oriented UI, heavy Webpack minification, telemetry callbacks to `agentsroom.dev`. Incompatible with multi-node spatial DAG workflows.
+
+---
+
+## 3. "Fork/Hack Binary" vs. "Clean-Room Tauri v2" Decision Matrix
+
+| Dimension | Binary Patch / Electron Fork | Clean-Room Tauri v2 Architecture |
+| :--- | :--- | :--- |
+| **Memory Footprint** | 800 MB – 1.4 GB RAM (Chromium runtime) | 40 – 70 MB RAM (macOS native WebKit) |
+| **UI Paradigm** | 1D chat or linear terminal tabs | 2D Spatial DAG Canvas (TaskForest, React Flow) |
+| **Maintenance Debt** | High: Breaks on upstream vendor updates | Zero: Full control over source code and releases |
+| **Data Privacy** | High risk of vendor telemetry leaks | 100% Local-first, direct Vertex AI / LLM APIs |
+| **Binary Security** | Potential TOS violations & account bans | Permissive open-source stack (MIT / Apache-2.0) |
+
+---
+
+## 4. Architectural Harvest for DNK OS
+
+When building the native DNK OS Desktop client (`DNK_STUDIO`):
+1. **Host MCP Servers Locally**: Adopt Anthropic's stdio/SSE host pattern (`claude_desktop_config.json` standard) for universal tool integration.
+2. **Isolate High-Risk Agent Execution**: Implement containerized or microVM execution (`smol-bin` pattern) for zero-trust bash tools.
+3. **Embed Native PTY Drawers**: Use `tauri-plugin-pty` in Rust to stream agent CLI outputs into node inspect drawers without blocking UI rendering.
+4. **Preserve Spatial Dominance**: Keep the 2D Node-Based Canvas (`apps/web/components/canvas/DNKCanvas.tsx`) as the primary interface, not linear chat.

@@ -1,0 +1,78 @@
+---
+title: "Amoeba Deterministic Orchestrator And Crash Only Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/amoeba_deterministic_orchestrator_and_crash_only_patterns.md"
+> purpose: "Document: Amoeba Deterministic Orchestrator And Crash Only Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/amoeba_deterministic_orchestrator_and_crash_only_patterns.md"
+# purpose: "Reference architecture and design patterns extracted from ecorkran/amoeba."
+# canonical_source: false
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-26"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# Amoeba: Deterministic Orchestrator & Crash-Only Agentic Patterns
+
+## Overview
+- **Repository**: `https://github.com/ecorkran/amoeba`
+- **Author**: Erik Corkran (`manta.digital`)
+- **License**: MIT
+- **Role in AI Stack**: Sits above Context Forge (`cf` - specification, slice decomposition, planning) and Squadron (`sq` - agentic execution engine, LLM pipelines). Provides deterministic control flow around bounded nondeterministic subsystems.
+- **Scale**: ~29k LOC production code (`src/amoeba`), ~57k LOC test code across 3,951 automated tests (2:1 test ratio).
+
+---
+
+## Core Architectural Invariants
+
+### 1. Crash-Only Architecture & Single Recovery Path
+- **Invariant**: The resident process has no special graceful shutdown code path that differs from `kill -9`.
+- **Mechanism**: Every external action or subprocess launch is pre-recorded into a SQLite `command_journal` table before execution.
+- **Recovery**: On startup, `RecoveryEngine` inspects journaled-but-unresolved commands, queries external process handles/IDs, adopts in-flight runs, or marks missing ones as `unknown`/`not_applied` and raises an escalation.
+
+### 2. Checkpoints as Data Rows, Not Blocking Sockets
+- **Rule**: *"A checkpoint is a persisted blocked-state, not a blocking call."*
+- **Mechanism**: When an agentic pipeline requires human intervention, review, or external approval, the runner creates a `blocked_state` record in SQLite with an unassigned resolution slot.
+- **Benefit**: Zero resource exhaustion, no hanging sockets or blocking RPC connections. Survives system reboots and process termination seamlessly.
+
+### 3. Durable File-System Inbox with Digest Idempotency
+- **Structure**: Submissions land in `inbox/<project>/<id>.json`.
+- **Idempotency**: Submissions are identified by the SHA-256 digest of their payload bytes. Resubmissions of identical artifacts are recognized as no-op replays.
+- **Decoupling**: The inbox accepts input asynchronously without holding database locks. The resident supervisor ingests inbox files into SQLite in controlled batches.
+
+### 4. Declarative Routing Tables (YAML)
+- **Reduction**: Finished runs are distilled into 10 discrete normalized inputs (verdicts, findings count, exit status, retry attempts).
+- **Matching**: The reduced state is evaluated against an ordered YAML routing table (`first matching rule wins`, terminating with a mandatory catch-all escalation).
+- **Replayability**: The table version and reduction parameters are persisted with each decision, enabling verifiable recomputation (`recompute`).
+
+### 5. Tick Budget & Strict Subprocess Hygiene
+- **Tick Budget**: Every tick of the runner loop checks a remaining time budget (`TickBudget`). No new subprocess (`cf` or `sq`) is launched if the remaining time is insufficient.
+- **Subprocess Safety**: Never invoke shell strings (`shell=False` everywhere). Explicit argv lists only. Timeouts strictly enforced.
+
+---
+
+## Relevance to DNK OS
+- Direct alignment with **TaskForest** and **SCONES Memory Engine**:
+  - Incorporate the *checkpoint-as-blocked-state* pattern into task dependency graphs.
+  - Implement crash-only write-ahead command journaling for long-running swarm dispatches.
+  - Apply declarative YAML routing tables to automate post-review worker transitions.

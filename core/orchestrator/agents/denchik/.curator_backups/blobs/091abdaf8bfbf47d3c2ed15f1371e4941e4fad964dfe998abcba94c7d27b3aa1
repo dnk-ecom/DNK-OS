@@ -1,0 +1,100 @@
+---
+title: "Freellmapi Multi Provider Bandit And Tool Rescue Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/freellmapi_multi_provider_bandit_and_tool_rescue_patterns.md"
+> purpose: "Document: Freellmapi Multi Provider Bandit And Tool Rescue Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "references/freellmapi_multi_provider_bandit_and_tool_rescue_patterns.md"
+# purpose: "SOTA Reference: FreeLLMAPI Multi-Provider Bandit Routing, Tool-Call Rescue, and Gateway Architecture"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-24"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# FreeLLMAPI Multi-Provider Bandit & Tool-Rescue Architectural Patterns
+
+## 1. Overview & Provenance
+- **Source**: `tashfeenahmed/freellmapi` (MIT License)
+- **Domain**: LLM Gateway, Multi-Provider Routing, High-Availability Fallback, Tool-Call Rescue
+- **Significance**: Aggregates 34 free/low-cost tiers (635+ endpoints) behind a single OpenAI/Anthropic/Gemini/Ollama/MCP gateway.
+
+---
+
+## 2. Thompson-Sampling Multi-Armed Bandit Router
+Instead of arbitrary heuristic bonus points or rigid static priorities, routing uses a **convex combination** normalized to $[0, 1]$ combined with Beta-distribution posterior sampling (Thompson Sampling) for automatic exploration/exploitation:
+
+### Mathematical Model
+$$\text{base} = w_{\text{rel}} \cdot \text{reliability} + w_{\text{speed}} \cdot \text{speed} + w_{\text{intel}} \cdot \text{intelligence}$$
+where $w_{\text{rel}} + w_{\text{speed}} + w_{\text{intel}} = 1$.
+
+### Guardrail Multipliers
+$$\text{effective} = \text{base} \times \text{headroomFactor} \times \text{rateLimitFactor}$$
+- **headroomFactor**: Penalizes models as observed usage approaches RPM/RPD/TPM/TPD daily quotas.
+- **rateLimitFactor**: Exponential cooldown demotion triggered by HTTP 429 status codes.
+- **Beta Posterior**: $\text{reliability} \sim \text{Beta}(\alpha, \beta)$ updated online per request success/failure, preventing any model from being permanently locked out after transient blips.
+
+### Preset Weight Vectors
+| Preset | $w_{\text{rel}}$ | $w_{\text{speed}}$ | $w_{\text{intel}}$ | Primary Use Case |
+|---|---|---|---|---|
+| `balanced` | 0.50 | 0.25 | 0.25 | General conversational traffic |
+| `smartest` | 0.35 | 0.10 | 0.55 | Complex code generation & reasoning |
+| `fastest` | 0.35 | 0.55 | 0.10 | Ghost-text completions & inline edits |
+| `reliable` | 0.70 | 0.15 | 0.15 | Mission-critical background pipelines |
+
+---
+
+## 3. Tool-Call Rescue Engine
+Cheaper or open-weight models frequently fail to output strict JSON tool call structures, hallucinating function calls into markdown blocks (````json\n{"name": ...}\n````) or natural language prefixes.
+
+### Rescue Pipeline
+1. Intercept stream / response before client emission.
+2. If `tools` were requested but the model returned empty `tool_calls` with raw text matching schema regex signatures:
+   - Extract function name, argument object, and call ID.
+   - Synthesize valid OpenAI `tool_calls: [{ id, type: 'function', function: { name, arguments } }]`.
+   - Strip raw tool syntax from user-visible `content`.
+3. Route future tool calls only to models with proven parameter adherence.
+
+---
+
+## 4. Context Handoff & Sticky Sessions
+- **Session Affinity**: Sticky 30-minute routing binds a conversation lineage to one model instance to prevent cognitive tonal jitter.
+- **Compressed Handoff Summary**: When failover occurs mid-session (e.g. model 429 or quota exhaustion), the gateway injects a lightweight system transition marker summarizing previous turns before passing state to the fallback model.
+
+---
+
+## 5. Security & Multi-Wire Protocol Emulation
+- **Envelope Encryption**: Provider keys stored in SQLite encrypted via AES-256-GCM using an encryption key derived at startup; decrypted strictly in-memory during outbound HTTP dispatch.
+- **Wire Translators**:
+  - Anthropic `/v1/messages` ↔ OpenAI `/v1/chat/completions` (enables zero-config usage for Claude Code CLI).
+  - Google Gemini `/v1beta` (generateContent) adapter.
+  - Ollama NDJSON stream adapter for local IDEs (Zed, JetBrains).
+  - MCP `/mcp` server endpoint exposing routing controls and catalog introspection to ChatGPT/agents.
+
+---
+
+## 6. Operational & Legal Boundaries (ToS Guardrails)
+- **Single-Tenant Local Rule**: Free proxy stacks are only compliant under personal developer/evaluation terms. Reselling or multi-tenant hosting violates provider ToS (especially Cohere, NVIDIA NIM, Google).
+- **Late-Day Degradation**: Free tiers reset at 00:00 UTC. Frontier tiers run out of quota early in the day, causing systematic fallback to lower-tier models. Systems must anticipate variance in output depth over time.

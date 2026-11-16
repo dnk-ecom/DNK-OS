@@ -1,0 +1,62 @@
+---
+title: "Codespring Visual Planning And Four Core Values"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/codespring_visual_planning_and_four_core_values.md"
+> purpose: "Document: Codespring Visual Planning And Four Core Values"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+<!-- --- DNK-MRH-HEADER ---
+mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/codespring_visual_planning_and_four_core_values.md"
+purpose: "Reference document: CodeSpring visual planning patterns, mind map hierarchy, and the 4 Core Values for SOTA repository assimilation."
+canonical_source: true
+alters_files: []
+triggers_tasks: []
+status: "Active"
+version: "1.0.0"
+updated_at: "2026-09-10"
+author: "DNK-e.com Maksym & Gerych Prime"
+--- END DNK-MRH-HEADER -->
+
+# CodeSpring Visual Planning & The 4 Core Values
+
+## 1. Executive Summary
+CodeSpring (`codespring.app`) provides a visual intermediate representation (Mind Map Canvas) acting as the shared working memory between human builders and autonomous AI agents (Claude Code, Cursor, Hermes).
+
+## 2. The 4 Assimilated Values
+1. **Context-First Architecture ("Tag first, then ask")**:
+   - Every agent interaction is grounded in a specific node context.
+   - Prevents context bloat and catastrophic forgetting.
+2. **Structural Decomposition (Mockup before PRD)**:
+   - Journey A: Idea ➔ Clickable UI Mockup ➔ Tri-Partite PRD ➔ Tasks.
+   - Visual consensus prevents hallucinating incorrect specifications.
+3. **Continuous Traceability & Resync Protocol**:
+   - Bi-directional sync: Code changes are analyzed by AST to detect architecture drift against the map.
+4. **Autonomous Execution with 5-Question Audit Gate**:
+   - Before accepting existing code or merging features, evaluate:
+     1. Actual business purpose fulfilled?
+     2. Zero hallucinated/fake data?
+     3. Architecture allows scalability?
+     4. Safe foundation to build upon?
+     5. Error-free runtime execution?
+
+## 3. Integration Points with DNK OS
+- **XYFlow Spatial Canvas**: Node hierarchy (`ProjectNode`, `FeatureNode`, `SubFeatureNode`, `BridgeNode`, `NoteNode`).
+- **Gerych Swarm**: `gerych_builder` generates mockups before `gerych_auditor` reviews PRDs.
+- **Scout Pipelines**: Background research bots dispatch feature proposals onto the canvas backlog.

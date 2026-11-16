@@ -1,0 +1,353 @@
+---
+name: obsidian-vault-hygiene
+description: "Use when checking Obsidian vault hygiene and link gates."
+version: 1.0.0
+author: Gerych Prime & DNK OS
+license: MIT
+metadata:
+  hermes:
+    tags: [obsidian, vault, markdown, hygiene, frontmatter, dead-links, quality-gate, cognitive-memory]
+    related_skills: [obsidian, architecture-invariants-and-blast-radius, test-driven-development]
+---
+
+# Obsidian Vault Hygiene & Automated Quality Gates
+
+Maintain markdown vaults as high-integrity long-term cognitive memory (Tier 4) and human-in-the-loop visual command centers. Enforces path hygiene, dual-header validity, dynamic numeric indexing, dead-link prevention, and automated CI test gates.
+
+## When to Use
+
+- When creating, re-indexing, or maintaining markdown notes in an Obsidian vault (e.g. `docs/notes/`).
+- When setting up automated tests to prevent dead relative links and malformed YAML frontmatter.
+- When generating automated audit, research, or assimilation notes with numeric prefixes without colliding with existing notes.
+- When organizing knowledge graphs, task forest nodes (`tasks_and_ideas/`), or architecture decision records (ADRs).
+- When discovering local Obsidian vaults or installing plugins from GitHub releases (see `references/obsidian_plugin_installation_protocol.md`).
+
+## Core Principles
+
+1. **Strict Relative Paths Only**:
+   - Never use absolute paths (`/Users/...`, `~/Documents/...`) in notes, scripts, or tool arguments.
+   - Always reference the vault via relative paths (e.g. `./docs/notes/`) or symlinks.
+2. **Dual-Header Architecture**:
+   - Notes must start with clean YAML frontmatter delimited by `---`.
+   - Hidden Machine-Readable Headers (MRH) must follow YAML frontmatter inside HTML comments `<!-- --- DNK-MRH-HEADER --- -->`.
+   - **Crucial**: Never place `# --- DNK-MRH-HEADER ---` before YAML frontmatter, as it breaks H1 markdown rendering in Obsidian.
+3. **Dynamic Prefix Allocation (Zero Collisions)**:
+   - When programmatically creating notes with 3-digit prefixes (`001_...`), never hardcode prefix numbers.
+   - Dynamically inspect existing files, calculate `max(existing_prefixes) + 1`, and allocate sequentially.
+4. **Obsidian Local REST API & MCP Server Bridge**:
+   - For real-time active file inspection, direct UI note opening, and atomic vault updates, interact via the Obsidian MCP server on `http://127.0.0.1:27123/mcp`. See `references/obsidian_mcp_bridge_and_compass.md` for tools, auth tokens, and the Daniel Agrici Compass Life OS folder permission matrix.
+5. **Stable Functional Permalinks & Internalized Versioning (Preserving [[Wikilinks]])**:
+   - File names are immutable functional entities (e.g., `Order Processing Pipeline.md`).
+   - Never put versions (`_v2`), dates, or status in the file name. All versioning lives strictly INSIDE YAML frontmatter and MRH headers.
+   - This guarantees 100% stable `[[Wikilinks]]`, prevents broken knowledge graphs, and eliminates directory bloat. See `references/stable_permalinks_and_version_encapsulation.md`.
+
+## Step 1 — Validate YAML Frontmatter & Dual-Header Architecture
+
+Every note in `docs/notes/` must strictly implement the **Gold-Standard Note Schema** (`templates/gold_standard_note_template.md`):
+
+1. **8 Mandatory Frontmatter Fields**:
+   - `title`: Canonical note title.
+   - `aliases`: List of 2–4 alternate search titles/synonyms (UA and EN) for Obsidian Quick Switcher (`Cmd+O`) and fast `[[wikilinks]]`.
+   - `tags`: Kebab-case list without `#` prefix (must include `dnk-os`, document type, domain tags).
+   - `type`: Strict enum (`ARCH`, `ADR`, `SOTA`, `STANDARD`, `GUIDE`, `AUDIT`, `SPEC`, `MOC`).
+   - `status`: `active`, `draft`, `completed`, `deprecated`.
+   - `created`: `YYYY-MM-DD`.
+   - `updated`: `YYYY-MM-DD`.
+   - `author`: `"Maksym Kuzmenko & Gerych Prime"`.
+2. **Collapsible Metadata Callout / Muted MRH Header (Zero Ghost H1 Outline)**:
+   - Must NEVER use a raw unescaped Markdown header `# --- DNK-MRH-HEADER ---`. In Obsidian, a leading `#` creates an unwanted ghost H1 item in the Document Outline/TOC, polluting navigation and visual hierarchy.
+   - **Canonical Standard (Dual-Optics Collapsible Callout)**: Wrap inside a collapsed metadata callout (`[!metadata]-` with minus for collapsed state) containing a YAML code fence and an agent summary block:
+     ```markdown
+     > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+     > ```yaml
+     > # --- DNK-MRH-HEADER ---
+     > mrh_id: "docs/notes/0XX_note_name.md"
+     > purpose: "Канонічний архітектурний опис та специфікація компонента."
+     > canonical_source: true
+     > alters_files: []
+     > triggers_tasks: []
+     > status: "Active"
+     > version: "2.0.0"
+     > updated_at: "2026-09-19"
+     > author: "DNK-e.com Maksym & Gerych Prime"
+     > # --- END DNK-MRH-HEADER ---
+     > ```
+     > > [!summary] 📋 Контекст для ШІ-агента
+     > > Стислий виклад інженерної ролі документа та шлюзів перевірки.
+     ```
+   - **User UX**: Renders as a single compact, elegant 1-line strip in Obsidian Live Preview & Reading view (`▶ ⚙️ Системні метадані...`). Never clutters the reader's view, yet opens in one click.
+   - **Agent / CI Compatibility**: Retains 100% AST parseability of `# --- DNK-MRH-HEADER ---` while completely eliminating ghost H1 headers from the Outline panel.
+   - **Fallback**: HTML comment `<!-- --- DNK-MRH-HEADER --- ... --- END DNK-MRH-HEADER -->` for pure machine files.
+3. **Type-Emoji H1 & Abstract Callout**:
+   - Visual H1 with icon matching document type (ARCH 🏛️, ADR ⚖️, SOTA 🔬, STANDARD 📐, GUIDE 📘, AUDIT 🔍, SPEC 🧬, MOC 🗺️).
+   - Followed immediately by `> [!abstract] **Контекст та мета**` (or Призначення) and horizontal divider `---`.
+
+### Validation Snippet:
+```python
+import re
+import yaml
+from pathlib import Path
+
+REQUIRED_KEYS = ["title", "aliases", "tags", "type", "status", "created", "updated", "author"]
+vault_path = Path("docs/notes")
+
+for md_file in vault_path.glob("*.md"):
+    if md_file.name.startswith("."):
+        continue
+    content = md_file.read_text(encoding="utf-8")
+    m = re.match(r"^---\n(.*?)\n---", content.strip(), re.DOTALL)
+    assert m, f"{md_file.name}: Missing YAML frontmatter"
+    
+    data = yaml.safe_load(m.group(1))
+    assert isinstance(data, dict), f"{md_file.name}: Frontmatter must be a dict"
+    for k in REQUIRED_KEYS:
+        assert k in data, f"{md_file.name}: Missing required key '{k}'"
+    assert isinstance(data.get("aliases"), list), f"{md_file.name}: 'aliases' must be a list"
+    assert isinstance(data.get("tags"), list), f"{md_file.name}: 'tags' must be a list"
+    assert "<!-- --- DNK-MRH-HEADER ---" in content, f"{md_file.name}: Missing HTML-comment MRH"
+```
+
+To automatically format or re-align all vault notes to this gold standard, run the canonical migration script:
+```bash
+./.venv/bin/python3 scripts/system/standardize_notes_vault.py --apply
+```
+
+## Step 2 — Enforce Unique Numeric Note Prefixes
+
+Ensure all numbered notes maintain a strictly unique index:
+
+```python
+prefixes = {}
+for md_file in vault_path.glob("*.md"):
+    m = re.match(r"^(\d{3})[_\s]", md_file.name)
+    if m:
+        num = m.group(1)
+        prefixes.setdefault(num, []).append(md_file.name)
+
+duplicates = {k: v for k, v in prefixes.items() if len(v) > 1}
+assert not duplicates, f"Duplicate note prefixes: {duplicates}"
+```
+
+To allocate the next available prefix dynamically:
+```python
+existing_nums = [
+    int(m.group(1))
+    for f in vault_path.glob("*.md")
+    if (m := re.match(r"^(\d{3})[_\s]", f.name))
+]
+next_prefix = f"{max(existing_nums, default=0) + 1:03d}"
+```
+
+## Step 3 — Scan and Prevent Dead Links (Markdown & Wikilinks)
+
+Validate that markdown links `[label](target)` and Obsidian wikilinks `[[target]]` / `[[target|alias]]` / `![[embedded]]` pointing to vault notes or relative workspace files exist on disk.
+
+> [!IMPORTANT]
+> Always strip out fenced code blocks (` ```...``` `) and inline code spans (` `...` `) before scanning so that code snippets, examples, or pseudo-syntax are not falsely treated as active dead links. Refer to `references/vault_5_invariants_integrity_audit.md` for the complete 5-Invariant vault audit protocol.
+
+```python
+import re
+from pathlib import Path
+
+vault_path = Path("docs/notes").resolve()
+hub_root = Path(".").resolve()
+
+# Build note lookup table: by relative path, stem, and filename
+vault_notes_by_stem = {}
+vault_notes_rel = set()
+for p in vault_path.rglob("*"):
+    if p.is_file() and p.suffix in (".md", ".canvas", ".excalidraw"):
+        rel = str(p.relative_to(vault_path))
+        vault_notes_rel.add(rel)
+        vault_notes_rel.add(str(p.relative_to(hub_root)))
+        stem = p.stem.replace(".excalidraw", "")
+        vault_notes_by_stem.setdefault(stem.lower(), []).append(p)
+
+wikilink_pattern = re.compile(r"!?\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
+markdown_link_pattern = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+broken_links = []
+for md_file in vault_path.rglob("*.md"):
+    raw = md_file.read_text(encoding="utf-8")
+    # Strip code blocks
+    sanitized = re.sub(r"```[\s\S]*?```", "", raw)
+    sanitized = re.sub(r"`[^`\n]+`", "", sanitized)
+
+    # 1. Check Wikilinks
+    for target in wikilink_pattern.findall(sanitized):
+        t = target.strip()
+        if not t or t.startswith("http://") or t.startswith("https://"):
+            continue
+        # Direct relative to note or vault
+        if (md_file.parent / t).exists() or (vault_path / t).exists() or (hub_root / t).exists():
+            continue
+        # Check by stem
+        t_clean = t.replace(".md", "").replace(".canvas", "").split("/")[-1].lower()
+        if t_clean in vault_notes_by_stem:
+            continue
+        broken_links.append(f"{md_file.name} -> [[{target}]]")
+
+    # 2. Check Markdown Links
+    for label, target in markdown_link_pattern.findall(sanitized):
+        if any(target.startswith(p) for p in ("http://", "https://", "#", "mailto:")):
+            continue
+        clean_target = target.split("#")[0].split("?")[0].strip()
+        if not clean_target:
+            continue
+        rel_to_note = md_file.parent / clean_target
+        rel_to_root = hub_root / clean_target.lstrip("/")
+        if not rel_to_note.exists() and not rel_to_root.exists():
+            broken_links.append(f"{md_file.name} -> [{label}]({target})")
+
+assert not broken_links, f"Dead links found: {len(broken_links)}"
+```
+
+## Step 4 — Automated Pre-Commit / Test Gate
+
+Integrate the checks into a permanent pytest module (e.g. `tests/verification/test_obsidian_vault_hygiene.py`):
+
+```bash
+./.venv/bin/pytest tests/verification/test_obsidian_vault_hygiene.py -v
+```
+
+Include:
+- `test_vault_notes_yaml_frontmatter_validity`: Validates frontmatter parsing and required fields.
+- `test_vault_markdown_file_links_integrity`: Detects broken relative links.
+- `test_vault_note_prefixes_unique`: Guarantees unique 3-digit identifiers.
+- `test_tasks_and_ideas_subfolder_hygiene`: Confirms DAG nodes are organized into subdirectories (`epics`, `tasks`, `ideas`, `gates`).
+- `test_task_forest_index_and_telemetry_sync`: Verifies Task Forest DAG metrics calculation (`completion_rate`, `avg_progress`, `epics_summary`, `blocked_nodes`) and validates index synchronization against disk via non-mutating `--verify` mode.
+- `test_vault_no_ascii_box_characters`: Exhaustive character set scan (`set("┌┐└┘├┤┬┴┼─│═║╔╗╚╝╠╣╦╩╬")`) across all vault notes to guarantee zero escaped ASCII/Unicode borders. Re-runnable directly via the bundled verification script:
+  ```bash
+  python3 scripts/verify_no_box_chars.py --path docs/notes --strict
+  ```
+- `test_review_gated_note_ingest`: Verify atomic note compliance with the 8 mandatory YAML fields, hidden HTML MRH header, and index registration via:
+  ```bash
+  .venv/bin/python core/orchestrator/agents/herich_librarian/scripts/verify_ingest_gate.py --file docs/notes/<NNN>_<slug>.md
+  ```
+  (See companion skill `review-gated-ingest` for full Anti-Poisoning & Gated Ingestion Protocol).
+
+## Step 5 — Enforce Visual Triad (Mermaid + Markdown Table + Callouts) Over ASCII Blocks
+
+When creating ADRs, evaluation notes, architectural specs, or evolutionary diagrams:
+- **Never embed monospace ASCII box borders** (`┌───┐`, `│...│`, `└───┘`) or ascii art inside `text` or `code` blocks. They break on mobile viewports, clip on dark theme, and display ugly "Copy" buttons.
+- **The DNK Visual Triad Pattern**:
+  1. **Vector Mermaid Diagram (Ergonomic Viewport Layout)**:
+     - **2-Column / Multi-Column Matrix for Multi-Level Architectures (`flowchart LR` with vertical `direction TB` subgraphs)**: When mapping 4–8 levels, stages, or taxonomies, do NOT stack all nodes in a single endless vertical tower (`flowchart TD`) which forces awkward scrolling or downscaling. Group them into 2–3 functional tiers side-by-side (e.g. Session/Fast Tier vs Long-term/Persistent Tier) using a root `flowchart LR` where each subgraph has `direction TB` (internal vertical flow). Connect tiers with bold bridges (`FastTier ==>|Handoff / Escalation| LongTier`). This achieves an ideal 16:9/4:3 aspect ratio, keeps height <500px, and fits 100% into the viewport without zoom degradation.
+     - **Vertical Stacking with `direction LR` subgraphs for Sequential Pipelines**: For strict step-by-step sequential pipelines (Generation 1 ➔ Generation 2), use root `flowchart TD` with subgraphs stacked vertically (`Stage1 ==> Stage2`), where each subgraph is internally horizontal (`direction LR`).
+     - **Theme-Adaptive (No Hardcoded Fills)**: Never hardcode `fill:#...` or `style ... fill` — let Obsidian's native Mermaid engine bind theme variables for seamless Dark ⇄ Light switching. Always quote node labels `["..."]` and keep edge labels unquoted between pipes `|...|`.
+     - **Left-Aligned Text & Bullets in Nodes (`<div align='left'>`)**: NEVER center-align multi-line descriptions or bullet points (`•`) inside Mermaid cards. Centered bullet lists create a ragged left margin where bullets start at random horizontal offsets, forcing the eye to zigzag and causing severe visual fatigue. Wrap multi-line card text and bullet lists in `<div align='left'>• Item 1<br>• Item 2</div>` inside `["<b>Title</b><br><div align='left'>...</div>"]`. Always escape `<` as `&lt;` or use words like `(менше 3k)` to prevent HTML parser collisions.
+     - **Anti-Diagram Fatigue**: Never place two large diagrams directly adjacent to each other. Interleave with concise takeaway Callouts (`> [!tip]`, `> [!abstract]`) to give readers visual breathing room.
+  2. **Clean Markdown Comparison Matrix**:
+     - **Strict Alignment Hygiene**: Text, names, and descriptions MUST be left-aligned (`:---`) for a solid vertical reading axis. Numeric metrics, percentages, and costs MUST be right-aligned (`---:`). Only short icons, badges, and status indicators (`🛑`, `⚠️`, `🚀`) may be centered (`:---:`). NEVER center-align variable-length text columns in tables.
+     - Keep cell text concise; avoid multi-paragraph text dumps inside table cells that cause massive vertical line wrapping.
+     - Balance column widths so the entire matrix is viewable without horizontal scroll or extreme row heights.
+  3. **Native Obsidian Callouts** (`> [!info]`, `> [!tip]`, `> [!success]`, `> [!danger]`): Detailed cards with rich typography and collapsible deep-dives.
+  4. **Roadmap & Action Status Badges**: Always prefix headings in implementation roadmaps with explicit status badges (`[В РОБОТІ: Слайс X.Y]`, `[ЗАПЛАНОВАНО: Слайс X.Y]`, `[R&D: ...]` or `[COMPLETED]`) for rapid human and agent triage.
+- **Reference Template**: Load and apply `templates/synthesis_matrix_template.md` (`skill_view('obsidian-vault-hygiene', file_path='templates/synthesis_matrix_template.md')`).
+
+## Step 6 — Enforce Quoted Node Labels & Unquoted Edge Labels in Mermaid Diagrams
+
+When embedding Mermaid flowcharts (` ```mermaid ... ``` `) in Obsidian notes:
+- **Always quote complex node and subgraph labels in explicit double quotes `["..."]`**.
+- Any node label containing parentheses `()`, colons `:`, slashes `/`, ampersands `&`, brackets, or quotes **MUST** be double-quoted.
+  - ✅ Correct: `subgraph Core ["ЯДРО СИСТЕМИ (DNK OS Core)"]`
+  - ❌ Fatal Parser Error: `subgraph Core [ЯДРО СИСТЕМИ (DNK OS Core)]`
+  - ✅ Correct: `Router["Task Router / Swarm Coordinator"]`
+  - ✅ Correct: `SCONES["Пам'ять SCONES & Сесії"]`
+- In Mermaid syntax, an unquoted parenthesis `(` inside square brackets `[...]` is parsed as a stadium/round-edges node shape selector rather than literal text, triggering `Parse error: Expecting 'SQE'... got 'PS'`.
+- **CRITICAL: Never put double quotes inside edge labels `|...|`**:
+  - While nodes require `["..."]`, edge labels between pipes MUST be clean unquoted text.
+  - ❌ Fatal Lexer Error: `WS -->|"Текст"| Pipe` or `A ==>|"Text"| B` (triggers `Expecting 'LINK', 'UNICODE_TEXT', 'EDGE_TEXT', got 'STR'`).
+  - ✅ Correct: `WS -->|Текст| Pipe` or `A ==>|Text| B`.
+- **CRITICAL: Never use reverse labeled arrows (`Target <--|label| Source`)**:
+  - Mermaid flowchart parser does not support labeled reverse arrows.
+  - ❌ Fatal Parser Error: `WS <--|Читання| Pipe`
+  - ✅ Correct: `Pipe -->|Читання| WS` (or bidirectional `UI <-->|Синхронізація| WS` without quotes).
+- **HTML Formatting & Escaped Operators in Nodes**:
+  - Safe formatting tags `<b>...</b>`, `<br>`, and `<div align='left'>...</div>` ARE supported inside quoted labels `["<b>Title</b><br><div align='left'>...</div>"]`.
+  - **CRITICAL**: Never use literal mathematical comparison operators `<` or `>` or unescaped angle brackets inside node labels (e.g. `< 3k tokens` or `depth > 2`). Mermaid's HTML parser treats unescaped `<` as the start of an HTML tag and crashes with syntax errors. Always escape as `&lt;` / `&gt;` or write in plain words (e.g. `(менше 3k токенів)`).
+- **Theme Adaptivity (Dark ⇄ Light Theme Invariant)**: Never hardcode custom HEX fills or stroke styles (`style Node fill:#1e1e2e,stroke:#3b82f6`). Hardcoded styles break legibility when users toggle between Obsidian Dark and Light themes (e.g., dark text on dark fill or white box on white background). Omit manual `style ... fill:#...` directives so Obsidian's native Mermaid engine dynamically binds CSS theme variables (`--background-secondary`, `--text-normal`, `--background-modifier-border`).
+- **Strict Top-Down Flow & Rank Inversion Prevention in `flowchart TD`**: Avoid creating backward feedback loops from bottom-tier nodes back to upper layers (e.g. `Storage -->|Sync| UI`). Dagre's cycle-breaking algorithm reverses cyclic edges during topological sorting, causing the bottom storage layer to flip to the very top of the rendered diagram. Maintain clean downward flow `UI --> Storage`, and model feedback or synchronization with bidirectional edges (`UI <-->|Sync| Storage`) or localized sibling links.
+- **Reference Template**: Load and apply `templates/mermaid_diagram_template.md` (`skill_view('obsidian-vault-hygiene', file_path='templates/mermaid_diagram_template.md')`).
+
+## Step 7 — Configure Full-Width Layout with 20px Margins for Wide Notes & Diagrams
+
+By default, Obsidian restricts note reading/editing width to ~700–800px via `readableLineLength: true`, compressing large Mermaid flowcharts, architecture diagrams, and wide comparison tables into cramped scroll boxes.
+
+To ensure notes stretch across the full available viewport with comfortable 20px side gutters:
+1. **Disable Line-Length Capping in Vault Settings (`.obsidian/app.json`)**:
+   ```json
+   {
+     "readableLineLength": false
+   }
+   ```
+2. **Deploy and Activate Full-Width CSS Snippet (`.obsidian/snippets/full-width-view.css`)**:
+   - Copy `templates/full_width_view.css` (`skill_view('obsidian-vault-hygiene', file_path='templates/full_width_view.css')`) into the vault's `.obsidian/snippets/full-width-view.css`.
+   - The snippet forces `max-width: 100% !important;`, sets `padding: 0 20px !important;` on `.cm-scroller` and `.markdown-rendered`, and unconstrains `.mermaid`, `.block-language-mermaid`, and `.mermaid svg` to 100% responsive width without micro-scrolling.
+   - **Crucial Layout Rule**: Never use `display: flex; justify-content: center;` with `overflow-x: auto` on Mermaid containers. Use `display: block; text-align: center;` and `display: inline-block;` on SVG to prevent pushing the left flank into negative scroll space.
+3. **Register Snippet in Vault Appearance (`.obsidian/appearance.json`)**:
+   ```json
+   {
+     "enabledCssSnippets": ["full-width-view"]
+   }
+   ```
+4. **Interactive Zoom Controls & Infinite Canvas Navigation**:
+   - For multi-actor sequence diagrams or dense flowcharts, deploy `.obsidian/plugins/mermaid-interactive-zoom/` to provide:
+     - **Ghost Mode Toolbar**: Non-blocking `opacity: 0.18` at rest with backdrop blur so diagram labels remain completely readable.
+     - **Infinite Canvas Pan & Drag ("Ладошка")**: Native grab/grabbing cursor, 60 FPS panning across all directions, and double-click auto-fit reset.
+     - **Optimized Scaling Steps**: `[-]` / `[+]` toolbar buttons step by **15%** for decisive scaling, while mouse wheel and trackpad pinch scale by **3%** for ultra-smooth fluid navigation.
+     - **Height Constraint & Initial Auto-Fit**: Strict `500px` initial window cap (`--mermaid-max-height: 500px`) where diagrams automatically scale and fit completely inside the 500px viewport upon note opening before user interaction, with native vertical resize handle and a single `[⛶ На все вікно]` toggle (swapping to `[⛶ 500px]` / Escape key to collapse) expanding in-place to `calc(100vh - 120px)`. Never use `position: fixed` because CodeMirror 6 CSS containment clips it into non-existence. See `references/mermaid_zoom_and_responsive_layout.md` for full CSS and plugin specifications.
+5. **Visual PKM & Spatial Diagrams (Excalidraw & JSON Canvas)**:
+   - For freeform spatial thinking, architectural blueprints with bidirectional Obsidian `[[wikilinks]]`, and interactive visual graphs, use the hybrid `.excalidraw.md` format (`obsidian-excalidraw-plugin`) and native JSON Canvas (`.canvas`). See `obsidian-excalidraw` skill.
+6. Trigger reload in active Obsidian window via `Cmd + R` or switching tabs.
+
+## Pitfalls to Avoid
+
+- **Missing `aliases` in YAML Frontmatter**: Omitting search aliases or providing empty arrays degrades Obsidian Quick Switcher (`Cmd+O`) discoverability. Always provide 2–4 alternate titles, acronyms, and Ukrainian/English variants.
+- **Hash `#` Prefixes in Frontmatter Tags (`tags: ['#dnk-os']`)**: Never write tags with `#` inside YAML frontmatter. YAML tags must be clean strings without hashes (`tags: ['dnk-os']`), otherwise Obsidian and Dataview tag indices break or show duplicate nested `#` roots.
+- **Raw Monolithic Introductory Text Without `> [!abstract]` Callout**: Placing a dense wall of text immediately under H1 without an executive callout slows down human comprehension. Always wrap the note purpose/rationale into `> [!abstract] **Контекст та мета**` followed by `---` per `templates/gold_standard_note_template.md`.
+- **Task Node Exporters Dumping to Vault Root**: Exporters (such as `services/dnk_node_tasks/persistence.py`) must never write `.md` node files directly into `docs/notes/tasks_and_ideas/` root. Nodes must be partitioned into typed subdirectories (`epics/`, `tasks/`, `ideas/`, `gates/`) so they don't break subfolder hygiene gates or leave orphaned files.
+- **Index Generators Mutating During CI/Tests**: Always provide a non-destructive verification mode (e.g. `scripts/system/update_task_forest_metrics.py --verify`). Tests must verify index synchronization and exit with code 1 if out-of-sync without silently rewriting production files during test runs.
+- **Hardcoded Note Prefixes in Automation Tools**: Avoid static strings like `f"016_{name}.md"` in generators; scan the directory dynamically to avoid overwriting or colliding with canonical notes.
+- **Placing Markdown Text Inside Frontmatter**: Putting prose or section headers between the opening and closing `---` delimiters breaks YAML parsers and corrupts Obsidian metadata.
+- **Unsanitized Test Artifacts**: If a test suite generates test notes in the vault, always clean them up in a `finally` block or fixture teardown to prevent cluttering the production knowledge graph.
+- **Absolute Path Leaks**: Never hardcode user home directories in wikilinks or note bodies; use workspace-relative references or sanitized placeholders (`/Users/<username>/...`) to prevent `test_path_hygiene.py` failures.
+- **Prefix Collision in Ad-hoc Architectural Notes**: When manually or semi-automatically authoring new architectural notes, verify existing numbers first to prevent duplicate 3-digit prefixes (e.g. colliding with existing `074` or `075`), re-indexing to the next sequential identifier (e.g. `082`, `083`).
+- **Subdirectory-Scoped vs Root Vault Numbering Collisions**: When creating modular domain subdirectories inside the vault (e.g. `docs/notes/marketing/`, `docs/notes/tasks_and_ideas/`), allow scoped indexing starting from `000_...` within the subfolder, but always maintain a canonical root gateway note (e.g. `086_commercial_marketing_assets_hub.md`) in `docs/notes/` so the root vault index remains strictly monotonic and globally discoverable without prefix collisions.
+- **Embedded JSON Manifest Validation in Notes**: When authoring architectural or template notes containing code blocks (like Remotion or agent manifests), write unit tests (e.g. `test_marketing_assets_hygiene.py`) that extract and validate the embedded JSON blocks with `json.loads` to guarantee they never drift from production schemas.
+- **Ephemeral Test Artifacts in Tasks/Ideas Folders**: Test suites invoking persistence routers (e.g. `test_node_tasks_router.py`) must isolate or cleanly purge created `.md` files in `docs/notes/tasks_and_ideas/` to ensure the git tree remains 100% clean for pre-commit gates.
+- **Raw Exposed `# --- DNK-MRH-HEADER ---` in Markdown Notes**: In `.py` and `.sh` scripts, MRH headers use `#` comments. In Obsidian markdown notes, never use raw `# --- DNK-MRH-HEADER ---` blocks, as they render as ugly markdown headings, bloat the note, and ruin live preview. Always wrap the MRH block inside an HTML comment directly after YAML frontmatter: `<!-- --- DNK-MRH-HEADER --- ... --- END DNK-MRH-HEADER -->` (never with leading `#`).
+- **Setext Heading Traps from Raw `---` Underlines**: In CommonMark/Markdown specifications, any non-empty line followed immediately by `---` (without an empty line or inside plain text) is parsed as a Setext H1/H2 heading. When raw `# --- DNK-MRH-HEADER ---` or text lines are followed by `---`, Obsidian renders them as giant headings and breaks YAML frontmatter detection. Always wrap metadata in `<!-- ... -->` and ensure horizontal rules `---` are isolated with blank lines.
+- **ASCII Art Box Diagrams & Monospace Matrices Instead of Native Callouts**: Never use raw ASCII/Unicode box-drawing characters (`┌───┐`, `│`, `└───┘`) or ascii art inside text or code blocks for comparison matrices, evolutionary timelines, or architecture diagrams. In Obsidian dark mode and mobile views, monospace boxes clip, overflow horizontally, create wide empty voids, and show unwanted "Copy" buttons. Always replace them with the **DNK Visual Triad**: (1) an expressive dark-themed Mermaid diagram (`flowchart LR`/`timeline`), (2) an aligned Markdown comparison table (`:--- | :---`), and (3) Obsidian callout cards (`> [!info]`, `> [!tip]`, `> [!success]`) per `templates/synthesis_matrix_template.md`.
+- **Unquoted Parentheses or Special Characters in Mermaid Node Shapes (`Parse error: Expecting 'SQE'... got 'PS'`)**: Never leave parentheses `()`, colons `:`, slashes `/`, or apostrophes `'` unquoted inside Mermaid shape brackets (e.g. `subgraph Core [ЯДРО СИСТЕМИ (DNK OS Core)]`). Mermaid lexer interprets `(` as a round-edge node opening, terminating square bracket parsing prematurely and crashing with a fatal red parse error in Obsidian. Always write `subgraph Core ["ЯДРО СИСТЕМИ (DNK OS Core)"]` and quote every node label containing punctuation.
+- **Double Quotes Inside Mermaid Edge Labels `|...|` (`Expecting 'LINK', 'UNICODE_TEXT', 'EDGE_TEXT', got 'STR'`)**: Never wrap text inside edge pipes in double quotes (e.g. `WS -->|"Текст"| Pipe` or `A ==>|"Text"| B`). While node shapes require double quotes `["..."]`, Mermaid edge syntax expects plain text between pipes (`EDGE_TEXT`). A double quote character is parsed as an unexpected string token `'STR'` rather than edge text, throwing a fatal parse error in Obsidian. Always write `WS -->|Текст| Pipe` or `A ==>|Text| B` without quotes.
+- **Reverse Labeled Arrows in Mermaid Flowcharts (`Target <--|label| Source`)**: Never use reverse labeled arrows in Mermaid diagrams. The parser does not support labeled backward arrows and will fail. Always orient the arrow from source to target: `Source -->|label| Target` (or bidirectional `Source <-->|label| Target` without quotes).
+- **Core Context Bloat via Service Spec Bleed**: Avoid placing domain-specific service documentation (Shopify Admin schemas, Liquid AST rules, etc.) into `core/`. Keep domain specs and schemas strictly encapsulated within the service root (`services/<service_name>/`), keeping Core lean and orchestrating via open standards (Agent Protocol / MCP).
+- **Narrow 700px Default Obsidian Line Length Cramping Diagrams & Tables**: Never rely on vanilla Obsidian line-width constraints when viewing dense architectural specs, wide comparison tables, or Mermaid diagrams. Default `readableLineLength: true` causes horizontal overflow, awkward internal scrollbars, and miniature SVG rendering. Always turn off `readableLineLength: false` in `.obsidian/app.json` and inject `templates/full_width_view.css` with 20px padding into `.obsidian/snippets/`.
+- **Flexbox Justify-Center with Overflow-X Auto Clipping Mermaid Diagram Left Flank in Negative Scroll Space**: Never apply `display: flex; justify-content: center;` to `.mermaid` or `.block-language-mermaid` containers alongside `overflow-x: auto;`. When diagram width exceeds the container viewport, flex centering pushes the leftmost SVG elements into unreachable negative scroll coordinates (`scrollLeft < 0`), permanently cutting off left participants or labels. Always use `display: block !important; text-align: center !important;` on the container and `display: inline-block !important; margin: 0 auto !important;` on the SVG, paired with interactive percent zoom controls (`mermaid-interactive-zoom`) for deep exploration.
+- **`position: fixed` in Obsidian CodeMirror 6 Containers Causing Fullscreen Diagram Disappearance**: Never use `position: fixed !important;` on `.mermaid` or `.block-language-mermaid` to create a fullscreen preview. In Obsidian's CodeMirror 6 architecture, ancestor containers (`.cm-embed-block`, `.cm-content`) enforce CSS containment (`contain: layout paint` / `isolation: isolate` and `overflow: hidden`). An ancestor with `contain: paint` establishes a local containing block for `position: fixed` and clips it, causing the diagram to collapse to 0px or disappear off-screen. Always use in-flow full-window expansion (`position: relative !important; height: calc(100vh - 120px) !important; max-height: calc(100vh - 120px) !important; min-height: calc(100vh - 120px) !important; width: 100% !important;`), paired with smooth `scrollIntoView` and auto-fit.
+- **Horizontal Sprawl & Auto-Downscale in Multi-Stage Mermaid Diagrams (`flowchart LR`)**: Never use `flowchart LR` across 3+ multi-stage pipelines or generational architectures (e.g. Gen 1 -> Gen 2 -> Gen 3) in Obsidian notes. A single ultra-wide horizontal chain forces Obsidian's Mermaid renderer to scale the entire diagram down to fit the container width, shrinking node text into microscopic unreadable specks and creating massive empty black voids (letterboxing) above and below the diagram. Always use vertical stacking (`flowchart TD`) with internal horizontal rows (`subgraph ... direction LR`), connecting stages via vertical arrows (`Gen1 ==> Gen2 ==> Gen3`).
+- **Hardcoded HEX Fills in Mermaid Breaking Dark/Light Theme Switching**: Never write manual node or subgraph fill styles (`style Node fill:#1e1e2e,stroke:#3b82f6`). Hardcoded dark fills produce unreadable dark-on-dark or dark-on-light boxes when the user switches Obsidian themes. Always omit manual `style ... fill:#...` directives and allow Obsidian's theme CSS engine to dynamically shade backgrounds and borders.
+- **Cycle Feedback Edges Inverting Dagre Rank in `flowchart TD`**: Never create a feedback edge pointing from a lower-tier subsystem back to a higher-tier subsystem (e.g. `Storage -->|Update| Controller`). In Dagre's layering algorithm, cycles are broken by reversing backward edges, which causes the entire hierarchy to flip upside-down (rendering the bottom storage subgraph at the very top of the diagram). Maintain strict downward flow (`Controller --> Storage`) and use bidirectional `<-->` edges or downward response paths.
+- **MRH Header Preceding YAML Frontmatter Breaks Obsidian Metadata Parsing**: In CommonMark and Obsidian specifications, YAML frontmatter MUST be located at the very start of the file (lines 1 to N, delimited by `---`). If a DNK-MRH header (or any comment, text, or blank lines) precedes the frontmatter, Obsidian completely ignores the YAML block, failing to register tags, aliases, and metadata in Dataview/Graph indices, and instead renders raw YAML keys as body prose. Always ensure line 1 is `---`. Position the HTML-commented MRH block (`<!--\n# --- DNK-MRH-HEADER ---\n...-->`) strictly *after* the closing `---` delimiter of the YAML frontmatter.
+- **Centered Text & Bullet Lists inside Mermaid Nodes and Markdown Tables (Ragged Left / Visual Fatigue)**: Centering variable-length text or bulleted lists (`•`) breaks the eye's natural vertical scanning axis. In Mermaid, centered bullets start at arbitrary horizontal positions, forcing erratic zigzag eye movements. In Markdown tables, centered description text appears chaotic and difficult to compare across rows. Inside Mermaid nodes, wrap multi-line text and bullet points in `<div align='left'>• Item 1<br>• Item 2</div>` inside `["<b>Title</b><br><div align='left'>...</div>"]`. In Markdown tables, strictly use `:---` for text and description columns, reserve `:---:` exclusively for short status icons/badges (e.g. `🛑`, `✅`), and use `---:` for numerical metrics.
+- **Unescaped Mathematical `<` and `>` in Mermaid Node Labels**: Writing comparison operators like `tokens < 3000` or `latency > 500ms` directly inside node labels breaks the Mermaid HTML renderer, as it attempts to parse `< 3000` as an HTML element. Always escape to `tokens &lt; 3000` and `latency &gt; 500ms` or use natural phrasing `tokens (менше 3k)`.
+- **Legacy ASCII Box Borders in Production Notes (`docs/notes/`)**: Retaining raw ASCII border frames (`┌───┐`, `│...│`, `└───┘`) or ascii art in note bodies violates the DNK Visual Triad standard. Always convert legacy ASCII diagrams into vector Mermaid flowcharts with `<div align='left'>` bullet lists and use `scripts/system/standardize_notes_vault.py` to audit and enforce compliance across the vault.
+- **Unicode Box-Drawing Characters in Directory Trees (`├──`, `└──`, `│`)**: Inside code blocks (e.g. ````text` or ````bash`), directory trees created with Unicode box-drawing characters (`├──`, `└──`, `│`) contain characters like `├`, `─`, `└`, `│` that trigger box-character quality gate failures (`set("┌┐└┘├┤┬┴┼─│═║╔╗╚╝╠╣╦╩╬")`). Always standardize directory trees using clean ASCII characters: `|--` for branches, `\--` for leaf/final branches, and `|` for trunk lines.
+- **Unicode Horizontal Bars in Mermaid Node Text (`──>`)**: When replacing ASCII art, authors sometimes leave Unicode horizontal box characters `─` (U+2500) inside Mermaid node strings (e.g. `["Крок 1 ──> Крок 2"]`). This triggers box-char CI audit failures even inside vector diagrams. Always use standard ASCII arrows (`->` or `-->`) or plain text.
+- **Strict Sequential Order Invariant for Vault Migrations**: When executing bulk standardization across numbered notes (`001_...` to `NNN_...`), never skip files or process out of order. Execute strictly sequentially in ascending numeric order, verifying YAML frontmatter, MRH comment encapsulation, table `:---` alignment, and box-char elimination on each note before committing.
+- **False Completion from Superficial Vault Range Audits (The ASCII Box Escape Pitfall)**: Declaring a numbered range (e.g. `110–125`) standardized based on casual inspection or frontmatter validation alone without running an exhaustive unicode box-character scan. Legacy ASCII art (`┌───┐`, `│...│`, `└───┘`) often hides in middle subsections. ALWAYS run a deterministic programmatic scanner across every file in the target range (`python3 scripts/verify_no_box_chars.py --path docs/notes --strict`) before asserting 100% Dual-Optics migration.
+- **Excalidraw Scripts & Plugin Files Breakage from Frontmatter Injection**: In subdirectories like `Excalidraw/Scripts/` or `.obsidian/plugins/`, files ending in `.md` (e.g. `Add Link to Existing File and Open.md`) contain executable JavaScript or plugin action hooks, while `*.excalidraw.md` files require `excalidraw-plugin: parsed` as the primary frontmatter key. Blindly injecting generic YAML frontmatter or MRH headers into script `.md` files or before `excalidraw-plugin: parsed` corrupts plugin execution and breaks drawing canvas rendering. Always whitelist/exclude plugin script folders and preserve native Excalidraw plugin headers.
+- **Handling Newly Added Empty or Scaffold Notes**: When users create empty or title-only notes into the vault (e.g. `080926- 1.md`, `080926-.md`), do not leave them uninitialized, delete them, or treat them as malformed. Immediately scaffold a compliant Dual-Optics v4.5 structure: YAML Frontmatter (tags, aliases, type, created), HTML-comment MRH block (`<!-- --- DNK-MRH-HEADER ... -->`), an executive callout `> [!abstract]`, and structured operational sections for daily work.
+- **Ghost Note References in Strategic Next Steps & Handoffs**: Never refer to a newly proposed note as "Оновити нотатку..." or promise a note path in handoff checklists before physically creating it on disk and indexing it in `docs/notes/000 DNK HUB Index.md`. If an architectural note is part of the current milestone, author it atomically alongside the code and test verification before summarizing next steps, or explicitly designate it as "Створити нотатку (Create note)" to avoid misleading the user with phantom references.
+- **Root Vault Dumping vs Thematic Workstream Subdirectory Scoping**: Never dump ad-hoc research or architecture analyses into the `docs/notes/` root when a designated thematic subfolder exists (e.g. `docs/notes/Harness DNK/` for Harness, Agentic Runtime, and Core-Service protocol research, alongside its master worklog `Harness DNK — Робочий Журнал.md` and daily session records in `NEW DNK_HUB/Герич/`). Always check for active workstream directories before authoring notes, place the core architecture note inside the thematic directory, record the session turn in the agent subfolder, and cross-link the journal.
+- **Wikilink Scanner Code-Span Bleed & Basename Resolution Traps**: Automated vault link auditors that use naive regexes on raw markdown encounter two major pitfalls: (1) false positives from code blocks (e.g. ```` ``` ```` or `` `[[...]]` ``) containing sample link syntax, and (2) false positives from failing to mirror Obsidian's basename link resolver (where `[[Note Name]]` resolves to `path/to/Note Name.md` without requiring the relative directory prefix). Always strip code blocks prior to link extraction, resolve basenames globally across the vault, and fall back to repository root for workspace code references.
+- **Wikilink Syntax for Code Files vs Markdown Notes**: When referencing codebase files (e.g. `apps/web/src/App.tsx` or `core/orchestrator/...`), writing them as Obsidian wikilinks `[[apps/...]]` pollutes the Obsidian graph with ghost notes unless the resolver explicitly falls back to repository root. Prefer formatting code file references in backticks (`` `apps/web/src/App.tsx` ``) and reserve `[[wikilinks]]` for actual markdown notes, canvas graphs, and Excalidraw visual diagrams.
+- **Service Consolidation Code Wikilink Invalidation**: When a service or module is consolidated, renamed, or migrated (e.g. `services/dnk_store_studio` -> `services/dnk_shopify`), existing wikilinks pointing to source files (`[[services/old_service/...]]`) across architectural notes break, causing `audit_notes_vault_integrity.py` (Invariant 1: Zero Broken Links Gate) and `test_vault_markdown_file_links_integrity` to fail with exit code 1. Whenever executing service consolidations, always grep `docs/notes/` for old service directory patterns and update code wikilinks to the new consolidated paths atomically.
+- **Standalone App-Vault Root Clutter & Missing Agentic Guardrails**: When structuring standalone repositories that double as Obsidian vaults (e.g. `DNK_OS_APP`), never dump unorganized `.md` drafts or specs directly in root without a master MOC (`00_MOC_...md`), `context/AGENTS.md` token budgets, and segregated `specs/`, `docs/adr/`, `docs/guides/` subdirectories. Follow the canonical structure detailed in `references/two_tier_app_vault_architecture.md`.
+- **Vault Root Pollution by Temporary Subagent Notes (Invariant 3)**: Autonomous research subagents or code tools sometimes dump temporary markdown audits or task files directly into `docs/notes/` root (e.g. `001_personalive_...`, `002_artifact_server_...`), breaking Invariant 3 (`Root Notes Disambiguation Gate` / `test_no_root_markdown_files`). The root `docs/notes/` must contain strictly zero unorganized `.md` files; the only sanctioned entry point is `000_DNK_HUB_NOTES_INDEX.md`. All domain notes, audits, and task artifacts must be placed in their respective categorized subfolders (`MY TASKS/1. АРХІТЕКТУРА/.../SOTA/`, `tasks_and_ideas/tasks/`, etc.) or de-duplicated if canonical versions exist.
+- **Escaped Pipes in Table Wikilinks (`[[target\|alias]]`) Corrupting Resolution**: Never write escaped pipes `\|` inside Obsidian wikilink aliases within Markdown tables (e.g. `[[docs/adr/ADR-001\|ADR-001]]`). While standard Markdown tables escape raw pipes to avoid column breaking, Obsidian's internal wikilink parser consumes the `\` literally into the target path (`docs/adr/ADR-001\`), causing ghost unlinked notes, broken graph edges, and 404 navigation failures. Modern Obsidian handles raw unescaped pipes within wikilinks inside table cells cleanly (`[[docs/adr/ADR-001|ADR-001]]`).
+- **Centered Pill Badges & Breadcrumbs for Dark Theme Dual-Optics**: To guarantee immediate visual scanning without polluting the Document Outline/TOC, include a centered pill-badge container directly under the abstract callout: `<div align="center"><span style="background-color: #1e293b; color: #38bdf8; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; border: 1px solid #0284c7;">Домен: ...</span> ...</div>`, followed by a single breadcrumb navigation line: `` `Навігація`: [[00_MOC_...|🗺️ Головний MOC]] ➔ [[...|Розділ]] ➔ **Поточний Документ** ``.
+- **Naive LLM-per-File Triage & 1-of-N Classification for Vault Migration**: Never run individual LLM calls or single-choice routers (like Jev) to categorize multi-domain markdown files during vault consolidation/export to standalone apps. Per-file LLM calls suffer from context-blind isolation, taxonomy drift, and high token costs, while 1-of-N routers break on documents spanning multiple domains. Always apply the 3-Tier Cascading Pipeline (Graph In-Degree Centrality + Git Co-Commit Mining -> Local FastEmbed ONNX -> Bounded Batched LLM tail) and accumulate decisions into a read-only manifest before physical file migration per `references/deterministic_doc_triage_and_migration.md`.
+- **Obsidian In-Memory Plugin Config Cache vs Disk `data.json` Edits**: Modifying a plugin's `.obsidian/plugins/<plugin_id>/data.json` file on disk while Obsidian is running does NOT update the active plugin instance in RAM. The plugin continues using the stale in-memory state until explicitly reloaded via `Cmd+R` (`Reload app without saving`) or by toggling the plugin off/on in `Settings -> Community plugins`. Always document and instruct reloading whenever seeding or fixing plugin configurations programmatically.
+- **Obsidian LLM Plugin Function Response Count Mismatch in Gemini Vertex AI**: When proxying LangChain-based Obsidian LLM plugins (`ai-agent`, `obsidian-agent`) to Google Cloud Vertex AI, multi-tool executions fail with HTTP 400 `INVALID_ARGUMENT` (`Please ensure that the number of function response parts is equal to the number of function call parts of the function call turn`). LangChain formats each tool result as an individual message turn, whereas Vertex AI strictly requires all matching `functionResponse` parts to reside in a single merged turn immediately following the model's call. Local bridges must normalize `contents` payload in-flight per `references/obsidian_plugin_installation_protocol.md`.

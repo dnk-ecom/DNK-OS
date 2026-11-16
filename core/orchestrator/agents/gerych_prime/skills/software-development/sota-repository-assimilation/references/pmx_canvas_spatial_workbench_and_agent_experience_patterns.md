@@ -1,0 +1,40 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/pmx_canvas_spatial_workbench_and_agent_experience_patterns.md"
+# purpose: "Architectural patterns, AX primitives, and Generative UI integration extracted from pmx-canvas."
+# canonical_source: false
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-09"
+# author: "Gerych Prime & DNK OS Swarm"
+# --- END DNK-MRH-HEADER ---
+
+# PMX-Canvas Spatial Workbench & Agent Experience (AX) Patterns
+
+## 1. Core Architecture
+- **Runtime**: Bun + TypeScript + SQLite WAL (`canvas.db`) with debounced auto-save (~500ms).
+- **Client**: Preact / React, Mermaid, Recharts, TailwindCSS v4.
+- **Protocols**: FastMCP Server (`@modelcontextprotocol/sdk`), CLI (`pmx-canvas`), REST/HTTP API, standalone single-file HTML export.
+
+## 2. Agent Experience (AX) Primitives
+1. **Agent-Native Nodes**:
+   - Nodes act as context triggers, task queues, evidence sinks, or steering dispatchers.
+   - Nodes have machine-readable schemas and attribute metadata.
+2. **Scope Fencing & Human Touch Locking**:
+   - Boundary enforcement restricting an agent's write scope to dedicated nodes or bounding regions.
+   - Active locking when human edits are detected to prevent race conditions and overwrites.
+3. **Attributed Undo Stack**:
+   - Separation of human vs. agent actions in the mutation history.
+   - When a human undoes an agent mutation, the system automatically formats corrective steering feedback for the agent model.
+4. **HITL (Human-in-the-Loop) Decision Gates**:
+   - Status transitions (`pending -> approved / rejected`) embedded directly into canvas nodes for pre-commit verification.
+
+## 3. Generative UI via Declarative JSON (`@json-render/core`)
+- Replaces raw untrusted execution (`iframe`, `eval`, arbitrary JS) with structured JSON schemas.
+- Uses `@json-render/core` and `@json-render/shadcn` to safely render complex charts, metrics, and dashboards inside agent nodes.
+- Inter-frame messaging strictly routed through a validated interaction envelope (`window.PMX_AX.emit`) with server-side validation.
+
+## 4. Multi-Agent Addressable Steering (`pump` Queue)
+- CLI/API pattern: `pmx-canvas pump --consumer <agent_role> --exec '<command>'`.
+- Queues directives until explicit agent acknowledgment, preventing dropped tasks during high-throughput orchestration.

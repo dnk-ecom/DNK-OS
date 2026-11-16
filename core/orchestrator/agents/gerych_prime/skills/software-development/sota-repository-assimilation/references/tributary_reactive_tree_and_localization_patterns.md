@@ -1,0 +1,111 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "references/tributary_reactive_tree_and_localization_patterns.md"
+# purpose: "Tributary SOTA reverse-engineering: upward causal lineage, spatial tree layout, ADR-008 dual-theme engine, and i18n localization protocols."
+# canonical_source: false
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.3.0"
+# updated_at: "2026-10-14"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# Tributary Reactive Tree & Internationalization (i18n) Patterns
+
+## 1. Upward Causal Lineage Isolation (`messagesForNode`)
+When branching thoughts into trees (N-ary conversation tree), naive context assembly passes all sibling branches to the LLM, causing context contamination and token waste.
+Tributary solves this with pure upward lineage traversal:
+- Given an active leaf or intermediate node `N`, traverse upward: `N -> parent(N) -> parent(parent(N)) -> ... -> root`.
+- Prune all siblings, unselected branches, and orphaned forks.
+- Produces a single linear conversation path strictly representing the causal chain of thought leading to `N`.
+- **In DNK OS Microkernel**: Used by `SwarmCoordinator` to provide isolated execution trajectories to subagents (`gerych_builder`, `dnk_shopify`) without cross-worker noise.
+
+## 2. Dynamic Spatial Tree Layout Algorithm (`layout.ts`)
+- Pure functional tree bounding-box computation supporting both Left-to-Right (`LR`) and Top-to-Bottom (`TB`) orientations.
+- Calculates node bounding boxes and centers parent cards relative to the cumulative height/width of their children.
+- Offsets descendant columns beyond the maximum boundary of adjacent branches to ensure zero visual overlap on infinite canvases.
+
+## 3. Two-Tier Event Streaming Architecture (`stream-bus.ts`)
+- **Tier 1 (In-Process)**: Fast in-memory synchronous `StreamHub` with `Set<Listener>` for zero-latency local event fan-out.
+- **Tier 2 (Distributed / Inter-Process)**: PostgreSQL `LISTEN/NOTIFY` channels (`pg_notify('tributary_node', nodeId)`) combined with Server-Sent Events (SSE) streaming tokens and status updates to React clients.
+
+## 4. Reverse-Engineering Localization (i18n) Audit & Extraction Strategy
+When assimilating Chinese-first (zh-CN) or single-language SOTA repositories:
+1. **Layer Separation**:
+   - UI Surface (`apps/web`): Audit all interactive components (`ContextMenu.tsx`, `HelpPanel.tsx`, `CanvasDock.tsx`, `SettingsDialog.tsx`, `EmptyHero.tsx`, `Outline.tsx`).
+   - Agent Prompts (`apps/server/src/agent/prompt.ts`): System framing, markdown formatting instructions, role definitions.
+   - Server Validation & Route Status (`apps/server/src/routes.ts`): Error codes and default titles.
+   - Domain Tree Logic (`packages/domain/src/tree.ts`): Tree validation and mutation errors (e.g. `Node not found`, `Cannot move into its own subtree`, `Question cannot be empty`). Must match unit test expectations in `tree.test.ts`.
+   - Backward Compatibility Aliases (`packages/domain/src/providers.ts`): When renaming localized provider labels (e.g. '智谱' -> 'Zhipu AI', '通义百炼' -> 'DashScope'), maintain a `LEGACY_ALIASES` dictionary mapping old localized keys to new standardized keys so saved databases and configs don't break.
+   - Vector Graphics Replacement: Replace hardcoded language-specific glyphs/calligraphy (e.g. center canvas character '支') with universal SVG icons (`GitBranch` 36px) or canvas markers.
+
+## 5. Automated Chinese-Text Sweep & Quality Gate (`re.compile(r"[\u4e00-\u9fff]")`)
+- **Zero-Chinese Invariant**: Never present an assimilated UI to the user with unlocalized Chinese text in menus, buttons, settings, or alerts.
+- **Verification Probe**: Prior to delivery, execute regex scan across `apps/web/src`, `apps/server/src`, and `packages/domain/src`:
+  ```bash
+  python3 -c "
+  import os, re
+  pattern = re.compile(r'[\u4e00-\u9fff]')
+  for root, _, files in os.walk('.'):
+      for f in files:
+          if f.endswith(('.ts', '.tsx', '.json')) and not f.endswith('zh.json'):
+              p = os.path.join(root, f)
+              with open(p, 'r', errors='ignore') as fp:
+                  for i, line in enumerate(fp, 1):
+                      if pattern.search(line):
+                          print(f'{p}:{i}: {line.strip()[:80]}')
+  "
+  ```
+- All detected Chinese strings must be mapped to English (SSOT) or localized.
+
+## 6. DNK_Bookmarks Dual-Theme Engine (ADR-008) Alignment
+When styling assimilated canvases and panels to match the `DNK_Bookmarks` design standard:
+- **Dark Mode (Matte Obsidian & Emerald)**:
+  - `--bg`: `#0d0e10`
+  - `--card` / `--surface`: `#16181b` (hover `#1e2125`)
+  - `--border`: `rgba(255, 255, 255, 0.08)`
+  - `--accent`: `#30cd90` (Emerald Glow)
+  - `--text`: `#f6f6f7` (primary), `#c9cccf` (secondary), `#8c9196` (muted)
+  - `--grid-dot`: `rgba(255, 255, 255, 0.07)`
+- **Light Mode (Snow Canvas)**:
+  - `--bg`: `#f1f2f4`
+  - `--card` / `--surface`: `#ffffff` (hover `#f8f9fa`)
+  - `--border`: `#e3e5e8`
+  - `--accent`: `#008060` (Shopify Green)
+  - `--text`: `#202223` (primary), `#6d7175` (secondary)
+  - `--grid-dot`: `rgba(0, 0, 0, 0.08)`
+- **Micro-Dot Matrix**:
+  `background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px); background-size: 16px 16px;`
+- **Interactive Details**: 8px rounded scrollbars with transparent track, radius tokens (`--radius-sm: 4px`, `--radius-md: 6px`, `--radius-lg: 8px`).
+
+## 7. Local Multi-Process Monorepo Runtime Orchestration
+When launching multi-tier TypeScript monorepos (Fastify + React/Vite + PostgreSQL + Background Worker):
+1. **Database Isolation**:
+   - Check existing local PostgreSQL container (`docker ps -a | grep -i postgres`) or use a shared dev container (`creator-os-postgres` on `:5432`).
+   - Create a dedicated database: `docker exec <container> psql -U postgres -c "CREATE DATABASE tributary_dev;"`.
+   - Configure root `.env` (`DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tributary_dev`, `PORT=8787`).
+2. **Fastify Server Boot**:
+   - Execute in background: `pnpm --filter @tributary/server dev`.
+   - Verifies database connection and runs auto-migration `ensureSchema()` on startup.
+   - Health check: `GET http://127.0.0.1:8787/api/health` -> `{"ok":true,"service":"tributary"}`.
+3. **Async Queue Worker**:
+   - Execute in background: `pnpm --filter @tributary/server dev:worker`.
+   - Polling loop monitors async LLM stream generations.
+4. **Vite Frontend & Reverse Proxy**:
+   - Execute in background: `pnpm dev:web` (binds to `http://localhost:5180` or `5173`).
+   - Vite proxy routes `/api/*` directly to `http://127.0.0.1:8787`, ensuring seamless CORS-free communication.
+
+## 8. Per-Conversation Workspace-Bound Agent Tools & Sandboxed Execution (`workspace-tools.ts`)
+When embedding an autonomous coding agent (e.g. Gerych / Hermes Prime) inside each causal conversation tree via `@earendil-works/pi-agent-core`:
+1. **Per-Conversation Database Binding**:
+   - Persist `workspace_path text` on `conversations` (`ALTER TABLE conversations ADD COLUMN IF NOT EXISTS workspace_path text;`).
+   - Expose `GET /api/workspaces/directories` (scanning top-level project roots first before sub-repositories) and `PATCH /api/conversations/:id/workspace` for live directory switching from `CanvasToolbar.tsx`.
+2. **Multi-Turn `@earendil-works/pi-agent-core` Tool Contract**:
+   - Define `AgentTool` schemas using `@sinclair/typebox` (`Type.Object(...)`) and return `{ content: [{ type: 'text', text: output }], details: {...} }`.
+   - Set `finishTurn: (turnIndex) => turnIndex >= 8` when `tools.length > 0` (vs `turnIndex >= 1` for plain chat) so the agent can execute multi-step `list_workspace_files`, `read_workspace_file`, `search_workspace_files`, `write_workspace_file`, and `run_workspace_command` loops before emitting its final answer.
+   - Subscribe to `event.type === 'tool_execution_start'` in `agent.subscribe(...)` to stream real-time tool invocation traces (`🔧 [Герич → <toolName>] <args>`) directly into the node's `thinking` stream.
+3. **Path Traversal, Secret Masking & macOS Temp Directory Pitfall**:
+   - Resolve every candidate path via `fs.realpathSync()` and enforce `canonicalTarget.startsWith(canonicalWorkspace + path.sep)` to block `../` traversal and symlink escapes.
+   - Block secret files (`.env*`, `*credentials*.json`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`) from both read and write tools.
+   - **macOS `os.tmpdir()` Pitfall**: Never block bare `/var/` in path blocklists on macOS, because `os.tmpdir()` resolves to `/private/var/folders/...`. Block specific system paths (`/var/root`, `/var/db`, `/var/log`, `/etc/`, `/System/`) instead so unit tests using `fs.mkdtempSync(path.join(os.tmpdir(), ...))` succeed.
+

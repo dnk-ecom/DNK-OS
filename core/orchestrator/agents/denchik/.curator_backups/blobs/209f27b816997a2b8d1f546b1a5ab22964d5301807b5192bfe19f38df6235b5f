@@ -1,0 +1,14 @@
+# Obsidian Excalidraw AI Bridge via Google Cloud Vertex
+
+Integration guide for connecting desktop canvas environments (such as `obsidian-excalidraw-plugin`) to Google Cloud Vertex AI and Gemini APIs.
+
+## 1. Native Gemini API (Google AI Studio Key backed by GCP Project)
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}`
+- **Authentication**: Direct API Key generated in Google AI Studio linked to Google Cloud project billing and quotas.
+- **Supported Models**: `gemini-2.5-pro`, `gemini-2.0-flash`, `gemini-2.5-flash-image`, `gemini-3.1-flash-image-preview`.
+
+## 2. Vertex AI Enterprise Bridge (OAuth2 / ADC)
+- **Endpoint**: `https://{REGION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{REGION}/publishers/google/models/{MODEL}:generateContent`
+- **Authentication**: `Authorization: Bearer $(gcloud auth print-access-token)` (OAuth2 tokens expire in 60 minutes).
+- **Desktop App Integration Pattern**:
+  Run a local OpenAI-compatible bridge daemon on fixed port (e.g. `5199`) that handles background `gcloud auth print-access-token` minting, and point client app's `OpenAI-compatible` provider to `http://localhost:5199/v1`.

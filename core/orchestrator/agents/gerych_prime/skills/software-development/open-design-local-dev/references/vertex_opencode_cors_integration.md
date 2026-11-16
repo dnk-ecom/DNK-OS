@@ -1,0 +1,78 @@
+# Vertex AI & OpenCode CLI Runtime Integration in Open Design Local
+
+## Architecture & Failure Modes
+
+### 1. CORS & Browser Origin Validation (`apps/daemon/src/origin-validation.ts`)
+- **Symptom**: `403 Cross-origin requests are not allowed` when triggering `POST /api/gcloud/login` from Next.js (`http://127.0.0.1:54330`).
+- **Root Cause**: The daemon origin validator checks `allowedBrowserPorts(port, process.env)`. If only `OD_PORT=54301` is known and `OD_WEB_PORT` is omitted or defaults to 3000/7456, requests carrying `Origin: http://127.0.0.1:54330` are rejected on non-GET calls.
+- **Solution**:
+  1. In `apps/daemon/src/origin-validation.ts`, ensure port 54330 is included in `allowedBrowserPorts`.
+  2. Launch the daemon with `OD_WEB_PORT=54330 OD_PORT=54301`.
+
+### 2. BYOK OpenCode Agent Binary Resolution & Pre-Flight Availability Check
+- **Symptom**: Immediate task crash upon submitting prompt (`Запуск не вдався` / `Не вдалося завершити завдання`). Database logs report:
+  `BYOK API runs require OpenCode CLI to be installed and available in PATH. Run 'npm install -g opencode' to install it.`
+- **Root Cause**:
+  `ProjectView.tsx` in Next.js performs an upfront gate:
+  ```ts
+  if (!agentsById.get('byok-opencode')?.available) {
+    handlers.onError(new Error('BYOK API runs require OpenCode. Install OpenCode, then rescan local agents in Settings before retrying.'));
+  }
+  ```
+  If `opencode-cli` is not installed globally in `/usr/local/bin` or `~/.nvm`, `/api/agents` returns `"available": false`.
+- **Solution**:
+  1. Use the bundled binary in the pnpm store:
+     `node_modules/.pnpm/@powerformer+vela-cli-darwin-arm64@*/node_modules/@powerformer/vela-cli-darwin-arm64/bin/libexec/opencode/opencode`.
+  2. In `apps/daemon/src/runtimes/executables.ts` (which runs as an ES Module `"type": "module"`), patch `resolveAmrOpenCodeExecutable` using `RUNTIME_PROJECT_ROOT` (`path.resolve(RUNTIME_PROJECT_ROOT, 'node_modules/.pnpm/...')`). **NEVER use `__dirname`**, as it throws `ReferenceError: __dirname is not defined` at runtime during `resolveAgentLaunch`, causing the exact same "require OpenCode CLI installed in PATH" error even if `/api/agents` was overridden!
+  3. In `apps/daemon/src/routes/static-resource.ts`, normalize `/api/agents` payload and SSE stream so `byok-opencode` reports `available: true`.
+  4. Clean up stuck failed messages in `.od/app.sqlite` (`DELETE FROM messages WHERE events_json LIKE '%AGENT_AUTH_REQUIRED%';`) if the UI chat history remains blocked by prior failed runs.
+
+### 3. OpenCode Vertex AI Auth Failure (`AGENT_AUTH_REQUIRED` / «Вхід у OpenAI API via OpenCode не виконано»)
+- **Symptom**: Sending a message in the project chat immediately surfaces an error card:
+  `Запуск не вдався — Вхід у OpenAI API via OpenCode не виконано` (`AGENT_AUTH_REQUIRED`).
+- **Root Cause**:
+  1. In `apps/daemon/src/run-failure-classification.ts`, `byok-opencode` has the static display label `"OpenAI API via OpenCode"` and classifies any HTTP 401/403 `APIError` from the underlying provider as `AGENT_AUTH_REQUIRED`.
+  2. If `byok-opencode.ts` configures Vertex AI with `npm: '@ai-sdk/google'`, the `@ai-sdk/google` SDK unconditionally attaches `x-goog-api-key: <apiKey>` to every HTTP request (and throws `AI_LoadAPIKeyError` locally if `apiKey` is omitted). When `aiplatform.googleapis.com` receives `x-goog-api-key` alongside `Authorization: Bearer <oauth_token>`, it rejects the call with HTTP 401:
+     `API keys are not supported by this API. Expected OAuth2 access token or other authentication credentials that assert a principal.`
+  3. Furthermore, the bundled `opencode` binary's internal `CUSTOM_LOADERS['google-vertex']` checks for ADC files (`~/.config/gcloud/application_default_credentials.json`) rather than `gcloud auth print-access-token` CLI tokens.
+- **Verified Solution (`apps/daemon/src/runtimes/byok-opencode.ts`)**:
+  1. Route Vertex AI models through `npm: '@ai-sdk/openai-compatible'` against Vertex's OpenAPI endpoint (`buildVertexBaseUrl()`: `https://aiplatform.googleapis.com/v1beta1/projects/{projectId}/locations/global/endpoints/openapi`).
+  2. Ensure the model ID retains its `google/` prefix (e.g., `google/gemini-4-argon`, `google/gemini-2.5-pro`).
+  3. Pass the GCloud Bearer token (`getCachedToken()`) in `OPEN_DESIGN_BYOK_API_KEY` and reference it via `apiKey: "{env:OPEN_DESIGN_BYOK_API_KEY}"`. Crucially, explicitly include `headers: { Authorization: "Bearer {env:OPEN_DESIGN_BYOK_API_KEY}" }` in the provider configuration to guarantee authentication persistence across SDK instantiations.
+  4. In `apps/daemon/src/server.ts`, export both `OPEN_DESIGN_BYOK_API_KEY` and `GEMINI_API_KEY` into the child process environment when spawning OpenCode.
+
+### 4. HTTP 429 Rate Limit Misclassification as `AGENT_AUTH_REQUIRED`
+- **Symptom**: When Vertex AI returns HTTP 429 (`AI_APICallError: Too Many Requests`), the UI displays «Вхід у OpenAI API via OpenCode не виконано» (`AGENT_AUTH_REQUIRED`), confusing rate limiting with missing credentials.
+- **Root Cause**: `apps/daemon/src/runtimes/opencode-log.ts` in `extractOpenCodeServiceFailure` only checked for specific strings like `API key`, `unauthorized`, or fell back to `AGENT_AUTH_REQUIRED`. It lacked an explicit parser branch for `AI_APICallError: Too Many Requests`.
+- **Solution**:
+  1. In `opencode-log.ts`, inspect for `Too Many Requests` or `rate limit` in error messages and map them to `RATE_LIMITED` (HTTP 429) rather than `AGENT_AUTH_REQUIRED`.
+  2. Implement an automatic fallback in `apps/daemon/src/routes/runs.ts` (`hasCompleteByokOpenCodeConfig` and `effectiveByokProvider`): if the incoming `POST /api/runs` payload for `agentId === 'byok-opencode'` does not contain a complete `byokProvider`, automatically synthesize the Vertex AI provider configuration (`baseUrl: "https://aiplatform.googleapis.com"`, `apiKey: "CONNECTED_VIA_GCLOUD"`) using the active Google Cloud project and cached gcloud token instead of aborting with `VALIDATION_FAILED`.
+  3. **End-to-End API Run Verification (`POST /api/runs`)**:
+      Note that `POST /api/runs` requires `"message"` (NOT `"prompt"`) in its JSON body. Passing `"prompt"` creates a run that silently skips message execution. Test end-to-end run creation and completion with:
+     ```bash
+     curl -s -X POST http://127.0.0.1:54301/api/runs \
+       -H "Origin: http://127.0.0.1:54330" \
+       -H "Content-Type: application/json" \
+       -d '{
+         "agentId": "byok-opencode",
+         "message": "Ping test",
+         "model": "google/gemini-2.5-flash"
+       }' | jq .
+     ```
+- **Deterministic CLI Verification**:
+  Always test `buildOpenCodeByokProviderConfig` directly against the `opencode` binary before restarting the daemon:
+  ```bash
+  node -e '
+  const { spawnSync } = require("child_process");
+  const { buildOpenCodeByokProviderConfig } = require("./dist/runtimes/byok-opencode.js");
+  const res = buildOpenCodeByokProviderConfig({
+    protocol: "openai",
+    baseUrl: "https://aiplatform.googleapis.com",
+    apiKey: "CONNECTED_VIA_GCLOUD"
+  }, "google/gemini-4-argon");
+  const env = { ...process.env, ...res.env, OPENCODE_CONFIG_CONTENT: JSON.stringify(res.config) };
+  const bin = "../../node_modules/.pnpm/@powerformer+vela-cli-darwin-arm64@0.1.6/node_modules/@powerformer/vela-cli-darwin-arm64/bin/libexec/opencode/opencode";
+  const out = spawnSync(bin, ["run", "--format", "json", "-m", res.modelId, "Say OK"], { env, encoding: "utf8", timeout: 30000 });
+  console.log("EXIT:", out.status, out.stdout);
+  '
+  ```

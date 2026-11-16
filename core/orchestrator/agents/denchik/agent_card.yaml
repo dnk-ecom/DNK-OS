@@ -1,0 +1,77 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/denchik/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Denchik (Master of DNK OS Development)"
+# author: "DNK-e.com Maksym & Antigravity"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "2.0.0"
+# updated_at: "2026-11-08"
+# --- END DNK-MRH-HEADER ---
+
+# Card lists only what config.yaml actually enables (toolsets; mcp_servers: {}).
+# Removed 2026-11-08: git_researcher, scones_memory, repo_map, canvas_agent,
+# review_on_stop_gate (no MCP server / toolset / hook backs them).
+
+agent_id: "denchik"
+name: "Денчік (Master of DNK OS Development)"
+description: "DNK OS Sovereign Chief Autonomous Builder (Hermes CLI on Vertex Gemini)"
+version: "2.0.0"
+domain: "autonomous_development"
+owner: "Chief Autonomous Builder"
+
+capabilities:
+  - "code_execution"
+  - "architecture_review"
+  - "persistent_memory"
+  - "vertex_ai_gemini_routing"
+  - "a2a_swarm_orchestration"
+  - "subagent_delegation"
+
+tool_whitelist:
+  - "terminal"
+  - "file"
+  - "web"
+  - "skills"
+  - "dnk_swarm"
+  - "delegation"
+  - "architecture"
+  - "memory"
+  - "code_execution"
+
+auth:
+  type: "system_master"
+  scope: "global"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      goal:
+        type: "string"
+      target_files:
+        type: "array"
+        items:
+          type: "string"
+      negative_scope:
+        type: "array"
+        items:
+          type: "string"
+    required: ["goal"]
+  output_schema:
+    type: "object"
+    properties:
+      summary:
+        type: "string"
+      diff_verified:
+        type: "boolean"
+      test_evidence:
+        type: "string"
+
+safety_gates:
+  high_risk_actions: ["code_deprecation", "system_reconfiguration", "database_migration"]
+  token_budget_cap_usd: 10.00
+  # config.yaml has no approvals.mode -> Hermes default "manual": dangerous
+  # commands wait for a human (approvals.timeout, default 300s).
+  require_hitl: true

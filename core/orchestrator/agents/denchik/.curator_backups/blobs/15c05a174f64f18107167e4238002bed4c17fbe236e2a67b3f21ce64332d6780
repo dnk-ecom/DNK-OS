@@ -1,0 +1,69 @@
+# Obsidian AI Agent Plugin Direct Google Cloud Vertex AI Integration
+
+Architecture pattern for connecting Obsidian desktop plugins (e.g. `ai-agent`) directly to Google Cloud Vertex AI with automatic token refresh, zero background daemons, and multi-model Gemini selection.
+
+## 1. Authentication Architecture (Zero Background Daemons)
+
+Instead of running an external local proxy daemon (like Python or Node on port 8765/5199), desktop plugins running in Electron/Node can manage token lifecycle directly:
+
+1. **Primary Auth Path: ADC Refresh Token Exchange (Fastest, ~200ms)**
+   - Read `~/.config/gcloud/application_default_credentials.json`.
+   - If present with `client_id`, `client_secret`, and `refresh_token`:
+   - POST to `https://oauth2.googleapis.com/token`:
+     ```json
+     {
+       "client_id": "<client_id>",
+       "client_secret": "<client_secret>",
+       "refresh_token": "<refresh_token>",
+       "grant_type": "refresh_token"
+     }
+     ```
+   - Returns `{ "access_token": "ya29...", "expires_in": 3599 }`.
+   - Cache token in-memory and refresh automatically when expiration is within 5 minutes or on HTTP 401.
+
+2. **Secondary Auth Path: Direct `gcloud` Execution with Path Probing**
+   - In Electron desktop environments (macOS Finder launch), `process.env.PATH` is often minimal (`/usr/bin:/bin:/usr/sbin:/sbin`).
+   - Probe candidate paths:
+     - `/opt/homebrew/bin/gcloud` (Apple Silicon)
+     - `/usr/local/bin/gcloud` (Intel macOS)
+     - `~/google-cloud-sdk/bin/gcloud`
+   - Execute `gcloud auth print-access-token`.
+
+3. **Fallback: Service Account JSON Key**
+   - Allow user to paste a service account JSON file.
+   - Mint JWT signed with RS256 and exchange at `https://oauth2.googleapis.com/token`.
+
+## 2. Vertex AI Endpoint & Payload Normalization Rules
+
+### Endpoint Construction
+```text
+https://aiplatform.googleapis.com/v1/projects/{projectId}/locations/{location}/publishers/google/models/{model}:{action}
+```
+- For standard generation: `:generateContent`
+- For streaming: `:streamGenerateContent?alt=sse`
+- Location: `global` is recommended for modern Gemini 2.5 / 3.x models.
+
+### Headers
+```http
+Authorization: Bearer <ACCESS_TOKEN>
+Content-Type: application/json
+```
+*(CRITICAL: Do NOT send `x-goog-api-key` to `aiplatform.googleapis.com` when Bearer token is present, as it triggers HTTP 401).*
+
+### Critical Payload Normalization Quirks
+1. **Thinking Config Compatibility**:
+   - `gemini-2.5-flash` and `gemini-2.5-pro` **reject** `thinkingConfig.thinkingLevel`. Sending `thinkingLevel: "low"|"high"` results in:
+     `HTTP 400 Unable to submit request because thinking_level is not supported by this model`.
+   - `thinkingLevel` is only supported on Gemini 3.x series (`gemini-3.7-flash`, `gemini-3-flash-preview`).
+   - For Gemini 2.5, use `thinkingConfig.thinkingBudget` (integer tokens) or completely strip `thinkingConfig` if set to `"Default"`.
+
+2. **SSE Stream Parsing**:
+   - Streamed chunks on Vertex AI arrive as `data: { ... }\n\n`.
+   - Chunks must be trimmed and parsed as JSON.
+   - Text delta is extracted from `chunk.candidates?.[0]?.content?.parts?.[0]?.text`.
+
+3. **Suggested Models List**:
+   - `gemini-2.5-flash`: Fast, high-context, multimodal (Default).
+   - `gemini-2.5-pro`: Deep reasoning, coding, architectural planning.
+   - `gemini-3.7-flash`: Hybrid reasoning with Thinking budget controls.
+   - `gemini-2.0-flash` / `gemini-1.5-pro`: Legacy fallbacks.

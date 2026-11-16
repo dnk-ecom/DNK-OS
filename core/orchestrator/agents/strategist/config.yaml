@@ -1,0 +1,109 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/strategist/config.yaml"
+# purpose: "Runtime configuration for Strategist Prime (CoT Streaming, node_canvas_core bridge, Obsidian JSON Canvas 1.0)"
+# author: "Antigravity & DNK-e.com Maksym"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-27"
+# --- END DNK-MRH-HEADER ---
+
+agent:
+  reasoning_effort: medium
+  reasoning_overrides:
+    gemini-4-argon: medium
+    gemini-3.8-flash: medium
+    gemini-3.7-flash: medium
+    gemini-3.6-flash: medium
+    gemini-3.1-pro-preview: low
+  id: "strategist_prime"
+  title: "Стратег Prime"
+  role: "Chief Spatial Orchestrator & TaskDNA Master"
+
+models:
+  primary:
+    provider: "vertex_ai"
+    model: "gemini-3.8-flash"
+    fallback: "claude-3-7-sonnet"
+    temperature: 0.2
+    top_p: 0.95
+    extended_thinking: true
+    thinking_budget_tokens: 4096
+  fast:
+    provider: "vertex_ai"
+    model: "gemini-2.5-flash"
+    temperature: 0.1
+
+reasoning_streaming:
+  enabled: true
+  protocol: "sse"
+  event_types:
+    - "thought"
+    - "tool"
+    - "mutation"
+    - "handoff"
+    - "finish"
+  chunk_delay_ms: 50
+  buffer_size_lines: 50
+
+canvas_runtime:
+  engine_module: "core.canvas.node_canvas_core"
+  headless_core_class: "NodeCanvasCore"
+  sync_protocol: "thoughtdag_context_wire"
+  auto_cycle_rejection: true
+  kahn_dag_validation: true
+  occ_optimistic_concurrency: true
+  max_context_wires_per_node: 12
+
+obsidian_canvas_sync:
+  enabled: true
+  spec_version: "1.0"
+  vault_relative_path: "docs/notes/CANVAS_OBSIDIAN_MASTER.canvas"
+  bidirectional_merge: true
+  auto_save_interval_sec: 15
+
+tandem_auditor:
+  auditor_agent_id: "auditor_gate"
+  mandatory_pre_commit_audit: true
+  fail_closed_on_rejection: true
+  require_deterministic_proof: true
+
+workhorse_handoff:
+  protocol: "folder_as_harness_dec_025"
+  core_services:
+    shopify: "services/dnk_shopify/"
+    media: "services/dnk_media/"
+    distribution: "services/dnk_distribution/"
+  max_tools_per_slice: 8
+  max_tool_calls_per_turn: 25
+
+fallback_providers:
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.7-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.6-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.1-pro-preview
+    provider: vertex
+    context_length: 2097152
+  - model: gemini-2.5-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-2.5-pro
+    provider: vertex
+    context_length: 2097152
+  - model: meta/llama-3.2-11b-vision-instruct
+    provider: nvidia
+    context_length: 128000
+  - model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning
+    provider: nvidia
+    context_length: 128000
+  - model: openrouter/auto
+    provider: openrouter
+    context_length: 128000

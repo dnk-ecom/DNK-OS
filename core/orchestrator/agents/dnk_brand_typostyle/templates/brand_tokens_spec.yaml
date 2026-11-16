@@ -1,0 +1,245 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/dnk_brand_typostyle/templates/brand_tokens_spec.yaml"
+# purpose: "Canonical W3C DTCG & Google DESIGN.md hybrid YAML template with primitive and semantic 60-30-10 CRO tokens, 1.25 modular typography scale, and 8pt spacing grid."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-17"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+schema_version: "dtcg-2025.10"
+design_md_standard: "google-design-md-1.0"
+
+meta:
+  brand_name: "DNK Commerce Reference"
+  archetype: "ecommerce_conversion"
+  cro_allocation_rule: "60-30-10"
+  typography_ratio_name: "Major Third"
+  typography_ratio: 1.25
+  base_font_size_px: 16
+  spacing_grid_base_px: 8
+
+primitives:
+  color:
+    neutral:
+      "0":
+        $value: "#FFFFFF"
+        $type: "color"
+      "50":
+        $value: "#F8FAFC"
+        $type: "color"
+      "100":
+        $value: "#F1F5F9"
+        $type: "color"
+      "300":
+        $value: "#94A3B8"
+        $type: "color"
+      "600":
+        $value: "#475569"
+        $type: "color"
+      "700":
+        $value: "#334155"
+        $type: "color"
+      "900":
+        $value: "#0F172A"
+        $type: "color"
+    brand:
+      "500":
+        $value: "#0F766E"
+        $type: "color"
+      "600":
+        $value: "#115E59"
+        $type: "color"
+      "700":
+        $value: "#134E4A"
+        $type: "color"
+    feedback:
+      success:
+        $value: "#15803D"
+        $type: "color"
+      warning:
+        $value: "#B45309"
+        $type: "color"
+      danger:
+        $value: "#B91C1C"
+        $type: "color"
+
+semantic:
+  proportion_allocation:
+    dominant_surface_pct: 60
+    structural_typography_pct: 30
+    focal_accent_pct: 10
+  color:
+    bg-base:
+      $value: "#FFFFFF"
+      $type: "color"
+      role: "60_dominant"
+      description: "Primary canvas background (60% allocation)"
+    bg-subtle:
+      $value: "#F8FAFC"
+      $type: "color"
+      role: "60_dominant"
+      description: "Secondary card and section surface"
+    text-primary:
+      $value: "#0F172A"
+      $type: "color"
+      role: "30_structural"
+      contrast_against: "bg-base"
+      min_contrast: 4.5
+      is_large_text: false
+    text-secondary:
+      $value: "#334155"
+      $type: "color"
+      role: "30_structural"
+      contrast_against: "bg-base"
+      min_contrast: 4.5
+      is_large_text: false
+    text-muted:
+      $value: "#475569"
+      $type: "color"
+      role: "30_structural"
+      contrast_against: "bg-subtle"
+      min_contrast: 4.5
+      is_large_text: false
+    border-default:
+      $value: "#64748B"
+      $type: "color"
+      role: "30_structural"
+      contrast_against: "bg-base"
+      min_contrast: 3.0
+      category: "ui_component"
+    action-primary:
+      $value: "#0F766E"
+      $type: "color"
+      role: "10_accent"
+      contrast_against: "bg-base"
+      min_contrast: 3.0
+      category: "ui_component"
+      description: "Primary CTA conversion button surface (10% focal accent)"
+    action-primary-hover:
+      $value: "#115E59"
+      $type: "color"
+      role: "10_accent"
+      contrast_against: "bg-base"
+      min_contrast: 3.0
+      category: "ui_component"
+    text-on-action:
+      $value: "#FFFFFF"
+      $type: "color"
+      role: "10_accent"
+      contrast_against: "action-primary"
+      min_contrast: 4.5
+      is_large_text: false
+
+typography:
+  families:
+    heading:
+      $value: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif"
+      $type: "fontFamily"
+    body:
+      $value: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+      $type: "fontFamily"
+    mono:
+      $value: "'JetBrains Mono', monospace"
+      $type: "fontFamily"
+  scale:
+    display:
+      rem: 2.441
+      px: 39.06
+      line_height: 1.12
+      weight: 700
+      letter_spacing: "-0.025em"
+      role: "heading"
+    h1:
+      rem: 1.953
+      px: 31.25
+      line_height: 1.15
+      weight: 700
+      letter_spacing: "-0.02em"
+      role: "heading"
+    h2:
+      rem: 1.563
+      px: 25.00
+      line_height: 1.20
+      weight: 600
+      letter_spacing: "-0.015em"
+      role: "heading"
+    h3:
+      rem: 1.250
+      px: 20.00
+      line_height: 1.25
+      weight: 600
+      letter_spacing: "-0.01em"
+      role: "heading"
+    body-lg:
+      rem: 1.125
+      px: 18.00
+      line_height: 1.50
+      weight: 400
+      letter_spacing: "0em"
+      role: "body"
+    body-md:
+      rem: 1.000
+      px: 16.00
+      line_height: 1.50
+      weight: 400
+      letter_spacing: "0em"
+      role: "body"
+    body-sm:
+      rem: 0.875
+      px: 14.00
+      line_height: 1.45
+      weight: 400
+      letter_spacing: "0.005em"
+      role: "body"
+    caption:
+      rem: 0.750
+      px: 12.00
+      line_height: 1.40
+      weight: 500
+      letter_spacing: "0.01em"
+      role: "body"
+
+spacing:
+  none:
+    $value: "0px"
+    px: 0
+    $type: "dimension"
+  xs:
+    $value: "4px"
+    px: 4
+    $type: "dimension"
+  sm:
+    $value: "8px"
+    px: 8
+    $type: "dimension"
+  md:
+    $value: "16px"
+    px: 16
+    $type: "dimension"
+  lg:
+    $value: "24px"
+    px: 24
+    $type: "dimension"
+  xl:
+    $value: "32px"
+    px: 32
+    $type: "dimension"
+  2xl:
+    $value: "48px"
+    px: 48
+    $type: "dimension"
+  3xl:
+    $value: "64px"
+    px: 64
+    $type: "dimension"
+
+radii:
+  none: "0px"
+  sm: "4px"
+  md: "8px"
+  lg: "12px"
+  full: "9999px"

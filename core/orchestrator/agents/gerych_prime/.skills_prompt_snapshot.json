@@ -1,0 +1,2353 @@
+{
+  "version": 2,
+  "manifest": {
+    "apple/DESCRIPTION.md": [
+      1793646875801497530,
+      137
+    ],
+    "research/DESCRIPTION.md": [
+      1793646875929480436,
+      179
+    ],
+    "research/blocked-page-recovery/SKILL.md": [
+      1793646875929654182,
+      5152
+    ],
+    "research/venture-evidence-investigation/SKILL.md": [
+      1793646875930006759,
+      5688
+    ],
+    "research/tri-lens-sota-research/SKILL.md": [
+      1793646875929843554,
+      7178
+    ],
+    "excalidraw_diagram_assimilated/SKILL.md": [
+      1793646875886264880,
+      2617
+    ],
+    "ghost_assimilated/SKILL.md": [
+      1793646875894982340,
+      2439
+    ],
+    "ks_origin_assimilated/SKILL.md": [
+      1793646875898825017,
+      9267
+    ],
+    "scriptwriter_assimilated/SKILL.md": [
+      1793646875963095256,
+      2441
+    ],
+    "herdr_assimilated/SKILL.md": [
+      1793646875896903512,
+      2396
+    ],
+    "openexecutive_assimilated/SKILL.md": [
+      1793646875919969699,
+      2577
+    ],
+    "archify_assimilated/SKILL.md": [
+      1793646875802008104,
+      3218
+    ],
+    "social-media/DESCRIPTION.md": [
+      1793646875967150638,
+      151
+    ],
+    "social-media/transcript-intelligence/SKILL.md": [
+      1793646875968412614,
+      1670
+    ],
+    "social-media/outlier-post-finder/SKILL.md": [
+      1793646875968246075,
+      1650
+    ],
+    "social-media/comment-mining/SKILL.md": [
+      1793646875967794167,
+      2061
+    ],
+    "social-media/ad-library-teardown/SKILL.md": [
+      1793646875967502548,
+      1980
+    ],
+    "social-media/ecommerce-ad-funnel-cro-audit/SKILL.md": [
+      1793646875968102578,
+      5810
+    ],
+    "creator_os_starter_assimilated/SKILL.md": [
+      1793646875870007689,
+      2617
+    ],
+    "teppich_paradies_shopify_ai_assimilated/SKILL.md": [
+      1793646876095301457,
+      2800
+    ],
+    "hypokiln_assimilated/SKILL.md": [
+      1793646875897071300,
+      2529
+    ],
+    "blender_editable_timeline_assimilated/SKILL.md": [
+      1793646875855422090,
+      2887
+    ],
+    "zclip-google-cloud-setup/SKILL.md": [
+      1793565637690011260,
+      3140
+    ],
+    "dsh_univer_office_assimilated/SKILL.md": [
+      1793646875874497520,
+      2744
+    ],
+    "agentshield_assimilated/SKILL.md": [
+      1793646875800164930,
+      2585
+    ],
+    "consensus_pipeline_assimilated/SKILL.md": [
+      1793646875859867048,
+      2712
+    ],
+    "keyper_assimilated/SKILL.md": [
+      1793646875898433858,
+      2690
+    ],
+    "zvec_grep_assimilated/SKILL.md": [
+      1793646876109969096,
+      2465
+    ],
+    "prefect_assimilated/SKILL.md": [
+      1793646875925600467,
+      2477
+    ],
+    "aimock_assimilated/SKILL.md": [
+      1793646875800727503,
+      2502
+    ],
+    "scallopbot_assimilated/SKILL.md": [
+      1793646875962314563,
+      2543
+    ],
+    "software-development/shopify-native-bundle-widgets/SKILL.md": [
+      1793646876009504959,
+      19037
+    ],
+    "software-development/shopify-cleanroom-neutralization/SKILL.md": [
+      1793646876009304588,
+      3299
+    ],
+    "software-development/app-localization-engineering/SKILL.md": [
+      1793646875969196182,
+      7439
+    ],
+    "software-development/helix-reverse-engineering-workflow/SKILL.md": [
+      1793646876002374011,
+      8059
+    ],
+    "software-development/claude-code-workspace-engineering/SKILL.md": [
+      1793965748800566187,
+      4641
+    ],
+    "software-development/plan/SKILL.md": [
+      1793565637208975388,
+      9361
+    ],
+    "software-development/shopify-theme-ast-engineering/SKILL.md": [
+      1793646876009982784,
+      84464
+    ],
+    "software-development/dnk-local-prototype-launcher/SKILL.md": [
+      1793646876000905622,
+      7724
+    ],
+    "software-development/sota-repository-assimilation/SKILL.md": [
+      1793891664206870626,
+      62081
+    ],
+    "software-development/tauri-dev-workflow/SKILL.md": [
+      1793646876091888772,
+      3146
+    ],
+    "software-development/iris-visual-inspection/SKILL.md": [
+      1793646876003357701,
+      3064
+    ],
+    "software-development/gcp-vertex-multimodal-integration/SKILL.md": [
+      1793565637759914576,
+      12136
+    ],
+    "software-development/structured-llm-pipelines/SKILL.md": [
+      1793646876091115411,
+      10935
+    ],
+    "software-development/patchright_assimilated/SKILL.md": [
+      1793646876006393393,
+      3629
+    ],
+    "software-development/cognitive-memory-engineering/SKILL.md": [
+      1793646875999472691,
+      8690
+    ],
+    "software-development/llm-guardrails-and-spend-control/SKILL.md": [
+      1793646876003580488,
+      15140
+    ],
+    "software-development/hermes-agent-skill-authoring/SKILL.md": [
+      1793565637210625688,
+      14944
+    ],
+    "software-development/web-app-reverse-engineering/SKILL.md": [
+      1793565637769517801,
+      5649
+    ],
+    "software-development/architecture-invariants-and-blast-radius/SKILL.md": [
+      1793979742689874727,
+      41346
+    ],
+    "software-development/chrome-extension-engineering/SKILL.md": [
+      1793646875998069760,
+      11878
+    ],
+    "software-development/dnk-intent-discovery/SKILL.md": [
+      1793646876000639294,
+      3784
+    ],
+    "software-development/untangle-codebase/SKILL.md": [
+      1794075352506053695,
+      8719
+    ],
+    "software-development/open-design-local-dev/SKILL.md": [
+      1793646876005475161,
+      13188
+    ],
+    "software-development/shopify-agentic-canvas-themes/SKILL.md": [
+      1793646876007376041,
+      6814
+    ],
+    "software-development/canvas-engine-architecture/SKILL.md": [
+      1793646875978623087,
+      100348
+    ],
+    "software-development/dogfood/SKILL.md": [
+      1793565637215143723,
+      6788
+    ],
+    "shopify_theme_handbook_assimilated/SKILL.md": [
+      1793646875964361899,
+      5442
+    ],
+    "the_ultimate_cro_app_assimilated/SKILL.md": [
+      1793646876097219004,
+      4699
+    ],
+    "bytebox_assimilated/SKILL.md": [
+      1793646875856912270,
+      2616
+    ],
+    "mlops/DESCRIPTION.md": [
+      1793646875906281334,
+      162
+    ],
+    "mlops/models/DESCRIPTION.md": [
+      1793646875908537041,
+      253
+    ],
+    "mlops/inference/DESCRIPTION.md": [
+      1793646875907466603,
+      161
+    ],
+    "mlops/evaluation/DESCRIPTION.md": [
+      1793646875907287148,
+      126
+    ],
+    "spec_kit_assimilated/SKILL.md": [
+      1793646876092633008,
+      2427
+    ],
+    "shopify_dynamic_pdp_playbook_assimilated/SKILL.md": [
+      1793646875963285253,
+      2649
+    ],
+    "notification_mcp_assimilated/SKILL.md": [
+      1793646875916811842,
+      2643
+    ],
+    "skills_assimilated/SKILL.md": [
+      1793646875964662935,
+      2115
+    ],
+    "ecc_assimilated/SKILL.md": [
+      1793646875880505531,
+      2507
+    ],
+    "tributary_assimilated/SKILL.md": [
+      1793646876102971478,
+      2735
+    ],
+    "tauri_skills_assimilated/SKILL.md": [
+      1793646876093493116,
+      2529
+    ],
+    "web_mcp_assimilated/SKILL.md": [
+      1793646876103662715,
+      2585
+    ],
+    "laya_assimilated/SKILL.md": [
+      1793646875899538545,
+      2421
+    ],
+    "ods_assimilated/SKILL.md": [
+      1793646875916961631,
+      2501
+    ],
+    "rea_assimilated/SKILL.md": [
+      1793646875927522598,
+      2408
+    ],
+    "runeicons_assimilated/SKILL.md": [
+      1793646875961886238,
+      2451
+    ],
+    "auteur_assimilated/SKILL.md": [
+      1793646875805653493,
+      2533
+    ],
+    "cc_settings_assimilated/SKILL.md": [
+      1793646875857512467,
+      4680
+    ],
+    "roast_room_assimilated/SKILL.md": [
+      1793646875930437042,
+      9039
+    ],
+    "agentrq_assimilated/SKILL.md": [
+      1793646875795657807,
+      2616
+    ],
+    "personalive_assimilated/SKILL.md": [
+      1793979742687011329,
+      2516
+    ],
+    "jev_ultrafast_assimilated/SKILL.md": [
+      1793646875897873785,
+      2445
+    ],
+    "autocanvas_assimilated/SKILL.md": [
+      1793979742681676441,
+      2593
+    ],
+    "skills_collection_2_assimilated/SKILL.md": [
+      1793646875966233447,
+      2709
+    ],
+    "freebuff_assimilated/SKILL.md": [
+      1793646875890246263,
+      2422
+    ],
+    "dnk_triage_task/SKILL.md": [
+      1793646875871730364,
+      2211
+    ],
+    "codegraff_assimilated/SKILL.md": [
+      1793646875858132247,
+      2649
+    ],
+    "yaos_assimilated/SKILL.md": [
+      1793646876105761634,
+      2425
+    ],
+    "vista_assimilated/SKILL.md": [
+      1793646876103508343,
+      2567
+    ],
+    "github/DESCRIPTION.md": [
+      1793646875895303417,
+      167
+    ],
+    "github/codebase-inspection/SKILL.md": [
+      1793565637234666501,
+      4102
+    ],
+    "kintara_assimilated/SKILL.md": [
+      1793646875898630604,
+      2572
+    ],
+    "note-taking/DESCRIPTION.md": [
+      1793646875908793661,
+      146
+    ],
+    "note-taking/review-gated-ingest/SKILL.md": [
+      1793646875913408740,
+      4939
+    ],
+    "note-taking/obsidian-vault-hygiene/SKILL.md": [
+      1793646875910610710,
+      46061
+    ],
+    "note-taking/obsidian-excalidraw/SKILL.md": [
+      1793646875908953158,
+      4788
+    ],
+    "note-taking/spatial-lexicon-curation/SKILL.md": [
+      1793646875913567071,
+      4772
+    ],
+    "note-taking/visual-thinking-pkm/SKILL.md": [
+      1793646875913934147,
+      15428
+    ],
+    "web_scout_mcp_assimilated/SKILL.md": [
+      1793646876104949691,
+      2701
+    ],
+    "pmx_canvas_assimilated/SKILL.md": [
+      1793646875921265466,
+      2682
+    ],
+    "kplex_assimilated/SKILL.md": [
+      1793565637908036624,
+      3026
+    ],
+    "mapie_assimilated/SKILL.md": [
+      1793646875899678626,
+      2562
+    ],
+    "rynix_studio_assimilated/SKILL.md": [
+      1793646875962151524,
+      2756
+    ],
+    "artifact_server_assimilated/SKILL.md": [
+      1793646875802704674,
+      2512
+    ],
+    "harness_engineering_playbook_assimilated/SKILL.md": [
+      1793646875895615536,
+      2949
+    ],
+    "smythos_studio_assimilated/SKILL.md": [
+      1793646875967004099,
+      2693
+    ],
+    "immich_assimilated/SKILL.md": [
+      1793979742685501611,
+      2615
+    ],
+    "creative/DESCRIPTION.md": [
+      1793646875860904611,
+      116
+    ],
+    "creative/blender_skills_assimilated/SKILL.md": [
+      1793646875861156690,
+      4408
+    ],
+    "creative/comfyui/SKILL.md": [
+      1793646875862187545,
+      24075
+    ],
+    "creative/excalidraw/SKILL.md": [
+      1793646875866465589,
+      7297
+    ],
+    "creative/claude-design/SKILL.md": [
+      1793565637272161295,
+      25581
+    ],
+    "creative/design-md/SKILL.md": [
+      1793565637273819137,
+      8933
+    ],
+    "creative/ukrainian_humanizer/SKILL.md": [
+      1793646875869834025,
+      16386
+    ],
+    "creative/humanizer/SKILL.md": [
+      1793565637296327730,
+      34919
+    ],
+    "founder_skill_assimilated/SKILL.md": [
+      1793646875886744871,
+      2650
+    ],
+    "shopify_theme_builder_assimilated/SKILL.md": [
+      1793646875964197902,
+      2683
+    ],
+    "freellmapi_assimilated/SKILL.md": [
+      1793646875891601154,
+      2657
+    ],
+    "openbot_assimilated/SKILL.md": [
+      1793646875917702242,
+      2556
+    ],
+    "understand_anything_assimilated/SKILL.md": [
+      1793646876103321596,
+      2689
+    ],
+    "agent_native_assimilated/SKILL.md": [
+      1793646875790131287,
+      2612
+    ],
+    "email/DESCRIPTION.md": [
+      1793646875885538019,
+      101
+    ],
+    "smart-home/DESCRIPTION.md": [
+      1793646875966400569,
+      123
+    ],
+    "autonomous-ai-agents/DESCRIPTION.md": [
+      1793646875806796429,
+      211
+    ],
+    "autonomous-ai-agents/orbit/SKILL.md": [
+      1793646875855238677,
+      25373
+    ],
+    "autonomous-ai-agents/dnk-swarm-orchestration/SKILL.md": [
+      1793979742683955518,
+      21457
+    ],
+    "autonomous-ai-agents/beads-task-forest-integration/SKILL.md": [
+      1793646875807360044,
+      21186
+    ],
+    "autonomous-ai-agents/hermes-agent/SKILL.md": [
+      1793565637309547467,
+      13657
+    ],
+    "agentic_memory_assimilated/SKILL.md": [
+      1793646875795197483,
+      2713
+    ],
+    "dsh_agent_team_gui_assimilated/SKILL.md": [
+      1793646875872174856,
+      2617
+    ],
+    "productivity/DESCRIPTION.md": [
+      1793646875926858694,
+      114
+    ],
+    "productivity/session-librarian/SKILL.md": [
+      1793565637322787203,
+      5303
+    ],
+    "productivity/ocr-and-documents/DESCRIPTION.md": [
+      1793646875927088856,
+      147
+    ],
+    "thoughtdag_assimilated/SKILL.md": [
+      1793646876102090036,
+      2541
+    ],
+    "skills_collection_1_assimilated/SKILL.md": [
+      1793646875966053158,
+      2717
+    ],
+    "ghidra_assimilated/SKILL.md": [
+      1793646875894812802,
+      2484
+    ],
+    "media/DESCRIPTION.md": [
+      1793646875899931579,
+      139
+    ],
+    "media/youtube-content/SKILL.md": [
+      1793646875905979590,
+      3538
+    ],
+    "media/word-anchored-shorts/SKILL.md": [
+      1793646875905792843,
+      4041
+    ],
+    "media/seamless-brand-injection/SKILL.md": [
+      1793646875900833062,
+      5192
+    ],
+    "media/hybrid-3d-ai-video-animation/SKILL.md": [
+      1793646875900373863,
+      6191
+    ],
+    "media/postiz-distribution-rlsf/SKILL.md": [
+      1793646875900621316,
+      3994
+    ],
+    "media/content-compliance-hitl/SKILL.md": [
+      1793646875900089868,
+      3192
+    ],
+    "media/video-retention-engineering/SKILL.md": [
+      1793646875901937375,
+      13411
+    ],
+    "open_multi_agent_canvas_assimilated/SKILL.md": [
+      1793646875917568745,
+      2843
+    ]
+  },
+  "skills": [
+    {
+      "skill_name": "agent_native_assimilated",
+      "category": "agent_native_assimilated",
+      "frontmatter_name": "agent_native_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from BuilderIO...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "agentic_memory_assimilated",
+      "category": "agentic_memory_assimilated",
+      "frontmatter_name": "agentic_memory_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Verace-Pv...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "agentrq_assimilated",
+      "category": "agentrq_assimilated",
+      "frontmatter_name": "agentrq_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from agentrq/a...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "agentshield_assimilated",
+      "category": "agentshield_assimilated",
+      "frontmatter_name": "agentshield_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from affaan-m/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "aimock_assimilated",
+      "category": "aimock_assimilated",
+      "frontmatter_name": "aimock_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from CopilotKi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "archify_assimilated",
+      "category": "archify_assimilated",
+      "frontmatter_name": "archify_assimilated",
+      "description": "SOTA indices and recipes for Archify spatial diagram comp...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "artifact_server_assimilated",
+      "category": "artifact_server_assimilated",
+      "frontmatter_name": "artifact_server_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from plannotat...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "auteur_assimilated",
+      "category": "auteur_assimilated",
+      "frontmatter_name": "auteur_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from agiwhitel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "autocanvas_assimilated",
+      "category": "autocanvas_assimilated",
+      "frontmatter_name": "autocanvas_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from TestOrg/A...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "beads-task-forest-integration",
+      "category": "autonomous-ai-agents",
+      "frontmatter_name": "beads-task-forest-integration",
+      "description": "Use for task forest graphs. Manages agent task dependency.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dnk-swarm-orchestration",
+      "category": "autonomous-ai-agents",
+      "frontmatter_name": "dnk-swarm-orchestration",
+      "description": "Run and coordinate Gerych and DNK OS multi-agent swarms.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "hermes-agent",
+      "category": "autonomous-ai-agents",
+      "frontmatter_name": "hermes-agent",
+      "description": "Use, configure, theme, extend, and orchestrate Hermes Agent.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "orbit",
+      "category": "autonomous-ai-agents",
+      "frontmatter_name": "orbit",
+      "description": "Shared memory and coordination layer for AI agents. Use t...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "blender_editable_timeline_assimilated",
+      "category": "blender_editable_timeline_assimilated",
+      "frontmatter_name": "blender_editable_timeline_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from CatsMansi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "bytebox_assimilated",
+      "category": "bytebox_assimilated",
+      "frontmatter_name": "bytebox_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "cc_settings_assimilated",
+      "category": "cc_settings_assimilated",
+      "frontmatter_name": "cc_settings_assimilated",
+      "description": "Assimilated SOTA patterns from darkroomengineering/cc-set...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "codegraff_assimilated",
+      "category": "codegraff_assimilated",
+      "frontmatter_name": "codegraff_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from justrach/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "consensus_pipeline_assimilated",
+      "category": "consensus_pipeline_assimilated",
+      "frontmatter_name": "consensus_pipeline_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from fangqian6...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "blender_skills_assimilated",
+      "category": "creative",
+      "frontmatter_name": "blender_skills_assimilated",
+      "description": "Use for Blender 3D, Shopify GLB models, and bpy scripts.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "claude-design",
+      "category": "creative",
+      "frontmatter_name": "claude-design",
+      "description": "Design one-off HTML artifacts (landing, deck, prototype).",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "comfyui",
+      "category": "creative",
+      "frontmatter_name": "comfyui",
+      "description": "Generate images, video, and audio via diffusion workflows.",
+      "platforms": [
+        "macos",
+        "linux",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "design-md",
+      "category": "creative",
+      "frontmatter_name": "design-md",
+      "description": "Author/validate/export Google's DESIGN.md token spec files.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "excalidraw",
+      "category": "creative",
+      "frontmatter_name": "excalidraw",
+      "description": "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "humanizer",
+      "category": "creative",
+      "frontmatter_name": "humanizer",
+      "description": "Humanize text: strip AI-isms and add real voice.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ukrainian_humanizer",
+      "category": "creative",
+      "frontmatter_name": "ukrainian-humanizer",
+      "description": "Use when generating, editing, or auditing Ukrainian text,...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "creator_os_starter_assimilated",
+      "category": "creator_os_starter_assimilated",
+      "frontmatter_name": "creator_os_starter_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from kevinbadi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dnk_triage_task",
+      "category": "dnk_triage_task",
+      "frontmatter_name": "dnk_triage_task",
+      "description": "Autonomous complexity classifier and triage protocol befo...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dsh_agent_team_gui_assimilated",
+      "category": "dsh_agent_team_gui_assimilated",
+      "frontmatter_name": "dsh_agent_team_gui_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from toolclub/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dsh_univer_office_assimilated",
+      "category": "dsh_univer_office_assimilated",
+      "frontmatter_name": "dsh_univer_office_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from dream-num...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ecc_assimilated",
+      "category": "ecc_assimilated",
+      "frontmatter_name": "ecc_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from affaan-m/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "excalidraw_diagram_assimilated",
+      "category": "excalidraw_diagram_assimilated",
+      "frontmatter_name": "excalidraw_diagram_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from alxmax/ex...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "founder_skill_assimilated",
+      "category": "founder_skill_assimilated",
+      "frontmatter_name": "founder_skill_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Jakeschin...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "freebuff_assimilated",
+      "category": "freebuff_assimilated",
+      "frontmatter_name": "freebuff_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from CodebuffA...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "freellmapi_assimilated",
+      "category": "freellmapi_assimilated",
+      "frontmatter_name": "freellmapi_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from tashfeena...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ghidra_assimilated",
+      "category": "ghidra_assimilated",
+      "frontmatter_name": "ghidra_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from NationalS...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ghost_assimilated",
+      "category": "ghost_assimilated",
+      "frontmatter_name": "ghost_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from TryGhost/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "codebase-inspection",
+      "category": "github",
+      "frontmatter_name": "codebase-inspection",
+      "description": "Inspect codebases w/ pygount: LOC, languages, ratios.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "harness_engineering_playbook_assimilated",
+      "category": "harness_engineering_playbook_assimilated",
+      "frontmatter_name": "harness_engineering_playbook_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from flyrank-b...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "herdr_assimilated",
+      "category": "herdr_assimilated",
+      "frontmatter_name": "herdr_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from herdrdev/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "hypokiln_assimilated",
+      "category": "hypokiln_assimilated",
+      "frontmatter_name": "hypokiln_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from agiwhitel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "immich_assimilated",
+      "category": "immich_assimilated",
+      "frontmatter_name": "immich_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from immich-ap...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "jev_ultrafast_assimilated",
+      "category": "jev_ultrafast_assimilated",
+      "frontmatter_name": "jev_ultrafast_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from browser-u...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "keyper_assimilated",
+      "category": "keyper_assimilated",
+      "frontmatter_name": "keyper_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "kintara_assimilated",
+      "category": "kintara_assimilated",
+      "frontmatter_name": "kintara_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "kplex_assimilated",
+      "category": "kplex_assimilated",
+      "frontmatter_name": "kplex_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from zsviczian...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ks_origin_assimilated",
+      "category": "ks_origin_assimilated",
+      "frontmatter_name": "ks_origin_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from kondasoft...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "laya_assimilated",
+      "category": "laya_assimilated",
+      "frontmatter_name": "laya_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from NandhaKis...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "mapie_assimilated",
+      "category": "mapie_assimilated",
+      "frontmatter_name": "mapie_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from scikit-le...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "content-compliance-hitl",
+      "category": "media",
+      "frontmatter_name": "content-compliance-hitl",
+      "description": "Use when validating content tone of voice, FTC rules, and...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "hybrid-3d-ai-video-animation",
+      "category": "media",
+      "frontmatter_name": "hybrid-3d-ai-video-animation",
+      "description": "Use for 2D-to-3D Blender extrusion and Veo 3.1 animation.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "postiz-distribution-rlsf",
+      "category": "media",
+      "frontmatter_name": "postiz-distribution-rlsf",
+      "description": "Use when publishing content via Postiz, collecting social...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "seamless-brand-injection",
+      "category": "media",
+      "frontmatter_name": "seamless-brand-injection",
+      "description": "Use when injecting brand logos onto photos or videos.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "video-retention-engineering",
+      "category": "media",
+      "frontmatter_name": "video-retention-engineering",
+      "description": "Use when optimizing video retention, hooks, or captions.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "word-anchored-shorts",
+      "category": "media",
+      "frontmatter_name": "word-anchored-shorts",
+      "description": "Generate 9:16 word-anchored kinetic typography Shorts usi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "youtube-content",
+      "category": "media",
+      "frontmatter_name": "youtube-content",
+      "description": "YouTube transcripts to summaries, threads, blogs.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "obsidian-excalidraw",
+      "category": "note-taking",
+      "frontmatter_name": "obsidian-excalidraw",
+      "description": "Create Obsidian Excalidraw drawings and JSON Canvas graphs.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "obsidian-vault-hygiene",
+      "category": "note-taking",
+      "frontmatter_name": "obsidian-vault-hygiene",
+      "description": "Use when checking Obsidian vault hygiene and link gates.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "review-gated-ingest",
+      "category": "note-taking",
+      "frontmatter_name": "review-gated-ingest",
+      "description": "Ingest research and ADRs into Obsidian Vault and SCONES w...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "spatial-lexicon-curation",
+      "category": "note-taking",
+      "frontmatter_name": "spatial-lexicon-curation",
+      "description": "Use when curating spatial lexicons or vibecoding patterns.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "visual-thinking-pkm",
+      "category": "note-taking",
+      "frontmatter_name": "visual-thinking-pkm",
+      "description": "Use for Obsidian, Excalidraw, and spatial PKM visual graphs.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "notification_mcp_assimilated",
+      "category": "notification_mcp_assimilated",
+      "frontmatter_name": "notification_mcp_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ods_assimilated",
+      "category": "ods_assimilated",
+      "frontmatter_name": "ods_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Osmantic/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "open_multi_agent_canvas_assimilated",
+      "category": "open_multi_agent_canvas_assimilated",
+      "frontmatter_name": "open_multi_agent_canvas_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from CopilotKi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "openbot_assimilated",
+      "category": "openbot_assimilated",
+      "frontmatter_name": "openbot_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from CopilotKi...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "openexecutive_assimilated",
+      "category": "openexecutive_assimilated",
+      "frontmatter_name": "openexecutive_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from SenteLabs...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "personalive_assimilated",
+      "category": "personalive_assimilated",
+      "frontmatter_name": "personalive_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from GVCLab/Pe...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "pmx_canvas_assimilated",
+      "category": "pmx_canvas_assimilated",
+      "frontmatter_name": "pmx_canvas_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pskoett/p...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "prefect_assimilated",
+      "category": "prefect_assimilated",
+      "frontmatter_name": "prefect_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from PrefectHQ...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "session-librarian",
+      "category": "productivity",
+      "frontmatter_name": "session-librarian",
+      "description": "Organize sessions by prompt: find, rename, archive, prune.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "rea_assimilated",
+      "category": "rea_assimilated",
+      "frontmatter_name": "rea_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from morluto/rea.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "blocked-page-recovery",
+      "category": "research",
+      "frontmatter_name": "blocked-page-recovery",
+      "description": "Recover blocked/paywalled/WAF'd pages via fallbacks.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "tri-lens-sota-research",
+      "category": "research",
+      "frontmatter_name": "tri-lens-sota-research",
+      "description": "Tri-Lens SOTA research pipeline combining Internal Baseli...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "venture-evidence-investigation",
+      "category": "research",
+      "frontmatter_name": "venture-evidence-investigation",
+      "description": "Investigate ventures with evidence logs and live audits.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "roast_room_assimilated",
+      "category": "roast_room_assimilated",
+      "frontmatter_name": "roast_room_assimilated",
+      "description": "Assimilated SOTA Roast Room & 12-Entrepreneur Board of Di...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "runeicons_assimilated",
+      "category": "runeicons_assimilated",
+      "frontmatter_name": "runeicons_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Nexvyn/ru...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "rynix_studio_assimilated",
+      "category": "rynix_studio_assimilated",
+      "frontmatter_name": "rynix_studio_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Nexvyn/ry...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "scallopbot_assimilated",
+      "category": "scallopbot_assimilated",
+      "frontmatter_name": "scallopbot_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from tashfeena...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "scriptwriter_assimilated",
+      "category": "scriptwriter_assimilated",
+      "frontmatter_name": "scriptwriter_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from unclebob/...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify_dynamic_pdp_playbook_assimilated",
+      "category": "shopify_dynamic_pdp_playbook_assimilated",
+      "frontmatter_name": "shopify_dynamic_pdp_playbook_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from NikoCarti...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify_theme_builder_assimilated",
+      "category": "shopify_theme_builder_assimilated",
+      "frontmatter_name": "shopify_theme_builder_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from moVictor9...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify_theme_handbook_assimilated",
+      "category": "shopify_theme_handbook_assimilated",
+      "frontmatter_name": "shopify_theme_handbook_assimilated",
+      "description": "SOTA Shopify Theme Store & Horizon block architecture pat...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "skills_assimilated",
+      "category": "skills_assimilated",
+      "frontmatter_name": "skills_assimilated",
+      "description": "SOTA engineering disciplines from mattpocock/skills: deep...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "skills_collection_1_assimilated",
+      "category": "skills_collection_1_assimilated",
+      "frontmatter_name": "skills_collection_1_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "skills_collection_2_assimilated",
+      "category": "skills_collection_2_assimilated",
+      "frontmatter_name": "skills_collection_2_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "smythos_studio_assimilated",
+      "category": "smythos_studio_assimilated",
+      "frontmatter_name": "smythos_studio_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from SmythOS/s...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ad-library-teardown",
+      "category": "social-media",
+      "frontmatter_name": "ad-library-teardown",
+      "description": "Deconstruct active competitor ads from Meta, Google, and ...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "comment-mining",
+      "category": "social-media",
+      "frontmatter_name": "comment-mining",
+      "description": "Extract customer objections, pain points, and buying inte...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "ecommerce-ad-funnel-cro-audit",
+      "category": "social-media",
+      "frontmatter_name": "ecommerce-ad-funnel-cro-audit",
+      "description": "Use when auditing ad funnel URLs and Shopify pages for CRO.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "outlier-post-finder",
+      "category": "social-media",
+      "frontmatter_name": "outlier-post-finder",
+      "description": "Identify statistical outlier posts that exceed creator ba...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "transcript-intelligence",
+      "category": "social-media",
+      "frontmatter_name": "transcript-intelligence",
+      "description": "Extract retention hooks and script formulas from video tr...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "app-localization-engineering",
+      "category": "software-development",
+      "frontmatter_name": "app-localization-engineering",
+      "description": "Use when localizing web apps into Ukrainian or multi-lang.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "architecture-invariants-and-blast-radius",
+      "category": "software-development",
+      "frontmatter_name": "architecture-invariants-and-blast-radius",
+      "description": "Use when enforcing architecture boundaries or blast radius.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "canvas-engine-architecture",
+      "category": "software-development",
+      "frontmatter_name": "canvas-engine-architecture",
+      "description": "Canvas architectural patterns & headless test environments.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "chrome-extension-engineering",
+      "category": "software-development",
+      "frontmatter_name": "chrome-extension-engineering",
+      "description": "Use when building Chrome Manifest V3 extensions & panels.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "claude-code-workspace-engineering",
+      "category": "software-development",
+      "frontmatter_name": "claude-code-workspace-engineering",
+      "description": "Use when configuring Claude Code workspaces and dev teams.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "cognitive-memory-engineering",
+      "category": "software-development",
+      "frontmatter_name": "cognitive-memory-engineering",
+      "description": "Use when designing agent memory stores, decay, or pruning.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dnk-intent-discovery",
+      "category": "software-development",
+      "frontmatter_name": "dnk-intent-discovery",
+      "description": "Socratic Inception Protocol for turning ambiguous develop...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dnk-local-prototype-launcher",
+      "category": "software-development",
+      "frontmatter_name": "dnk-local-prototype-launcher",
+      "description": "Use to build and launch local repos in ../DNK_Vibe/.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "dogfood",
+      "category": "software-development",
+      "frontmatter_name": "dogfood",
+      "description": "Exploratory QA of web apps: find bugs, evidence, reports.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "gcp-vertex-multimodal-integration",
+      "category": "software-development",
+      "frontmatter_name": "gcp-vertex-multimodal-integration",
+      "description": "Use to wire apps to Google Cloud Vertex AI media models.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "helix-reverse-engineering-workflow",
+      "category": "software-development",
+      "frontmatter_name": "helix-reverse-engineering-workflow",
+      "description": "Use when reverse-engineering competitor stores, web apps,...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "hermes-agent-skill-authoring",
+      "category": "software-development",
+      "frontmatter_name": "hermes-agent-skill-authoring",
+      "description": "Author in-repo SKILL.md files: frontmatter and structure.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "iris-visual-inspection",
+      "category": "software-development",
+      "frontmatter_name": "iris-visual-inspection",
+      "description": "Use when inspecting web designs or UI examples via iris.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "llm-guardrails-and-spend-control",
+      "category": "software-development",
+      "frontmatter_name": "llm-guardrails-and-spend-control",
+      "description": "Manage LLM guardrails, SpendGuard limits, and fallbacks w...",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "open-design-local-dev",
+      "category": "software-development",
+      "frontmatter_name": "open-design-local-dev",
+      "description": "Use when running or editing Open Design Local.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "patchright_assimilated",
+      "category": "software-development",
+      "frontmatter_name": "patchright_assimilated",
+      "description": "Undetectable browser automation, anti-bot evasion (Cloudf...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "plan",
+      "category": "software-development",
+      "frontmatter_name": "plan",
+      "description": "Write a markdown plan to .hermes/plans/; no execution.",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify-agentic-canvas-themes",
+      "category": "software-development",
+      "frontmatter_name": "shopify-agentic-canvas-themes",
+      "description": "Use when building themes for Shopify Canvas and Sidekick.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify-cleanroom-neutralization",
+      "category": "software-development",
+      "frontmatter_name": "shopify-cleanroom-neutralization",
+      "description": "Use when neutralizing, sanitizing, or packaging a cloned ...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify-native-bundle-widgets",
+      "category": "software-development",
+      "frontmatter_name": "shopify-native-bundle-widgets",
+      "description": "Use for native Shopify Liquid Bundle & Save PDP widgets.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "shopify-theme-ast-engineering",
+      "category": "software-development",
+      "frontmatter_name": "shopify-theme-ast-engineering",
+      "description": "Shopify OS 2.0 AST mutations & Canvas-to-Liquid transpiler.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "sota-repository-assimilation",
+      "category": "software-development",
+      "frontmatter_name": "sota-repository-assimilation",
+      "description": "Audit and assimilate open-source repos into DNK OS.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "structured-llm-pipelines",
+      "category": "software-development",
+      "frontmatter_name": "structured-llm-pipelines",
+      "description": "Use for structured schema-guided LLM prompt pipelines.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "tauri-dev-workflow",
+      "category": "software-development",
+      "frontmatter_name": "tauri-dev-workflow",
+      "description": "Use when creating, cloning, or running Tauri v2 apps.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "untangle-codebase",
+      "category": "software-development",
+      "frontmatter_name": "untangle-codebase",
+      "description": "Untangle code: structural decoupling refactor of a module...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "web-app-reverse-engineering",
+      "category": "software-development",
+      "frontmatter_name": "web-app-reverse-engineering",
+      "description": "Use when reverse-engineering SPAs. Extract tokens and AST.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "spec_kit_assimilated",
+      "category": "spec_kit_assimilated",
+      "frontmatter_name": "spec_kit_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from github/sp...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "tauri_skills_assimilated",
+      "category": "tauri_skills_assimilated",
+      "frontmatter_name": "tauri_skills_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "teppich_paradies_shopify_ai_assimilated",
+      "category": "teppich_paradies_shopify_ai_assimilated",
+      "frontmatter_name": "teppich_paradies_shopify_ai_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from kontakt75...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "the_ultimate_cro_app_assimilated",
+      "category": "the_ultimate_cro_app_assimilated",
+      "frontmatter_name": "the_ultimate_cro_app_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Omar92953...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "thoughtdag_assimilated",
+      "category": "thoughtdag_assimilated",
+      "frontmatter_name": "thoughtdag_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from chenxiach...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "tributary_assimilated",
+      "category": "tributary_assimilated",
+      "frontmatter_name": "tributary_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from ximing/tr...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "understand_anything_assimilated",
+      "category": "understand_anything_assimilated",
+      "frontmatter_name": "understand_anything_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Egonex-AI...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "vista_assimilated",
+      "category": "vista_assimilated",
+      "frontmatter_name": "vista_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from Mantitup-...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "web_mcp_assimilated",
+      "category": "web_mcp_assimilated",
+      "frontmatter_name": "web_mcp_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from AgriciDan...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "web_scout_mcp_assimilated",
+      "category": "web_scout_mcp_assimilated",
+      "frontmatter_name": "web_scout_mcp_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from pinkpixel...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "yaos_assimilated",
+      "category": "yaos_assimilated",
+      "frontmatter_name": "yaos_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from kavinsood...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "zclip-google-cloud-setup",
+      "category": "zclip-google-cloud-setup",
+      "frontmatter_name": "zclip-google-cloud-setup",
+      "description": "Deploy zclip with Google Cloud resources and model config.",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    },
+    {
+      "skill_name": "zvec_grep_assimilated",
+      "category": "zvec_grep_assimilated",
+      "frontmatter_name": "zvec_grep_assimilated",
+      "description": "Assimilated SOTA patterns and architecture from zvec-ai/z...",
+      "platforms": [],
+      "conditions": {
+        "fallback_for_toolsets": [],
+        "requires_toolsets": [],
+        "fallback_for_tools": [],
+        "requires_tools": []
+      }
+    }
+  ],
+  "category_descriptions": {
+    "autonomous-ai-agents": "Skills for spawning and orchestrating autonomous AI coding agents and multi-agent workflows — running independent agent processes, delegating tasks, and coordinating parallel workstreams.",
+    "creative": "Creative content generation — ASCII art, hand-drawn style diagrams, and visual design tools.",
+    "email": "Skills for sending, receiving, searching, and managing email from the terminal.",
+    "github": "GitHub workflow skills for managing repositories, pull requests, code reviews, issues, and CI/CD pipelines using the gh CLI and git via terminal.",
+    "media": "Skills for working with media content — YouTube transcripts, GIF search, music generation, and audio visualization.",
+    "mlops": "Knowledge and Tools for Machine Learning Operations - tools and frameworks for training, fine-tuning, deploying, and optimizing ML/AI models",
+    "mlops/evaluation": "Model evaluation benchmarks, experiment tracking, data curation, tokenizers, and interpretability tools.",
+    "mlops/inference": "Model serving, quantization (GGUF/GPTQ), structured output, inference optimization, and model surgery tools for deploying and running LLMs.",
+    "mlops/models": "Specific model architectures and tools — image segmentation (Segment Anything / SAM) and audio generation (AudioCraft / MusicGen). Additional model skills (CLIP, Stable Diffusion, Whisper, LLaVA) are available as optional skills.",
+    "note-taking": "Note taking skills, to save information, assist with research, and collab on multi-session planning and information sharing.",
+    "productivity": "Skills for document creation, presentations, spreadsheets, and other productivity workflows.",
+    "productivity/ocr-and-documents": "Skills for extracting text from PDFs, scanned documents, images, and other file formats using OCR and document parsing tools.",
+    "research": "Skills for academic research, paper discovery, literature review, domain reconnaissance, market data, content monitoring, and scientific knowledge retrieval.",
+    "smart-home": "Skills for controlling smart home devices — lights, switches, sensors, and home automation systems.",
+    "social-media": "Skills for interacting with social platforms and social-media workflows — posting, reading, monitoring, and account operations."
+  }
+}

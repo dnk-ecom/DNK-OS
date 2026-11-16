@@ -1,0 +1,296 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/dnk_aab_registry_and_catalog_fit_patterns.md"
+# purpose: "Architecture patterns, canonical dnk-aab/v0.1 schema, CLI commands, provenance normalization rules, TaskDNA Proposal Bridge, Manual Proposal Review & Approval Policy, and Execution Task Contract Adapter (SLICE AAB-005)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.6.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# DNK-AAB Registry & Repository Catalog Fit Patterns (v0.1)
+
+## 1. Context & Architectural Problem
+When scaling the SOTA repository assimilation pipeline (1,465+ repositories), extracted architectural patterns must be formalized as **Atomic Assimilation Blocks (AAB)**.
+A critical architectural decision was made during Audit Slice 0.4-A and implemented in **DNK-AAB Foundation v0.1**:
+AAB blocks are stored via a **`files_first` GitOps model** in `docs/tech/sota_assimilation/blocks/<AAB-ID>.yaml`, NOT inside `data/repo_catalog/catalog.db`.
+
+## 2. Invariants & Storage Decision (`files_first`)
+
+### The Storage Decision Matrix
+| Storage Option | Evaluation | Architectural Consequence |
+|:---|:---|:---|
+| `separate_db` (`data/aab.db`) | **REJECTED** | Violates zero-database-duplication rule; requires `ATTACH DATABASE` for cross-joins; untracked in Git. |
+| `extend_catalog_db` (as SSOT) | **REJECTED AS PRIMARY** | `catalog.db` is in `.gitignore` (`data/`); `scripts/system/build_repo_catalog.py` executes `os.remove(db_path)` on rebuilds, destroying primary records; binary DB blocks PR reviews. |
+| `files_first` (Git-native + In-Memory Projection) | **CANONICAL SSOT** | AAB YAML manifests live in Git (`docs/tech/sota_assimilation/blocks/`). Durable, auditable, PR-reviewable, zero migration risk. |
+
+### Canonical Invariant
+> **Primary SSOT is always version-controlled YAML files in Git.**
+> `core/aab/registry.py` loads blocks into memory for fast lookup, filtering, and composition. `catalog.db` remains strictly an ephemeral query engine and read cache.
+
+---
+
+## 3. Canonical Schema Specification (`dnk-aab/v0.1`)
+
+The formal JSON Schema Draft-07 specification is located at `docs/schemas/dnk_aab.schema.yaml`.
+Each AAB block YAML must validate against `core.aab.models.AtomicAssimilationBlock`:
+
+```yaml
+schema_version: "dnk-aab/v0.1"
+id: "AAB-GATE-001"                         # Regex: ^AAB-[A-Z0-9]+-[0-9]{3,}$
+title: "Pre-Condition Gate Pattern"
+summary: "Fails closed before executing side-effects to eliminate invalid states."
+
+source:
+  repository_id: "AgriciDaniel/agentic-habits" # GitHub slug or 'dnk-internal'
+  repository_url: "https://github.com/AgriciDaniel/agentic-habits" # Required unless repository_id is 'dnk-internal'
+  commit_sha: "9f8b1c4e2a3d4f5e6a7b8c9d0e1f2a3b4c5d6e7f"        # Min 7 hex chars (null for internal)
+  source_path: "core/gate.py"                 # Repo-relative path only
+  license_spdx: "MIT"                         # SPDX license identifier or 'DNK-INTERNAL' / 'UNKNOWN'
+  assimilation_track: "permissive"            # permissive | clean-room | internal
+
+classification:
+  domain: "security"                          # core | media | ecommerce | devops | knowledge | agentic | taskdna | security | catalog | swarm | memory | canvas
+  type: "gate"                                # gate | runtime | canvas_node | role | prompt_lens | rule | workflow | tool | memory
+  leverage_score: 8.5                         # 0.0 to 10.0
+  validation: "tested"                        # hypothesis | tested | proven | deprecated
+  status: "evaluated"                         # candidate | evaluated | approved | implemented | rejected | deprecated
+
+compatibility:
+  python_version: ">=3.11"
+  license_status: "permissive"                # permissive | clean_room_required | internal | unknown
+  frameworks:
+    - "pydantic>=2.0"
+  target_agents:
+    - "gerych_builder"
+    - "dnk_dev_fullstack"
+
+evidence:
+  linked_note: "docs/notes/012 Agentic Habits Architecture Invariants.md"
+  linked_evidence:
+    - "docs/audit/EVIDENCE_GATE_001.json"
+  observed_impact: "Reduced test execution time by 40% and prevented flaky state."
+
+composition:
+  requires: []                                # List of prerequisite AAB IDs
+  conflicts_with: []                          # List of mutually exclusive AAB IDs
+  composes_well_with:
+    - "AAB-WORKFLOW-001"
+
+proposal:
+  suggested_slice: "core/gate validation guard"
+  estimated_complexity: "low"                 # low | medium | high
+  target_files:
+    - "core/gate.py"
+```
+
+---
+
+## 4. Strict Provenance, Status & Validation Invariants (SLICE AAB-002.1)
+
+1. **Internal Provenance (`dnk-internal`) Protocol**:
+   - If an AAB describes proprietary, internal DNK OS logic:
+     - `source.repository_id`: `"dnk-internal"`
+     - `source.repository_url`: `null`
+     - `source.commit_sha`: `null`
+     - `source.assimilation_track`: `"internal"`
+     - `source.license_spdx`: `"DNK-INTERNAL"`
+     - `compatibility.license_status`: `"internal"`
+2. **External SOTA Provenance Protocol**:
+   - Must specify exact GitHub slug in `repository_id` and full URL in `repository_url`.
+   - Must specify SPDX license or `"UNKNOWN"`.
+   - **External Unknown License Gate**: An external AAB with `license_spdx: "UNKNOWN"` CANNOT have `status: implemented`.
+   - **Clean-Room License Invariant**: Clean-room derived patterns must declare `license_status: "clean_room_required"`.
+3. **Implemented Status Evidence Gate**:
+   - Status `implemented` is strictly forbidden unless:
+     - `evidence.linked_evidence` has at least one valid, non-empty relative code or audit path.
+     - For internal blocks, `source.source_path` or `evidence.linked_evidence` points to actual DNK OS implementation/audit artifacts.
+4. **Hypothesis Status Rule**:
+   - Blocks with `validation: "hypothesis"` MUST NOT have status `approved` or `implemented`. They must remain `candidate` until empirically proven.
+5. **Relative Path Enforcement**:
+   - `source_path`, `linked_note`, and `linked_evidence` MUST be repo-relative paths (e.g. `docs/notes/...`). Absolute paths (`/Users/`, `/home/`) are strictly rejected.
+6. **⚠️ Absolute Path Test Fixture Pitfall (CI / verify_all.sh)**:
+   - When writing unit tests to verify that absolute paths are rejected, **NEVER use `/Users/...` as a test string** (e.g. `bad_path = "/Users/test/note.md"`).
+   - The master preflight gate `scripts/verify_all.sh` greps across the repository for literal `/Users/` substrings and will fail CI if any file contains them.
+   - **Correct Pattern**: Use `/var/data/...`, `/tmp/...`, or dynamic string construction in test fixtures.
+7. **Canonical Memory Block Type**:
+   - Patterns managing knowledge distillation, anomaly remediation, or error memories use `type: "memory"`, which is supported in both Pydantic `BlockType.MEMORY` and Draft-07 JSON Schema.
+
+---
+
+## 5. Curated Pilot Blocks Normalized Registry
+
+| Block ID | Type | Domain | Repository ID | URL | License Status | Status | Source Link |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| `AAB-GATE-001` | `gate` | `security` | `AgriciDaniel/agentic-habits` | GitHub URL | `permissive` | `evaluated` | `Note 012 Agentic Habits` |
+| `AAB-WORKFLOW-001` | `workflow` | `catalog` | `dnk-internal` | *null* | `internal` | `implemented` | `Note 056 Two-Track Assimilation` |
+| `AAB-RUNTIME-001` | `runtime` | `swarm` | `dnk-internal` | *null* | `internal` | `implemented` | `Note 062 Task Forest Swarm` |
+| `AAB-MEMORY-001` | `memory` | `memory` | `dnk-internal` | *null* | `internal` | `implemented` | `Note 048 Closed-Loop Self-Healing` |
+| `AAB-CANVAS-001` | `canvas_node` | `canvas` | `dnk-internal` | *null* | `internal` | `implemented` | `Note 048 Reactive Observer HUD` |
+
+---
+
+## 6. CLI Utility Commands (`scripts/system/aab_registry.py`)
+
+AAB blocks are queried and verified using the standalone CLI:
+
+```bash
+# 1. Validate all blocks in docs/tech/sota_assimilation/blocks/ against schema
+python scripts/system/aab_registry.py validate
+
+# 2. List blocks with optional filters (text or JSON)
+python scripts/system/aab_registry.py list --domain media --type pattern
+python scripts/system/aab_registry.py list --json
+
+# 3. Search blocks by query across title, summary, and domain
+python scripts/system/aab_registry.py search --query "avatar"
+python scripts/system/aab_registry.py search --query "gate" --domain taskdna
+
+# 4. Find composition candidates for a set of selected blocks
+python scripts/system/aab_registry.py compose AAB-EXAMPLE-001
+```
+
+---
+
+## 7. TaskDNA Proposal Bridge & Eligibility Gates (SLICE AAB-003)
+
+### Architectural Problem & Solution
+Directly converting raw AAB blocks into executable tasks risks executing premature hypotheses, unlicensed code, or conflicting components.
+The **TaskDNA Proposal Bridge** (`core/aab/taskdna_bridge.py`) implements a strictly controlled, read-only translation step:
+```text
+Selected AAB blocks
+→ Eligibility & Compatibility Check
+→ Deterministic TaskDNA Proposal Draft (.yaml)
+→ Human Review / Approval in Git
+→ (Only then) Real Task Execution
+```
+
+### Safety Invariants
+1. **Zero Runtime Mutation**: The bridge NEVER creates real TaskForest/TaskDNA runtime tasks, never spawns agents, never calls tools, and never alters `catalog.db` or source AAB blocks.
+2. **Drafts Only**: Generated proposals in `docs/tech/taskdna_proposals/` strictly have `status: draft`.
+3. **Strict Eligibility Gate**:
+   - `status`: MUST be `approved` or `implemented`. Blocks with `candidate` or `evaluated` are rejected (e.g. `AAB-GATE-001`).
+   - `validation`: MUST be `tested` or `proven`. Blocks with `hypothesis` are rejected.
+   - `license_status`: MUST NOT be `unknown`.
+   - `conflicts_with`: Mutually exclusive blocks within selection are rejected.
+   - External blocks: MUST specify non-empty `repository_url`, `commit_sha` (min 7 hex chars), and known SPDX license.
+   - `implemented` status: MUST include non-empty `evidence.linked_evidence` or valid source code path.
+4. **Cross-Domain Execution Mode Recommendation**:
+   - If selected blocks share the same `target_domain`, mode defaults to `SOLO` (or single-worker).
+   - If selected blocks cross domains (e.g. `catalog` + `swarm`), mode automatically promotes to `SWARM_SEQUENTIAL`.
+
+### CLI Usage (`scripts/system/aab_to_taskdna.py`)
+```bash
+# 1. Validate block selection eligibility
+python scripts/system/aab_to_taskdna.py validate AAB-WORKFLOW-001 AAB-RUNTIME-001
+# Returns exit 0 if valid; exit 1 with detailed rejection reasons if invalid (e.g. AAB-GATE-001)
+
+# 2. Propose a new TaskDNA draft from eligible AAB blocks
+python scripts/system/aab_to_taskdna.py propose \
+  AAB-WORKFLOW-001 AAB-RUNTIME-001 \
+  --title "Research-to-TaskDNA assimilation workflow" \
+  --domain catalog \
+  --interface assimilation_task_proposal
+
+# 3. List existing proposal drafts in docs/tech/taskdna_proposals/
+python scripts/system/aab_to_taskdna.py list
+python scripts/system/aab_to_taskdna.py list --json
+```
+
+---
+
+## 8. Manual Proposal Review & Approval Policy (SLICE AAB-004)
+
+### Architectural Problem & Human-in-the-Loop Governance
+Automating the conversion of AAB blocks into TaskDNA proposals creates drafts, but unattended autonomous execution poses serious operational risks (runaway subagents, architectural drift, unvetted mutations).
+The **Manual Proposal Review & Approval Policy** (`docs/specs/DNK_TASKDNA_PROPOSAL_REVIEW_POLICY_v1.0.md`) formalizes a strict, non-bypassable human gate before any draft can progress toward execution planning.
+
+### Canonical Governance Invariants
+1. **Source Immutability**:
+   - Proposal files in `docs/tech/taskdna_proposals/*.yaml` are strictly **immutable**.
+   - Their internal status remains `status: draft`.
+   - Reviews are persisted strictly as separate YAML files in:
+     `docs/tech/taskdna_proposals/reviews/<proposal_id>/REVIEW-<timestamp>-<slug>.yaml`
+   - Active state is calculated deterministically from the chronological history of valid review records.
+2. **Status Lifecycle**:
+   - `draft` → `reviewed` → `approved` | `rejected`
+   - `reviewed`: Neutral technical inspection. Explicitly **does not** authorize execution.
+   - `approved`: Authorizes downstream execution planning.
+   - `rejected`: Archives the proposal with explicit rationale.
+3. **Exclusive Approval Authority**:
+   - Decision `approved` is **STRICTLY FORBIDDEN** unless `reviewer: "maksym"`.
+   - Any other reviewer attempting to approve fails closed (`ValueError: Approval decision requires reviewer to be 'maksym'`).
+4. **Mandatory Rationale**:
+   - Both `approved` and `rejected` decisions require non-empty `rationale`.
+5. **Zero Execution Task Invariant**:
+   - The review and approval engine (`core/aab/proposal_review.py`) and CLI (`scripts/system/review_taskdna_proposal.py`) NEVER create execution tasks, never spawn agents, never mutate TaskForest/TaskDNA runtime, and never touch `catalog.db`.
+   - CLI output explicitly certifies: `"No TaskDNA execution task was created"`.
+6. **Pydantic v2 & JSON Schema Serialization Pitfall**:
+   - When dumping Pydantic v2 models that contain enums or `datetime` fields to YAML or passing to `jsonschema.validate`, standard `.model_dump()` preserves native Python datetime objects, causing schema validator regex failures on ISO-8601 `date-time`.
+   - **Mandatory Pattern**: Always call `.model_dump(mode="json")` before serializing to YAML or validating against Draft-07 schemas.
+
+### Review CLI Usage (`scripts/system/review_taskdna_proposal.py`)
+```bash
+# 1. Inspect proposal state, immutable source status, and chronological review trail
+python scripts/system/review_taskdna_proposal.py show <proposal-id>
+python scripts/system/review_taskdna_proposal.py show <proposal-id> --json
+
+# 2. Add technical review (decision: reviewed; does not authorize execution)
+python scripts/system/review_taskdna_proposal.py review <proposal-id> \
+  --rationale "Technical inspection completed; dependencies verified"
+
+# 3. Approve proposal (exclusive to reviewer maksym)
+python scripts/system/review_taskdna_proposal.py approve <proposal-id> \
+  --reviewer maksym \
+  --rationale "Approved for controlled execution adapter slice" \
+  --condition "No runtime mutation in first phase"
+
+# 4. Reject proposal
+python scripts/system/review_taskdna_proposal.py reject <proposal-id> \
+  --reviewer maksym \
+  --rationale "Rejected due to overlap with existing orchestrator slice"
+```
+
+---
+
+## 9. Approved Proposal → Execution Task Contract Adapter (SLICE AAB-005)
+
+### Architectural Problem & Bridge to Execution
+A human-approved proposal (`decision: approved` by `maksym`) must not be handed directly to autonomous agents as an unconstrained prompt. Without strict encapsulation, agents may hallucinate allowed file paths, bypass safety boundaries, or execute unauthorized side-effects.
+The **Execution Task Adapter** (`core/aab/execution_task_adapter.py`) creates an immutable, standardized **DNK Execution Task Contract** (`docs/tech/execution_tasks/<TASK-ID>.yaml`) validating against `docs/schemas/dnk_execution_task.schema.yaml` (`dnk-execution-task/v0.1`).
+
+### Invariants & Zero-Execution Rule
+1. **This is NOT Task Execution**: Creating a contract converts the task to `status: ready_for_manual_dispatch`. No agents, swarm workers, MCP servers, subagents, or tools are invoked.
+2. **Deterministic Preconditions (7 Non-Bypassable Gates)**:
+   - **Gate 1 (Proposal Exists)**: Source file exists in `docs/tech/taskdna_proposals/` and validates against `dnk-taskdna-proposal/v0.1`.
+   - **Gate 2 (Status Draft)**: `proposal.status == "draft"`.
+   - **Gate 3 (Review Exists)**: At least one valid review exists in `reviews/<proposal_id>/`.
+   - **Gate 4 (Maksym Approval)**: Latest chronological review has `decision: approved`, `reviewer: "maksym"`, and non-empty `rationale`.
+   - **Gate 5 (SHA-256 Hash Match)**: Raw SHA-256 of the proposal file matches `proposal_sha256` recorded in the approval review. Any post-approval edits fail closed.
+   - **Gate 6 (AAB Eligibility)**: All referenced AAB blocks have `status in [approved, implemented]`, `validation in [tested, proven]`, and `license_status != unknown`.
+   - **Gate 7 (Transfer of Requirements)**: Capabilities, constraints, conditions, and risks are transferred intact.
+3. **Conservative Scope Defaults**:
+   - `allowed_paths`: Strictly `[]` unless explicitly provided in the proposal. Never hallucinate paths!
+   - `forbidden_paths`: Mandatory default deny list:
+     - `".env"`, `".env.*"`, `"data/"`, `"deployments/**/secrets*"`, `"data/repo_catalog/catalog.db"`
+   - `allowed_actions`: `["Read-only analysis only until scope is manually refined"]`
+   - `prohibited_actions`: `["No automatic execution", "No tool calls before manual dispatch", "No external service calls before manual dispatch"]`
+4. **Idempotency & Overwrite Guard**:
+   - Re-running creation fails closed with `ExecutionTaskExistsError` (exit code 1) unless `--force` is explicitly passed.
+
+### Adapter CLI Usage (`scripts/system/proposal_to_execution_task.py`)
+```bash
+# 1. Validate proposal eligibility against all 7 preconditions
+python scripts/system/proposal_to_execution_task.py validate <proposal-id>
+
+# 2. Create the immutable execution task contract
+python scripts/system/proposal_to_execution_task.py create <proposal-id>
+# To overwrite an existing contract if needed:
+python scripts/system/proposal_to_execution_task.py create <proposal-id> --force
+
+# 3. List generated execution task contracts
+python scripts/system/proposal_to_execution_task.py list
+python scripts/system/proposal_to_execution_task.py list --json
+```

@@ -1,0 +1,78 @@
+---
+title: "Ods Homelab Ai Server And Hermes Switchboard Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/ods_homelab_ai_server_and_hermes_switchboard_patterns.md"
+> purpose: "Document: Ods Homelab Ai Server And Hermes Switchboard Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# ODS Homelab AI Server, Hermes Switchboard & APE Policy Engine Patterns
+
+<!-- --- DNK-MRH-HEADER ---
+mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/ods_homelab_ai_server_and_hermes_switchboard_patterns.md"
+purpose: "SOTA reference for Osmantic/ODS: Hermes Agent WebSocket connection pooling, Model Switchboard routing, and APE Policy Engine"
+canonical_source: true
+alters_files: []
+triggers_tasks: []
+status: "Active"
+version: "1.0.0"
+updated_at: "2026-09-15"
+author: "Gerych Prime"
+--- END DNK-MRH-HEADER -->
+
+## 1. Overview & Provenance
+- **Source**: `Osmantic/ODS` (Osmantic Deployment System)
+- **Stars / License**: ⭐ 6,525+ | `Apache-2.0` (Track 1: Direct Template Assimilation)
+- **Core Stack**: Python, Docker Compose overlays, LiteLLM, llama.cpp, Hermes Agent, FastAPI.
+- **Role in DNK OS**: ODS serves as the reference architecture for the *Metal/Host AI Deployment & Hardware Substrate*, while DNK OS operates as the *Autonomous Multi-Agent Cognitive OS*.
+
+---
+
+## 2. Key Assimilated Architectural Patterns
+
+### Pattern 1: Model Switchboard (`ods/current` Virtual Model Alias)
+- **Problem**: Changing backend LLMs (local llama.cpp vs. cloud Vertex/OpenAI) often breaks client connections or requires restarts.
+- **ODS Solution**: All consumers (Hermes, WebUI, OpenCode, APIs) send requests to a single virtual model name: `ods/current`.
+- **Mechanism**:
+  ```text
+  Agent / Client -> LiteLLM (:4000) -> ODS model-router (:8081) -> model-state.json -> Active Backend
+  ```
+- **Benefits**: Zero-downtime transactional model swaps (`POST /api/models/swap`) without dropping agent WebSockets or mutating downstream client configurations.
+
+### Pattern 2: Hermes Agent WebSocket Pooling & KV-Cache Warming (`hermes_bridge.py`)
+- **Problem**: Opening a fresh WebSocket connection for each agent prompt causes local inference backends (llama.cpp) to re-evaluate the full 16k-token agent system prompt, incurring a 30–60s prefill penalty per message.
+- **ODS Solution**:
+  1. **Session-Key Connection Pool**: `HermesConnectionPool` holds persistent WebSockets keyed by user session with idle expiry (`_IDLE_EXPIRY_SECONDS = 300`).
+  2. **Event Scope Preservation**: Both `session.create` and `prompt.submit` must execute on the exact same WebSocket, as Hermes scopes streaming events to the session-owning connection.
+  3. **Result**: KV-cache stays warm in VRAM across turns; follow-up turns achieve 0-prefill latency.
+
+### Pattern 3: APE (Agent Policy Engine) — Circuit Breakers & Approval Tokens
+- **Mechanism**: Intercepts agent capabilities (`ExecuteCommand`, `WriteFile`, `NetworkFetch`, `SpawnAgent`).
+- **Policy Dimensions**:
+  - **Hard Deny**: Regex patterns for destructive commands (`rm -rf`, piped curl-to-bash, raw disk devices).
+  - **Sliding-Window Quotas**: Granular rate-limiting per 5m / 1h / 1d.
+  - **Approval Tokens**: Risky actions yield a pending status + approval token. The agent waits until human-in-the-loop POSTs `/approve` with the token.
+  - **Circuit Breaker**: When denied action ratio exceeds a threshold, the policy engine auto-trips to read-only/deny-all and persists across container restarts.
+
+### Pattern 4: Hardware-Adaptive Layered Compose
+- Dynamic overlay selection based on host GPU inspection (`tier-map` + `gpu-database.json`):
+  - **Apple Silicon**: Metal-accelerated host `llama-server` bridged to Docker via `host.docker.internal:8080`.
+  - **AMD ROCm / APU Strix Halo**: Lemonade container integration with NPU/iGPU offloading.
+  - **NVIDIA CUDA**: Multi-GPU tensor parallelism and vLLM acceleration.
+- Informs DNK OS's `scripts/export_standalone_app.py` for turnkey client deployments.

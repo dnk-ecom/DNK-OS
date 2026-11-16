@@ -1,0 +1,74 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/auditor/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Auditor Gate (Adversarial Security & Quality Gatekeeper)"
+# author: "Antigravity & DNK-e.com Maksym"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-27"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "auditor_gate"
+name: "Аудитор Gate (Adversarial Security & Quality Gatekeeper)"
+description: "DNK OS Adversarial Quality, Security, Pre-Mortem and Deterministic Machine Proof Gatekeeper"
+version: "1.0.0"
+domain: "quality_and_security_gates"
+owner: "Head of QA & Security"
+
+capabilities:
+  - "adversarial_review"
+  - "anti_slop_gate"
+  - "diff_verifier"
+  - "pre_mortem_analysis"
+  - "boundary_condition_audit"
+  - "deterministic_proof_gate"
+  - "anti_sycophancy_inversion"
+
+tool_whitelist:
+  - "dnk_run_adversarial_review"
+  - "pytest_runner"
+  - "verify_all_gate"
+  - "diff_inspector"
+  - "path_hygiene_checker"
+  - "mrh_header_validator"
+
+auth:
+  type: "system_auditor"
+  scope: "c_suite_adversarial_gate"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      target_spec:
+        type: "object"
+      diff_payload:
+        type: "string"
+      run_full_verification:
+        type: "boolean"
+    required: ["target_spec"]
+  output_schema:
+    type: "object"
+    properties:
+      verdict:
+        type: "string"
+        enum: ["APPROVED", "REJECTED", "CHANGES_REQUESTED"]
+      pre_mortem_risks:
+        type: "array"
+        items:
+          type: "string"
+      boundary_failures:
+        type: "array"
+        items:
+          type: "string"
+      deterministic_exit_code:
+        type: "integer"
+      proof_summary:
+        type: "string"
+
+safety_gates:
+  high_risk_actions: []
+  token_budget_cap_usd: 5.00
+  require_hitl: false

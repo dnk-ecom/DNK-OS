@@ -1,0 +1,98 @@
+---
+title: "Open Code Review Deterministic Hybrid And Relocation Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/open_code_review_deterministic_hybrid_and_relocation_patterns.md"
+> purpose: "Document: Open Code Review Deterministic Hybrid And Relocation Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/open_code_review_deterministic_hybrid_and_relocation_patterns.md"
+# purpose: "Assimilated SOTA patterns from alibaba/open-code-review: Deterministic Engineering x Agent Hybrid, Smart Bundling, and Line Relocation."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.1.0"
+# updated_at: "2026-09-10"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# Open Code Review (Alibaba) Assimilation Patterns: Deterministic Hybrid & Comment Relocation
+
+## 1. Upstream Metadata & Provenance
+- **Repository**: `alibaba/open-code-review` (GitHub)
+- **License**: Apache-2.0 (Track 1 Direct Assimilation)
+- **Scale**: ⭐ 22,000+ stars, 2,800+ forks
+- **Core Architecture**: Go CLI + AST scanners + LLM Agent API (`internal/scan`, `internal/diff`, `internal/rules`)
+
+## 2. The Deterministic Engineering × Agent Hybrid Philosophy
+Pure LLM reviewers suffer from three systemic flaws on production PRs:
+1. **Incomplete Coverage**: For PRs with 20+ files, prompt-only reviewers silently ignore files beyond token context limits.
+2. **Position Drift**: LLMs miscalculate line indices across multiple patch hunks by 2-10 lines.
+3. **High False-Positive Noise**: Subjective style comments degrade developer trust.
+
+**Alibaba Solution**:
+100% deterministic code performs all discovery, language classification, ruleset retrieval, batch bundling, and coordinate calibration. The LLM agent is treated strictly as an isolated, narrow semantic evaluator for single batches.
+
+## 3. Core Architectural Mechanisms
+
+### A. Smart File Bundling & Divide-and-Conquer (`internal/scan/batch.go`)
+- Groups changed files by directory / language domain (e.g. backend vs frontend vs config).
+- Dispatches each bundle to an isolated LLM sub-agent invocation (`dnk_swarm_parallel`).
+- Aggregates findings deterministically into a single structured report.
+
+### B. Curated Domain-Specific Review Rules & Dynamic Sniffing (`core/orchestrator/code_review_rules.py`)
+Rules are injected based on file extensions without prompt bloat:
+- **Python**: Default mutable arguments (`def f(x=[])`), loop variable capture in closures, exception swallowing, unclosed files, shell injection in subprocess.
+- **TypeScript / React**: Missing hook deps, dangerous innerHTML, direct React state mutation, unhandled promises, uncleaned listeners.
+- **CI / GitHub Actions**: Unpinned action tags, script injection via `${{ github.event.* }}`, secret leaks in logs.
+- **Go / Docker**: Goroutine leaks, unhandled errors, Docker containers running as root.
+- **Invariance Rule (Precision over Recall)**:
+  > *"Favor precision over recall: only raise an issue when you are confident it is a real defect, and stay silent when the surrounding context is unclear — a false alarm costs more reviewer trust than a missed minor issue. Treat security and correctness findings as blocking, and style or idiom suggestions as non-blocking."*
+
+### C. Comment Relocation Algorithm (`core/orchestrator/git_diff_engine.py`)
+Prevents line drift between LLM suggestions and git hunks:
+1. The LLM returns `suggested_line` and `existing_code` snippet.
+2. Exact window search: checks `[suggested_line - tolerance, suggested_line + tolerance]`.
+3. Global nearest search: checks whole file to recover from massive shifts (>100 lines) due to earlier inserts/deletes.
+4. Fuzzy fallback: Levenshtein distance fallback for minor whitespace/token edits.
+5. Verification Gate: if `existing_code` cannot be verified in the target file, comment is flagged `matched=False` to prevent phantom comments.
+
+### D. Autonomous OCR Delegation Engine (`core/orchestrator/ocr_delegation.py`)
+- **Packet Preparation**: `OCRDelegationEngine.prepare_packet(raw_diff, commit_hash)` deterministically parses unified diffs, extracts target files, sniffs matched language rules, and packages diff hunks with JSON schemas for worker execution.
+- **Worker Swarm Integration**: Integrated into `GerychSwarmCoordinator` (`core/orchestrator/swarm_coordinator.py`) under action `ocr_delegation` dispatched to `gerych_auditor`.
+- **Finding Ingestion & Gate Verdict**: `OCRDelegationEngine.ingest_findings(packet, raw_findings, file_contents)` runs line relocation calibration, deduplication through `AuditStateMachine`, and returns a pass/fail gate verdict.
+
+## 4. Key Production Pitfalls & Implementation Lessons
+1. **[WINDOW_CLAMPING_TRAP]**:
+   When searching in a local tolerance window around `suggested_line`, DO NOT clamp `s_idx = min(total_lines - 1, suggested_line - 1)`. Clamping forces the window search to evaluate the tail of the file when `suggested_line > total_lines`, producing false-positive "exact_window" matches on trailing code rather than detecting global drift. Only search the local window if `window_start < total_lines and window_end > 0 and window_start < window_end`.
+2. **[LOCAL_OFFSET_LINE_INDEXING]**:
+   When enumerating matching slice offsets `for offset, line in enumerate(window_lines):`, the 1-indexed target line is `window_start + offset + 1`, NOT `s_idx + offset`.
+3. **[BLOCKING_GATE_ENFORCEMENT]**:
+   In `core/orchestrator/audit_state_machine.py`, `FindingSeverity.is_blocking_severity` partitions findings into:
+   - Blocking (`CRITICAL`, `BLOCKER`): fails CI/CD gate immediately (`is_gate_passed(strict=True) == False`).
+   - Non-blocking (`MEDIUM`, `LOW`, `NITPICK`): warnings and suggestions delivered asynchronously without stalling merges.
+4. **[BARE_DIFF_FALLBACK_PITFALL]**:
+   Unified diff parsers relying strictly on `^diff --git a/` silently fail (returning empty file sets) when fed bare diffs (e.g. from editor buffers, unstaged memory, or LLMs) that start directly with `--- a/` and `+++ b/`. `OCRDelegationEngine.prepare_packet` incorporates a resilient fallback scanning `+++ b/<path>` to ensure file discovery and rule matching never drop to 0.
+5. **[DIFF_PARSER_SIGNATURE_CONTRACT]**:
+   `parse_unified_diff(raw_diff)` accepts exactly one argument (`raw_diff: str`). Do not pass `file_name` as a secondary argument, as `parse_unified_diff` handles multi-file unified streams natively in a single pass.
+
+## 5. Verification
+- 100% Green test suite: `tests/core/test_open_code_review_assimilation.py` and `tests/core/test_pr_agent_assimilation.py`.

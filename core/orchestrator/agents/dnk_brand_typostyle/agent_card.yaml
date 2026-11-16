@@ -1,0 +1,84 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/dnk_brand_typostyle/agent_card.yaml"
+# purpose: "A2A Agent Card specification for dnk_brand_typostyle (Brand Identity, Design Tokens & Typography Architect)"
+# author: "DNK-e.com Maksym"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-17"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "dnk_brand_typostyle"
+name: "dnk_brand_typostyle (Brand Token & Typography Architect)"
+description: "DNK OS LEGO specialist for W3C DTCG design tokens, Google DESIGN.md synthesis, WCAG 2.2 perceptual contrast linting, 60-30-10 CRO color systems, and modular typography scales"
+version: "1.0.0"
+domain: "design_systems"
+owner: "Head of Brand & Commerce UX"
+
+capabilities:
+  - "dtcg_design_token_synthesis"
+  - "google_design_md_authoring"
+  - "wcag22_contrast_verification"
+  - "modular_typography_scale_engineering"
+  - "cro_60_30_10_color_allocation"
+  - "tailwind_v4_shopify_css_export"
+
+auth:
+  type: "system_worker"
+  scope: "workspace"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      task_id:
+        type: "string"
+        description: "Canonical DNK task identifier"
+      brand_brief:
+        type: "object"
+        properties:
+          brand_name: {"type": "string"}
+          archetype:
+            type: "string"
+            enum: ["ecommerce_conversion", "saas_precision", "minimalist_editorial", "luxury_craft"]
+          primary_accent_hex: {"type": "string"}
+          surface_mode:
+            type: "string"
+            enum: ["light", "dark", "adaptive"]
+          scale_ratio:
+            type: "number"
+            enum: [1.2, 1.25]
+        required: ["brand_name", "archetype"]
+      spec_path:
+        type: "string"
+        description: "Relative path to input or target YAML/JSON token specification"
+    required: ["brand_brief"]
+  output_schema:
+    type: "object"
+    properties:
+      status:
+        type: "string"
+        enum: ["PASS", "FAIL"]
+      dtcg_tokens_path:
+        type: "string"
+      exported_css_path:
+        type: "string"
+      typography_scale:
+        type: "object"
+      contrast_report:
+        type: "object"
+        properties:
+          all_passed: {"type": "boolean"}
+          min_text_ratio: {"type": "number"}
+          min_ui_ratio: {"type": "number"}
+          pairs_checked: {"type": "integer"}
+      summary:
+        type: "string"
+    required: ["status", "contrast_report", "summary"]
+
+safety_gates:
+  high_risk_actions: ["live_storefront_css_override"]
+  token_budget_cap_usd: 3.00
+  require_hitl: false

@@ -1,0 +1,551 @@
+model:
+  default: gemini-4-argon
+  provider: vertex
+  reasoning_effort: medium
+providers:
+  gemini:
+    base_url: ${VERTEX_BASE_URL}
+    key_env: VERTEX_API_KEY
+  nvidia:
+    base_url: https://integrate.api.nvidia.com/v1
+    key_env: NVIDIA_API_KEY
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    key_env: OPENROUTER_API_KEY
+fallback_providers:
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 2097152
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 2097152
+  - model: meta/llama-3.2-11b-vision-instruct
+    provider: nvidia
+    context_length: 128000
+  - model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning
+    provider: nvidia
+    context_length: 128000
+  - model: openrouter/auto
+    provider: openrouter
+    context_length: 128000
+platform_toolsets:
+  cli:
+    - terminal
+    - file
+    - web
+    - skills
+    - dnk_swarm
+    - delegation
+toolsets:
+  - terminal
+  - file
+  - web
+  - skills
+  - dnk_swarm
+  - delegation
+agent:
+  service_tier: ''
+  tool_use_enforcement: auto
+  coding_context: focus
+  gateway_timeout_warning: 900
+  clarify_timeout: 600
+  gateway_notify_interval: 180
+  gateway_auto_continue_freshness: 3600
+  image_input_mode: auto
+  disabled_toolsets:
+    - computer_use
+    - session_search
+    - clarify
+    - desktop_ui
+    - tts
+    - browser
+    - homeassistant
+    - spotify
+    - kanban
+    - discord
+    - discord_admin
+    - yuanbao
+    - feishu_doc
+    - feishu_drive
+    - cronjob
+    - image_gen
+    - video_gen
+    - todo
+    - x_search
+    - xai_video
+  reasoning_overrides:
+    gemini-4-argon: medium
+    gemini-3.8-flash: medium
+    gemini-3.8-flash: medium
+    gemini-3.8-flash: medium
+    gemini-3.8-flash: low
+terminal:
+  backend: local
+  modal_mode: auto
+  cwd: .
+  timeout: 300
+  env_passthrough:
+    - NVIDIA_API_KEY
+    - GH_TOKEN
+    - GITHUB_TOKEN
+    - PYTHONPATH
+    - VERTEX_API_KEY
+  shell_init_files: []
+  auto_source_bashrc: true
+  docker_forward_env: []
+  container_cpu: 1
+  container_memory: 5120
+  container_disk: 51200
+  container_persistent: true
+  docker_volumes: []
+  docker_mount_cwd_to_workspace: false
+  docker_extra_args: []
+  docker_run_as_host_user: false
+  persistent_shell: true
+web:
+  backend: ''
+  search_backend: ''
+  extract_backend: ''
+browser:
+  inactivity_timeout: 120
+  command_timeout: 30
+  record_sessions: false
+  allow_private_urls: false
+  engine: auto
+  auto_local_for_private_urls: true
+  cdp_url: ''
+  dialog_policy: must_respond
+  dialog_timeout_s: 300
+  camofox:
+    managed_persistence: false
+    user_id: ''
+    session_key: ''
+    adopt_existing_tab: false
+checkpoints:
+  enabled: true
+  max_snapshots: 20
+  max_total_size_mb: 500
+  max_file_size_mb: 10
+  auto_prune: true
+  retention_days: 7
+  min_interval_hours: 0
+  delete_orphans: true
+file_read_max_chars: 40000
+tool_output:
+  max_bytes: 15000
+  max_lines: 300
+  max_line_length: 1000
+tool_loop_guardrails:
+  warnings_enabled: true
+  hard_stop_enabled: false
+  warn_after:
+    exact_failure: 2
+    same_tool_failure: 3
+    idempotent_no_progress: 2
+  hard_stop_after:
+    exact_failure: 5
+    same_tool_failure: 8
+    idempotent_no_progress: 5
+compression:
+  enabled: true
+  threshold: 0.05
+  target_ratio: 0.12
+  protect_last_n: 6
+  hygiene_hard_message_limit: 25
+  protect_first_n: 2
+  in_place: true
+prompt_caching:
+  cache_ttl: 1h
+  enabled: true
+  long_lived_prefix: true
+openrouter:
+  response_cache: true
+  response_cache_ttl: 300
+  min_coding_score: 0.65
+bedrock:
+  region: global
+  discovery:
+    enabled: true
+    provider_filter: []
+    refresh_interval: 3600
+  guardrail:
+    guardrail_identifier: ''
+    guardrail_version: ''
+    stream_processing_mode: async
+    trace: disabled
+auxiliary:
+  vision:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 120
+    download_timeout: 30
+  compression:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 120
+  skills_hub:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 30
+  approval:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 30
+  mcp:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 120
+  title_generation:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 30
+  triage_specifier:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 120
+  curator:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 600
+  web_extract:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 360
+  session_search:
+    api_key: ''
+    base_url: ''
+    extra_body: {}
+    max_concurrency: 3
+    model: gemini-3.8-flash
+    provider: vertex
+    timeout: 30
+display:
+  compact: false
+  personality: ''
+  resume_display: full
+  busy_input_mode: interrupt
+  tui_auto_resume_recent: false
+  bell_on_complete: true
+  show_reasoning: true
+  reasoning_full: true
+  streaming: true
+  timestamps: false
+  final_response_markdown: render
+  persistent_output: true
+  persistent_output_max_lines: 200
+  inline_diffs: true
+  file_mutation_verifier: true
+  show_cost: false
+  skin: dnk-os
+  language: en
+  tui_status_indicator: kaomoji
+  user_message_preview:
+    first_lines: 2
+    last_lines: 2
+  interim_assistant_messages: true
+  tool_progress_command: false
+  tool_preview_length: 0
+  ephemeral_system_ttl: 0
+  runtime_footer:
+    enabled: false
+    fields:
+      - model
+      - context_pct
+      - cwd
+  copy_shortcut: auto
+  tool_progress: all
+  tool_progress_overrides: {}
+dashboard:
+  theme: default
+  show_token_analytics: false
+privacy:
+  redact_pii: false
+tts:
+  provider: edge
+  edge:
+    voice: uk-UA-OstapNeural
+  elevenlabs:
+    voice_id: pNInz6obpgDQGcFmaJgB
+    model_id: eleven_multilingual_v2
+  openai:
+    model: gemini-3.8-flash
+    voice: alloy
+  xai:
+    voice_id: eve
+    language: en
+    sample_rate: 24000
+    bit_rate: 128000
+  mistral:
+    model: gemini-3.8-flash
+    voice_id: c69964a6-ab8b-4f8a-9465-ec0925096ec8
+  neutts:
+    ref_audio: ''
+    ref_text: ''
+    model: gemini-3.8-flash
+    device: cpu
+  piper:
+    voice: en_US-lessac-medium
+stt:
+  enabled: true
+  local:
+    model: gemini-3.8-flash
+    language: ''
+  openai:
+    model: gemini-3.8-flash
+  mistral:
+    model: gemini-3.8-flash
+  provider: local
+voice:
+  record_key: ctrl+b
+  max_recording_seconds: 120
+  auto_tts: true
+  beep_enabled: true
+  silence_threshold: 200
+  silence_duration: 3.0
+human_delay:
+  mode: 'off'
+  min_ms: 800
+  max_ms: 2500
+context:
+  engine: compressor
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  memory_char_limit: 2200
+  user_char_limit: 1375
+  provider: dnk_hub_memory
+delegation:
+  model: gemini-4-argon
+  provider: vertex
+  base_url: ''
+  api_key: ''
+  inherit_mcp_toolsets: true
+  max_iterations: 100
+  child_timeout_seconds: 600
+  reasoning_effort: medium
+  max_concurrent_children: 4
+  max_spawn_depth: 2
+  orchestrator_enabled: true
+  subagent_auto_approve: true
+prefill_messages_file: ''
+goals:
+  max_turns: 20
+skills:
+  external_dirs: []
+  trusted_project_dirs:
+    - .
+  template_vars: true
+  inline_shell: false
+  inline_shell_timeout: 10
+  disabled:
+    - apple
+    - gaming
+    - gifs
+    - smart-home
+    - social-media
+    - yuanbao
+    - hyperframes
+    - hyperframes-animation
+    - hyperframes-cli
+    - hyperframes-core
+    - hyperframes-creative
+    - hyperframes-keyframes
+    - hyperframes-registry
+    - email
+    - note-taking
+    - cooking
+curator:
+  enabled: true
+  interval_hours: 168
+  min_idle_hours: 2
+  stale_after_days: 14
+  archive_after_days: 30
+  backup:
+    enabled: true
+    keep: 5
+timezone: ''
+slack:
+  require_mention: true
+  free_response_channels: ''
+  allowed_channels: ''
+discord:
+  require_mention: true
+  free_response_channels: ''
+  allowed_channels: ''
+  auto_thread: true
+  thread_require_mention: false
+  history_backfill: true
+  history_backfill_limit: 50
+  reactions: true
+  dm_role_auth_guild: ''
+  server_actions: ''
+telegram:
+  reactions: false
+  allowed_chats: ''
+mattermost:
+  require_mention: true
+  free_response_channels: ''
+  allowed_channels: ''
+matrix:
+  require_mention: true
+  free_response_rooms: ''
+  allowed_rooms: ''
+approvals:
+  mode: smart
+  timeout: 300
+  cron_mode: allow
+  mcp_reload_confirm: false
+  destructive_slash_confirm: false
+command_allowlist:
+  - recursive delete
+  - script execution via heredoc
+  - command parser limit or malformed executable payload
+  - git clean with force (deletes untracked files)
+  - docker restart/stop/kill (container lifecycle)
+  - delete in root path
+  - git reset --hard (destroys uncommitted changes)
+  - script execution via -e/-c flag
+  - docker compose restart/stop/kill/down (container lifecycle)
+  - git force push (rewrites remote history)
+  - chmod +x followed by immediate execution
+  - find -exec/-execdir rm
+hooks:
+  - event: pre_tool_call
+    command: python3 scripts/system/hermes_pre_tool_hook.py
+    matcher: .*
+    fail_closed: false
+    timeout: 10
+  - event: post_tool_call
+    command: python3 scripts/system/hermes_post_tool_hook.py
+    matcher: .*
+    fail_closed: false
+    timeout: 10
+hooks_auto_accept: true
+security:
+  allow_private_urls: false
+  redact_secrets: true
+  tirith_enabled: false
+  tirith_path: tirith
+  tirith_timeout: 5
+  tirith_fail_open: true
+  website_blocklist:
+    enabled: false
+    domains: []
+    shared_files: []
+  acked_advisories: []
+  allow_lazy_installs: true
+cron:
+  wrap_response: true
+kanban:
+  dispatch_in_gateway: true
+  dispatch_interval_seconds: 60
+  failure_limit: 2
+code_execution:
+  mode: project
+logging:
+  level: INFO
+  max_size_mb: 5
+  backup_count: 3
+model_catalog:
+  enabled: true
+  url: https://hermes-agent.nousresearch.com/docs/api/model-catalog.json
+  ttl_hours: 24
+network:
+  force_ipv4: false
+sessions:
+  auto_prune: false
+  retention_days: 90
+  vacuum_after_prune: true
+  min_interval_hours: 24
+onboarding:
+  seen:
+    busy_input_prompt: true
+    tool_progress_prompt: true
+updates:
+  pre_update_backup: false
+  backup_keep: 5
+lsp:
+  enabled: true
+  wait_mode: document
+  wait_timeout: 5.0
+  install_strategy: auto
+vertex:
+  project_id: project-17fe1d8a-b1f4-46ac-87e
+  region: ${VERTEX_REGION}
+_config_version: 49
+mcp_servers: {}
+disabled_mcp_servers:
+  context7:
+    command: node
+    args:
+      - ~/.npm/_npx/eea2bd7412d4593b/node_modules/.bin/context7-mcp
+  github:
+    command: node
+    args:
+      - ~/.npm/_npx/3dfbf5a9eea4a1b3/node_modules/.bin/mcp-server-github
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_TOKEN}
+  obsidian:
+    url: http://127.0.0.1:27123/mcp
+    headers:
+      Authorization: Bearer ${OBSI...KEY}
+    enabled: true
+  orbit:
+    url: https://mcp.orbitagents.xyz/api/public/mcp/b013fee7-371e-41a1-9827-aae2d5bd7196
+  notion:
+    command: node
+    args:
+      - ~/.npm/_npx/2e5266eea15d0ccd/node_modules/.bin/notion-mcp-server
+    env:
+      NOTION_TOKEN: «redacted:ntn_…»
+  postgresql:
+    command: node
+    args:
+      - ~/.npm/_npx/cd1ce99963b5e8b1/node_modules/.bin/mcp-server-postgres
+      - postgresql://dnk:dnk_password@localhost:5432/dnk_os
+    command: npx
+  open-design:
+    command: /Applications/Open Design.app/Contents/Frameworks/Open Design Helper.app/Contents/MacOS/Open Design Helper
+    args:
+      - /Applications/Open Design.app/Contents/Resources/app/prebundled/daemon/daemon-cli.mjs
+      - mcp
+    env:
+      OD_DATA_DIR: ~/Library/Application Support/Open Design/namespaces/release-stable/data
+      OD_SIDECAR_IPC_PATH: /tmp/open-design/ipc/release-stable/daemon.sock
+      OD_MCP_BOOTSTRAP_COMMAND: /usr/bin/open
+      OD_MCP_BOOTSTRAP_ARGS: -g -j '/Applications/Open Design.app' --args --headless
+      ELECTRON_RUN_AS_NODE: '1'
+session_reset:
+  at_hour: 4
+  idle_minutes: 1440
+  mode: both

@@ -387,7 +387,15 @@ print(json.dumps({'mode': res.mode, 'score': res.complexity_score, 'rationale': 
             if [ -n "$HERMES_INFERENCE_MODEL" ]; then
                 PROVIDER_EXTRA_FLAGS+=(--model "$HERMES_INFERENCE_MODEL")
             fi
-            uv run --project "$HUB_ROOT/core/hermes_agent" python3 "$HUB_ROOT/core/hermes_agent/hermes" -z "$PROMPT_CONTENT" "${PROVIDER_EXTRA_FLAGS[@]}"
+            HERMES_EXEC="${DNK_GERYCH_EXEC:-$HOME/Kuzmenko/MY_LIFE_WORK/Gerych-Agent/hermes}"
+            HERMES_PYTHON="${DNK_GERYCH_PYTHON:-$HOME/.dnk_runtime/venvs/hermes-agent/bin/python}"
+            if [ ! -x "$HERMES_PYTHON" ]; then
+                HERMES_PYTHON="$HOME/Kuzmenko/MY_LIFE_WORK/Gerych-Agent/.venv/bin/python"
+            fi
+            if [ ! -x "$HERMES_PYTHON" ]; then
+                HERMES_PYTHON="python3"
+            fi
+            "$HERMES_PYTHON" "$HERMES_EXEC" -z "$PROMPT_CONTENT" "${PROVIDER_EXTRA_FLAGS[@]}"
             EXIT_CODE=$?
             exit $EXIT_CODE
         fi
@@ -416,7 +424,16 @@ if [ $HAS_PROVIDER -eq 0 ] && [ -n "$HERMES_PROVIDER" ]; then
     fi
 fi
 
-uv run --project "$HUB_ROOT/core/hermes_agent" python3 "$HUB_ROOT/core/hermes_agent/hermes" "$@" "${EXTRA_PROVIDER_ARGS[@]}"
+HERMES_EXEC="${DNK_GERYCH_EXEC:-$HOME/Kuzmenko/MY_LIFE_WORK/Gerych-Agent/hermes}"
+HERMES_PYTHON="${DNK_GERYCH_PYTHON:-$HOME/.dnk_runtime/venvs/hermes-agent/bin/python}"
+if [ ! -x "$HERMES_PYTHON" ]; then
+    HERMES_PYTHON="$HOME/Kuzmenko/MY_LIFE_WORK/Gerych-Agent/.venv/bin/python"
+fi
+if [ ! -x "$HERMES_PYTHON" ]; then
+    HERMES_PYTHON="python3"
+fi
+
+"$HERMES_PYTHON" "$HERMES_EXEC" "${EXTRA_PROVIDER_ARGS[@]}" "$@"
 EXIT_CODE=$?
 exit $EXIT_CODE
 

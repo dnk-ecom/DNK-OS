@@ -1,0 +1,57 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/codebase_knowledge_graph_vs_security_audit_patterns.md"
+# purpose: "Architectural distinction and triage protocols between Codebase Knowledge Graph/Comprehension engines and Security/Quality Audit tools."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-19"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# Codebase Knowledge Graph vs. Security & Quality Audit Patterns
+
+When users or agents evaluate external open-source repositories (such as `Egonex-AI/Understand-Anything`) to determine whether they can perform an "audit" on large monorepos (e.g., `DNK_HUB`), agents must strictly distinguish between **Codebase Comprehension & Topology Mapping** and **Security, Quality & Invariant Auditing**.
+
+---
+
+## 1. Core Paradigm Distinction
+
+| Dimension | Knowledge Graph / Comprehension Engine (e.g. Understand-Anything) | Security, Quality & Compliance Audit (e.g. verify_all.sh, Adversarial Review) |
+|---|---|---|
+| **Primary Goal** | Visual exploration, entity relationship mapping, developer onboarding. | Vulnerability detection, invariant enforcement, regression prevention, test verification. |
+| **Mechanisms** | Tree-sitter AST extraction + LLM semantic batch summarization + Graph UI (Vite/React). | Deterministic static analysis, AST anti-tautology linters, pytest/tsc gates, Red-vs-Blue review. |
+| **Output Artifacts** | `knowledge-graph.json`, domain flows, architecture layer diagrams, web dashboards. | Gate pass/fail receipts, CVE/OWASP reports, code patch suggestions, test execution logs. |
+| **What It CANNOT Do** | Cannot detect secret leaks, auth bypasses, race conditions, missing unit tests, or broken contracts. | Does not generate interactive visual exploration graphs or natural-language onboarding tours. |
+
+---
+
+## 2. Critical Failure Modes on Monorepos (>1,000 files)
+
+1. **Token Exhaustion & Context Trap ($O(N)$ LLM Batches)**:
+   - Comprehension tools partition files into small batches (e.g., 20–30 files per LLM prompt) to generate high-level summaries and layer classifications.
+   - On large monorepos (e.g., `DNK_HUB` with >12,900 source files), running a full scan requires 500+ LLM roundtrips, exhausting context windows, tool budgets (90/90), and API quotas within minutes.
+2. **The "Hairball Graph" Anti-Pattern**:
+   - Visual graph canvases (Cytoscape, React Flow, Sigma.js) degrade rapidly when rendering >2,000 nodes and >10,000 edges. The result is unreadable visual noise that freezes browser WebGL/Canvas contexts.
+3. **False Sense of Security (Status Laundering)**:
+   - A successfully generated, green graph view gives an illusion of system health while masking runtime crashes, broken imports, missing authentication middleware, and security vulnerabilities.
+
+---
+
+## 3. Mandatory Triage & Scoping Protocol
+
+Before deploying or recommending any codebase visualization or graph tool on a DNK OS repository:
+
+1. **Invert the Presupposition (Epistemic Armor)**:
+   - If prompted: "Can tool X audit our repository?", immediately clarify whether the need is *structural visualization* or *vulnerability/quality verification*.
+   - Never endorse a graph/onboarding tool as a code quality or security auditor.
+2. **Enforce Strict Sub-Package Scoping**:
+   - Never run comprehension tools against the repository root (`DNK_HUB`).
+   - Restrict execution to a single isolated module (≤ 150–300 files), e.g., `apps/api/` or `services/dnk_shopify/`.
+   - Ensure an aggressive ignore file (`.understandignore` or `--exclude`) prunes tests, node_modules, virtualenvs, documentation, and build outputs.
+3. **Use Zero-Token Deterministic Alternatives for Topology**:
+   - For fast symbol and call graph resolution: use `python3 scripts/system/repo_map.py` (<200ms, zero LLM tokens).
+   - For SSOT architectural boundaries: use `dnk_get_architecture_map`.
+4. **Route True Audits to Deterministic Gates**:
+   - For code, security, and invariant auditing: run `bash scripts/verify_all.sh` and dispatch `dnk_run_adversarial_review` (Auditor ⚔️ vs Builder 🛡️).

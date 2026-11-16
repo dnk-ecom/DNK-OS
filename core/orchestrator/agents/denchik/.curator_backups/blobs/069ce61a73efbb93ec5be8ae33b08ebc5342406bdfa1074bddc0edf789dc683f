@@ -1,0 +1,49 @@
+# Foreign Language Purge & Ukrainian Localization Checklist
+
+When tasked with completely removing an unwanted foreign language (e.g. Chinese `zh`, Korean `ko`, Russian `ru`) and establishing Ukrainian (`uk`) and English (`en`) as the primary locales:
+
+## 1. UI & Dictionary Scope
+- **Core Dictionary**: Generate full key symmetry for `uk`. Ensure natural, domain-specific terminology (e.g., IT and software terms preserved or cleanly adapted, not machine-translated literalisms).
+- **Default Locale**: Set default fallback to `uk` (or user-preferred `en`), remove the purged locale from `SUPPORTED_LOCALES` or language selectors (`LangSwitch`).
+- **Attributes & Hidden Text**: Inspect `placeholder`, `aria-label`, `title`, button labels, shortcut tooltips, and modal descriptions.
+
+## 2. Dynamic Language Detection & Regex
+- Replace CJK/foreign regex filters with Cyrillic detection for Ukrainian:
+  ```typescript
+  // Match Ukrainian / Cyrillic characters
+  const UKRAINIAN_CYRILLIC_REGEX = /[\u0400-\u04FF]/;
+  ```
+- If an automated content language detector exists, remove branches routing to the purged language codes.
+
+## 3. Generative AI Prompts & LLM Directives
+- **System Instructions**: Update LLM system prompts directing output language to Ukrainian (`uk`) and English (`en`).
+- **Prompt Examples (Few-Shot)**: Replace any hardcoded foreign-language examples in system prompts with authentic Ukrainian or English examples.
+- **Language Hints**: Pass explicit `lang: "uk"` in API payloads and generation briefs.
+
+## 4. Starter Content & Presets
+- Starter templates, sample projects, cards, and preset collections often contain hardcoded strings.
+- Separate or localize template files (e.g. `templates_uk.json` or dynamic template localization helpers).
+
+## 5. API Routes & Server Errors
+- Audit `app/api/*` or `routes/*` for hardcoded error strings, validation messages, or fallback responses.
+- Translate error payloads into Ukrainian so that frontend toasts and alerts never display foreign text when requests fail.
+
+## 6. Document Shell & Fonts
+- Update `<html lang="uk">` in `layout.tsx` or `index.html`.
+- Ensure font stacks include clean Cyrillic glyph support (e.g., Inter, system-ui, Apple SD Gothic Neo, or -apple-system).
+
+## 7. Anti-Translation DOM Collision Guard
+When foreign characters (e.g. residual Korean, Chinese, or Japanese strings) leak into a localized Ukrainian UI, Chrome's auto-translator or translation extensions will inject `<font>` wrappers around text nodes. This corrupts React Fiber reconciliation when components unmount or switch states, resulting in fatal runtime error:
+`NotFoundError: Failed to execute 'removeChild' on 'Node'`
+
+**Mandatory Hardening Steps**:
+1. Disable browser translation on the root document shell:
+   ```html
+   <html lang="uk" translate="no" class="notranslate">
+     <head>
+       <meta name="google" content="notranslate" />
+     </head>
+   ```
+2. Mount client-side `<DomGuard />` in root layout (`app/layout.tsx`) to catch and safely divert detached `removeChild` and `insertBefore` operations.
+3. Wrap multi-step wizard views, tabs, or conditional sections with explicit key attributes (`<div key={`step-${step}`}>`) so React unmounts cleanly rather than attempting granular DOM node reconciliation.
+4. Eliminate adjacent bare text expressions (`{part1} · {part2}`) in JSX which easily split into detached text nodes; combine them into single template literals: `{`${part1} · ${part2}`}`.

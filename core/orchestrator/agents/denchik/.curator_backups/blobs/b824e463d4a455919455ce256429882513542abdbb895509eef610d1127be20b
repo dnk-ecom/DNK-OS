@@ -1,0 +1,93 @@
+---
+title: "Ecc Agent Harness And Instinct Learning Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/ecc_agent_harness_and_instinct_learning_patterns.md"
+> purpose: "Document: Ecc Agent Harness And Instinct Learning Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "references/ecc_agent_harness_and_instinct_learning_patterns.md"
+# purpose: "SOTA assimilation patterns from affaan-m/ECC: Agent Harness OS, Continuous Learning v2.1 (Instincts), GateGuard Fact-Force, and AgentShield"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-15"
+# author: "Gerych Prime & Maxim"
+# --- END DNK-MRH-HEADER ---
+
+# 🧬 SOTA Architecture: affaan-m/ECC (Everything Claude Code)
+
+## 📌 1. Identity & Provenance
+- **Repository**: `affaan-m/ECC` (Everything Claude Code)
+- **Stars**: 258,000+ ⭐
+- **Author**: Affaan Mustafa (`@affaan-m`)
+- **License**: MIT (Track 1 Direct Assimilation)
+- **Core Concept**: "The Agent Harness Operating System" — turning LLM coding tools (Claude Code, Hermes, Codex, Cursor) into governed, resilient, self-learning engineering systems.
+
+---
+
+## 🏛️ 2. Core Architectural Pillars
+
+### A. Continuous Learning v2.1: The "Instincts" Paradigm
+Traditional memory stores either raw chat logs (unstructured bloat) or static monolithic rules (rigid). ECC introduces **Atomic Instincts**:
+1. **Micro-Observations**: Post-tool hooks on background lightweight models (Haiku / Gemini Flash) capture small behavioral patterns.
+   - Format: `{ id, trigger, action, confidence, scope: project | global, repo_hash }`
+2. **Confidence Gradient**:
+   - Initial observation: `confidence = 0.3`.
+   - Repeated validation without failure: increments towards `0.95`.
+   - Contradiction: penalizes confidence or marks deprecated.
+3. **Cross-Project Elevation (Scope Promotion)**:
+   - An instinct local to a specific repository (`scope: project`) that is independently observed across 2+ projects is automatically promoted to `scope: global`.
+4. **Autonomous Skill Evolution (`/evolve`)**:
+   - High-confidence clusters of instincts are periodically synthesized into canonical `SKILL.md` documents, closing the loop between ephemeral runtime behavior and durable procedural memory.
+
+### B. GateGuard Fact-Force Pattern (`gateguard-fact-force.js`)
+- **Anti-Hallucination & Anti-Overconfidence Hook**:
+  - LLMs routinely proclaim "all tests pass" or "this refactor is safe" without running checks.
+  - GateGuard intercepts pre-tool file writes and destructive actions.
+  - Forces the agent to explicitly state verifiable facts:
+    1. Direct file importers / reverse dependencies (via AST).
+    2. Exact public interfaces or data contracts impacted.
+    3. Literal quote of user requirement justifying the mutation.
+  - Missing facts trigger an immediate hook refusal, forcing the agent to inspect before editing.
+
+### C. AgentShield: Autonomous MCP & Config Security Gate
+- **Vulnerability Defense**:
+  - Audits `mcp.json` and agent tool definitions against OWASP MCP Top 10.
+  - Scans for prompt injection channels in local markdown rules and system instructions.
+  - Blocks credential / token leakage into unencrypted tool argument logs.
+
+### D. Silent-Failure Hunter Archetype
+- **Targeted Static Analysis**:
+  - Detects swallowed exceptions: `except Exception: pass`, empty Promise `.catch(() => {})`, untracked error boundaries.
+  - Ensures every caught exception produces a structured log or telemetry event.
+
+---
+
+## 🚀 3. DNK OS Swarm Adaptation Matrix
+
+| ECC Feature | DNK OS Target Subsystem | Implementation Strategy |
+| :--- | :--- | :--- |
+| **Instincts Engine** | `core/scones/` (SCONES Cognitive Memory) | Integrate confidence-weighted micro-instincts alongside architectural rules. |
+| **GateGuard Fact-Force** | `scripts/system/hermes_pre_tool_hook.py` | Add import-contract and requirement verification before core mutations. |
+| **AgentShield MCP Gate** | `gerych_auditor` / `dnk_security_guard` | Automated audit pass on all MCP server configurations and tool contracts. |
+| **Silent-Failure Hunter** | `apps/api/` & `services/` QA checks | Add specialized AST linter for silent exception handling in PR review gates. |

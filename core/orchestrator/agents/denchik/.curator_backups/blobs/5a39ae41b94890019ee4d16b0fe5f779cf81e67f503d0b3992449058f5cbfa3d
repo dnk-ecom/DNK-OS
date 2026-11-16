@@ -1,0 +1,149 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/pr_af_adversary_blast_radius_and_scoring_patterns.md"
+# purpose: "Operational guide, AST dependency graph algorithms, adversary gate heuristics, and deterministic scoring assimilated from Agent-Field/pr-af."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "2.0.0"
+# updated_at: "2026-09-10"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# PR-AF Assimilated Architecture & Implementation Recipes
+
+Assimilated from **Agent-Field/pr-af** (Apache-2.0, #1 on Martian Code-Review-Bench with 0.706 golden recall).
+Production implementations reside in `core/orchestrator/`:
+- `core/orchestrator/blast_radius.py`
+- `core/orchestrator/adversary_challenge.py`
+- `core/orchestrator/audit_state_machine.py`
+- Verified via `tests/core/test_pr_af_assimilation.py` (100% Green).
+
+---
+
+## 1. Architectural Philosophy: The Three Invariants
+1. **Zero Hallucination Scoring**: LLMs must never output the final PR health score. Scores are computed deterministically via exact Python mathematical formulas with discrete severity deductions.
+2. **Blast Radius Awareness**: Reviewers cannot evaluate diffs in a vacuum. Changing a function signature in module A can break caller B even if B was not changed in the PR.
+3. **Adversary Verification (Devil's Advocate)**: 40-60% of automated LLM review comments are false alarms (handled upstream, covered by tests, or pure nitpicks). Every finding must face an adversarial challenge before reaching the developer.
+
+---
+
+## 2. Blast Radius Engine (`core/orchestrator/blast_radius.py`)
+
+### A. Graph Construction (AST + Regex)
+- **Python**: Uses standard `ast.parse` to extract `import <module>` and `from <module> import <name>`. Resolves relative module imports (`.`, `..`) against workspace root.
+- **TypeScript / JavaScript**: High-speed regex tokenization matching:
+  - `import ... from ['"](\.{1,2}/[^'"]+)['"]`
+  - `import ... from ['"](@/[^'"]+)['"]`
+  - `require\(['"](\.{1,2}/[^'"]+)['"]\)`
+- **Dynamic Dependency Traversal**: Inverts the forward import graph (`A -> imports -> B`) to compute reverse dependents (`B -> imported_by -> [A, C, D]`).
+
+### B. Risk Classification Table
+| Impact Level | Condition | Blast Multiplier |
+|---|---|---|
+| `CRITICAL` | $\ge 10$ dependents OR $\ge 5$ uncovered dependents OR critical path (`core/`, `auth`, `security`) | `1.50` |
+| `HIGH` | $\ge 5$ dependents OR $\ge 2$ uncovered dependents | `1.25` |
+| `MEDIUM` | $\ge 2$ dependents | `1.15` |
+| `LOW` | $< 2$ dependents | `1.00` |
+
+### C. Usage Recipe
+```python
+from core.orchestrator.blast_radius import BlastRadiusEngine, compute_blast_radius
+
+engine = BlastRadiusEngine(workspace_root=".")
+report = engine.compute_blast_radius(["core/orchestrator/audit_state_machine.py"])
+
+print(f"Risk: {report.impact_risk.value}")
+print(f"Direct dependents: {report.direct_dependents}")
+print(f"Transitive dependents: {report.transitive_dependents}")
+# Export markdown report for PR summary:
+md_summary = report.to_markdown_summary()
+```
+
+---
+
+## 3. Adversary Challenge Gate (`core/orchestrator/adversary_challenge.py`)
+
+### A. Heuristic Refutation Rules
+Every candidate `ReviewFinding` is evaluated through the Adversary Gate:
+1. **Nitpick Filter**:
+   - Detects cosmetic/naming preferences: `variable name`, `rename to`, `typo`, `formatting`, `style preference`, `cleaner`.
+   - Action: `DISMISSED` (Verdict: `DISMISSED`, Reason: stylistic noise).
+2. **Guard Clause / Upstream Protection**:
+   - Detects `NoneType`, `KeyError`, `AttributeError`, or `IndexError` warnings where the surrounding code contains safety guards:
+     - `if not <var>: return`
+     - `if <var> is None:`
+     - `getattr(..., default)`
+   - Action: `DISMISSED` (Verdict: `DISMISSED`, Reason: protected by upstream guard).
+3. **Test Suite Coverage**:
+   - If the affected function/method is invoked in test files matching `test_*.py` or `*.test.ts`.
+   - Action: `DOWNGRADED` (Severity reduced to `LOW`, Verdict: `DOWNGRADED`).
+4. **Valid Issue**:
+   - If no refutation condition is met.
+   - Action: `RETAINED` (Verdict: `RETAINED`).
+
+### B. Usage Recipe
+```python
+from core.orchestrator.adversary_challenge import AdversaryGate, AdversaryStatus
+from core.orchestrator.audit_state_machine import ReviewFinding
+
+gate = AdversaryGate(repo_root=".", default_threshold=0.6)
+finding = ReviewFinding(
+    rule_id="SEC-001",
+    file_path="core/security.py",
+    line_start=42,
+    line_end=42,
+    title="Security Check",
+    description="Missing token check before signature verification",
+    severity="critical",
+    category="SECURITY",
+)
+
+challenged = gate.challenge_finding(finding, code_context="...", diff_patch="...")
+if challenged.status == AdversaryStatus.CONFIRMED:
+    print(f"Confirmed finding: {challenged.finding.description}")
+elif challenged.status == AdversaryStatus.REFUTED:
+    print(f"Refuted nitpick/false alarm: {challenged.rationale}")
+```
+
+---
+
+## 4. Deterministic Audit Scoring (`core/orchestrator/audit_state_machine.py`)
+
+### A. Mathematical Formula
+$$\text{Deduction}_{\text{base}} = (25.0 \times N_{\text{crit}}) + (12.0 \times N_{\text{high}}) + (4.0 \times N_{\text{med}}) + (1.0 \times N_{\text{low}})$$
+$$\text{Deduction}_{\text{weighted}} = \text{Deduction}_{\text{base}} \times M_{\text{blast\_radius}}$$
+$$\text{Health Score} = \max(0.0, 100.0 - \text{Deduction}_{\text{weighted}})$$
+
+**Merge Gate Rule**:
+```python
+merge_allowed = (
+    critical_count == 0 
+    and high_count == 0 
+    and health_score >= 70.0
+)
+```
+
+### B. Usage Recipe
+```python
+from core.orchestrator.audit_state_machine import calculate_audit_score
+
+scoring = calculate_audit_score(
+    findings=active_findings,
+    blast_radius_risk="high",  # Multiplier 1.25 applied to base deductions
+)
+
+print(f"Health Score: {scoring.health_score}/100.0")
+print(f"Merge Allowed: {scoring.merge_allowed}")
+print(f"Risk Level: {scoring.risk_level.value}")
+```
+
+---
+
+## 5. Verification & Test Suite
+Regression tests are maintained at `tests/core/test_pr_af_assimilation.py`.
+Run targeted verification:
+```bash
+./.venv/bin/pytest tests/core/test_pr_af_assimilation.py -v
+```
+All tests run with 0 network calls and execute in $<0.30$ seconds.

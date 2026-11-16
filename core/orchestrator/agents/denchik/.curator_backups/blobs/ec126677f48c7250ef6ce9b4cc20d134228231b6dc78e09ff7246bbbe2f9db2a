@@ -1,0 +1,86 @@
+---
+name: web-app-reverse-engineering
+description: Use when reverse-engineering SPAs. Extract tokens and AST.
+version: 1.0.0
+metadata:
+  hermes:
+    tags: [reverse-engineering, spa, react, vite, css-extraction, gemini-vision, pixel-match]
+---
+<!-- --- DNK-MRH-HEADER ---
+mrh_id: "core/orchestrator/agents/denchik/skills/software-development/web-app-reverse-engineering/SKILL.md"
+purpose: "Class-level engineering standard for 1-to-1 reverse-engineering of modern SPA web applications, extracted CSS tokens, and multimodal verification."
+canonical_source: true
+alters_files: []
+triggers_tasks: []
+status: "Active"
+version: "1.0.0"
+updated_at: "2026-10-30"
+author: "DNK-e.com Maksym & Denchik"
+--- END DNK-MRH-HEADER --- -->
+
+# 🌐 Web App & SPA Reverse Engineering Protocol
+
+Use when tasked with rebuilding or cloning third-party web applications, interactive visual CAD/canvas editors, or rich SaaS tools with 1-to-1 pixel and behavioral fidelity.
+
+## 🎯 High-Level Principles
+1. **Zero UI Approximation**: Never guess padding, colors, fonts, or control handle dimensions from eyesight alone. Production minified bundles contain the exact mathematical tokens.
+2. **Deterministic Token & Style Harvesting**: Modern SPAs (React 18, Vite, Next.js) inject styled CSS at runtime via template literals or Webpack/Vite chunks. Extract them directly from the JS code.
+3. **AST State & Geometry Recovery**: Discriminated unions, canvas math (B-spline smoothing, coordinate projection, snapping), and domain enums exist in plain text inside client bundles.
+4. **Multimodal Pixel-Match Gate (Gemini Vision)**: Machine-verified visual diffing between real screenshots and generated views.
+
+---
+
+## 🛠️ Step-by-Step Execution Pipeline
+
+### Phase 1: Asset & Manifest Reconnaissance
+- Fetch the target entrypoint and resolve all `modulepreload` chunks:
+  ```python
+  # Download entry HTML and inspect <script type="module"> and <link rel="modulepreload">
+  # Key targets: app-bundle.js, vendor-react.js, catalog-data.js, app.css
+  ```
+- Extract base theme variables from HTML or root CSS:
+  * Inspect `:root` and `:root[data-theme="dark"]` for background, text, border, and accent tokens.
+
+### Phase 2: Injected CSS & Component Style Extraction
+Extract all injected CSS template literal blocks from client JS bundles:
+```python
+import re
+from pathlib import Path
+
+js_text = Path("cache/target/index.js").read_text()
+
+# Extract backtick template literals containing class selectors
+matches = re.findall(r'`([^`]*?\.[a-z0-9\-_]{2,30}\s*\{[^`]*?)`', js_text)
+css_blocks = [m for m in matches if "{" in m and "}" in m and (";" in m or ":" in m)]
+combined_css = "\n\n".join(css_blocks)
+Path("cache/target/extracted_styles.css").write_text(combined_css)
+```
+
+### Phase 3: Domain Data & Canvas Geometry Decompilation
+- **Shape Models & Discriminated Unions**:
+  Search for `shape.kind === "..."` or geometry keys (`origin`, `width`, `depth`, `points`, `smooth`).
+- **Spline & Path Smoothing**:
+  Identify whether curves use Catmull-Rom, B-spline, or Chaikin subdivision. Refer to `references/extraction_recipes.md` for zero-dependency Chaikin B-spline algorithms.
+- **Dynamic Dimension Markers**:
+  Extract edge calculations and projection logic to render real-time meter tags along polygon segments.
+- **Domain Property Schemas**:
+  Extract canonical material arrays, botanical/product attribute labels, and pricing formulas.
+
+### Phase 4: Multimodal Pixel-Match Audit Loop
+1. Render both the original reference screenshot and local development view at identical viewports (e.g. 1440x900).
+2. Query Vertex AI Gemini Multimodal Vision:
+   - "Compare these two screenshots. Detail exact discrepancies in floating panel offsets, typography weights, icon alignments, and interactive control states."
+3. Execute atomic fixes until 0 discrepancies remain.
+
+### Phase 5: AI Chat Composer & Panel UI Architecture (Helix Standard)
+- Avoid horizontal cramping in side-panels (320px–420px): never squeeze `<textarea>` between left tool buttons and a wide rectangular send button ("Надіслати" ~100px).
+- Use the **Unified Composer Card** pattern: full-width borderless textarea on top, compact 28px tool buttons (`+`, `◫`) bottom-left, and a small circular send button (`32px` diameter, `border-radius: 50%`, SVG `↑` arrow) bottom-right.
+- Refer to `references/chat_composer_and_ui_patterns.md` for complete React/CSS specifications and defensive `omitData` payload sanitization.
+
+---
+
+## ⚠️ Pitfalls & Invariants
+- **[NO_MANUAL_COLOR_GUESSING]**: Always extract `:root` CSS variables; never guess hex codes.
+- **[NO_SYNTHETIC_STUBS]**: Do not declare completion with mock stubs when the user expects visual and behavioral parity.
+- **[NO_COMPOSER_HORIZONTAL_CRAMP]**: Never compromise text input width for wide text buttons in side-panels; use compact circular icon triggers.
+- **[MEMORY_PERSISTENCE]**: Store key reverse-engineered domain findings in SCONES memory.

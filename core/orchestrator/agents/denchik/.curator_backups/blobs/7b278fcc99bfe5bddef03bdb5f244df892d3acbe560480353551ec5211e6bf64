@@ -1,0 +1,110 @@
+---
+title: "Chat First Agentic Video Editing Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/chat_first_agentic_video_editing_patterns.md"
+> purpose: "Document: Chat First Agentic Video Editing Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+<!-- --- DNK-MRH-HEADER ---
+mrh_id: "core/orchestrator/agents/denchik/skills/software-development/sota-repository-assimilation/references/chat_first_agentic_video_editing_patterns.md"
+purpose: "SOTA Reference: Chat-First Agentic Video Editing Architectures & Ecosystem Decoupling Patterns."
+canonical_source: true
+alters_files: []
+triggers_tasks: []
+status: "Active"
+version: "1.0.0"
+updated_at: "2026-10-28"
+author: "DNK-e.com Maksym & Denchik Prime"
+--- END DNK-MRH-HEADER --- -->
+
+# 🎬 Chat-First Agentic Video Editing & Ecosystem Decoupling Patterns
+
+## 📌 Executive Overview
+Traditional AI video editors either suffer from regional cloud lock-in (e.g. SeeCut's hard dependencies on Zhipu AI GLM-5.3, GrsAI, Tencent SES, and Alipay) or act as pixel-level black-box generators without iterative editing. 
+
+Building a sovereign, **Chat-First Agentic Video Editor** requires:
+1. **Decoupled LLM Engine**: Leveraging frontier multimodal models with large context windows (Google Gemini 2.5 Flash/Pro via Google Cloud / Vertex AI, Anthropic Claude, or local Ollama) instead of proprietary domestic Chinese gateways.
+2. **Programmatic Composition Engine**: Rendering via React/Remotion and FFmpeg, ensuring videos are stored as readable code/JSON projects rather than opaque binary timelines.
+3. **Multimodal Feedback Loop**: An automated Reviewer Agent that "watches" rendered cuts and scores them before human handoff.
+
+---
+
+## 🏆 Benchmark SOTA Architectures (Western / Vendor-Agnostic)
+
+### 1. `poseljacob/agentic-video-editor` (Google Gemini + FFmpeg Ensemble)
+- **Stack**: Python 3.11+ (`uv`), Google Gemini (Google AI Studio / Vertex AI), FFmpeg / MoviePy.
+- **Pipeline Architecture**:
+  ```
+  Raw Clips + Creative Brief
+          │
+     [ Preprocess ]   --> Scene detection, Whisper transcription, shot indexing
+          │
+     [ Director ]     --> Gemini ADK: Selects shots, orders them, writes EditPlan
+          │
+     [ Trim Refiner ] --> Gemini: Narrows cut boundaries down to speech syllables
+          │
+     [ Editor ]       --> FFmpeg/MoviePy: Renders EditPlan to MP4
+          │
+     [ Reviewer ]     --> Multimodal Gemini: Watches MP4, scores 5 dimensions (0-1)
+          │               (Retries to Director if score < threshold)
+          ▼
+     Final Master MP4
+  ```
+- **Key Lesson**: Gemini's native 1M+ token context window allows ingesting full transcripts and shot lists in a single turn without vector DB fragmentation.
+
+### 2. `Remocn/remocn-studio` (Chat-First + Visual Spatial Directing)
+- **Stack**: TypeScript, React 19, Remotion, macOS/Linux desktop.
+- **UX Paradigm**: Completely eliminates traditional tracks/keyframes in favor of:
+  - **Natural Language Chat**: High-level intent ("Fix the text here", "Make it punchier").
+  - **Point-at-It Inspection**: Clicking an element in the live preview passes `[Element #N]` context into the agent chat.
+  - **Frame Snapshot**: Dragging a crop box injects an image crop directly into the agent's visual context.
+- **Project Structure**: Every video is an unbundled Remotion project committed to Git (`src/videos/<name>/index.tsx`).
+
+### 3. `tjameswilliams/ai-video-editor` (Remotion + On-Demand React Authoring + MCP)
+- **Stack**: TypeScript, Bun, Remotion, FFmpeg, MCP Server.
+- **Dynamic Component Generation**:
+  1. Assistant writes custom TSX motion graphics components on beat.
+  2. Static validation rejects unsafe imports/evals.
+  3. Smoke render (320x180) verifies zero runtime errors before adding to timeline.
+  4. Vision LLM audits the output frame against the user brief.
+
+### 4. `AKMessi/vex` ("Claude Code for Video Editing")
+- **Stack**: Python, FFmpeg, MoviePy, Whisper, Remotion/Manim.
+- **CLI/Chat-First Execution**: Translates conversational editing goals (*"Trim awkward pauses", "Auto color grade", "Add subtitle zooms"*) into deterministic, rebuildable FFmpeg/MoviePy filter chains.
+
+---
+
+## 🛡️ Critical Engineering Invariants for Sovereign Video Agents
+
+### 1. Two-Tier Media Ingest (Anti-Latency Invariant)
+- **Problem**: Uploading raw 4K footage to cloud LLMs creates 30–120s latency stalls.
+- **Invariant**: Run local preprocessing via FFmpeg and Whisper:
+  - Extract audio transcript with word-level timestamps.
+  - Extract scene cuts via PySceneDetect.
+  - Generate low-res proxy clips (360p/720p) and keyframe contact sheets.
+  - Send **only** lightweight proxies + transcripts to Gemini 2.5 / Vertex AI.
+
+### 2. Immutable `EditPlan` DAG with JSON-Patch
+- **Problem**: Re-prompting an LLM often causes it to hallucinate and wipe prior user adjustments.
+- **Invariant**: The timeline state must be an append-only or versioned DAG (`EditPlan`). Chat turns produce atomic `json-patch` operations (`cut_range`, `insert_broll`, `update_style`, `reorder_clips`) validated against current revision numbers (similar to SeeCut's M2 Protocol).
+
+### 3. Closed-Loop Reviewer Gate
+- **Problem**: Code execution may succeed with `exit 0`, but the resulting video has awkward cuts, overlapping text, or silence gaps.
+- **Invariant**: Before presenting results to the user, a lightweight Multimodal Vision call (e.g. `gemini-2.5-flash`) samples 4-8 key frames of the rendered cut to score visual pacing, subtitle safety margins, and brand compliance.

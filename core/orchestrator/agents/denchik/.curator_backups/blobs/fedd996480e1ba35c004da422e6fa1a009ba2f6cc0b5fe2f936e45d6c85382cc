@@ -1,0 +1,103 @@
+---
+name: claude-code-workspace-engineering
+description: "Use when configuring Claude Code workspaces and dev teams."
+version: "1.0.0"
+category: "software-development"
+---
+
+# 🚀 Claude Code Workspace Engineering
+
+Standardized protocol for structuring, configuring, and operating **Claude Code Desktop App** and **Claude Code CLI** as a full-spectrum, autonomous virtual software engineering team.
+
+---
+
+## 📌 1. When to Use
+- Setting up a new Claude Code workspace or repository for vibe coding and systems development.
+- Structuring subagent roles (`.claude/agents/`), behavioral rules (`.claude/rules/`), and settings (`.claude/settings.json`).
+- Auditing third-party Claude Code starter kits or plugins for context bloat, stack lock-in, or security risks.
+- Enforcing deterministic proof gates, surgical edits, and persistent session memory across agent runs.
+
+---
+
+## 👥 2. The 5-Role Virtual Dev Team Architecture
+
+To prevent single-prompt attention degradation and sycophantic hallucinations, partition work into 5 discrete personas under `.claude/agents/`:
+
+1. **Architect (`architect.md`)**:
+   - Deconstructs goals into bulletproof contracts.
+   - Mandates explicit **Target File Whitelist** and **Negative Scope** before coding.
+   - Climbs the Senior Dev Solution Ladder (YAGNI -> Reuse -> Platform/Stdlib -> Existing Deps -> Simplicity).
+2. **Builder (`builder.md`)**:
+   - Surgical fullstack implementer. Modifies only code directly tied to the request.
+   - Strict package manager discipline (`uv run ...` for Python, `pnpm ...` for Node.js).
+   - Zero generative bloat (never write 200 lines if 50 lines suffice).
+3. **Reviewer (`reviewer.md`)**:
+   - Adversarial 4-part review rubric for all diffs:
+     *(1) What this is* -> *(2) Problem* -> *(3) Fix* -> *(4) If we skip it*.
+   - Flags AI slop, dead code, and tautological test assertions.
+4. **QA Tester (`qa-tester.md`)**:
+   - Autonomous verification lead. Enforces deterministic machine proof (`exit code 0`).
+   - Verifies boundary conditions (nulls, empty sets, network errors, concurrency limits).
+5. **Skeptic (`skeptic.md`)**:
+   - Mandatory epistemic dissent. Inverts presuppositions.
+   - Outputs: (1) 3 critical hidden risks, (2) boundary failure conditions, (3) minimalist skeptic alternative.
+
+---
+
+## ⚙️ 3. Workspace Layout & Key Files
+
+```
+project_root/
+├── CLAUDE.md                   # Primary team constitution & operational protocol
+├── .claude/
+│   ├── settings.json           # Permissions, safe tool execution, environment variables
+│   ├── agents/                 # Virtual team role definitions (architect, builder, reviewer, qa, skeptic)
+│   └── rules/                  # Modular behavioral guidelines
+│       ├── anti-slop.md        # Zero boilerplate & AI slop invariants
+│       ├── context-diet.md     # Context window protection & targeted slice reads
+│       ├── dnk-stack.md        # uv, pnpm, relative paths, MRH headers
+│       └── git-workflow.md     # Atomic conventional commit rules
+├── sessions/                   # Logged milestone sessions (synced to Git)
+└── templates/
+    └── SESSION_LOG_TEMPLATE.md # Template for capturing session receipts and decisions
+```
+
+---
+
+## 🔌 4. Recommended Official Plugins & Marketplace Commands
+
+To equip Claude Code with production engineering and commerce superpowers:
+
+```bash
+# Official Anthropic engineering plugins
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install feature-dev@claude-plugins-official      # 7-phase guided feature development
+/plugin install pr-review-toolkit@claude-plugins-official # Automated PR code review & risk scoring
+/plugin install code-review@claude-plugins-official       # Surgical inline code review
+/plugin install receipts@claude-plugins-official          # Audit receipts & session proof
+/plugin install claude-md-management@claude-plugins-official # Auto-refine and update CLAUDE.md
+
+# E-commerce and merchant agent builder
+/plugin marketplace add anthropics/commerce-agents
+/plugin install commerce-builder@claude-commerce-agents   # Scaffold shopping & merchant agents
+```
+
+---
+
+## ⚠️ 5. Pitfalls in External Starters & Plugins
+
+1. **Stack Lock-in**: Many popular community starters (e.g. `AIBiz-Automatyzacje/claude-code-starter`) are tightly bound to a specific frontend stack (React 19 + Supabase + Vite). General-purpose engineering workspaces must remain polyglot.
+2. **Language Friction & Token Waste**: Templates with non-English filenames or prompts pollute the prompt cache and burn unnecessary context tokens.
+3. **Subagent Proliferation**: Running 7+ heavy reviewer subagents on every minor prompt saturates Claude Code's context window. Subagents must be invoked just-in-time (JIT) for non-trivial milestones.
+4. **Tautological Mocks**: Mocking out all dependencies in tests gives false confidence. Final verification requires real runtime execution against actual CLI tools or endpoints.
+
+---
+
+## 🔍 6. Verification Checklist
+
+Before declaring a Claude Code workspace operational:
+- [ ] `CLAUDE.md` explicitly lists core invariants (Karpathy senior rules + strict package managers).
+- [ ] `.claude/settings.json` restricts dangerous or unapproved package managers (`pip`, `npm`).
+- [ ] Subagents in `.claude/agents/` have distinct, non-overlapping mandates.
+- [ ] Git tracking is initialized with atomic conventional commit rules.
+- [ ] Session persistence template exists to capture learnings and prevent discussion amnesia.

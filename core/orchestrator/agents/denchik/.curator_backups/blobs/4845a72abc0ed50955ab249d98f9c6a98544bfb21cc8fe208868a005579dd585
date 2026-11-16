@@ -1,0 +1,140 @@
+---
+title: "Vtryon Multi Slot Fitting And Shopify Theme Extension Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/vtryon_multi_slot_fitting_and_shopify_theme_extension_patterns.md"
+> purpose: "Document: Vtryon Multi Slot Fitting And Shopify Theme Extension Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "references/vtryon_multi_slot_fitting_and_shopify_theme_extension_patterns.md"
+# purpose: "Architecture patterns for multi-slot AI virtual fitting rooms (DNK VTON), Clean-Room neutralization, and Shopify Theme App Extension adaptation."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.1.0"
+# updated_at: "2026-10-25"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# 👗 Multi-Slot Virtual Try-On (DNK VTON) & Clean-Room Shopify OS 2.0 Integration
+
+## 1. Overview & Clean-Room Architecture
+AI Virtual Try-On (VTON) in the DNK OS ecosystem is designed as an end-to-end multi-piece wardrobe assembler (`DNK AI Fitting Room`). It adapts open-source multi-slot patterns and Gradio-based models (such as Kolors VTON) into a strictly neutral, 100% DNK-branded architecture.
+
+### Key Architectural Invariants:
+1. **Strict Clean-Room Neutralization (Zero Foreign Footprint)**:
+   - All third-party author names, repositories, and plugin slugs are completely scrubbed.
+   - Namespaces strictly use `dnk-vton-*` in CSS classes, JS modules, Liquid templates, and API endpoints.
+   - Headers strictly follow `DNK-MRH-HEADER` (`author: "DNK-e.com Maksym"`).
+   - Automated unit tests (`tests/test_dnk_vton_engine.py`) verify 0 foreign developer occurrences.
+2. **Multi-Slot Wardrobe Assembler**:
+   - Manages up to 8 configurable garment slots (Upper Body, Bottom, Full Outfit, Footwear, Outerwear, Accessories).
+   - Dynamic Auto-Replace: Selecting a new item in a slot automatically updates that slot while preserving other pieces.
+3. **Client-Side Canvas Optimization**:
+   - In-browser HTML5 Canvas downsampling & JPEG compression before upload (clamps max dimensions to 1024x1024 to prevent iOS Safari memory crashes).
+   - LocalStorage persistence for user photo and selected wardrobe state across PDP page transitions.
+4. **Structured Multi-Garment Prompt Engineering**:
+   - Strict identity preservation: freezes face, hairstyle, skin tone, pose, camera geometry, and background lighting.
+   - Enforces garment attachment hierarchy with product titles and variant labels.
+5. **Deterministic SHA-256 Combination Caching**:
+   - `hash = sha256(user_photo_bytes + sorted_garment_variant_ids)`.
+   - Eliminates redundant inference costs ($0 & 0ms on repeated outfit views).
+6. **Multi-Provider Inference Switchboard**:
+   - **OpenRouter / OpenAI Edits**: Multimodal API with image URLs / base64 payloads.
+   - **Kolors VTON (Kwai-Kolors/Kolors-Virtual-Try-On)**: Direct HuggingFace/Gradio-client inference (`call_virtual_tryon_api`) with temporary file cleanup.
+   - **FASHN.ai / IDM-VTON / CatVTON**: High-fidelity garment drape backends.
+   - **Local Mock**: Deterministic offline simulation for fast automated testing.
+
+---
+
+## 2. Shopify 3-Tier Clean-Room Porting Architecture
+
+Shopify SaaS cannot execute arbitrary server-side PHP. The architecture maps into three decoupled tiers:
+
+```
+[ Tier 1: Storefront (Native Theme & App Extension) ]
+  ├── Native Theme: `sections/dnk-vton-floating-dock.liquid` (Floating launcher + Drawer)
+  ├── PDP App Block: `blocks/dnk-vton-button.liquid` (CTA "Try on me" + Slot detector)
+  ├── Universal App Extension: `apps/shopify/theme-extensions/dnk-app-blocks/blocks/dnk-vton.liquid`
+  └── WebComponent / JS: Canvas image compressor + LocalStorage + `/cart/add.js`
+            │
+            ▼ (Shopify App Proxy / REST API: `/api/v1/shopify/vton/*`)
+[ Tier 2: Backend Switchboard (FastAPI in DNK Core) ]
+  ├── SHA-256 Multi-Item Combo Cache (Memory + Disk/KV)
+  ├── Rate Limiter (IP / Customer ID / Shop session)
+  └── Multi-Garment Prompt Builder (Identity Freeze + Slot Hierarchy)
+            │
+            ▼ (HTTPS REST / Gradio Client)
+[ Tier 3: VTON Inference Engine ]
+  ├── Kolors VTON (`Kwai-Kolors/Kolors-Virtual-Try-On` via Gradio Client)
+  ├── Specialized VTON: FASHN.ai / IDM-VTON / CatVTON
+  └── General Multimodal: OpenRouter (Gemini / Claude / FLUX)
+```
+
+---
+
+## 3. Storefront Implementation Contracts
+
+### A. Liquid Theme Component (`blocks/dnk-vton-button.liquid`)
+```liquid
+{% comment %} blocks/dnk-vton-button.liquid {% endcomment %}
+{% assign slot = product.metafields.custom.vton_slot | default: 'upper' %}
+<button 
+  type="button" 
+  class="dnk-vton-btn" 
+  data-dnk-product-id="{{ product.id }}"
+  data-dnk-variant-id="{{ product.selected_or_first_available_variant.id }}"
+  data-dnk-title="{{ product.title | escape }}"
+  data-dnk-image="{{ product.featured_image | image_url: width: 1024 }}"
+  data-dnk-slot="{{ slot }}">
+  <span class="dnk-vton-icon">👗</span>
+  <span class="dnk-vton-label">{{ block.settings.button_label | default: 'Приміряти образ' }}</span>
+</button>
+```
+
+### B. Multi-Item Cart Submission (`/cart/add.js`)
+When user approves the assembled outfit in the drawer:
+```javascript
+async function addFullOutfitToCart(slots) {
+  const items = slots
+    .filter(slot => slot.variantId)
+    .map(slot => ({
+      id: Number(slot.variantId),
+      quantity: 1,
+      properties: { '_dnk_vton_outfit_id': outfitHash }
+    }));
+
+  const res = await fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items })
+  });
+  return await res.json();
+}
+```
+
+---
+
+## 4. Key Pitfalls & Hardening Rules
+1. **Never Expose Merchant API Keys**: Storefront JS must NEVER call OpenRouter / Fal.ai directly. All inference requests must pass through `/api/v1/shopify/vton/*`.
+2. **Mobile Canvas Memory Quota**: iOS Safari crashes if downscaling 48MP mobile photos on large canvases. Enforce maximum canvas dimension clamp to 1024x1024 before drawing.
+3. **Out-of-Stock Variants**: Always re-verify live Shopify variant availability via `/products/{handle}.js` before submitting generation or cart payload.
+4. **Clean-Room CI Assertion**: Ensure automated test asserts that no foreign developer handle or external author tag exists in production assets.

@@ -1,0 +1,38 @@
+# 🌐 SOTA Pattern: Agentic SEO Suite & Open-Source Semrush Alternatives
+
+## 1. Context & Architectural Paradigm
+Traditional SEO suites (Semrush, Ahrefs) rely on proprietary link indexes and SERP scrapers with steep monthly subscriptions ($140-$500/mo). Open-source modern alternatives pivot from centralized platforms to **Agent-Native BYOK (Bring Your Own Key) Architectures**.
+
+### Canonical Core: `every-app/open-seo`
+- **Stack**: TypeScript, Cloudflare Workers / Wrangler, TanStack Router + React 19, Drizzle ORM + LibSQL/Cloudflare D1, Better-Auth.
+- **Agent Integration**: Exposes native Model Context Protocol (MCP) server (`@modelcontextprotocol/server`) allowing AI agents (Hermes, Claude Code, OpenClaw) to query keyword metrics, competitors, backlinks, and run audits directly via tool calls.
+- **Skills Directory**: Ships with 27 reusable Agent Skills (`.agents/skills/`) covering:
+  - `ai-visibility-audit` (tracking brand citation frequency in LLM answers: Perplexity, ChatGPT, Gemini).
+  - `keyword-research` & `keyword-clustering` (semantic intent grouping).
+  - `competitor-analysis` & `link-prospecting`.
+- **Cost Model**: User pays wholesale data provider rates (e.g. DataForSEO API) on pay-as-you-go terms rather than fixed monthly seat licenses.
+
+---
+
+## 2. Technical Audit & Crawler Landscape
+
+| Tool | Ecosystem | Strengths | Limitations |
+| :--- | :--- | :--- | :--- |
+| **`eliasdabbas/advertools`** | Python / Scrapy / Pandas | Asynchronous high-throughput crawling, log file parsing, Schema.org/JSON-LD validation, robots.txt, sitemaps. | Headless CLI/library, no out-of-the-box GUI. |
+| **`PhialsBasement/LibreCrawl`** | C++ / Qt / Python | Full desktop Screaming Frog open-source alternative; calculates internal PageRank, visualizes link graphs, local SQLite storage. | Desktop only; requires packaging/display. |
+| **`viasite/site-audit-seo`** | Node.js / Lighthouse | Automated crawler + Google Lighthouse integration with CLI, JSON/CSV/XLSX and local browser reports. | High memory footprint when rendering full Lighthouse per page. |
+
+---
+
+## 3. Critical Pitfalls & Deprecated Approaches
+
+1. **Direct Google SERP Scraping is Dead**:
+   - Tools relying on direct HTML parsing of Google search results (e.g., `serphacker/serposcope`, archived Jan 2024) are broken without heavy rotating residential proxy pools and TLS fingerprint spoofing.
+   - Use official APIs (Google Search Console API for owned properties) or specialized SERP aggregators (DataForSEO, SerpApi).
+2. **Unofficial Google Trends Scraping (`pytrends` Broken)**:
+   - `GeneralMills/pytrends` is archived (Aug 2024) after Google closed unofficial endpoints.
+   - For keyword expansion, use direct Google Suggest queries (`suggestqueries.google.com/complete/search?client=chrome&q=...`) which remain high-speed, rate-limit friendly, and unauthenticated.
+3. **Edge Worker Execution Timeouts**:
+   - Deep crawls of large e-commerce catalogs (10,000+ URLs) exceed Cloudflare Worker CPU limits (50ms - 30s) and memory caps (128MB). Offload crawling workloads to persistent Python container workers (`advertools` / Scrapy).
+4. **Client-Side Rendering (CSR) Blind Spots**:
+   - Raw HTTP fetch crawlers miss content and links on React/Vue client-rendered SPAs. Use browser automation (Playwright / Patchright) selectively for rendered DOM verification.

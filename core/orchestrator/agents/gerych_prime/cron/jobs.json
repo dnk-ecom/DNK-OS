@@ -1,0 +1,49 @@
+{
+  "jobs": [
+    {
+      "id": "6704cfb2977e",
+      "name": "autonomous_skill_curator",
+      "prompt": "Execute autonomous skill curation cycle:\n1. Run ./.venv/bin/python3 core/skills_curator.py --export-digest\n2. Inspect generated ./docs/notes/Skill Curator Digest.md for any Second Violation Invariants requiring structural barriers in scripts/system/hermes_pre_tool_hook.py.\n3. Summarize high-generality observations and report status.",
+      "skills": [],
+      "skill": null,
+      "model": "gemini-3.8-flash",
+      "provider": "vertex",
+      "provider_snapshot": null,
+      "model_snapshot": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "monitor_script": null,
+      "monitor_url": null,
+      "monitor_state": null,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 4 * * 1",
+        "display": "0 4 * * 1"
+      },
+      "schedule_display": "0 4 * * 1",
+      "repeat": {
+        "times": null,
+        "completed": 1
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-09-21T15:48:19.852436+03:00",
+      "next_run_at": "2026-11-02T04:00:00+02:00",
+      "last_run_at": "2026-10-26T04:00:34.314425+02:00",
+      "last_status": "error",
+      "last_error": "RuntimeError: No LLM provider configured. Run `hermes model` to select a provider, or run `hermes setup` for first-time configuration.",
+      "last_delivery_error": null,
+      "failure_streak": 1,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "fire_claim": null
+    }
+  ],
+  "updated_at": "2026-10-26T04:00:34.314884+02:00"
+}

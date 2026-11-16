@@ -29,7 +29,9 @@ def get_repo_root() -> Path:
 
 def get_tracker_file(session_id: str) -> Path:
     clean_id = "".join(c for c in session_id if c.isalnum() or c in ("-", "_")) or "default"
-    return Path(f"/tmp/hermes_loop_tracker_{clean_id}.json")
+    run_dir = Path.home() / ".dnk_runtime" / "run"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir / f"hermes_loop_tracker_{clean_id}.json"
 
 
 def load_tracker(session_id: str) -> dict:

@@ -1,0 +1,198 @@
+---
+name: dnk-swarm-orchestration
+description: Run and coordinate Gerych and DNK OS multi-agent swarms.
+category: autonomous-ai-agents
+version: "2.0.0"
+author: "DNK-e.com Maksym"
+license: "MIT"
+metadata:
+  hermes:
+    tags: ["swarm", "orchestration", "gerych", "dnk-os", "circuit-breaker", "lod"]
+    related_skills: ["sota-repository-assimilation", "sdlc-review"]
+    references:
+      - "references/runtime_artifact_hygiene.md"
+      - "references/session_sentinel_and_loop_hardening_protocol.md"
+      - "references/dnk_os_agentic_lexicon_and_ontology_guide.md"
+      - "references/swarm_dynamic_routing_parallel_pipeline_and_subscriber_task_safety.md"
+      - "references/a2a_mailbox_ndjson_and_join_barrier_protocol.md"
+      - "references/agent_harness_architecture_and_sota_execution_loop.md"
+      - "references/adversarial_audit_and_uncommitted_release_hygiene.md"
+      - "references/task_dna_lifecycle_and_live_canvas_hud_protocol.md"
+      - "references/stateless_agent_runtime_and_disk_hygiene.md"
+      - "references/unified_swarm_control_plane_and_engine_consolidation.md"
+      - "references/dynamic_context_budgeting_and_toolset_pruning.md"
+      - "references/critical_security_guards_and_evidence_verification_protocol.md"
+      - "references/system_audit_git_hygiene_and_memory_buffer_protocol.md"
+      - "references/github_mcp_fast_path_and_pre_pr_gate.md"
+      - "references/auto_task_spec_generation_and_mase_protocol.md"
+      - "references/phased_roadmap_tracking_and_task_note_sync_protocol.md"
+      - "references/agentic_os_harness_and_saap_synthesis_manifesto.md"
+      - "references/unreliable_progress_bar_and_deterministic_fsm_protocol.md"
+      - "references/lean_coding_agent_harness_and_anti_ballast_protocol.md"
+      - "references/human_intent_to_agent_execution_app_pattern.md"
+      - "references/lod_context_extraction_and_fastmcp_contracts_protocol.md"
+      - "references/cross_harness_presence_and_weak_loop_timeout_mitigation.md"
+      - "references/mcp_stdio_never_die_and_team_send_budget_protocol.md"
+      - "references/remote_http_mcp_endpoints_and_orbit_federation_protocol.md"
+      - "references/sovereign_reverse_engineering_and_native_subsystem_assimilation_protocol.md"
+      - "references/two_phase_audit_first_and_runtime_verification_protocol.md"
+      - "references/scope_clamping_and_autonomy_tiering_protocol.md"
+      - "references/hermes_core_audit_and_vendor_upgrade_protocol.md"
+      - "references/direct_sqlite_session_recovery_protocol.md"
+      - "references/deterministic_decision_draft_and_cryptographic_receipts.md"
+      - "references/federated_role_capsule_harness_and_astryx_ui_registry_protocol.md"
+      - "references/thought_companion_agent_and_9_harness_synthesis.md"
+      - "references/hermes_managed_instance_gateway_and_opc_pattern.md"
+      - "references/sovereign_jit_agent_vs_swarm_code_execution_protocol.md"
+---
+
+# 🐝 DNK Swarm Orchestration & Gerych Lifecycle Protocol (LOD Edition)
+
+## 📌 When to Use
+Coordinate Gerych Prime & Swarm agents across the DNK OS ecosystem.
+Enforces Zero-Waste High-Velocity Protocol (ZWSP v2.5 / MASE), atomic execution slices (≤ 25 tools per turn), parallel worker dispatch, and fail-closed quality gates.
+
+---
+
+## ⚡ 1. Step 0 Autonomous Triage & Routing Matrix
+
+Before modifying files or exploring codebase for any task involving >1 file or domain:
+```python
+triage = dnk_triage_task(full_task_prompt)
+# Formula: C = F_files + (2 * D_domains) + (3 * S_stages)
+```
+
+| Mode | Complexity | Routing Rule | Next Action |
+| :--- | :--- | :--- | :--- |
+| **SOLO** | C ≤ 3 | Single file/simple fix | Execute directly (≤ 15 tools) |
+| **SWARM_PARALLEL** | C > 3, ≥2 domains | Cross-domain tasks | **IMMEDIATELY** `dnk_swarm_parallel(tasks_json=...)` |
+| **SWARM_SEQUENTIAL** | C > 3, phased | Phased handoffs | `dnk_swarm_dispatch` with join barrier |
+
+### Specialized Domain Workers
+- `dnk_mentor`: **Chief Architect, Socratic Inception & Epistemic Armor Mentor** (`core/orchestrator/agents/dnk_mentor/SOUL.md`). Activates automatically whenever the wake-word **«Ментор»** / **«Mentor»** is spoken in conversation (`(?i)\b(ментор(?:е|у|ом|а)?|mentor)\b`), enforcing Presupposition Inversion, 3 Hidden Risks + Boundary Conditions + Skeptic Alternative, 5-Vector Critique, and Read-Only Code Barrier until `GERYCH_TASK_TEMPLATE.md` v2.5 is locked.
+- `gerych_builder`: UI, Canvas engine, React components, Tailwind styling, and **Local Prototype Builder & Launcher** (`dnk-local-prototype-launcher` for `../DNK_Vibe/` repositories: SSOT port reservation, EN/UK localization, ADR-008 theme, Google Cloud Vertex AI wiring).
+- `dnk_dev_fullstack`: FastAPI endpoints, Pydantic schemas, ORM/DB migrations.
+- `dnk_shopify`: Liquid AST, Shopify Functions, Checkout UI, theme modules.
+- `dnk_brand_typostyle`: **Brand Identity, Color Systems & Typography Architect** (`core/orchestrator/agents/dnk_brand_typostyle/agent_card.yaml`). Enforces W3C DTCG (`dtcg-2025.10`) + Google `DESIGN.md` token schemas, WCAG 2.2 contrast math (`>= 4.5:1` body / `>= 3.0:1` UI), 60-30-10 color balance, 8pt spatial grids, and deterministic CSS/Tailwind v4 export (`lint_design_tokens.py`, `export_theme_css.py`).
+- `dnk_video_ai_creator`: Remotion compositions, FFmpeg stitching, Shorts scripts.
+- `herich_librarian`: Documentation, Obsidian notes, ADRs, skill indexing.
+- `gerych_auditor`: Red-Team security review, Master Quality Gate verification.
+
+---
+
+## 🎯 2. Mandatory Core Invariants (SSOT)
+
+1. **Root Execution & Virtualenv SSOT**:
+   - Execution base is strictly `$HUB_ROOT`. Subprocesses inherit `$PYTHONPATH` and `.venv`.
+   - Never insert absolute paths into `sys.path`.
+   - Ref: `references/agent_harness_architecture_and_sota_execution_loop.md`.
+
+2. **Mandatory Atomic Slice Execution (MASE)**:
+   - Tasks must be partitioned into discrete atomic slices bound by ≤ 25 tool calls.
+   - Execute one slice at a time: targeted edits → local test verification → git commit → report.
+   - Ref: `references/auto_task_spec_generation_and_mase_protocol.md`.
+
+3. **Circuit-Breaker Protected Reading & Anti-Loop**:
+   - The pre-tool hook blocks repeated reads (≥3) of unmutated files.
+   - Repeating identical `skill_view` calls without action triggers the Tool Guardrail.
+   - Ref: `references/session_sentinel_and_loop_hardening_protocol.md`.
+
+4. **Runtime Artifact & Process Guard**:
+   - Agent profiles (`core/orchestrator/agents/<agent>/`) must remain stateless.
+   - Ephemeral DBs and WAL logs are isolated to `~/.hermes/runtime/<agent>/`.
+   - Singleton lock prevents zombie processes on SQLite sessions.
+   - Ref: `references/runtime_artifact_hygiene.md`.
+
+5. **GitHub Native Tooling First**:
+   - For remote repo inspection and PRs, use pre-connected GitHub MCP tools (`mcp__github__*`).
+   - For terminal git operations, inherit `$GH_TOKEN`. Never use raw interactive prompts.
+   - Canonical remote for HUB is always `Kuzmenko-top/DNK_HUB`.
+   - Ref: `references/github_mcp_fast_path_and_pre_pr_gate.md`.
+
+6. **Quality Gate Verification & Evidence**:
+   - Modifying tasks require 100% Green `bash scripts/verify_all.sh` or `python3 scripts/system/auto_precommit_guard.py`.
+   - Generate signed evidence:
+     `python3 scripts/system/generate_evidence.py --task <ID> --title "<TITLE>" --components <FILES...>`
+   - Ref: `references/critical_security_guards_and_evidence_verification_protocol.md`.
+
+7. **LOD Context Slicing & FastMCP Workhorse Protocol**:
+   - Context extracted for domain workers must never exceed 1,500 tokens (JIT Tooling).
+   - Brand negative constraints (`BrandDNA.negative_constraints`) are strictly inviolable and never dropped during budget pressure.
+   - Ref: `references/lod_context_extraction_and_fastmcp_contracts_protocol.md`.
+
+8. **Sovereign Native Implementation over Cloud Subordination**:
+   - When assimilating external cognitive platforms (e.g. Orbit Agents, OpenBot): NEVER subordinate DNK OS as an ephemeral worker in an external cloud.
+   - Conduct clean-room reverse engineering of core features (Vault 3-tier storage, Knowledge Intercept HITL, Reactive Trackers, Heartbeat/Presence, FastMCP Gateway) directly into native `DNK_HUB` modules.
+   - Ref: `references/sovereign_reverse_engineering_and_native_subsystem_assimilation_protocol.md`.
+
+9. **Two-Phase Audit-First & Live Runtime Verification Protocol**:
+   - Strict Zero-Write Phase 1: file mutations are forbidden during initial exploration, root cause triage, and boundary planning.
+   - Anti-Mock Invariant: mock-only unit tests do not satisfy completion; require live FastMCP, HTTP, or DOM runtime verification.
+   - Safety Nets Over Guard Rails: low-friction feature branch execution guarded by pre-merge test nets and async task handoffs (>30s).
+   - Ref: `references/two_phase_audit_first_and_runtime_verification_protocol.md`.
+
+---
+
+## ⚠️ 3. High-Frequency Pitfalls & Immediate Mitigations
+
+| Pitfall | Root Cause | Mandatory Mitigation |
+| :--- | :--- | :--- |
+| **`skill_view` Compaction Loop** | Full skill dump exceeds context budget, causing compaction and repeated re-reads. | Use LOD loading (`skill_view(name, section="...")`). Guardrail blocks ≥3 reads. |
+| **GitHub GraphQL `Could not resolve to a Repository`** | Calling `gh` targeting wrong/stale remote names (`m-craft.top`, `DNK_OS_MVP`). | Resolve remote via `git remote get-url hub` (defaults to `Kuzmenko-top/DNK_HUB`). |
+| **Zombies & Stale Processes (>2.5h)** | Background subagents or hung watchers hold session locks. | Run `python3 scripts/system/session_sentinel.py --reap-stale`. |
+| **Rate Limit 429 on Pytest** | API tests hit default rate limiter in test runs. | Export `SECURITY_RATE_LIMIT=100000` and `TESTING=1` before tests. |
+| **Working Tree PR Block** | Pre-tool hook blocks PR creation with dirty uncommitted tree. | Commit verified changes before invoking PR tools. |
+| **Streamable HTTP MCP 406 / Profile Mismatch** | Missing `text/event-stream` Accept header or config written to wrong agent profile path. | Pass `Accept: application/json, text/event-stream` and sync config to both active profile and `~/.hermes/config.yaml`. |
+| **Absolute Path Rejection** | Using `/Users/...` in scripts, commands, or imports. | Always use relative paths (`./`, `../`). Pre-tool hook sanitizes or rejects. |
+| **`session_search` Zero Hits on Known Session** | Session recorded in agent profile `state.db` rather than default CLI SQLite path. | Query profile `state.db` directly (sessions/messages) per `references/direct_sqlite_session_recovery_protocol.md`. |
+| **Session ID & Timestamp Prefix Search Fail** | Passing short timestamp prefix (`20261010_235004`) to `session_search(query=...)` fails because FTS5 indexes message text, not session metadata. | Query `.scones/task_evolution_catalog.json` or `core/orchestrator/agents/gerych_prime/state.db` (`SELECT id, title FROM sessions WHERE id LIKE 'PREFIX%'`) to resolve the full hash ID (`20261010_235004_6412f7`), then call `session_search(session_id=full_id)`. |
+| **Public Harness Script Rejection (Gemini/ChatGPT)** | Uploading skill bundles containing `.py`, `.sh`, or executable instructions triggers security sandbox errors in Gemini Web Chat / Custom GPTs. | Export clean Zero-Script `SKILL.md` bundles via `references/public_ai_harness_skills_and_lead_magnet_protocol.md` with strict 2-field frontmatter (`name`, `description`). |
+| **Background Dev Server Killed Across Turns (`ERR_CONNECTION_REFUSED`)** | Starting long-lived preview servers (`shopify theme dev`, `vite`, `uvicorn`) with `background=True, notify_on_complete=True` treats them as 1-shot bounded jobs and terminates them. | Launch persistent dev servers with `background=True, notify_on_complete=False`. |
+| **Async `canvas.toBlob` Race (`FileNotFoundError` in `vision_analyze`)** | `browser_exec` returns before asynchronous `canvas.toBlob` download flushes to disk, causing immediate `vision_analyze` failures and retry thrashing. | Use `scripts/system/helix_re_gate_runner.py` (`build_composite_inspection_sheet` / `Promise.all` sync-wait) and verify `st_size >= 1024` before calling `vision_analyze`. |
+| **Evidence Gate / Coordinator Singleton Sandbox Desync** | When tests or subagents run in isolated scratch/mock worktrees (`tmp_path`), singleton instances of `VerifiableEvidenceGate` or `SwarmCoordinator` retain default `hub_root` (real repo root), causing target file mutation checks to reject valid outputs as status laundering (`target_files_missing`). | Dynamically bind `hub_root` upon instantiation (`VerifiableEvidenceGate(hub_root=...)`), instantiate `active_evidence_gate` within coordinator dispatch, and resolve fallback agents dynamically. |
+| **Worktree Relative Path Failure (`ValueError: is not in the subpath`)** | Ephemeral worktrees allocated in external system stores (e.g. `~/.dnk_runtime/worktrees`) fail when calling `path.relative_to(hub_root)`. | Wrap `relative_to` in `try...except ValueError` and fall back to raw path string representation. |
+
+---
+
+## 📚 4. Complete Reference Index
+
+For deep-dive runbooks and protocols, load specific reference files via `read_file`:
+- `references/runtime_artifact_hygiene.md` — Disk saturation, Docker pruning, WAL maintenance.
+- `references/swarmchat_at_least_once_delivery_and_role_topology_protocol.md` — SwarmChat At-Least-Once delivery via piggybacked ACK, `peek=True` long-polling recovery, and ProgramBench role topologies (Builder vs Tester channel isolation, Owner vs Helper single-committer model).
+- `references/chief_architect_mentor_and_human_task_intake_protocol.md` — `dnk_mentor` wake-word interception (`MENTOR_WAKE_REGEX`), SOLO vs SWARM_PIPELINE triage routing, Epistemic Armor (3 Flaws Rule, Presupposition Inversion), and `TriageResult.to_dict()` / `GerychSwarmCoordinator` test contracts.
+- `references/session_sentinel_and_loop_hardening_protocol.md` — Watchdog loops, self-healing.
+- `references/dnk_os_agentic_lexicon_and_ontology_guide.md` — 6-cluster agentic ontology, mental models & lexicon index (`086_dnk_os_agentic_lexicon_and_sota_architecture_glossary.md`).
+- `references/swarm_dynamic_routing_parallel_pipeline_and_subscriber_task_safety.md` — Dynamic routing.
+- `references/a2a_mailbox_ndjson_and_join_barrier_protocol.md` — Swarm communication & join barriers.
+- `references/agent_harness_architecture_and_sota_execution_loop.md` — Agent harness & execution loops.
+- `references/github_mcp_fast_path_and_pre_pr_gate.md` — GitHub MCP tools & pre-PR evidence gates.
+- `references/auto_task_spec_generation_and_mase_protocol.md` — TaskDNA DAGs & MASE specifications.
+- `references/phased_roadmap_tracking_and_task_note_sync_protocol.md` — Phased roadmap tracking, task note synchronization, and metrics logging.
+- `references/agentic_os_harness_and_saap_synthesis_manifesto.md` — SOTA Agentic OS & Harness architecture v5.0, SaaP 4-protocol ingestion, ODS model switchboard & WebSocket connection pooling.
+- `references/unreliable_progress_bar_and_deterministic_fsm_protocol.md` — Deterministic orchestrator FSM protocol & empirical proof against LLM self-reporting (arXiv:2609.08589).
+- `references/lean_coding_agent_harness_and_anti_ballast_protocol.md` — Lean coding agent harness architecture & anti-ballast protocol for pure terminal swarms (zero-bloat CLI runtime).
+- `references/human_intent_to_agent_execution_app_pattern.md` — Canonical architecture & engineering pattern for standalone agentic applications (Human = Ideas, Agents = Executors).
+- `references/skill_sandboxing_and_agentic_threat_defense_protocol.md` — Skill Sandboxing, Anti-Patchwork Architecture, Shift-Left Threat Defense, and Deterministic Agentic Fitness Functions.
+- `references/agent_context_architecture_and_5_file_audit.md` — 5-file context stack audit (CLAUDE.md, USER.md, rules.md, decisions.md, handoff.md), subagent context stripping, and anti-hyper-fragmentation invariants.
+- `references/lod_context_extraction_and_fastmcp_contracts_protocol.md` — Level-of-Detail (LOD) Context Slicing under 1,500-token ceiling, negative constraints inviolability, and FastMCP contracts for the 3 Core Workhorses.
+- `references/cross_harness_presence_and_weak_loop_timeout_mitigation.md` — Cross-Harness Multi-Agent Presence, Weak-Loop Timeout Clamping (Cursor/Antigravity vs CLI), Anti-Tool-Dropout Discipline (`NEXT_LISTEN`), and Webhook Wake-Up Architecture.
+- `references/mcp_stdio_never_die_and_team_send_budget_protocol.md` — MCP Stdio Never-Die Runtime Invariant (EPIPE/unhandledRejection process protection), Multi-Agent Team Send Budget Loop Breaker, and macOS DMG Entitlement Audit Protocol.
+- `references/remote_http_mcp_endpoints_and_orbit_federation_protocol.md` — Remote HTTP/SSE MCP endpoints, Cloudflare WAF header invariants, and compute decoupling (local Google Cloud / Vertex AI credits vs remote MCP tooling).
+- `references/async_orchestration_derisking_and_babysit_pattern.md` — High-velocity agentic workflows: async fire-and-forget, babysit PR remediation loops, runtime preview derisking, and safety nets over guard rails.
+- `references/two_phase_audit_first_and_runtime_verification_protocol.md` — Two-Phase Audit-First protocol (Zero-Write Phase 1), Live Runtime Anti-Mock Verification (FastMCP/HTTP/DOM), and Safety Nets Over Guard Rails.
+- `references/scope_clamping_and_autonomy_tiering_protocol.md` — Scope Clamping (-60% tokens), 4-Tier Autonomy Ladder, Pre-Execution Effort Estimation, and Hype Deconstruction.
+- `references/shopify_helix_4gates_and_fleet_worktree_patterns.md` — Shopify Helix 4 Hard Gates (Behavior, UI, Adversarial, HITL) and Fleet Swarm Git Worktree isolation.
+- `references/session_retrieval_and_prefix_resolution_protocol.md` — Timestamp prefix resolution, TaskDNA catalog correlation, and full session dump protocols.
+- `references/hermes_core_audit_and_vendor_upgrade_protocol.md` — Protocol for auditing, vendoring, and upgrading embedded/monorepo Hermes Agent core, managing local patches (Vertex token refresh), and preventing SQLite state.db lockups.
+- `references/direct_sqlite_session_recovery_protocol.md` — Direct SQLite session recovery & deep context extraction from agent `state.db` when `session_search` yields 0 hits.
+- `references/cma_decoupled_harness_dreaming_and_rubrics_protocol.md` — Claude Managed Agents (CMA) decoupled harness (Brain vs Hands), Egress Proxy security, Dreaming memory distillation, and rubric self-supervision.
+- `references/deterministic_decision_draft_and_cryptographic_receipts.md` — Deterministic candidate selection, zero-trust Hard Gates, Abstention Protocol (<5% margin / <70 score), and canonical JEV cryptographic decision receipts (`jvr_<digest>`).
+- `references/sota_repo_catalog_and_dogfooding_mvp_synthesis.md` — Standalone repo catalog FTS5 integration, Zero-Discussion-Amnesia Decision Draft Engine (3 risks + skeptic alt), and tri-interface dogfooding (MCP/CLI/REST) for Product v1 standalone repositories.
+- `references/federated_role_capsule_harness_and_astryx_ui_registry_protocol.md` — Clean Upstream binary + DNK Overlay separation, Federated Role-Capsule Swarm for the 6-stage Shopify Pipeline, and Meta Astryx machine-readable UI Component Registry over Next.js/Tailwind/@xyflow.
+- `references/thought_companion_agent_and_9_harness_synthesis.md` — `FirstThoughtCompanionAgent` (`core/kernel/thought_companion.py`) distilling `DNK_OS_APP` and 9 SOTA DAG/Canvas harnesses (`thoughtdag`, `canvas-harness`, `tributary`, `dim0`, `dagster`, `dsh-agent-team-gui`, `algopipe`, `node-editor`, `nonlinear-chat`), `Wire(from_node=..., to_node=...)` domain contract rules, single-line decomposition safeguard, and `/api/v1/kernel/companion/*` endpoints.
+- `references/tri_audience_docs_portal_and_client_delivery_protocol.md` — Architecture & Verification Protocol for Tri-Audience Docs Portal (DEC-019): Fumadocs Dark Teal UI blocks, Fern RBAC server-side multi-tenant filtering, `/llms.txt` + `*.md` pure agent protocols, and client sign-off auto-conversion into live TaskForest / TaskDNA DAG flowers.
+- `references/opendesign_vertex_media_and_model_switch_protocol.md` — OpenDesign Local / standalone canvas harness: dynamic Google Cloud Vertex AI model switcher and zero-key Imagen/Veo media provider activation.
+- `references/lego_agent_brick_and_dtcg_token_engineering.md` — LEGO Agent Brick 4-layer scaffolding (`agent_card.yaml`, templates, LOD skill, deterministic CLI scripts), protected `SOUL.md` approval fallback, and W3C DTCG 2025.10 + `DESIGN.md` design token validation (`dnk_brand_typostyle`).
+- `references/hermes_managed_instance_gateway_and_opc_pattern.md` — Hermes managed instance gateway (`:8642` agent execution vs `:8645` LLM proxy), OpenAI-compatible completions bridge, and OnePersonCompany zero-bloat architecture.
+- `references/folder_as_architecture_and_minimalist_posix_harness_protocol.md` — Folder-as-Architecture vs Code-as-Architecture paradigm, Minimalist POSIX Harness (Terminal, Read, Write, Search), AI Delegation Triad (Interview -> Toolbox -> Proof), and Multimodal Video Audit Protocol.
+- `references/sovereign_jit_agent_vs_swarm_code_execution_protocol.md` — Sovereign JIT Single-Agent vs Conversational Swarms: FastMCP Code Execution (-98% token payload compression), Bernoulli compound failure prevention ($0.95^{10} \approx 59.8\%$), and Ephemeral Goldfish Pre-Commit Gate (DEC-038).

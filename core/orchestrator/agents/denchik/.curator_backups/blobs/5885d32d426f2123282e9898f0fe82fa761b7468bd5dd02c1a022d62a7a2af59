@@ -1,0 +1,33 @@
+# Foreign Language Purge & Ukrainian Localization Checklist
+
+When tasked with completely removing an unwanted foreign language (e.g. Chinese `zh`, Korean `ko`, Russian `ru`) and establishing Ukrainian (`uk`) and English (`en`) as the primary locales:
+
+## 1. UI & Dictionary Scope
+- **Core Dictionary**: Generate full key symmetry for `uk`. Ensure natural, domain-specific terminology (e.g., IT and software terms preserved or cleanly adapted, not machine-translated literalisms).
+- **Default Locale**: Set default fallback to `uk` (or user-preferred `en`), remove the purged locale from `SUPPORTED_LOCALES` or language selectors (`LangSwitch`).
+- **Attributes & Hidden Text**: Inspect `placeholder`, `aria-label`, `title`, button labels, shortcut tooltips, and modal descriptions.
+
+## 2. Dynamic Language Detection & Regex
+- Replace CJK/foreign regex filters with Cyrillic detection for Ukrainian:
+  ```typescript
+  // Match Ukrainian / Cyrillic characters
+  const UKRAINIAN_CYRILLIC_REGEX = /[\u0400-\u04FF]/;
+  ```
+- If an automated content language detector exists, remove branches routing to the purged language codes.
+
+## 3. Generative AI Prompts & LLM Directives
+- **System Instructions**: Update LLM system prompts directing output language to Ukrainian (`uk`) and English (`en`).
+- **Prompt Examples (Few-Shot)**: Replace any hardcoded foreign-language examples in system prompts with authentic Ukrainian or English examples.
+- **Language Hints**: Pass explicit `lang: "uk"` in API payloads and generation briefs.
+
+## 4. Starter Content & Presets
+- Starter templates, sample projects, cards, and preset collections often contain hardcoded strings.
+- Separate or localize template files (e.g. `templates_uk.json` or dynamic template localization helpers).
+
+## 5. API Routes & Server Errors
+- Audit `app/api/*` or `routes/*` for hardcoded error strings, validation messages, or fallback responses.
+- Translate error payloads into Ukrainian so that frontend toasts and alerts never display foreign text when requests fail.
+
+## 6. Document Shell & Fonts
+- Update `<html lang="uk">` in `layout.tsx` or `index.html`.
+- Ensure font stacks include clean Cyrillic glyph support (e.g., Inter, system-ui, Apple SD Gothic Neo, or -apple-system).

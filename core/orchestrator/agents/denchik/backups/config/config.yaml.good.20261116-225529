@@ -1,0 +1,138 @@
+model:
+  default: gemini-4-argon
+  provider: vertex
+  reasoning_effort: medium
+providers:
+  gemini:
+    base_url: ${VERTEX_BASE_URL}
+    key_env: VERTEX_API_KEY
+  nvidia:
+    base_url: https://integrate.api.nvidia.com/v1
+    key_env: NVIDIA_API_KEY
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    key_env: OPENROUTER_API_KEY
+fallback_providers:
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.7-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.6-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.1-pro-preview
+    provider: vertex
+    context_length: 2097152
+  - model: gemini-2.5-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-2.5-pro
+    provider: vertex
+    context_length: 2097152
+  - model: meta/llama-3.2-11b-vision-instruct
+    provider: nvidia
+    context_length: 128000
+  - model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning
+    provider: nvidia
+    context_length: 128000
+  - model: openrouter/auto
+    provider: openrouter
+    context_length: 128000
+toolsets:
+  - terminal
+  - file
+  - web
+  - skills
+  - dnk_swarm
+  - delegation
+  - architecture
+  - memory
+  - code_execution
+agent:
+  reasoning_effort: medium
+  reasoning_overrides:
+    gemini-4-argon: medium
+    gemini-3.8-flash: medium
+    gemini-3.7-flash: medium
+    gemini-3.6-flash: medium
+    gemini-3.1-pro-preview: low
+  service_tier: ''
+  tool_use_enforcement: auto
+  coding_context: focus
+  gateway_timeout_warning: 300
+  clarify_timeout: 300
+  gateway_notify_interval: 120
+  gateway_auto_continue_freshness: 3600
+  image_input_mode: auto
+  disabled_toolsets:
+    - computer_use
+    - session_search
+    - clarify
+    - discord
+    - discord_admin
+    - homeassistant
+    - feishu_doc
+    - feishu_drive
+    - hermes-yuanbao
+    - tts
+    - video_gen
+    - image_gen
+    - browser
+    - browser_camofox
+compression:
+  enabled: true
+  threshold: 0.25
+  target_ratio: 0.12
+  protect_last_n: 6
+  hygiene_hard_message_limit: 25
+display:
+  busy_input_mode: interrupt
+  tui_auto_resume_recent: false
+  bell_on_complete: true
+  show_reasoning: true
+  reasoning_full: true
+  streaming: true
+  timestamps: false
+  final_response_markdown: render
+  persistent_output: true
+  persistent_output_max_lines: 200
+  inline_diffs: true
+approvals:
+  destructive_slash_confirm: false
+command_allowlist: []
+code_execution:
+  mode: project
+  timeout: 300
+  max_tool_calls: 50
+  max_stdout_bytes: 50000
+onboarding:
+  seen:
+    tool_progress_prompt: true
+    busy_input_prompt: true
+_config_version: 39
+platform_toolsets:
+  cli:
+    - architecture
+    - code_execution
+    - connections
+    - delegation
+    - dnk_swarm
+    - file
+    - memory
+    - skills
+    - terminal
+    - web
+mcp_servers: {}
+auxiliary_models:
+  compression:
+    provider: vertex
+    model: gemini-3.8-flash
+    base_url: ''
+    api_key: ''
+    timeout: 120
+session_reset:
+  at_hour: 4
+  idle_minutes: 1440
+  mode: both

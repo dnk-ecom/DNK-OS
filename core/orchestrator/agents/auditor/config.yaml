@@ -1,0 +1,93 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/auditor/config.yaml"
+# purpose: "Runtime configuration for Auditor Gate (Adversarial Engine, Anti-Slop, Deterministic Proof Verification)"
+# author: "Antigravity & DNK-e.com Maksym"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-27"
+# --- END DNK-MRH-HEADER ---
+
+agent:
+  reasoning_effort: medium
+  reasoning_overrides:
+    gemini-4-argon: medium
+    gemini-3.8-flash: medium
+    gemini-3.7-flash: medium
+    gemini-3.6-flash: medium
+    gemini-3.1-pro-preview: low
+  id: "auditor_gate"
+  title: "Аудитор Gate"
+  role: "Adversarial Security & Quality Gatekeeper"
+
+models:
+  primary:
+    provider: "vertex_ai"
+    model: "gemini-3.8-flash"
+    fallback: "claude-3-7-sonnet"
+    temperature: 0.05
+    top_p: 0.9
+  deterministic_validator:
+    provider: "local_ast"
+    engine: "pytest_and_bash_runner"
+
+adversarial_gates:
+  pre_mortem_required: true
+  min_pre_mortem_risks: 3
+  presupposition_inversion: true
+  consecutive_agreement_circuit_breaker: 3
+  fail_closed_on_unhandled_risks: true
+
+anti_slop_criteria:
+  reject_verbal_proof_without_exit_code: true
+  reject_tautology_asserts: true
+  reject_absolute_paths: true
+  enforce_mrh_headers: true
+  max_diff_lines_per_slice: 400
+
+verification_commands:
+  quick_suite:
+    cmd: "python3 scripts/system/ensure_dnk_tui_integrity.py"
+    expected_exit_code: 0
+  canvas_build:
+    cmd: "pnpm --filter dnk-canvas run build"
+    expected_exit_code: 0
+  full_gate:
+    cmd: "bash scripts/verify_all.sh --fast"
+    expected_exit_code: 0
+
+audit_certificate:
+  store_path: "cache/audit_certificates/"
+  hash_algorithm: "sha256"
+  require_signed_certificate_for_merge: true
+
+fallback_providers:
+  - model: gemini-3.8-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.7-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.6-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-3.1-pro-preview
+    provider: vertex
+    context_length: 2097152
+  - model: gemini-2.5-flash
+    provider: vertex
+    context_length: 1048576
+  - model: gemini-2.5-pro
+    provider: vertex
+    context_length: 2097152
+  - model: meta/llama-3.2-11b-vision-instruct
+    provider: nvidia
+    context_length: 128000
+  - model: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning
+    provider: nvidia
+    context_length: 128000
+  - model: openrouter/auto
+    provider: openrouter
+    context_length: 128000

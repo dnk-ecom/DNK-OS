@@ -1,0 +1,101 @@
+---
+title: "Openmontage Vertical Shorts And Clip Factory Patterns"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/openmontage_vertical_shorts_and_clip_factory_patterns.md"
+> purpose: "Document: Openmontage Vertical Shorts And Clip Factory Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "openmontage_vertical_shorts_and_clip_factory_patterns"
+# purpose: "Architectural Patterns & SOTA Implementation for OpenMontage, WhisperX Word Highlights, and Remotion Shorts Pipeline."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-14"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+# 🎬 OpenMontage Vertical Shorts & Clip Factory Patterns
+
+## 1. Overview & Core Philosophy
+The OpenMontage (`calesthio/OpenMontage`) pipeline automated vertical video production (9:16 Shorts/Reels/TikTok) from long-form audio/video content by combining:
+1. Word-level timestamp extraction (WhisperX / Gemini Multimodal Audio).
+2. Algorithmic highlight extraction based on speech density, hook strength, and WPM velocity.
+3. Programmatic rendering and subtitle kinetic typography via Remotion / FFmpeg.
+4. Cryptographic provenance receipts for verified auditability.
+
+---
+
+## 2. Highlight Extraction & Scoring Engine (`ClipFactory`)
+
+### A. Word-Level Ingestion & Disfluency Cleaning
+- **Word Timestamps**: Each word is mapped to `WordTimestamp(word, start, end, confidence)`.
+- **Disfluency Filtration**: Remove speech filler words that degrade retention while preserving sentence flow:
+  - English: `um`, `uh`, `like`, `you know`, `actually`, `basically`.
+  - Ukrainian: `ну`, `типу`, `коротше`, `е-е-е`, `значить`, `як би`, `в принципі`.
+- **Silence & Dead-Air Detection**:
+  - Gaps between adjacent words `>= 1.2s` are flagged as pause boundaries.
+  - Excessive silence ratio (> 0.20 of total duration) penalizes virality score.
+
+### B. Virality Retention Scoring Formula
+The highlight candidate retention score $S_{retention} \in [0.0, 1.0]$ is computed as:
+$$S = \text{clamp}\left(0.40 \cdot S_{density} + 0.30 \cdot S_{wpm} + 0.30 \cdot S_{hook} - P_{silence}, 0.0, 1.0\right)$$
+Where:
+- **Speech Density** ($S_{density}$): Active speech time divided by candidate duration.
+- **WPM Velocity Score** ($S_{wpm}$):
+  - Target optimum: $130 - 170 \text{ WPM}$ (high engagement for vertical mobile feed).
+  - Calculated as: $1.0 - \min(1.0, |\text{wpm} - 150| / 70)$.
+- **Hook Strength** ($S_{hook}$): Presence of high-impact trigger words in the first $3.0\text{s}$ (e.g., "secret", "how to", "never", "дивіться", "секрет", "найкращий").
+- **Silence Penalty** ($P_{silence}$): $0.5 \times \text{silence\_ratio}$ if silence exceeds 15%.
+
+### C. Sliding Window & Overlap Deduplication (IoU NMS)
+- Candidate window duration clamped to $[15.0\text{s}, 60.0\text{s}]$.
+- Overlapping candidates are suppressed using 1D Intersection over Union (IoU) with threshold $\theta_{iou} = 0.40$:
+  $$\text{IoU}(A, B) = \frac{\max(0, \min(A_{end}, B_{end}) - \max(A_{start}, B_{start}))}{\max(A_{end}, B_{end}) - \min(A_{start}, B_{start})}$$
+
+---
+
+## 3. Remotion 9:16 Shorts Pipeline Assembly
+
+### A. Strict Timeline Validator & Remotion Invariants
+When assembling vertical `VideoComposition` (1080x1920 @ 30 FPS):
+1. **Keyframe Boundary Clamping**:
+   - In Remotion and `TimelineValidator`, keyframes must never exceed clip duration in frames:
+     $$\text{frame}_{max} \le \text{duration\_frames} - 1$$
+   - A keyframe placed at $\text{duration\_frames}$ violates `keyframe.frame < clip.duration_in_frames`. Always clamp keyframe targets with `max(0, duration_frames - 1)`.
+2. **Track Separation for Simultaneous Overlays**:
+   - Multiple visual elements visible at the same time (e.g. Background Video, Retention Progress Bar, Subtitles, Hook Card, Branding Badge) **must** reside in separate dedicated tracks (e.g., `track_video_main`, `track_progress_bar`, `track_subtitles`, `track_brand_badge`).
+   - Placing overlapping visual clips in the same track causes timeline collision errors (`OverlappingClipsError`).
+3. **Kinetic Subtitle Phrase Chunking**:
+   - Do not display single words independently on screen; group words into rhythmic chunks of 3–4 words ($0.8 - 1.5\text{s}$ each).
+   - Apply micro-spring or ease-out scale animations ($0.9 \to 1.05 \to 1.0$) and rapid opacity ramp ($0.0 \to 1.0$ over 3 frames) to maximize visual rhythm without motion blur.
+
+---
+
+## 4. Cryptographic Provenance Receipt (`VideoReceipt`)
+To prevent "status laundering" and ensure deterministic traceability:
+- Every generated Short emits a tamper-evident `VideoReceipt`:
+  - `receipt_id`: 16-hex deterministic identifier.
+  - `source_media_hash`: SHA-256 of source transcript/audio stream.
+  - `composition_hash`: SHA-256 of serialized timeline JSON.
+  - `edl_segments`: List of `(source_start, source_end)` cuts.
+  - `render_preset`: Target resolution, FPS, and container codec parameters.

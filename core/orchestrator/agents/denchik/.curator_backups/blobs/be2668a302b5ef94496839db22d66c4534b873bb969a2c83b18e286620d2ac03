@@ -1,0 +1,157 @@
+---
+title: "Chief Of Staff Obsidian Chair Anatomy And Subtraction Rebuild"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/chief_of_staff_obsidian_chair_anatomy_and_subtraction_rebuild.md"
+> purpose: "Document: Chief Of Staff Obsidian Chair Anatomy And Subtraction Rebuild"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/chief_of_staff_obsidian_chair_anatomy_and_subtraction_rebuild.md"
+# purpose: "SOTA Reference: jdpolasky/chief-of-staff-2 Obsidian-First Chair Anatomy, Subtraction Rebuild, and 13 Operational Laws"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "2.1.0"
+# updated_at: "2026-10-26"
+# author: "Gerych Prime & Maxim"
+# --- END DNK-MRH-HEADER ---
+
+# 🧬 SOTA Reference: Chief of Staff v2 (jdpolasky/chief-of-staff-2)
+
+## 📌 Context & Motivation
+Many AI operating systems collapse under self-inflicted bloat:
+1. Memory systems mutate into tiered indices, decay rules, and logs that require their own audit tools.
+2. Hook proliferation triggers cascading latency and silent failures.
+3. Founders spend their mornings fixing the assistant instead of doing high-leverage work (breaking Law 10: *The system may never become its own project*).
+
+`chief-of-staff-2` provides the proven antidote: a complete "Subtraction Rebuild" based on plain markdown in Obsidian, disposable harnesses, strict 4-part chair anatomy, an inward-facing maintenance chair ("Physical Plant"), and 13 operational laws.
+
+---
+
+## 🏛️ 1. The 4-Part Chair Anatomy
+Every role / domain worker ("Chair") in the personal AI C-suite follows this exact invariant structure:
+
+```
+[ Chair Folder ]/
+├── <Chair> Skill.md     # Thin, stateless instructions. Followable by cheap/fast models.
+├── <Chair> Source.md    # Active state sheet. Open loops, active decisions, next physical action.
+├── Parts/ or Research/  # Domain reference assets, specifications, schemas, working documents.
+└── Archive/             # Dated write-once transcripts (YYYY-MM-DD Title.md). Never indexed or auto-loaded.
+```
+
+### Invariant Rules for Chair Anatomy:
+- **Skill**: Contains zero session state and zero history. Must fit in small context windows.
+- **Source**: Single Source of Truth (SSOT) for current status. Read at session start, rewritten at session end.
+- **Archive**: Write-once history. Never auto-loaded (respects Law 12: *Born Lazy*). Loaded strictly when specific historical recall is explicitly requested.
+
+---
+
+## 🏢 2. The Inward-Facing "Physical Plant" Chair
+Most systems blend infrastructure management with user task execution, leading to context contamination and distraction.
+Chief of Staff v2 isolates all internal upkeep into a dedicated inward-facing chair:
+
+- **Outward-Facing Chairs**: Planner (Time), Career Coach (Strategy), Health (Energy), Money (Runway), Product/Builder (Engineering).
+- **Inward-Facing Chair (`Physical Plant`)**:
+  - Owns: Harness configuration, permissions, skill routing, cron heartbeat verification, vault directory structure.
+  - Does NOT own: Domain content or user decisions.
+  - Mandate: *"Finish the machinery well enough that the user stops having to think about it."*
+
+---
+
+## ⚖️ 3. The 13 Operational Laws
+1. **Portability is the Prime Law**: The canon lives in human-readable markdown; any agent harness (Hermes, Claude Code, Cursor) is a thin, disposable adapter rebuildable in 1 hour.
+2. **Routine Work via Code; Model Makes Judgments**: Never ask an LLM to derive what a 10-line Python or bash script can execute deterministically.
+3. **Additions Earn Their Way In**: A mistake must happen twice before creating a new rule or hook. One rule added = one retired rule pruned.
+4. **Every Fact Has One Home**: Never duplicate facts across files. Cross-link via wikilinks.
+5. **Nothing Scheduled Dies Quietly**: Scheduled jobs must emit visible heartbeats or fail with alerts.
+6. **Done Means Saved, Wired, and Tested**: Work is only complete when backed by real tool verification.
+7. **Delegate Down**: Routine formatting and scans run on cheap/fast models; save frontier models for architecture and adversarial audits.
+8. **Match Effort to Question Size**: Provide punchy answers for simple questions; reserve deep reasoning for architectural decisions.
+9. **Museum, Never Delete**: Archive retired components rather than destructively deleting historical context.
+10. **Keep the System Boring**: The system exists to serve the work; it must never become its own black hole.
+11. **Snapshots Over Living Files**: Prefer dated write-once session notes over files undergoing continuous mutation.
+12. **Born Lazy**: Maintain a 1-line index; load full text only when explicitly triggered (Level-of-Detail / LOD).
+13. **Finish It or Put It in the User's Hand**: Never leave dangling half-steps; deliver single-action CLI recipes.
+- **Coda: Subtraction Over Surveillance**: If an automated monitor or rule broke silently and nobody missed it, delete it.
+
+---
+
+## 🔄 4. Universal Session Rhythms
+
+### Morning Briefing (`Morning.md`)
+- Inspect schedule and active alerts.
+- Read active Chair `Source.md` files.
+- Produce 3 blocks:
+  1. **Today**: Schedule + priority tasks.
+  2. **This Week**: Deadlines and rhythm milestones.
+  3. **The Big Picture**: 1 sentence connecting today's effort to the founder mission.
+- End with **one next physical action** (zero guilt, zero overwhelm).
+
+### Session Closure (`End.md`)
+- Acknowledge verified wins.
+- Sync state mutations back to the owning Chair's `Source.md`.
+- Record the single next move.
+- Halt execution cleanly without open-ended trailing questions.
+
+---
+
+## 🚀 5. v2.1 SOTA Refinements (October 2026 Invariants)
+
+1. **Dual Bootstrapping Paths**:
+   - `SETUP-HUMANS.md`: Step-by-step human guide with direct links, prerequisite CLI logins, and placeholder swaps.
+   - `SETUP-AI.md`: Interactive agent-driven interview. Step 0 copies the harness binding into place automatically if missing, interviews the founder, populates `CoS Core.md` and initial Chairs, and runs the inaugural morning briefing live.
+
+2. **Disposable Harness Bindings (`bindings/`)**:
+   - Agent root files (`CLAUDE.md`, `AGENTS.md`) are disposable scaffolds and must be git-ignored.
+   - The binding contains ONLY: (a) vault path, (b) read order (`CoS Core` -> `CoS Source`), (c) router link (`CoS Skill`), and (d) universal skills folder. It contains ZERO user profile state.
+
+3. **Archive Partitioning**:
+   - Retired Chairs and Chief-seat logs go to `Chief of Staff/CoS Archive/`.
+   - Active Chair transcripts go to their own `<Chair>/<Chair> Archive/`.
+
+4. **"Where Things Stand" Source Invariant**:
+   - Every chair `Source.md` anchors dynamic state under a standardized `## Where things stand` heading, ensuring uniform parser discovery and minimal token expenditure.
+
+5. **Companion Anti-Bloat Dyad**:
+   - `bloatbot`: Touchless audit of AI workspaces; proposes cuts without touching code.
+   - `buildbot`: Generates new tools/agents end-to-end from a single-page ratified blueprint.
+
+---
+
+## 🏛️ 6. DNK OS Integration & Adaptation Matrix
+
+### CoS-2 vs DNK_OS_APP Architectural Boundary
+| Dimension | Chief of Staff v2 | DNK_OS_APP Platform |
+|---|---|---|
+| **Role in Ecosystem** | Personal executive & daily routine layer | Autonomous multi-agent development & execution kernel |
+| **Execution Model** | Single-user sequential prompt loop | FastMCP, Action Bus, Task Forest DAG parallel swarm |
+| **UI Surface** | Linear Obsidian markdown notes | Spatial Canvas (`json_canvas_builder.py`, Excalidraw, Visual Shell) |
+| **Quality Gates** | Informal markdown conventions | Strict MRH headers, `DNK-STD-0075`, deterministic `verify_all.sh` |
+
+### The 6 Concrete System Adaptations
+1. **Personal C-Suite in Obsidian (`docs/notes/C-Suite/`)**: Isolate Maxim's personal focus areas (`Planner`, `Career`, `Health`, `Money`, `Physical Plant`) using 4-Part Chair Anatomy with mandatory MRH headers. `Archive/` is strictly isolated from LLM prompt ingestion.
+2. **Zero-Mutation Bloat Audit (`bloatbot`)**: Deploy `scripts/system/bloat_audit.py` to identify unlinked notes (>30 days), dead temporary files, and duplicate skills. Enforce: *"1 new system rule in = 1 stale rule retired"*.
+3. **Heartbeat Protocol (Law 5)**: Background jobs and swarm workers write timestamps to `.heartbeats/<service>.heartbeat`. Any job missing 2 run intervals triggers a fail-loud alert in morning briefings.
+4. **ADHD Morning & End Rhythms**: Morning: Today (2-3 priorities), This Week (milestones), Big Picture (1 sentence), plus ONE next physical action. End: record verified wins, update `Source.md`, cleanly close open loops.
+5. **Front-Door Directory Catalogs (Law 12 "Born Lazy")**: Directories with >3 files must maintain a concise `00. INDEX.md` (1 line per file) for progressive disclosure (LOD), saving up to 80% context tokens.
+6. **Buildbot 1-Page Blueprint Gate**: Enforce mandatory 1-page spec before constructing new agents or skills: Negative Scope, Target File Whitelist, and a single deterministic verification command.
+
+

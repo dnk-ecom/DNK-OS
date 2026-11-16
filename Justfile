@@ -32,6 +32,18 @@ test-fitness:
 test-shopify:
     @uv run pytest services/dnk_shopify/tests -v
 
+# Run Media workhorse tests
+test-media:
+    @uv run pytest services/dnk_media/tests -v
+
+# Run Distribution workhorse tests
+test-distribution:
+    @uv run pytest services/dnk_distribution/tests -v
+
+# Run all 3 workhorse tests in parallel
+test-workhorses:
+    @uv run pytest services/dnk_shopify/tests services/dnk_media/tests services/dnk_distribution/tests -v
+
 # -----------------------------------------------------------------------------
 # 🛍️ SHOPIFY THEME DEV & MOLECULAR GRAFTING
 # -----------------------------------------------------------------------------

@@ -1,0 +1,74 @@
+---
+title: "Marketplace Extraction And Shopify Sync"
+status: draft
+type: note
+domain: core
+author: "DNK-e.com Maksym"
+version: "1.0.0"
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/gerych_prime/skills/software-development/sota-repository-assimilation/references/marketplace_extraction_and_shopify_sync.md"
+> purpose: "Document: Marketplace Extraction And Shopify Sync"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Draft"
+> version: "1.0.0"
+> updated_at: "2026-09-24"
+> author: "DNK-e.com Maksym"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
+<!-- --- DNK-MRH-HEADER ---
+mrh_id: "skills/sota-repository-assimilation/references/marketplace_extraction_and_shopify_sync.md"
+purpose: "Reference architectures, patterns, and SDKs for e-commerce marketplace extraction (AliExpress, Best Buy, Taobao) and Shopify OS 2.0 GraphQL sync."
+canonical_source: true
+status: "Active"
+version: "1.0.0"
+updated_at: "2026-10-29"
+author: "DNK-e.com Maksym & Gerych Prime"
+--- END DNK-MRH-HEADER --- -->
+
+# Marketplace Extraction & Shopify OS 2.0 Ingestion Patterns
+
+## 1. Multi-Tier Extraction Architecture
+
+When importing products from high-friction e-commerce marketplaces (AliExpress, Best Buy, Taobao, Reverb):
+
+| Tier | Mechanism | Best Use Case | Reference Repositories |
+|---|---|---|---|
+| **Tier 1: Official / Partner API** | Direct OpenAPI / RPC with dev tokens | Real-time stock / price checks, automated order placement | `moh3a/ae_sdk` (TypeScript, `openservice.aliexpress.com`), `sergioteula/python-aliexpress-api` |
+| **Tier 2: Async Dataset & MCP Servers** | Trigger -> Poll progress -> Fetch JSON snapshot OR direct MCP tools | Bulk catalogue ingestion (1k-50k items), zero IP ban risk, or agentic tool use | `customcoder245/bestbuy` (`https://api.brightdata.com/datasets/v3`), `brightdata/brightdata-mcp` (2,694⭐, 32 tools), `GeLi2001/shopify-mcp` (239⭐, GraphQL 2026-01) |
+| **Tier 3: Stealth CDP / FastMCP & Browser Profiles** | Headless Chrome with stealth flags + patchright OR persistent browser profiles | Live interactive single-product checks, bypassing Cloudflare, Akamai, or Taobao `x5sec` | `omkarcloud/aliexpress-scraper` (Python, 64 countries), `limengwork/1688MCP` (Go + Rod, persistent session), `fanqi99-creator/taobao-mcp-server` (Playwright + persistent profile + OAuth 2.1) |
+
+## 2. Best Buy Dataset API v3 Pipeline & Pricing (from customcoder245/bestbuy)
+1. **Trigger Collection**: `POST https://api.brightdata.com/datasets/v3/trigger?dataset_id={dataset_id}&include_errors=true` with JSON body `[{"url": "...", "country": "us"}]` or `[{"keyword": "..."}]`. Returns `snapshot_id`.
+2. **Poll Status**: `GET https://api.brightdata.com/datasets/v3/progress/{snapshot_id}` every 5-10s until `status == "ready"`.
+3. **Stream Snapshot**: `GET https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}?format=json` (supports standard JSON or NDJSON stream).
+4. **Landed-Cost Pricing Engine**:
+   $$\text{Price}_{\text{retail}} = \Big(\big(\text{Price}_{\text{source}} + (\text{Weight}_{\text{kg}} \cdot \text{Rate}_{\text{shipping}} + \text{Handling}_{\text{fixed}})\big) \cdot \text{FX}\Big) \cdot (1 + \text{Margin})$$
+   - Weight normalization: converts imperial units (`lbs`, `oz`) to kg via regex before calculating freight.
+   - Metafields mapping: packs deep technical specs into namespace `custom`, key `bestbuy_specs` (JSON stringified).
+
+## 3. SOTA 2026 MCP Importer Architecture for dnk_shopify
+- **Ingestion**: Use `brightdata/brightdata-mcp` for western retail (Amazon, Best Buy, Walmart) and `omkarcloud/aliexpress-scraper` + `limengwork/1688MCP` / `fanqi99-creator/taobao-mcp-server` for Chinese source catalogs.
+- **Shopify Sync**: Replace legacy REST API 2024-01 with **GraphQL Admin API 2026-01** (`GeLi2001/shopify-mcp` patterns) supporting Dev Dashboard OAuth Client Credentials.
+- **Idempotency**: SQLite WAL cache storing `source_id -> shopify_product_gid` and SHA-256 payload hashes to prevent duplicate calls and rate-limiting.
+
+## 3. Shopify OS 2.0 Metafield Transformation
+- **Pre-Registration**: Use `metafieldDefinitionCreate` GraphQL mutation beforehand in namespace `custom` for public PDP specs and `supplier` for private fulfillment specs.
+- **Payload Mapping**:
+  ```graphql
+  mutation productCreate($input: ProductInput!) {
+    productCreate(input: $input) {
+      product {
+        id
+        metafields(first: 10) { edges { node { key value } } }
+      }
+    }
+  }
+  ```
+- **Media Ingestion**: Never keep hotlinks to supplier CDN images. Use Shopify Admin API `stagedUploadsCreate` to host assets directly on Shopify Files CDN (`cdn.shopify.com`).

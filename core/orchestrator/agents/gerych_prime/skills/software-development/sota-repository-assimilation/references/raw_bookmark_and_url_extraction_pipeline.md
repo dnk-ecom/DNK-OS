@@ -1,0 +1,57 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/raw_bookmark_and_url_extraction_pipeline.md"
+# purpose: "High-throughput extraction, sanitization, and dual-tier (Org / Repo) canonicalization of raw browser bookmarks and URL dumps."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-08"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# Raw Bookmark & URL Extraction Pipeline (Dual-Tier Canonicalization)
+
+## 1. Context & Pitfall
+When harvesting repositories from developer environments (e.g. Google Chrome bookmarks, markdown dumps, chat exports), data arrives with:
+- Non-repository noise (`github.com/search?...`, `github.com/topics/...`, `github.com/trending/...`, `github.com/features/...`).
+- Organization repository tabs (`github.com/orgs/<owner>/repositories`).
+- Deep links (`/tree/main/...`, `/blob/master/...`, `/releases/tag/...`, `/discussions/...`, `?utm_source=...`).
+- Inconsistent casing (`copilotkit` vs `CopilotKit`, `appflowy-io` vs `AppFlowy-IO`).
+- User risk: Monolithic overwriting of notes without backup leads to irreversible loss of non-GitHub tabs.
+
+## 2. Mandatory Extraction Protocol
+
+### Step 1: Zero-Loss Primary Backup
+Always preserve the raw dump before transformation:
+```bash
+cp "docs/notes/MY TASKS/REPOS AUDIT.md" "docs/notes/MY TASKS/REPOS AUDIT.raw_backup.md"
+```
+
+### Step 2: Dual-Tier Parsing & Filtering Rules
+When regex-parsing raw URLs:
+1. **Reserved Subpaths**:
+   Skip or quarantine system routes: `search`, `topics`, `trending`, `features`, `pricing`, `marketplace`, `explore`, `settings`, `notifications`, `login`, `signup`.
+2. **Organization Listing Normalization**:
+   If path matches `orgs/<owner>/repositories` or `orgs/<owner>/...`, extract `<owner>` as a Profile entry (`https://github.com/<owner>`).
+3. **Repository Path Extraction**:
+   Extract strictly `parts[0]` (owner) and `parts[1]` (repo). Strip any subpaths (`tree`, `blob`, `pull`, `issues`, `releases`, `discussions`) and clean trailing `.git`.
+4. **Casing Reconciliation**:
+   Group keys by `lower()` and select the variant with the most uppercase characters (e.g., `CopilotKit` over `copilotkit`, `Shopify` over `shopify`).
+
+### Step 3: Dual-Tier Output Format
+Format the output into four explicit sections:
+1. **🏢 Companies & Developers (`https://github.com/{owner}`)**:
+   Direct links with repository count badges:
+   ```markdown
+   - [Shopify](https://github.com/Shopify) — `https://github.com/Shopify` (12 repos)
+   ```
+2. **📦 Concrete Repositories (`https://github.com/{owner}/{repo}`)**:
+   Canonicalized repository links:
+   ```markdown
+   - [Shopify/cli](https://github.com/Shopify/cli) — `https://github.com/Shopify/cli`
+   ```
+3. **🗂️ Hierarchical Index (Owner ➔ Repos)**:
+   Grouped sub-bullets for Obsidian graph traversal.
+4. **🔍 Search Queries & Filter Bookmarks**:
+   Preserved search and topic URLs for future reconnaissance.

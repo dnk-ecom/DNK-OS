@@ -1,0 +1,358 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/llm-guardrails-and-spend-control/references/gcp_vertex_openai_bridge_and_app_patching.md"
+# purpose: "Google Cloud Vertex AI Credits Routing, Multi-Tier OAuth Token Refresh, Dynamic Model Discovery, and Electron App Patching"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.1.0"
+# updated_at: "2026-10-14"
+# author: "DNK-e.com Maksym & Gerych"
+# --- END DNK-MRH-HEADER ---
+
+# GCP Vertex AI Credit Routing, OAuth Token Refresh & Electron App Patching
+
+## 1. Overview & Strategy
+
+When utilizing cloud promotional grants or developer credits (e.g. Google Cloud Platform $300-$1000 credits), web and desktop developer tools require reliable Google Cloud authentication, automatic OAuth2 token lifecycle management, and dynamic model discovery.
+
+This reference details four key integration patterns:
+1. **Direct Native Vertex AI OpenAPI Endpoint (Zero-Proxy)**: Calling Google Cloud's official OpenAI-compatible endpoint directly with dynamic ADC/gcloud OAuth Bearer tokens.
+2. **Multi-Tier OAuth Token Refresh, In-App Login & Model Discovery**: Full lifecycle management for web/server apps (proactive 50-min refresh, ADC `refresh_token` fallback, reactive 401 self-healing retry, and global Publisher Models API discovery).
+3. **Local OpenAI Gateway for Vertex AI (LiteLLM)**: Converting legacy clients that require static API keys into Vertex AI calls via a local daemon.
+4. **Client-Side Electron / ASAR AST Patching**: Overriding local client-side limits in Electron-based desktop clients.
+
+---
+
+## 2. Direct Official Vertex AI OpenAPI-Compatible Endpoint (Zero-Proxy)
+
+Google Cloud Vertex AI natively exposes an OpenAI-compatible `/chat/completions` REST interface. This completely eliminates the need to run LiteLLM or an intermediate proxy process.
+
+### 2.1 Endpoint URL & Base URL Structure (`global` vs Regional)
+- **Canonical Global Base URL for OpenAI SDK (Recommended Default)**:
+  `https://aiplatform.googleapis.com/v1beta1/projects/{PROJECT_ID}/locations/global/endpoints/openapi`
+- **Regional Base URL (Legacy / Region-Locked Models Only)**:
+  `https://{LOCATION}-aiplatform.googleapis.com/v1beta1/projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/openapi`
+- **Full Completions Path**:
+  `POST https://aiplatform.googleapis.com/v1beta1/projects/{PROJECT_ID}/locations/global/endpoints/openapi/chat/completions`
+- **Critical Routing Rule (`global` vs `us-central1`)**:
+  - Models in the **Gemini 3** (`google/gemini-3-flash-preview`, `google/gemini-3.1-pro-preview`) and **Gemini 4** (`google/gemini-4-argon`) families are published on the **`global`** location (`locations/global`). Calling them against `us-central1-aiplatform.googleapis.com/.../locations/us-central1` fails with HTTP `404 Publisher model ... was not found`.
+  - When `location === 'global'`, the hostname MUST be bare `aiplatform.googleapis.com` (never `global-aiplatform.googleapis.com`):
+    ```ts
+    const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
+    const baseUrl = `https://${host}/v1beta1/projects/${projectId}/locations/${location}/endpoints/openapi`;
+    ```
+  - Always normalize legacy regional URLs in saved DB configs or auto-retry against `locations/global` when a regional Vertex endpoint returns `404 NOT_FOUND`.
+
+### 2.2 Multi-Tier Token Refresh & Introspection Algorithm
+Google OAuth2 access tokens (`ya29.*`) expire every 60 minutes (3600s). A resilient backend should implement a **3-tier token resolution ladder** combined with **proactive 50-minute caching**, **tokeninfo TTL introspection**, and **reactive 401/403 self-healing**:
+
+1. **Tier 1 — Active `gcloud` CLI Account**:
+   Run `gcloud auth print-access-token [account]` (with explicit `/opt/homebrew/bin:/usr/local/bin` in `PATH` so GUI/daemon processes find the binary).
+2. **Tier 2 — Direct OAuth2 Refresh Token Exchange (ADC Fallback)**:
+   Read `~/.config/gcloud/application_default_credentials.json` (`client_id`, `client_secret`, `refresh_token`) and `POST https://oauth2.googleapis.com/token` with `grant_type=refresh_token`. Works even if `gcloud` CLI is slow or unavailable.
+3. **Tier 3 — Environment Variable Override**:
+   Fallback to `process.env.VERTEX_TOKEN || process.env.VERTEX_API_KEY`.
+4. **Token Introspection (`tokeninfo`)**:
+   Query `GET https://oauth2.googleapis.com/tokeninfo?access_token=<token>` to verify the exact remaining `expires_in` seconds and authenticated `email`, setting `expiresAt = Date.now() + expiresInSec * 1000` with a 5-minute safety window (`REFRESH_SAFETY_WINDOW_MS = 5 * 60 * 1000`).
+5. **Reactive 401/403 Self-Healing Retry in Streaming Pipelines**:
+   In the LLM streaming caller, if Vertex AI returns HTTP `401`, `403`, or `UNAUTHENTICATED` before tokens are emitted, call `await refreshVertexTokenAsync(true)` to force-invalidate the cached token and transparently replay the request once (`_retriedVertexAuth = true`).
+
+### 2.3 Model Naming & Thinking Token Pitfalls
+- **Mandatory `google/` Prefix**: Model names on the OpenAPI endpoint must include the vendor prefix:
+  - `google/gemini-2.5-flash`
+  - `google/gemini-2.5-pro`
+  - `google/gemini-2.5-flash-lite`
+  - `google/gemini-3.8-flash`
+  - `google/gemini-3.7-flash`
+  - `google/gemini-4-argon`
+  Calling bare `gemini-2.5-flash` without `google/` returns HTTP 400 `Invalid model name`.
+- **Reasoning Tokens (Thinking Budget)**: Gemini 2.5+ models stream `reasoning_content` tokens prior to answering. Always ensure `max_tokens` is configured ≥ 1024; setting small `max_tokens` (e.g. 100–300) causes the model to consume the entire quota on internal reasoning, yielding empty final replies.
+- **Gemini 3.7+ Thinking Budget for Conversational Latency**: By default, `gemini-3.7-flash` enables dynamic reasoning tokens which can stall interactive chat turns for 80+ seconds. For low-latency conversational and agentic workflows, explicitly disable or clamp thinking via REST `generationConfig.thinkingConfig = { thinkingBudget: 0 }` (or `thinkingBudget: 1024`). Setting `thinkingBudget: 0` drops turn latency from ~85s to ~2.9s while preserving high quality.
+
+### 2.4 In-App Browser OAuth Login & Multi-Account Switching
+To let users log in or switch Google Cloud accounts directly from a web settings UI:
+- **List Accounts**: `gcloud auth list --format=json` returns `[{ account, status: "ACTIVE" | "" }]`.
+- **Switch Active Account**: `gcloud config set account <email>` followed by forced token refresh (`refreshVertexTokenAsync(true)`).
+- **Trigger Browser OAuth Flow**: Spawn `gcloud auth login --launch-browser --brief` (and optionally `gcloud auth application-default login` when `adc: true`) in the background (`detached: true`), and poll `gcloud auth list` or wait for process exit `code === 0` to automatically refresh the cached token.
+
+### 2.5 Dynamic Vertex AI Model Discovery & Regional Endpoint Pitfall
+- **Regional Endpoint Pitfall (HTTP 404)**: Calling `GET https://us-central1-aiplatform.googleapis.com/v1beta1/publishers/google/models` returns `404 Not Found` on standard GCP projects.
+- **Global Publisher Models Endpoint (HTTP 200)**: Always query the **global** endpoint with the project billed via `x-goog-user-project`:
+  ```http
+  GET https://aiplatform.googleapis.com/v1beta1/publishers/google/models?pageSize=100
+  Authorization: Bearer <VERTEX_OAUTH_TOKEN>
+  x-goog-user-project: <GCP_PROJECT_ID>
+  ```
+  Filter `publisherModels` where `name` matches `/^publishers\/google\/models\/gemini-[a-z0-9.-]+$/`, prefix each ID with `google/`, and merge with a curated fallback catalog so UI model selectors remain populated even offline.
+
+### 2.6 Preserving Gemini 3 & Gemini 4 `thought_signature` in Multi-Turn Tool Loops
+When invoking tools (`tool_calls`) with **Gemini 3** (`google/gemini-3-flash-preview`, `google/gemini-3.1-pro-preview`) or **Gemini 4** (`google/gemini-4-argon`) on the Vertex AI OpenAI-compatible endpoint, Vertex emits a cryptographic `thought_signature` inside each streamed tool-call delta:
+```json
+{
+  "index": 0,
+  "id": "0",
+  "type": "function",
+  "function": { "name": "read_workspace_file", "arguments": "{\"path\":\"pyproject.toml\"}" },
+  "extra_content": {
+    "google": {
+      "thought_signature": "<base64_signature>"
+    }
+  }
+}
+```
+- **The Pitfall (`400 INVALID_ARGUMENT`)**: Standard OpenAI-compatible client libraries (such as `@earendil-works/pi-ai` and OpenAI's message normalizers) construct the Turn 2 `assistant` message with `{ id, type, function }` and strip unknown fields like `extra_content`. On Turn 2, Vertex AI rejects the request with:
+  `400 Function call is missing a thought_signature in functionCall parts.`
+- **The Solution (`onProviderStreamEvent` + `onPayload` Hook Bridge)**:
+  Capture `tc.extra_content` from raw provider SSE chunks during Turn 1 and re-attach it to `msg.tool_calls` in `onPayload` before Turn 2 is transmitted:
+  ```ts
+  const toolCallExtraById = new Map<string, Record<string, unknown>>();
+  const toolCallExtraByIndex = new Map<number, Record<string, unknown>>();
+  let latestExtraContent: Record<string, unknown> | undefined;
+
+  // 1. Capture extra_content.google.thought_signature from raw SSE chunks:
+  onProviderStreamEvent: (chunk: unknown) => {
+    const c = chunk as { choices?: Array<{ delta?: { tool_calls?: Array<Record<string, unknown>> } }> };
+    const tcs = c?.choices?.[0]?.delta?.tool_calls;
+    if (!Array.isArray(tcs)) return;
+    for (const tc of tcs) {
+      const extra = tc.extra_content as Record<string, unknown> | undefined;
+      if (extra && typeof extra === 'object') {
+        latestExtraContent = extra;
+        if (typeof tc.index === 'number') toolCallExtraByIndex.set(tc.index, extra);
+        if (typeof tc.id === 'string' && tc.id) toolCallExtraById.set(tc.id, extra);
+      } else if (typeof tc.id === 'string' && tc.id && typeof tc.index === 'number') {
+        const byIdx = toolCallExtraByIndex.get(tc.index);
+        if (byIdx) toolCallExtraById.set(tc.id, byIdx);
+      }
+    }
+  },
+
+  // 2. Re-inject extra_content onto assistant.tool_calls on subsequent turns:
+    onPayload: (payload: unknown) => {
+      const p = payload as { messages?: Array<Record<string, unknown>> };
+      if (!p || !Array.isArray(p.messages)) return payload;
+      for (const msg of p.messages) {
+        if (msg.role === 'assistant' && Array.isArray(msg.tool_calls)) {
+          (msg.tool_calls as Array<Record<string, unknown>>).forEach((tc, idx) => {
+            if (!tc.extra_content) {
+              const extra =
+                (typeof tc.id === 'string' ? toolCallExtraById.get(tc.id) : undefined) ??
+                toolCallExtraByIndex.get(idx) ??
+                latestExtraContent;
+              if (extra) tc.extra_content = extra;
+            }
+          });
+        }
+      }
+      return payload;
+    }
+  ```
+
+### 2.7 URL Normalization Pitfall: Version Regex `/v1beta1` Truncation (HTTP 404)
+Standard OpenAI-compatible proxies and SDK client normalizers often detect API versions using naive regexes:
+```ts
+// DANGEROUS: Matches only pure digits like /v1/ or /v2/
+const hasVersion = /\/v\d+(?:\/|$)/.test(url);
+if (!hasVersion) url += '/v1/chat/completions';
+```
+- **The Pitfall**: For Google Cloud Vertex AI OpenAPI endpoints (`https://aiplatform.googleapis.com/v1beta1/projects/.../endpoints/openapi`), `/\v\d+(?:\/|$)/` fails to match `/v1beta1` because of the trailing `beta1`. The normalizer mistakenly strips the endpoint path or appends `/v1/chat/completions`, hitting `https://aiplatform.googleapis.com/v1/chat/completions` which yields:
+  `404 Not Found: upstream error`
+- **The Fix**: Use an alphanumeric-aware version regex:
+  ```ts
+  const hasVersion = /\/v\d+[a-z0-9]*(?:\/|$)/i.test(url);
+  ```
+  And when constructing the full chat URL, only append `/chat/completions` if the path doesn't already terminate with it.
+
+### 2.8 BYOK & Streaming Proxy Sentinel Key Pattern (`CONNECTED_VIA_GCLOUD`)
+In desktop or web apps supporting Bring-Your-Own-Key (BYOK) runtimes (such as OpenCode or custom streaming proxies):
+- Raw OAuth2 Bearer tokens (`ya29.*`) expire hourly and should never be persisted in localStorage or client database config.
+- **Sentinel Key Convention**: Set `apiKey: 'CONNECTED_VIA_GCLOUD'` (or `gcloud`) in client config.
+- The daemon proxy interceptor checks `if (apiKey === 'CONNECTED_VIA_GCLOUD' || isVertexHost(baseUrl))`:
+  1. Dynamically fetches or refreshes the OAuth2 token (`getCachedToken()` / `refreshVertexTokenAsync()`).
+  2. Injects the Bearer header: `headers['Authorization'] = `Bearer ${token}``.
+  3. Validates that downstream execution engines do not fail on "missing API key" validation checks.
+
+
+---
+
+## 3. Local OpenAI-to-Vertex Gateway (LiteLLM)
+
+### 3.1 Authentication via Application Default Credentials (ADC) & Quota Project
+Ensure local gcloud credentials are active and quota project is configured:
+```bash
+gcloud auth application-default login
+gcloud config set project <YOUR_GCP_PROJECT_ID>
+gcloud auth application-default set-quota-project <YOUR_GCP_PROJECT_ID>
+```
+
+> [!WARNING] ADC Quota Project Pitfall (HTTP 403 PERMISSION_DENIED)
+> Calling Google Cloud APIs (such as `texttospeech.googleapis.com` or Vertex AI client libraries) using local ADC without a configured quota project fails with:
+> `Your application is authenticating by using local Application Default Credentials. The texttospeech.googleapis.com API requires a quota project, which is not set by default.`
+> Running `gcloud auth application-default set-quota-project <PROJECT_ID>` writes `"quota_project_id": "<PROJECT_ID>"` into `~/.config/gcloud/application_default_credentials.json`, resolving the error permanently for all client libraries. For raw curl/HTTP requests, also supply `-H "x-goog-user-project: <PROJECT_ID>"`.
+
+### 3.2 Configuration (`litellm_config.yaml`)
+```yaml
+model_list:
+  - model_name: gpt-4o
+    litellm_params:
+      model: vertex_ai/gemini-2.5-pro
+      vertex_project: "<YOUR_GCP_PROJECT_ID>"
+      vertex_location: "us-central1"
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: vertex_ai/gemini-2.5-flash
+      vertex_project: "<YOUR_GCP_PROJECT_ID>"
+      vertex_location: "us-central1"
+  - model_name: text-embedding-3-small
+    litellm_params:
+      model: vertex_ai/text-embedding-004
+      vertex_project: "<YOUR_GCP_PROJECT_ID>"
+      vertex_location: "us-central1"
+
+general_settings:
+  master_key: "sk-local-gcp-bridge"
+```
+
+### 3.3 Starting the Local Daemon
+```bash
+litellm --config litellm_config.yaml --port 4000 --host 127.0.0.1
+```
+
+Point any CLI agent or client (AgentsRoom, Cursor, Aider, OpenCode):
+- `OPENAI_BASE_URL`: `http://127.0.0.1:4000/v1`
+- `OPENAI_API_KEY`: `sk-local-gcp-bridge`
+
+---
+
+## 4. Electron ASAR Inspection & Patching Pattern
+
+Electron applications package renderer and main processes inside `Contents/Resources/app.asar`.
+
+### 4.1 Extraction
+```bash
+npx asar extract /Applications/<AppName>.app/Contents/Resources/app.asar /tmp/app_extracted
+```
+
+### 4.2 Finding Plan Gates in Minified JS
+Search for typical AST patterns using regex:
+- **Plan resolution getters**: `effectivePlan`, `plan === "pro"`, `isPro`.
+- **Limits objects**: Objects with numeric limits for free vs `1/0` (JavaScript for `Infinity`) for pro:
+  ```javascript
+  // Example pattern found in minified React bundle:
+  free: { projects: 2, agentParallel: 6 },
+  pro:  { projects: 1/0, agentParallel: 1/0 }
+  ```
+- **Auth endpoints**: Search for `/api/auth/me` or `/api/account/` where client fetches subscription state.
+
+### 4.3 Atomic Replacement (Patching)
+1. **Uncap Limits**: Replace `free: { projects: 2` with `free: { projects: 1/0` (or `Infinity`).
+2. **Force Pro Plan**: Replace `function Zl(e){return(e.effectivePlan??e.plan)==="pro"}` with `function Zl(e){return true}`.
+3. **Repack ASAR**:
+   ```bash
+   cp /Applications/<AppName>.app/Contents/Resources/app.asar /Applications/<AppName>.app/Contents/Resources/app.asar.bak
+   npx asar pack /tmp/app_extracted /Applications/<AppName>.app/Contents/Resources/app.asar
+   ```
+
+### 4.4 Handling macOS Code Signing / Gatekeeper
+On modern macOS, modifying files inside an `.app` invalidates code signatures:
+```bash
+# Re-sign ad-hoc after repacking app.asar:
+codesign --force --deep --sign - /Applications/<AppName>.app
+# Or remove quarantine if blocked:
+xattr -cr /Applications/<AppName>.app
+```
+
+---
+
+## 5. Local Mock Bridge for Proprietary App Endpoints
+
+When an app calls proprietary endpoints (e.g. `/api/ai/generate-commit`, `/api/auth/me`):
+Run a lightweight FastAPI proxy (`~50 lines`) that:
+1. Intercepts `/api/auth/me` -> returns `{ "user": { "plan": "pro", "effectivePlan": "pro" } }`.
+2. Intercepts `/api/ai/*` -> translates prompt directly into Gemini Vertex AI call.
+3. Forwards all other static/unhandled calls to the live upstream server.
+
+---
+
+## 6. Local Google GenAI SDK to Vertex AI REST Bridge for Desktop & Obsidian Plugins
+
+Many modern desktop clients and plugins (e.g. Obsidian `obsidian-agent`, Electron tools) use `@langchain/google-genai` or `@google/generative-ai` rather than OpenAI SDKs.
+
+### 6.1 The Architectural Friction
+- `@langchain/google-genai` and `@google/generative-ai` construct requests matching:
+  `{baseUrl}/{apiVersion}/models/{model}:{task}?alt=sse`
+- They mandate a static `apiKey` and do not support dynamic GCP OAuth2 Bearer tokens (`ya29.*`).
+- Setting `baseUrl` alone is insufficient if the target expects Google Cloud IAM headers (`Authorization: Bearer <token>`).
+
+### 6.2 The Solution: Python Stdlib Daemon Bridge
+Deploy a lightweight daemon (`scripts/system/obsidian_vertex_bridge.py`) listening on `127.0.0.1:8765`:
+1. **CORS Handling**: Responds to browser/Electron preflight `OPTIONS` requests with standard CORS headers (`Access-Control-Allow-Origin: *`, `Access-Control-Allow-Headers: *`).
+2. **Dynamic Token Resolution**: Reads cached OAuth2 token from `~/.hermes/vertex_token.txt` (or triggers `gcloud auth print-access-token` fallback).
+3. **Endpoint Mapping**:
+   Translates:
+   `POST /v1beta/models/{model}:{task}` ->
+   `https://aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model}:{task}`
+4. **SSE Streaming**: Forwards chunked Server-Sent Events (`alt=sse`) directly back to the client.
+
+### 6.3 Client Configuration (Obsidian Plugin `data.json`)
+```json
+{
+  "provider": "google",
+  "model": "gemini-2.5-flash",
+  "googleApiKey": "vertex-bridge",
+  "baseUrl": "http://127.0.0.1:8765"
+}
+```
+*Note: Any non-empty string for `googleApiKey` passes client-side validation while the bridge injects real Bearer authentication upstream.*
+
+---
+
+## 7. Direct Native Vertex AI REST Shim for Anthropic / OpenAI Fallbacks (In-Process Node.js / Express)
+
+When adapting Node.js or Express backends that communicate with Anthropic or OpenAI (e.g. `anthropic.messages.create`) to run on zero-cost Google Cloud Vertex AI credits:
+
+### 7.1 Dynamic OAuth2 Token Acquisition with In-Memory Caching
+```js
+let gcloudTokenCache = { token: null, expiresAt: 0 };
+
+export async function getGcloudAccessToken() {
+  const now = Date.now();
+  if (gcloudTokenCache.token && gcloudTokenCache.expiresAt > now + 60_000) {
+    return gcloudTokenCache.token;
+  }
+  const { execSync } = await import('node:child_process');
+  const token = execSync('gcloud auth print-access-token', { encoding: 'utf8' }).trim();
+  gcloudTokenCache = { token, expiresAt: now + 45 * 60 * 1000 };
+  return token;
+}
+```
+
+### 7.2 Native REST Payload Mapping
+Translate Anthropic `{ system, messages, max_tokens, temperature }` into Gemini REST:
+```js
+const location = process.env.GEMINI_LOCATION || 'global';
+const host = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
+const endpoint = `https://${host}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+
+const body = {
+  contents: messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }]
+  })),
+  generationConfig: {
+    maxOutputTokens: max_tokens || 4096,
+    temperature: temperature ?? 0.7,
+    // Critical for Gemini 3.7+ Flash to prevent 80+ second stall on reasoning tokens:
+    thinkingConfig: {
+      thinkingBudget: Number(process.env.GEMINI_THINKING_BUDGET) || 0
+    }
+  }
+};
+if (system) {
+  body.systemInstruction = {
+    parts: [{ text: typeof system === 'string' ? system : JSON.stringify(system) }]
+  };
+}
+```
+

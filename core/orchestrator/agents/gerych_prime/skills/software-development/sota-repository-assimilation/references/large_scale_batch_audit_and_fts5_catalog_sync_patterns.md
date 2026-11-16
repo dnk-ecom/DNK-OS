@@ -1,0 +1,88 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/sota-repository-assimilation/references/large_scale_batch_audit_and_fts5_catalog_sync_patterns.md"
+# purpose: "Reference patterns for large-scale (>100 targets) SOTA repository batch auditing, FTS5 catalog synchronization, and web-resource classification."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.1.0"
+# updated_at: "2026-10-24"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# Large-Scale Batch Repository Auditing & FTS5 Catalog Sync Patterns
+
+## 1. Context & Operational Boundaries
+When handling batches (15-200+ URLs) containing mixed targets:
+- Live GitHub repositories (`owner/repo`)
+- Organizational profiles / Repositories lists (`github.com/orgs/...`)
+- Interactive non-repo tools and web documentation (`aicameramovements.com`, `gsap.com/docs`, etc.)
+
+### Step 0: Dedup Against Existing Catalog & Golden Core Skills
+Before fetching or re-assimilating repositories from scratch, always run a batch lookup against `.data/repo_catalog/catalog.db` (`WHERE lower(id) = lower(?)`) and check existing `*_assimilated` skills:
+- Starter templates or companion benchmark repos (e.g., `BuilderIO/builder-agent-native-starter` for `BuilderIO/agent-native`, or `BuilderIO/jev-computer-use-tests` for `browser-use/jev`) should be linked to their existing **Tier 1: Golden Core** skill (`skill_name`, `sota_doc_path`) rather than spawning duplicate standalone skills.
+
+## 2. GitHub API High-Velocity Harvest Pattern
+1. **Token Authentication SSOT**:
+   Ensure `$GH_TOKEN` or `$GITHUB_TOKEN` is loaded into requests (`Authorization: Bearer <TOKEN>`). Rate limits increase from 60 to 5,000 req/hour.
+2. **Batch Concurrency**:
+   Use `concurrent.futures.ThreadPoolExecutor(max_workers=8)` with bounded timeouts (10s) to fetch repository metadata + top-level file trees + README excerpts in a single Python turn.
+3. **License Track Classification (Track 1 vs Track 2 Noncommercial)**:
+   - Inspect `license.spdx_id` and README license headers.
+   - Repositories with `NOASSERTION` or source-available non-commercial licenses (e.g., **PolyForm Noncommercial 1.0.0** in `Mixar-AI/mixar-app`, GPL, AGPL) MUST be flagged as `Track 2: Clean-Room Reverse Engineering (Non-Commercial/Copyleft)` so no raw code is ever copied into `DNKOS_APP`.
+
+## 3. SQLite SSOT Schema & Bilingual FTS5 Synchronization
+Target catalog database: `.data/repo_catalog/catalog.db`
+Target mirror: `.data/repo_catalog/repositories.json`
+Target taxonomy: `.data/repo_catalog/categories.json` (Note: this file is a **JSON array** of category objects `[{"id": ..., "count": ...}]`, NOT a dict keyed by category name).
+
+### Canonical Database Schema (29 Columns + 14-Column Bilingual FTS5):
+> **CRITICAL PITFALL**: The table name is `repositories` (NEVER `repos`), and the full `owner/repo` slug is stored in the `id` column (`name` stores only the short repo name). Furthermore, `repositories_fts` uses the **14-column bilingual schema** (not the legacy 7-column schema) and does **NOT** have a `name` column — it uses `title` instead!
+
+```sql
+-- Primary table lookup:
+SELECT id, maturity_tier, assimilation_status, skill_name, sota_doc_path
+FROM repositories
+WHERE lower(id) = lower('owner/repo');
+
+-- Bilingual 14-column FTS5 virtual table:
+CREATE VIRTUAL TABLE IF NOT EXISTS repositories_fts USING fts5(
+    id, title, description, category, subcategory,
+    what_it_gives, architectural_pattern,
+    title_uk, description_uk, what_it_gives_uk,
+    use_cases_en, use_cases_uk, search_tags, tech_stack
+);
+```
+
+### Invariant: Two-Way Sync (29-Column Table + 14-Column FTS5)
+Always update `repositories` and upsert `repositories_fts` using the exact 14 FTS columns:
+```python
+cur.execute("DELETE FROM repositories_fts WHERE lower(id) = lower(?)", (rid,))
+cur.execute("""
+    INSERT INTO repositories_fts (
+        id, title, description, category, subcategory,
+        what_it_gives, architectural_pattern,
+        title_uk, description_uk, what_it_gives_uk,
+        use_cases_en, use_cases_uk, search_tags, tech_stack
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+""", (
+    rid, title, description, category, subcategory,
+    what_it_gives, architectural_pattern,
+    title_uk, description_uk, what_it_gives_uk,
+    use_cases_en, use_cases_uk, search_tags, json.dumps(tech_stack)
+))
+```
+
+## 4. Web Resources & Non-Repo Targets
+Non-GitHub links must be stored with:
+- `owner`: domain or project name
+- `tech_stack`: includes `["web_tool"]`, `["documentation"]`, or `["interactive_resource"]`
+- `sources`: includes `["external_reference"]`
+This guarantees that queries filtering for git code do not choke on web links while preserving access in search.
+
+## 5. Artifact Multi-Target Regeneration
+After catalog mutation, synchronously regenerate:
+1. `.data/repo_catalog/repositories.json` (machine SSOT)
+2. `.data/repo_catalog/categories.json` (hierarchical category counts)
+3. `docs/notes/MY TASKS/4. БАЗА ЗНАНЬ ТА SOTA/112 SOTA Repository Catalog.md` (human Obsidian knowledge base)
+4. `docs/tech/sota_assimilation/AUDIT_BATCH_<DATE>.md` (formal audit artifact with license & swarm analysis)

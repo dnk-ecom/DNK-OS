@@ -1,0 +1,60 @@
+# Obsidian Excalidraw AI Bridge via Google Cloud Vertex AI
+
+Integration guide for connecting Obsidian Excalidraw (`obsidian-excalidraw-plugin`) directly to Google Cloud Vertex AI and Gemini models with zero background proxy daemons.
+
+## 1. Native Gemini API (Google AI Studio Key)
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}`
+- **Authentication**: Static API Key from Google AI Studio (`AIzaSy...`).
+- **Use Case**: Default fallback when no enterprise GCP account/ADC is present.
+
+## 2. Vertex AI Direct In-Memory Bridge (Zero Background Daemons)
+Instead of running a separate proxy daemon (e.g. on port 5199 or 8765), desktop plugins running in Obsidian's Electron/Node.js environment can manage token lifecycle directly inside `main.js`.
+
+### Authentication Architecture (Two-Tier Token Discovery)
+1. **Primary: OAuth2 Refresh Token (~150-250ms)**
+   - Read `~/.config/gcloud/application_default_credentials.json`.
+   - If present with `client_id`, `client_secret`, and `refresh_token`:
+     POST to `https://oauth2.googleapis.com/token` with payload:
+     ```json
+     {
+       "client_id": "<client_id>",
+       "client_secret": "<client_secret>",
+       "refresh_token": "<refresh_token>",
+       "grant_type": "refresh_token"
+     }
+     ```
+   - Cache `access_token` in RAM for 45 minutes (`expires_in - 300s`).
+2. **Secondary: Direct `gcloud` Execution Fallback**
+   - Probe candidate paths for Finder/Electron minimal PATH:
+     `/opt/homebrew/bin/gcloud`, `/usr/local/bin/gcloud`, `~/google-cloud-sdk/bin/gcloud`.
+   - Execute `child_process.execSync("gcloud auth print-access-token")`.
+3. **Project ID Resolution**:
+   - Extracted from ADC `quota_project_id` or `gcloud config get-value project`.
+
+### Endpoint & Headers
+- **Vertex AI Endpoint**:
+  ```text
+  https://us-central1-aiplatform.googleapis.com/v1/projects/{projectId}/locations/us-central1/publishers/google/models/{model}:generateContent
+  ```
+- **Headers**:
+  ```http
+  Authorization: Bearer <ACCESS_TOKEN>
+  Content-Type: application/json
+  ```
+- **Query Params**:
+  Strip `?key=...` from query parameters, as `aiplatform.googleapis.com` rejects query key parameters when Bearer authorization is present.
+
+## 3. Minified Bundle Patching Pitfalls
+
+1. **Comma-Separated Expression Chains in Webpack/Esbuild**:
+   - In minified bundles, top-level helper functions are frequently chained by commas:
+     `...return i},getGooglePayload=async(...)=>{...},getGoogleEndpoint=e=>{...}`
+   - **Pitfall**: Inserting `let foo = ...` after a comma inside an expression causes `SyntaxError: Unexpected strict mode reserved word`.
+   - **Fix**: Terminate the expression chain with a semicolon `;var _vertexCachedToken = null;` or use `var` declarations with clean statement boundaries.
+2. **Deterministic Syntax Verification**:
+   - Always run `node --check <path_to_main.js>` before reloading Obsidian to prevent plugin load failures.
+3. **Transparent Fallback**:
+   - Preserve standard behavior if a user configures an AI Studio key (`AIzaSy...`). If `apiKey.startsWith("AIzaSy")`, route to standard `generativelanguage.googleapis.com` without Bearer token.
+4. **Bypassing Empty Key Guard**:
+   - The plugin enforces `if (!apiKey) throw new Error("AI API key is not set")`.
+   - In `data.json`, configure `apiKey: "vertex"` or `"gcloud"`, and treat these sentinel strings as Vertex AI mode in the dispatcher.

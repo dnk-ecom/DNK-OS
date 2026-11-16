@@ -1,0 +1,26 @@
+# 🔬 Production Bundle Extraction Recipes
+
+## 1. Extract Injected CSS Rules from Client JS
+```python
+import re
+from pathlib import Path
+
+def extract_injected_css(bundle_path: Path, output_path: Path):
+    text = bundle_path.read_text()
+    matches = re.findall(r'`([^`]*?\.[a-z0-9\-_]{2,30}\s*\{[^`]*?)`', text)
+    css_blocks = [m for m in matches if "{" in m and "}" in m and (";" in m or ":" in m)]
+    output_path.write_text("\n\n/* --- EXTRACTED COMPONENT --- */\n\n".join(css_blocks))
+    print(f"Extracted {len(css_blocks)} CSS blocks ({output_path.stat().st_size} bytes)")
+```
+
+## 2. Extract Shape AST & Discriminated Unions
+```python
+import re
+from pathlib import Path
+
+def extract_shape_contracts(bundle_path: Path):
+    text = bundle_path.read_text()
+    shape_kinds = set(re.findall(r'shape\.kind\s*===?\s*["\']([a-zA-Z0-9_\-]+)["\']', text))
+    print("Found shape kinds:", shape_kinds)
+    return shape_kinds
+```

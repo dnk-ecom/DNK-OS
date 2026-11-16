@@ -1,0 +1,20 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_media/brick.manifest.yaml"
+# purpose: "Sovereign Brick Manifest for dnk_media"
+# canonical_source: true
+# status: "Active"
+# version: "1.0.0"
+# --- END DNK-MRH-HEADER ---
+id: "dnk_media"
+version: "1.0.0"
+domain: "services"
+paths:
+  - "services/dnk_media/**"
+entrypoints:
+  in_ram_facade: "services.dnk_media.src.service"
+  standalone_cli: "services.dnk_media.cli"
+  mcp_server: "services.dnk_media.mcp_server"
+contracts:
+  schemas: "services.dnk_media.contracts.schemas"
+quality_gate:
+  test_command: "uv run pytest services/dnk_media/tests"

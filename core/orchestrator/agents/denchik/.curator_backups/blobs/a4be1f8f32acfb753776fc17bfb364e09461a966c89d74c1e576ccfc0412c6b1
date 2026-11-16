@@ -1,0 +1,218 @@
+---
+name: architecture-invariants-and-blast-radius
+description: "Use when enforcing architecture boundaries or blast radius."
+version: 1.0.0
+author: Gerych Prime & DNK OS
+license: MIT
+metadata:
+  hermes:
+    tags: [architecture, blast-radius, import-cycles, layer-isolation, quality-gate, clean-architecture]
+    related_skills: [requesting-code-review, test-driven-development, canvas-engine-architecture]
+---
+
+# Architecture Invariants, Import Cycle Defense & Blast Radius Analysis
+
+Enforce architectural boundaries, eliminate circular dependencies, decompose God Components, and determine precise test blast radius before committing.
+
+## When to Use
+
+- When refactoring large monolithic files (>1,000 LOC) or God Components into modular packages.
+- When resolving cyclic imports or type recursion across client/server layers.
+- When designing pre-commit or CI gates to prevent cross-tier layer leaks.
+- When selecting a targeted subset of unit/integration tests instead of running an entire slow monolithic suite.
+
+## Step 1 — Verify Layer Isolation
+
+Prevent upper presentation layers (e.g. `apps/web/`) from directly importing lower-tier private runtimes or daemon modules (e.g. `visual_shell/`, `agent-core/`):
+
+1. **Mirror Shared Contracts**: Instead of importing internal runtime models or error helpers, define a pure TypeScript/Python schema mirror in the client layer (e.g. `apps/web/types/apiProtocol.ts`).
+2. **Automated Static Scan**:
+   ```python
+   # Scan all client files for forbidden imports
+   forbidden = ["visual_shell", "packages/agent-core"]
+   for path in web_files:
+       content = path.read_text()
+       for pkg in forbidden:
+           assert pkg not in content, f"Layer leak in {path}: imports {pkg}"
+   ```
+
+## Step 2 — Detect and Break Circular Dependencies
+
+Circular imports create runtime initialization deadlocks, `undefined` module exports, and tightly coupled codebases.
+
+1. **Extract Shared Types**: Move shared interfaces and enums into a dedicated leaf module (`types.ts`) with zero runtime dependencies. Both mutually importing modules then import from `types.ts`.
+2. **Cycle Detection Algorithm (Tarjan / DFS)**:
+   - Parse all local relative imports (`import ... from './...'`) to build a directed graph.
+   - Run Strongly Connected Components (SCC) or recursive DFS to detect back-edges.
+   - Any SCC with size > 1 represents a cycle that must fail the CI gate.
+   ```bash
+   python3 scripts/system/architecture_and_cycle_guard.py
+   ```
+
+## Step 3 — Decompose God Components
+
+Monolithic components (e.g. >5,000 LOC handling layout, state, stream buffering, and rendering) should be decomposed into a cohesive directory package:
+
+1. **Extract Pure Utilities**:
+   - `layoutUtils.ts`: Pure calculations, dimensions, and storage persistence.
+   - `conversationUtils.ts`: Message normalization, stream buffering, run lifecycle.
+   - `artifactRecoveryUtils.ts`: File scanning and artifact restoration.
+2. **Expose a Unified Facade**: Create `index.ts` exporting only the clean public surface.
+3. **Decouple Existing Consumers**: Migrate external hooks and views to import from the package barrel rather than the monolith.
+
+## Step 4 — Deterministic Blast Radius & Targeted Testing
+
+Running an entire 2,000+ test suite on every minor change causes developer fatigue and timeouts. Use deterministic blast radius tracking:
+
+1. **Instant Graphify AST Blast Radius (<200ms, 0 Tokens)**:
+   When analyzing the impact of refactoring, moving, or removing modules, routers, or engine classes, invoke the local Tree-sitter AST engine via `graphify`:
+   ```bash
+   # Find all downstream tests and modules affected by a router or core class
+   graphify affected "apps/api/routers/canvas.py"
+   graphify affected "core/orchestrator/task_forest.py"
+
+   # Discover shortest call paths between frontend bridge and backend services
+   graphify path "VisualCanvasControlEngine" "AccountingEngine"
+
+   # Inspect architectural hubs (god nodes) to guard against high-risk mutations
+   graphify god-nodes --top 10
+   ```
+   *Why this works*: Graphify parses 100k+ AST nodes across 7,000+ files locally without spending LLM tokens. Combining `graphify affected` with OpenAPI schema introspection and frontend string scanning gives a 100% deterministic, regression-free API contract audit.
+
+2. **Inspect Staged / Changed Files**:
+   ```bash
+   git diff --name-only HEAD
+   ```
+3. **Reverse Dependency Graph**: Map which modules import the touched files (transitive closure).
+4. **Domain Classification & Risk Scoring**:
+   - Classify changed paths into system domains (`core`, `api`, `web`, `services`, `scripts`).
+   - Assign risk levels:
+     - `LOW`: Documentation, markdown, static assets.
+     - `MEDIUM`: Isolated CLI script, single UI component.
+     - `HIGH`: Shared utility, provider adapter, protocol contract.
+     - `CRITICAL`: Orchestrator core, base state machine, root schema.
+5. **Discover Targeted Tests & Instant Affected Runner**:
+   - Automatically select matching Vitest and Pytest files covering only the affected surface.
+   ```bash
+   python3 scripts/system/blast_radius_analyzer.py --staged
+   # Or invoke the master verification suite in targeted affected mode:
+   bash scripts/verify_all.sh --affected   # or: bash scripts/verify_all.sh -a
+   ```
+6. **Programmatic API Integration**:
+   - For targeted test execution:
+     ```python
+     from scripts.system.blast_radius_analyzer import BlastRadiusAnalyzer
+
+     analyzer = BlastRadiusAnalyzer(hub_root=".")
+     report = analyzer.run(staged_only=False)
+     pytest_args = report["targeted_tests"]["pytest"]
+     vitest_args = report["targeted_tests"]["vitest"]
+     ```
+   - For orchestrator PR audit & risk multiplier calculation (PR-AF assimilated):
+     ```python
+     from core.orchestrator.blast_radius import BlastRadiusEngine, compute_blast_radius
+
+     engine = BlastRadiusEngine(workspace_root=".")
+     report = engine.compute_blast_radius(["apps/api/routers/canvas.py"])
+     # Returns: report.impact_risk (LOW, MEDIUM, HIGH, CRITICAL)
+     # and reverse dependents: report.direct_dependents, report.transitive_dependents
+     ```
+
+## Step 5 — Option B: Legacy Shell Consolidation into Root Web SSOT & Contract Sync
+
+When deprecating secondary or experimental shells (e.g. `visual_shell/`):
+1. **Identify High-Value Unique Widgets**: Extract specialized canvas nodes, timeline rails, and artifact panes.
+2. **Port Directly into Root Presentation Layer**: Move them to `apps/web/components/stitch/` following standard contracts and zero-leak imports.
+3. **Automate API Contracts**: Generate frontend TypeScript contracts directly from FastAPI OpenAPI schema (`scripts/system/generate_frontend_types.py` ➔ `apps/web/types/apiGenerated.ts`) with unique `operationId` deduplication.
+4. **AST Codebase ➔ Canvas Sync**: Update spatial architecture graphs (`scripts/system/sync_codebase_to_canvas.py` ➔ `docs/notes/DNK_HUB_Core_Architecture.canvas`).
+5. **Archive Deprecated Sub-Shell**: Eliminate redundant `node_modules` trees, divergent TypeScript configs, and isolate legacy directories.
+
+## Step 6 — Integrate into Pre-Commit and Master CI Gate
+
+Ensure architecture guards and blast radius calculators run automatically:
+
+- **Pre-Commit Hook**: Execute fast static checks (<0.1s) before commits land.
+- **CI Master Gate**: Run full architectural and targeted test validation on pull requests.
+
+## Supporting References
+
+- `references/algorithms.md`: Complete implementations of DFS cycle detection for relative imports and reverse dependency blast radius tracking.
+- `references/canonical_root_hygiene_and_constructor_defaults.md`: Protocol for enforcing canonical 8-root domains, theme archive/asset isolation (`assets/themes/`), eliminating constructor default path leakage, unified runtime & dependency storage (DEC-033 `~/.dnk_runtime`), and maintaining 100% root hygiene.
+- `references/targeted_affected_testing_and_shell_consolidation.md`: Guide to `verify_all.sh --affected` / `-a` and Option B sub-shell consolidation.
+- `references/capability_baseline_audit_protocol.md`: Read-only capability baseline, architecture audit protocol, and sanitized mirror synchronization for external mentor review.
+- `references/graphify_blast_radius_and_contract_alignment.md`: Graphify AST call graph commands (`affected`, `path`, `god-nodes`) and Triad Contract Alignment protocol for zero-token API audits.
+- `references/repo_topology_audit_and_graphify_orphan_elimination.md`: Canonical protocol for full repository directory topology audits, zero-token deterministic inventory, Graphify AST orphan/god-node elimination, duplicate consolidation, and swarm test verification.
+- `references/agentic_service_isolation_and_core_contract_protocol.md`: Canonical architectural protocol for Core vs Autonomous Services boundary isolation, manifest.json capability passports, and self-contained specifications in DNK OS.
+- `references/runtime_migration_mapping_and_core_extraction_protocol.md`: Canonical protocol for strict read-only runtime migration mapping, 4-status component classification (PROVEN/PARTIAL/DOCUMENTED_ONLY/UNKNOWN), MVR formulation, and 8-slice topological extraction.
+- `references/harness_manifest_and_evidence_protocol.md`: Canonical protocol for drafting 5-layer Agentic Harness architecture manifests, strict non-goals, and zero-hallucination evidence audits (PROVEN / PARTIAL / DESIGN).
+- `references/agentic_microkernel_ssot_contracts_and_mcp_compat.md`: Canonical protocol for DNK OS Agentic Microkernel SSOT contracts (ADR-091), Contract-Driven Thin Slice development, and FastMCP version compatibility guards (`mcp<2.0.0`).
+- references/plugin_sandbox_governance_and_lifecycle_invariants.md: Declarative Sandbox-First Plugin Governance Policy, default-deny security matrices, fail-closed 5-stage lifecycle transition gates (draft -> sandbox -> evaluated -> active -> deprecated), Plugin Certification (evaluated -> active), GitHub Intake, Discovery Registry, Plugin Capability Graph, Execution Plan DAG, Execution Engine, append-only Audit Log, and Health & Metrics (PLUGIN-010) protocols.
+- `references/production_hardening_and_sandbox_execution_protocol.md`: Canonical architectural invariants and standards for Phase-003 Production Hardening: ephemeral gVisor/Docker sandboxing, non-root execution, cgroups limits, OAuth2/OIDC + WebAuthn zero-trust auth, dynamic Vault secrets, tamper-evident WORM audit chaining, OpenTelemetry/Prometheus golden signals, and KEDA/HPA elastic scaling.
+- `references/verifiable_evidence_gate_and_anti_status_laundering_protocol.md`: Protocol for Split Authority, pre/post SHA-256 fingerprinting, raw test runner log verification, and stale verdict invalidation to prevent delegated status laundering.
+- `references/service_modularization_and_root_sentinel_resolution.md`: Dynamic root sentinel resolution algorithm, headless worker service manifests (port optionality), and zero-breaking deprecation shims for loose service modularization.
+- `references/saap_fastmcp_registry_and_backward_compatibility_invariants.md`: Canonical architectural invariants for SaaP FastMCP Dynamic Registry: 100% manifest backward compatibility (v1alpha1 to v1alpha2 with dual fields), in-memory catalog caching with auto-invalidation, and strict scan path isolation (only `services/dnk_*` and `packages/plugins/`).
+- `references/monorepo_pythonpath_and_service_topology_audit.md`: Protocol for multi-root PYTHONPATH exports (`packages/` & `services/`), DDD service prefix invariants (`services/dnk_*`), and Clean 4-Layer Core demarcation.
+- `references/domain_decoupling_and_meta_path_finder_protocol.md`: Dual-layer backward-compatible decoupling of business domains (`core/` -> `packages/domains/` & `services/dnk_*`) using thin deprecation shims, dynamic prefix `sys.meta_path` `_LegacyCoreFinder` hooks with fallback, and canonical storage/fixture default invariants.
+- `references/agent_harness_architecture_and_monorepo_audit.md`: Canonical reference for Agent Harness patterns (DeepSeek Harness / Cordis), resolving monorepo architectural sprawl, god-directory core extraction, and plugin lifecycle standardization.
+- `references/ghost_runtime_trees_and_shim_hygiene.md`: Protocol for diagnosing gitignored recursive shadow trees (`core/.../core`, agent CWD relative log traps), empty ghost directories (`core/tests/` fixture regressions), submodule cache leaks, deprecation shim lifecycle management, and pyproject.toml multi-root PYTHONPATH SSOT.
+- `references/packages_and_core_consolidation_protocol.md`: Canonical protocol for `packages/` and `core/` dual-namespace consolidation, adapter SSOT, plugin governance vs domain plugins delineation, shared JSON logging utilities, and deprecation warning eradication under strict `-W error::DeprecationWarning` CI gates.
+- `references/fastapi_gateway_consolidation_and_ssot_registry_protocol.md`: Canonical protocol for FastAPI Gateway route consolidation, domain package organization (`canvas/`, `video/`, `tasks/`), SSOT router registry with deduplication, zero-breaking dynamic facade shims (`globals()[_name]`), and OpenAPI collision elimination.
+- `references/standalone_mvp_and_two_tier_distribution_protocol.md`: Protocol for Two-Tier Development, Standalone MVP workspace routing (`../DNK_OS_APP`), 8-root directory hygiene preservation, and FastMCP Core-Plugin Architecture with LOD Context Routing.
+- `references/system_one_machine_native_architecture.md`: Protocol for System One Machine-Native Intelligence (ADR-007), sub-50ms deterministic triage, winnow context compaction, Canny/jev-belay completion gates, and pure-Python zero-torch Tier 2 standalone export.
+- `references/standalone_export_whitelist_and_root_hygiene_protocol.md`: Protocol for standalone packaging whitelist (`scripts/system/export_standalone_app.py`), Zero-Torch Invariant enforcement, IDE workspace hygiene whitelisting (`.kilo`, `.vscode`, `DNK_HUB.code-workspace`), and Markdown Schema MRH / Mandatory Dissent validation gates.
+- `references/calibrated_5vector_anti_bloat_gate.md`: Protocol for evaluating external SaaS platforms, libraries, and cloud headless services using the Calibrated 5-Vector Anti-Bloat Gate (Knowledge Sovereignty, Zero-Glue Efficiency, Agent-First Readiness, Concrete Utility vs Vanity Shell, 3 Core Workhorses Compliance) to prevent Frankenstein Architecture and maintain Local-First SSOT.
+- `references/agent_native_greenfield_react19_next15_architecture.md`: Protocol and architectural invariants for Agent-Native Greenfield Frontend (React 19, Next.js 15 Turbopack, Tailwind v4, Astryx UI CLI, FastMCP) with Golden Code Snippets and LLM training bias mitigation.
+- `references/dual_repo_audit_and_core_unification_protocol.md`: Canonical protocol for dual-repo role separation (`DNK_OS_APP` as Clean Self-Aware Product v1 Flagship vs `DNK_HUB` as R&D Swarm Factory), 6-layer modular architecture (`SelfAwarenessEngine` + `FirstThoughtCompanionAgent`), 5-gate `verify_all.sh` Zero-Hub-Leak invariants, and Split-Brain Anti-Pattern defense with DEC-022 One-Way Two-Tier Export Guard.
+- `references/dual_optics_documentation_and_10day_deprecation_protocol.md`: Canonical protocol for Dual-Optics Documentation (Machine-Executable WHAT/WHY/HOW for Agents vs High-Level Strategic Decisions for Humans), MacBook Host Environment Isolation (`../DNK_Vibe/`, global `pnpm` store, `uv` cache), and strict 10-day sunset/deprecation horizon for `DNK_HUB` upon launching `DNK-Ecom_OS`.
+- `references/docs_4quadrant_consolidation_and_git_batch_protocol.md`: Canonical protocol for high-velocity documentation consolidation (DEC-055) into 4 quadrants (`docs/architecture/`, `docs/tasks/`, `docs/audit/`, `docs/vault/`), In-RAM Python batch moving without lock contention, MRH header auto-fixing, and schema contract fallback synchronization.
+- `references/unified_runtime_and_repo_noise_purge_protocol.md`: Protocol for enforcing Unified Runtime Environment Invariants (DEC-033: centralized `~/.dnk_runtime`, root uv, global `pnpm-store`), zero local virtualenvs or physical `node_modules` duplicates, deterministic repository noise audits (`.DS_Store`, `__pycache__`, high-volume log truncation), and frontend type-checking re-link steps.
+- `references/git_packfile_and_history_bloat_purge_protocol.md`: Protocol for in-RAM `.git/objects/pack` bloat introspection, identifying massive historical blobs (nested `.pack` stores, compiled binaries `bin/`, ledger logs, cyclic JSON dumps), and executing the 2-Tier Zero-Loss Purge (Tier 1 safe local reflog prune without SHA rewrite vs Tier 2 deep `git-filter-repo` excision) while preserving 100% of SCONES/agent memory and production functionality.
+- `references/clean_room_repo_reset_and_agent_interconnection_protocol.md`: Protocol for clean-room repository reset, orphan branch initialization (`git checkout --orphan`), scaffolding canonical agent governance contracts (`README.md`, `AGENTS.md`, `CLAUDE.md`, `INTERCONNECTION_ARCHITECTURE.md`, `contracts.py`), TDD verification, and force-push safety barrier handling.
+
+## Pitfalls to Avoid
+
+- **The Distillation Mirage & Parallel Repository Split-Brain**: Attempting to distill or sunset a monorepo by manually creating a parallel secondary folder/repository (e.g. `DNK-Ecom_OS` next to `DNK_HUB`) while active development continues in the monorepo causes context split-brain, git history divergence (secondary folders become gitless/stale), and double maintenance. Distillation must strictly occur in-tree within the monorepo (e.g. `apps/docs`, tree-shaking dead code in git history) or via one-way automated downstream export scripts (`scripts/export_standalone_app.py`), NEVER by hand-editing parallel twin repositories.
+- **Unquarantined Foreign Clones & MacBook Host Pollution**: External reference repositories (`fumadocs`, `fern`), experimental benchmarks, or fat dependencies MUST NEVER be cloned directly into monorepo working directories (`DNK_HUB`, `DNK-Ecom_OS`). Doing so pollutes git status, triggers IDE indexer lag, and duplicates gigabytes of storage. Always enforce isolation: clone foreign repos strictly into `../DNK_Vibe/` via `python3 scripts/system/safe_repo_clone.py <url>`, leverage global `pnpm` content-addressable storage (`~/.pnpm-store`), and use `uv` APFS copy-on-write Python virtual environments.
+- **Documentation Asymmetry & 10-Day Migration Trap**: Documenting only high-level human narratives without machine-executable schemas and runbooks blinds autonomous agents, preventing them from locating or self-healing system components. Conversely, writing monolithic walls of text without AST headers or `/llms.txt` exhausts agent context windows. Furthermore, when migrating to `DNK-Ecom_OS` with a planned 10-day deprecation horizon for `DNK_HUB`, graduating components without autonomous contract tests creates hidden dangling runtime dependencies that fail catastrophically upon monorepo deprecation.
+- **Anti-Reverse-Ingestion & Downward Sync Invariant (Tier 1 vs Tier 2)**: Never unify or overwrite Tier 1 monorepo documentation (`DNK_HUB`) to match downstream standalone client apps or export repositories (`../DNK_OS_APP`). Standalone vaults and client repos frequently contain frozen, legacy, or superseded drafts (e.g. `AGENTS.md` v2.4 vs v2.8, older specs/ADRs). Synchronization flows strictly outward (Tier 1 ➔ Tier 2 via `scripts/export_standalone_app.py`). Inverting this direction creates catastrophic architectural regression, chore traps, and context exhaustion. When prompted with claims of "new architecture" in downstream repos, run deterministic `mtime` and version audits first to invert the presupposition.
+- **Script Subdirectory Restructuring & Relative Depth Calibration**: When categorizing flat root scripts into subdirectories (`scripts/` -> `scripts/system/`, `scripts/verification/`, `scripts/deployment/`), maintain a zero-overhead root shim forwarding layer (`exec "$DIR/system/script.sh" "$@"`) so Makefile, CI/CD, and developer commands continue working without disruption. Crucially, audit all internal relative root ancestry computations: scripts navigating to the project root via `SCRIPT_DIR/..` or `Path(__file__).resolve().parents[1]` must be updated to `SCRIPT_DIR/../..` / `parents[2]` when moved one folder deeper, preventing silent `FileNotFoundError` or misdirected file searches.
+- **Visual Shell Public Telemetry vs Security Middleware Exemption**: When establishing a unified Visual Shell monitoring and status surface (`/api/v1/shell/*`), frontend status bars, swarm health monitors, and dashboard cards must fetch live system metrics before full user authentication is complete. FastAPI security middleware must explicitly exempt public read-only shell status routes (`and not path.startswith("/api/shell")` and `not path.startswith("/api/v1/shell")`) alongside `/api/health` to prevent 401/403 drops on initial load.
+- **Dual Namespace Core vs Packages Fragmentation & Deprecation Warning Churn**: Splitting integration adapters between `core/adapters/` and `packages/adapters/` or scattering utilities in `packages/dnk_os/utils/` causes inconsistent imports and circular dependencies. Always consolidate canonical implementations into `packages/adapters/` and `packages/utils/`, maintaining `core/adapters/__init__.py` as a facade re-export layer (`is` identity equality) for 100% backward compatibility. Crucially, delineate `core/plugins/` (governance engine/sandbox) from `packages/plugins/` (ecosystem plugins), and update test suites from deprecated shims to canonical domain services (`services.dnk_shopify.supervisor`) so tests pass under strict `-W error::DeprecationWarning` CI gates without resource leak warnings (`with zipfile.ZipFile(...) as zf:`).
+- **SaaP Dynamic FastMCP Tool Registry & Contract Dual-Schema Invariants**: When evolving service manifests to expose dynamic FastMCP tools or ToolRAG catalogs (v1alpha2 `ServicePluginCard`), never break legacy v1alpha1 or flat-dict parsing. Ensure dual-field sync (`capabilities` <-> `fastmcp_tools`), in-memory catalog caching with auto-invalidation on registration, and strict boundary scanning (`services/dnk_*` and `packages/plugins/`). Crucially, synchronize contract test suites (`test_service_card_contract.py`) to branch on manifest `kind`/schema so upgraded services (`service_manifest.yaml`) are validated via Pydantic v1alpha2 models while legacy services continue validating against v1alpha1 JSON Schema without pre-commit failure.
+- **Blind Monolithic Runs**: Don't run the entire multi-suite test runner for a single CSS or markdown change. Check blast radius first.
+- **FastAPI Duplicate Route Aliasing**: Do not mix manual router inclusion (`app.include_router(mod.router)`) with dynamic `pkgutil.iter_modules()` loaders without deduplication. It causes duplicate `operation_id` collisions and route aliasing (`/` vs `/api/`).
+- **Circular Type-Only Imports in Bundlers**: Even if TypeScript allows `import type`, bundlers (Vite/Rollup) or transpilers may emit cyclic runtime references if re-exported through barrels. Always isolate leaf interfaces into `types.ts`.
+- **Ignoring Untracked Tests**: Git hygiene guards should block pre-commit if new test files remain untracked.
+- **Literal Forbidden Paths in Negative Tests**: Static grep sanitizers in pre-commit scripts scan for forbidden patterns (e.g. `/Users/`). Construct test strings dynamically (`"/Users" + "/fake/path"`) in negative test cases to prevent false-positive sanitizer failures.
+- **Starlette TestClient Deadlock in Async Background Tasks**: When testing FastAPI endpoints that trigger background simulation or Action Bus loops, synchronous `TestClient` blocks the single-threaded asyncio loop and deadlocks. Always use `httpx.AsyncClient(transport=ASGITransport(app=app))` inside `async def` tests.
+- **Ephemeral Docker Sandbox Governance**: When executing agent-generated untrusted code, enforce `--network none`, `--user 10001:10001`, `--read-only`, and cgroups v2 caps (`--memory 512m --cpus 1.0 --pids-limit 64`). Always provide a dual-mode fallback with cleansed environment variables when the Docker daemon is unreachable.
+- **Dynamic Test Fixture Root Symlinks & Zero-Tolerance Root Hygiene**: In monorepos with strict canonical root invariants (`scripts/system/root_hygiene_guard.py`), test fixtures (`conftest.py`) must NEVER dynamically create backward-compatibility symlinks or files at the repository root (`templates -> ...`, `data -> ...`, `Dockerfile*`, `monitoring`). If a test run is interrupted, times out, or receives `SIGKILL`, teardown is skipped, leaving dangling symlinks that immediately break root hygiene checks. Tests must directly target canonical infrastructure paths (`infra/docker/`, `infra/compose/`, `core/data/`, `core/templates/`). Furthermore, `root_hygiene_guard.py` checks `entry.is_symlink()` to reject all unauthorized root symlinks fail-closed.
+- **Fail-Closed 13 Canonical Core Subsystems & Service Card Contracts**: Monorepo hygiene guards verify that the 13 canonical `core/` subsystems remain intact and forbid scratch folders (`core/artifacts/`, `core/cache/`). Concurrently, pre-commit guards (`auto_precommit_guard.py`) must continuously run `tests/contracts/test_service_card_contract.py` to prevent broken metadata, unassigned ports, or missing specs across all microservices before commit.
+- **Zero-Unauthorized-Root-Folders Invariant**: Monorepo restructuring consolidates all components into canonical root domains (`apps/`, `core/`, `services/`, `packages/`, `infra/`, `docs/`, `tests/`, `scripts/`). Agents must never create top-level directories (e.g. `skills/`, `artifacts/`, `cache/`, `logs/`) in the repository root; all cache/runtime state belongs in `.data/` or pytest `tmp_path`.
+- **Default Constructor Path Leakage & Source-Tree Pollution**: Engine, telemetry, and service constructors (e.g. `LocalTelemetryEngine`, `RemotionExporter`, `CacheManager`, `YouTubeMediaCacher`) must NEVER use legacy bare folder names or paths pointing inside source trees (`telemetry_dir="telemetry"`, `output_dir="artifacts/videos"`, `cache_dir="./core/cache/..."`). When instantiated in tests or background tasks without explicit arguments, these defaults silently regenerate uncanonical directories in repo root or dirty source folders (`core/cache/`), tripping fail-closed `root_hygiene_guard.py` and `git_hygiene_guard.py`. Always bind runtime caches to isolated runtime directories (`os.getenv("DNK_CACHE_DIR", str(Path.home() / ".dnk_runtime" / "cache" / "..."))`) or pytest `tmp_path`. Source trees (`core/`, `apps/`, `services/`, `packages/`) must remain 100% read-only at runtime.
+- **Autonomous Service Directory Isolation (`services/dnk_*`)**: In accordance with DDD, every service in `services/` must be an encapsulated package directory prefixed with `dnk_` (e.g., `services/dnk_alerting/`, `services/dnk_video_ai_creator/`). Never allow loose Python scripts in the root of `services/`; preserve backwards compatibility using thin deprecation shims.
+- **Root Hygiene Guard Failure from Ephemeral State vs Workspace Janitor**: When `root_hygiene_guard.py` fails due to transient folders like `.worktrees/`, `.extracted_assets/`, or orphan dead-PID locks (`core/orchestrator/agents/*/*.lock`), do not attempt ad-hoc manual deletion. Execute `python3 scripts/system/workspace_janitor.py` immediately to prune dead worktrees (`git worktree prune -v`), clear stale agent locks, and purge ephemeral root directories deterministically.
+- **Dynamic Manifest Discovery vs Dangling Documentation Links**: When contract test suites (`test_service_card_contract.py`) dynamically discover all `services/*/service_manifest.yaml` files, any manifest declaring `spec.docs_path` (e.g. `docs/SPECIFICATION.md`) causes dynamic contract tests to fail-closed if that document is missing on disk. Always verify or scaffold documentation alongside every manifest before committing.
+- **MRH Header Format in Markdown vs Code**: `scripts/system/check_mrh_headers.py` strictly requires HTML comment delimiters (`<!-- --- DNK-MRH-HEADER --- ... -->`) for Markdown (`.md`) files, whereas Python/YAML files use `#`. Use `python3 scripts/system/check_mrh_headers.py --fix` for automatic syntax alignment.
+- **Git-Ignored Plan Trackers in Atomic Commits**: Files such as `docs/plans/TASK_ACTIVE.md` may be ignored in `.gitignore`. Exclude ignored tracking files from atomic slice staging (`git add`) to prevent pre-commit staging aborts.
+- **FastAPI TestClient Directly on APIRouter**: `TestClient(router)` instantiated directly on an `APIRouter` fails with `KeyError: 'fastapi_middleware_astack'` because `TestClient` expects a full ASGI `FastAPI()` application. In isolated unit/integration tests, always wrap: `app = FastAPI(); app.include_router(router); client = TestClient(app)`.
+- **Platform Ingest vs Core Analysis Engine Decoupling**: Pure analytical engines (e.g. `dnk_video_retention_auditor` for FFmpeg pacing/RMS) must remain platform-agnostic and operate on local/cached media files. Never bundle heavy external platform scrapers (`yt-dlp`, proxy rotators, anti-bot bypass) directly into the core analyzer; delegate ingest, metadata, transcript fetching, and media caching to dedicated domain services (e.g. `dnk_youtube_auditor`).
+- **Pytest APIRouter Module Collision on Monkeypatch**: When `src/__init__.py` exposes `from .router import router`, Python binds the `APIRouter` instance to `services.<service>.src.router`. In unit tests, `monkeypatch.setattr("services.<service>.src.router.helper_fn", ...)` fails with `AttributeError: 'APIRouter' object has no attribute 'helper_fn'`. Always import sub-engines as namespaces in `router.py` (`from .engine import metadata_fetcher`) and target the engine module directly in tests (`services.<service>.src.engine.metadata_fetcher.helper_fn`).
+- **Bounded Media Chunk Caching for Analytical Probing**: Full-length media downloads for signal audits trigger bandwidth saturation and test timeouts. Platform ingest services must use bounded download range clipping (e.g. `yt-dlp` `download_ranges` or section filters `*0-60`) to cache only the initial probe window (`cache/<platform>_media/{id}.mp4`) for FFmpeg processing, while extracting transcripts via separate lightweight API requests.
+- **Polymorphic Path-or-Content Loaders vs POSIX Filename Limits**: When utility, expectation, or configuration loaders accept a polymorphic argument (`path_or_content: str`), passing multi-line string content (e.g., inline YAML or JSON) directly to `Path(path_or_content).exists()` or `Path(path_or_content).is_file()` crashes on POSIX with `OSError: [Errno 63] File name too long` whenever the string exceeds 255 characters or contains newlines. Always guard polymorphic parsers: verify `"\n" not in s and len(s) < 256` before constructing `Path(s)` / checking filesystem existence, and wrap in `try ... except (OSError, ValueError): pass` before falling back to string deserializers.
+- **Persistent Cognitive Memory Store Isolation (`~/.dnk_runtime/scones/`)**: Long-term agent cognitive memories and episodic knowledge stores (e.g., SCONES) must resolve default persistence to user runtime directories (`~/.dnk_runtime/scones/scones_storage.json` or `DNK_SCONES_STORAGE`), never inside repository source or test folders (`core/tests/scones_storage.json`, `tests/scones_storage.json`). Storing persistent agent memory inside source/test trees creates volatile git diff churn, violates root hygiene invariants, and risks catastrophic knowledge loss during test cache or transient artifact purges.
+- **Repository Root Resolution in Nested Core Modules vs Multi-Level Subdirectories**: When moving modules into deeper subdirectories (e.g. `core/service_registry.py` -> `core/registry/service_registry.py`), hardcoded ancestor directory steps (`os.path.dirname(os.path.dirname(__file__))`) or checking for generic child names like `"services"` break because parent directories (e.g. `core/`) might contain subdirectories with identical names (`core/services/`), causing the module to misidentify `core/` as repo root. Always resolve the repository root dynamically by walking upward looking for authoritative root sentinel files (`pyproject.toml`, `AGENTS.md`, `.git`).
+- **Headless Worker & Event Stream Services Port Contract**: Worker-only, headless, or stream-consumer services (e.g. `dnk_canvas_worker`) do not expose HTTP endpoints or bind network ports. Microservice models (`ServiceManifestModel`) must declare `port: Optional[int] = None` rather than defaulting to arbitrary ports (e.g. `8000`), preventing false-positive port collision warnings and test contract assertion failures across background workers.
+- **Fail-Closed Root Symlink Prohibition**: In monorepos with strict root hygiene rules, developers or test harnesses must NEVER create top-level symlinks to nested files or directories (e.g. `Dockerfile -> infra/docker/Dockerfile`, `data -> ...`, `deployments -> ...`). The root directory must contain strictly canonical domain directories (`apps/`, `core/`, `services/`, `packages/`, `infra/`, `docs/`, `tests/`, `scripts/`). Any symlink or loose configuration file in the root trips `root_hygiene_guard.py`.
+- **Multi-Root Monorepo PYTHONPATH Invariant & Plugin Resolution**: In monorepos where plugins or shared modules live inside subpackages (`packages/plugins/`), test harnesses (`tests/conftest.py`) and CI runners (`scripts/verify_all.sh`) must explicitly add both `$HUB_ROOT/services` and `$HUB_ROOT/packages` to `sys.path` and `PYTHONPATH`. Relying solely on `pyproject.toml` causes dynamic test discovery to fail with `ModuleNotFoundError: No module named 'plugins'`. Concurrently, all microservices in `services/` must strictly maintain the `dnk_` prefix (e.g., `services/dnk_*`); un-prefixed folders (e.g., `services/media/`) violate service isolation invariants and break dynamic contract audits.
+- **Embedded Submodule Root Namespace Shadowing via `sys.path.insert(0, ...)`**: Never insert embedded frameworks or submodules (`core/hermes_agent/`) at index 0 of `sys.path` at module scope in test files. If the embedded module contains directories with common names (such as `plugins/`, `core/`, `utils/`, or internal `tests/`), prepending it to `sys.path` permanently shadows top-level monorepo namespaces (`packages/plugins/`) and the root `tests/` directory itself, breaking pytest collection across subsequent test suites. Instead of mutating global `sys.path` in test files, adapt nested submodules to support dual-mode package imports (`try: from core.<submodule>... except ImportError: from ...`) and reference them in test files via fully-qualified canonical package paths (`from core.hermes_agent.agent.tool_guardrails import ...`).
+- **FastAPI Route Registry SSOT vs Dynamic Multi-Mounting**: Avoid mixing manual route inclusion with unconstrained dynamic `pkgutil.iter_modules()` loaders. In a monorepo with evolution versions (`canvas_router.py` vs `canvas_v3_router.py`), dynamic loading registers all legacy and experimental iterations simultaneously, causing path collisions and schema corruption. Maintain a declarative registry in `apps/api/routers/__init__.py`.
+- **Domain Decoupling & Meta-Path Shimming Invariants**: When moving business domains (`shopify_liquid`, `supervisor`, `video`, `voice`) out of `core/` to domain services (`services/dnk_*`), never break existing imports. Use dual-layer backward compatibility: thin shim modules with `DeprecationWarning` and wildcard re-exports in legacy folders, paired with a custom `sys.meta_path` finder (`_LegacyCoreFinder`) in `core/__init__.py` for consolidated internal packages (`core.agents`, `core.coordinators`, `core.services`). Concurrently, ensure test suites resolving migration directories use fallback path arrays (`infra/migrations/db/migrations` vs `db/migrations`) so path migrations don't break verification tests.
+- **Gitignored Recursive Runtime Shadow Trees & Zero-File MetaPath Shimming**: Daemons, agents, and subprocesses running inside gitignored directories must never run with a working directory nested within themselves or output caches inside source trees, which creates invisible recursive shadow trees (`core/hermes_agent/core/...`) unnoticed by git status. In post-domain decoupling, physical shim directories (`core/video/`, `core/shopify_liquid/`, `core/supervisor/`, `core/voice/`) must be purged in Phase B after migrating API routes directly to `services/dnk_*`, backed by a dynamic `sys.meta_path` `_LegacyCoreFinder` in `core/__init__.py` that transparently redirects and caches modules in `sys.modules` with `DeprecationWarning` for external callers without leaving physical directories on disk. Binary archives (e.g. `.zip` themes) must be moved from services to `artifacts/themes/`, with `artifacts` explicitly whitelisted in `scripts/system/root_hygiene_guard.py`. Pytest PYTHONPATH multi-root paths (`.`, `services`, `packages`) must be synchronized directly in `pyproject.toml` so bare `pytest` and CI scripts run identically without missing plugin imports.
+- **Package Name Standardization vs Frontend Path Aliases Synchronization**: When migrating, deleting, or renaming package symlinks to canonical PEP 8 packages (e.g. removing `packages/teleprompter-core` in favor of `packages/teleprompter_core`), always audit and synchronize build/test path aliases across frontend configurations (`apps/web/vitest.config.ts`, `apps/web/tsconfig.json`, `apps/web/vite.config.ts`). Removing a package alias without updating Vitest/Webpack paths causes instant broken import resolutions across web test runners.
+- **SCONES Assimilated Rules Relocation & Directory Auto-Creation**: Knowledge extraction rules (`assimilated_*_rules.json`) must never be saved in code roots (`core/`). Always relocate to `docs/scones/assimilated_rules/`, and ensure ingestion tools (`core/orchestrator/dna_assimilation.py`) include automatic parent directory creation (`target_path.parent.mkdir(parents=True, exist_ok=True)`) before writing.
+- **Ghost Test Storage Folders & Submodule Tracked Bytecode**: State and memory engines (e.g. `SCONESMemoryEngine`, `VisualContextRegistry`) invoke `os.makedirs` on parent directories of configured storage paths. If tests use deprecated paths such as `core/tests/...`, the directory is physically created on every test run, and teardown only removes the JSON file, causing empty untracked ghost directories (`core/tests/`) to constantly respawn. Test storage paths must always be routed to `artifacts/test_storage/` (which is git-ignored and sanctioned by `root_hygiene_guard.py`) or use pytest `tmp_path`. Concurrently, git submodules committed with tracked `.pyc` files cause deleted-tracked-file diffs when cleaning `__pycache__`; purge them from the submodule index via `git rm -f --cached **/*.pyc && git commit`.
+- **Mass Documentation Relocation & Schema Contract Drift**: When consolidating large doc trees (thousands of markdown/yaml specs) into canonical quadrants (`docs/architecture/`, `docs/tasks/`, `docs/audit/`, `docs/vault/`), contract tests (`tests/contracts/test_service_card_contract.py`) hardcoded to old schema paths (`docs/schemas/`) fail fail-closed. Always provide backward-compatible fallback paths (`candidate_paths = [Path("docs/architecture/schemas/..."), Path("docs/schemas/...")]`) or atomically update test constants, clear stale `.git/index.lock` files, and re-run `anti_tautology_guard.py` alongside `check_mrh_headers.py --fix` to avoid CI/pre-commit blocks.
+- **Local Runtime Environment Proliferation & Blind node_modules Purging**: Monorepo policy strictly prohibits downloading isolated virtual environments or duplicate package stores inside repository subdirectories (DEC-033). All Python environments point to centralized `~/.dnk_runtime/venv`, and Node packages are hardlinked from global store `~/.pnpm-store` / `pnpm_virtual_store`. When performing repository noise purges, never blindly delete `apps/web/node_modules` without immediate `pnpm install` re-linking: doing so strips `.bin/tsc` and causes pre-commit frontend type-checking (`auto_precommit_guard.py`) to fail fail-closed.
+- **Root PNPM Workspace & Root Hygiene Guard Invariants**: Adding `pnpm-workspace.yaml` causes pnpm to hoist binary links into a root `node_modules` directory. Monorepo hygiene guards (`scripts/system/root_hygiene_guard.py`) must explicitly whitelist `pnpm-workspace.yaml`, `pnpm-lock.yaml`, and `node_modules` in `ALLOWED_ROOT_FILES` and `ALLOWED_ROOT_DIRS`. Additionally, monorepo packages must use `"workspace:*"` rather than fragile `"file:../"` relative links.
+- **Pre-Existing Template/Fixture Deletion & Git Submodule Traps**: Never delete or move root template directories (e.g. `templates/plugin`) without auditing all hardcoded string references in `core/` and running the corresponding pytest suite (`tests/plugins/`), as doing so causes dozens of `FileNotFoundError` failures across plugin registries and sandboxes. Similarly, when root `git status` shows modified submodule pointers (e.g. `services/dnk_shopify/DNK-e.com`), always inspect with `git -C <submodule_path> status` first: submodules often hold uncommitted work on active feature branches (e.g. `story`) that must not be blindly reset or committed.

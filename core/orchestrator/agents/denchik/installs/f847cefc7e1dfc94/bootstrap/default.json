@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "identity": "d4cedc4946638f1332b4c27f9c9996ce72bf25cf",
+  "bootstrappedAt": "2026-11-16T22:55:29+0200",
+  "results": {
+    "adopt_blessed_checkout": {
+      "ok": true,
+      "skipped": "not-a-blessed-root"
+    },
+    "migrate_config": {
+      "ok": true,
+      "migrated": "39->52"
+    },
+    "state_db_guard": {
+      "ok": false,
+      "error": "too small (0 bytes) to be a valid SQLite database"
+    },
+    "drop_live_plugin_catalog": {
+      "ok": true
+    },
+    "expose_cli": {
+      "ok": true,
+      "skipped": "no-store-python"
+    }
+  }
+}

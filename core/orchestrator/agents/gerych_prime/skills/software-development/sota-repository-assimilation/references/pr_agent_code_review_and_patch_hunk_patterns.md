@@ -1,0 +1,78 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "skills/software-development/sota-repository-assimilation/references/pr_agent_code_review_and_patch_hunk_patterns.md"
+# purpose: "SOTA Patterns: PR-Agent Patch Processing, Token Budgeting, and Review Finding Reconciliation"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.1.0"
+# updated_at: "2026-09-10"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+# PR-Agent Patch Processing & Review State Reconciliation
+
+Assimilated from `The-PR-Agent/pr-agent` (MIT License, ⭐ 12.9k+).
+
+## 1. Multi-File Hunk-Only Unified Diff Processing
+In raw Git unified diffs, headers (`diff --git`, `index ...`, `--- a/...`, `+++ b/...`) confuse LLM tokenizers and diff parsers.
+Crucial Pitfall: Simply stripping lines before the first `@@` leaves header lines intact between subsequent files in a multi-file diff. The robust filter retains only hunk boundaries (`@@ ... @@`) and delta lines (`+`, `-`, ` `), stripping all intermediate git/diff headers:
+
+```python
+import re
+
+RE_HUNK_HEADER = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@[ ]?(.*)")
+
+def to_hunk_only_patch(patch_str: str) -> str:
+    """Filter raw unified diff into a clean hunk stream.
+    Strips file headers (diff --git, index, ---, +++) both at diff start
+    and across file transitions, retaining only hunk headers and changes.
+    """
+    output_lines = []
+    in_hunk = False
+    for line in patch_str.splitlines(keepends=True):
+        if line.startswith("@@"):
+            in_hunk = True
+            output_lines.append(line)
+        elif in_hunk:
+            if line.startswith(("diff --git", "index ", "--- ", "+++ ", "new file mode", "deleted file mode")):
+                in_hunk = False
+                continue
+            output_lines.append(line)
+    return "".join(output_lines)
+```
+
+## 2. Dynamic Token Budgeting & File Weighting
+When evaluating large multi-file PRs (50+ files), the diff must not exceed the prompt token budget. PR-Agent prioritizes files by semantic impact:
+1. **Core Business Logic (Weight: 1.0)**: `.py`, `.ts`, `.tsx`, `.rs`, `.go` (High priority, full hunk context).
+2. **Configuration & Schemas (Weight: 0.7)**: `.json`, `.yaml`, `.toml` (Medium priority, compact representation).
+3. **Tests & Fixtures (Weight: 0.5)**: `test_*.py`, `*.spec.ts` (Medium-low priority).
+4. **Documentation & Static Assets (Weight: 0.2–0.3)**: `.md`, `.txt`, `.svg` (Lowest priority, summarized).
+
+Batching splits files into discrete review slices using `partition_diff_by_token_budget(files, max_tokens=12000)`.
+
+## 3. Inline Comment Fingerprinting & State Reconciliation
+Prevents spamming duplicate comments when new commits are pushed to an open PR:
+
+```python
+import hashlib
+
+def key_issue_fingerprint(file_path: str, line_no: int, issue_signature: str) -> str:
+    raw = f"{file_path}:{line_no}:{issue_signature}".strip().encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:16]
+
+def reconcile_review_findings(prior_findings: set[str], current_findings: set[str]) -> dict:
+    return {
+        "resolved": list(prior_findings - current_findings),
+        "persistent": list(prior_findings & current_findings),
+        "new": list(current_findings - prior_findings),
+    }
+```
+
+## 4. Production Integration in DNK OS
+Implemented as core modules in `core/orchestrator/`:
+- `core/orchestrator/git_diff_engine.py`: `GitDiffEngine`, `FileDiff`, `DiffHunk`, `to_hunk_only_patch`, `partition_diff_by_token_budget`.
+- `core/orchestrator/audit_state_machine.py`: `AuditStateMachine`, `ReviewFinding`, `FindingState`, `format_github_suggestion`.
+- `core/orchestrator/pr_agent_adapter.py`: `review_diff_with_pr_agent_pipeline` (hexagonal bridge to `AdversarialReviewEngine`).
+- `core/orchestrator/swarm_coordinator.py`: Integrated into worker `gerych_auditor` for `action="pr_review"` and `action="audit_diff"`.
+- Unit tests: `tests/core/test_pr_agent_assimilation.py` (100% Green).
