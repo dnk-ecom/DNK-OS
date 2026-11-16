@@ -4,7 +4,7 @@ status: active
 type: adr
 domain: core
 archetype: "ADR"
-author: "Gerych & Antigravity & Maxim"
+author: "DNK-e.com"
 version: "1.0.0"
 updated: "2026-11-15"
 ---
@@ -23,7 +23,7 @@ updated: "2026-11-15"
 > status: "Active"
 > version: "1.0.0"
 > updated_at: "2026-11-15"
-> author: "Gerych & Antigravity & Maxim"
+> author: "DNK-e.com"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

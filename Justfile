@@ -7,7 +7,7 @@
 # status: "Active"
 # version: "2.5.0"
 # updated_at: "2026-11-16"
-# author: "Antigravity & Gerych & Maxim"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 export PYTHONPATH := "."

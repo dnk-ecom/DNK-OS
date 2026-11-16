@@ -3,7 +3,7 @@ title: "DNK OS Foundation Execution Chronicle (Living Engineering Log)"
 status: active
 type: sop-runbook
 domain: core
-author: "Gerych (Cold Knowledge Archivist & Historical Auditor) & Antigravity & Maxim"
+author: "DNK-e.com"
 version: "1.0.0"
 updated: "2026-11-15"
 ---
@@ -19,7 +19,7 @@ updated: "2026-11-15"
 > status: "Active"
 > version: "1.0.0"
 > updated_at: "2026-11-15"
-> author: "Gerych & Antigravity & Maxim"
+> author: "DNK-e.com"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -78,7 +78,7 @@ updated: "2026-11-15"
      - У кінець Розділу 3 додано заблоковане рішення **`[🔒 LOCKED] DEC-110: Sovereign Workstation Topology (DNK_OS 8 Canonical Roots, 4-Zone APFS Runtime, Dual-Mount FastMCP Microkernel <400 LOC, and Spatial Canvas Orchestration Engine)`**.
      - Зафіксовано всі 8 інваріантів: Narrow Waist `< 400 LOC` без бізнес-логіки, 3 воркхорси (`dnk_shopify`, `dnk_media`, `dnk_distribution`), Dual-Mount (In-RAM `0 мс` + FastMCP), SCONES FTS5 + AST замість Vector DB, 4-Zone APFS worktree pool, 8 канонічних коренів, розкриття нод канвасу в ізольовані чати (`node:{canvas_id}:{node_id}`) з передачею виключно кристалізованих артефактів по ребрах.
   2. **Створено Офіційний Архітектурний Запис (`./docs/architecture/adr/ADR-092-DNK-OS-FOUR-ZONE-APFS-SPATIAL-CANVAS-ARCHITECTURE.md`):**
-     - Оформлено за стандартом `DNK-STD-0075` із валідним MRH-хедером (`status: Active`, `version: 1.0.0`, `author: Gerych & Antigravity & Maxim`).
+     - Оформлено за стандартом `DNK-STD-0075` із валідним MRH-хедером (`status: Active`, `version: 1.0.0`, `author: DNK-e.com`).
      - Розкрито розділи: `Context & Problem Statement`, `Decision`, `Architecture Matrix`, `Alternatives Considered`, `Trade-offs & Epistemic Armor (3 Flaws, Boundary Conditions & Skeptic Alternative)`, `Consequences & Verification Gates`.
   3. **Ініціалізовано Живий Бортовий Журнал (`./docs/plans/DNK_OS_FOUNDATION_EXECUTION_CHRONICLE.md`):**
      - Закладено матрицю пояснень «Чому саме так побудовано», реєстр міграції компонентів (`FOUND-00` .. `FOUND-08`) та стандарт подальших хронікальних записів для кожного атомарного зрізу MASE.

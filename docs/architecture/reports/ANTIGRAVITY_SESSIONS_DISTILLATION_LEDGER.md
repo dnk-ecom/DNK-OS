@@ -3,7 +3,7 @@ title: "Antigravity IDE Sessions Master Distillation Ledger"
 status: "active"
 type: "audit-report"
 domain: "core"
-author: "Antigravity (Chief Sovereign Architect) & Maxim"
+author: "DNK-e.com"
 version: "1.0.0"
 updated: "2026-11-16"
 ---
@@ -19,7 +19,7 @@ updated: "2026-11-16"
 > status: "Active"
 > version: "1.0.0"
 > updated_at: "2026-11-16"
-> author: "Antigravity & Maxim"
+> author: "DNK-e.com"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

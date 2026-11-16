@@ -21,7 +21,7 @@ tags:
 > status: "Active"
 > version: "1.0.0"
 > updated_at: "2026-11-15"
-> author: "Antigravity & Gerych & Maxim"
+> author: "DNK-e.com"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

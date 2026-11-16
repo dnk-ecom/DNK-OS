@@ -3,7 +3,7 @@ title: "DNK OS Foundation & Session Handoff (DEC-110 / DEC-117)"
 status: "Active"
 type: "plan"
 domain: "core"
-author: "Antigravity & Maxim"
+author: "DNK-e.com"
 version: "1.0.0"
 ---
 
@@ -18,7 +18,7 @@ version: "1.0.0"
 > status: "Active"
 > version: "1.0.0"
 > updated_at: "2026-11-16"
-> author: "Antigravity & Maxim"
+> author: "DNK-e.com"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
