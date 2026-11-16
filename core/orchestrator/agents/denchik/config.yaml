@@ -2,6 +2,21 @@ model:
   default: gemini-4-argon
   provider: vertex
   reasoning_effort: medium
+moa:
+  default_preset: "goldfish-review"
+  presets:
+    goldfish-review:
+      enabled: true
+      aggregator:
+        provider: "vertex"
+        model: "gemini-4-argon"
+      reference_models:
+        - provider: "vertex"
+          model: "gemini-3.8-flash"
+          enabled: true
+        - provider: "vertex"
+          model: "gemini-3.7-flash"
+          enabled: true
 providers:
   gemini:
     base_url: ${VERTEX_BASE_URL}
