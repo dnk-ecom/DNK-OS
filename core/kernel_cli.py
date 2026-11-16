@@ -33,6 +33,7 @@ async def run_cli_command(kernel: Any, args: List[str]) -> int:
         print("  codemap <file_path>       - Generate AST symbol map of a file")
         print("  prune <file_or_text>      - Prune verbose logs")
         print("  clipboard <status|search|projects|screenshots> - Query ClipBoardLine database")
+        print("  node <context|post|messages|crystallize> [args...] - Spatial Canvas node session control")
         return 0
 
     cmd = args[0]
@@ -151,6 +152,58 @@ async def run_cli_command(kernel: Any, args: List[str]) -> int:
         else:
             print(f"Unknown clipboard command: {sub}. Use status, projects, screenshots, or search.")
         return 0
+    elif cmd == "node":
+        from pathlib import Path
+        if len(args) < 2:
+            print("Usage: node <context|post|messages|crystallize> [args...]")
+            return 1
+        sub = args[1]
+        if sub == "context":
+            if len(args) < 4:
+                print("Usage: node context <canvas_path> <node_id>")
+                return 1
+            c_path = Path(args[2])
+            n_id = args[3]
+            ctx = kernel.session_router.compile_node_context(canvas_path=c_path, node_id=n_id)
+            print(json.dumps(ctx.model_dump() if hasattr(ctx, "model_dump") else str(ctx), indent=2, ensure_ascii=False))
+            return 0
+        elif sub == "post":
+            if len(args) < 6:
+                print("Usage: node post <canvas_id> <node_id> <role> <message>")
+                return 1
+            c_id = args[2]
+            n_id = args[3]
+            role = args[4]
+            message = args[5]
+            res = kernel.post_node_message(canvas_id=c_id, node_id=n_id, role=role, content=message)
+            print(json.dumps(res, indent=2, ensure_ascii=False))
+            return 0
+        elif sub in ("messages", "history"):
+            if len(args) < 4:
+                print("Usage: node messages <canvas_id> <node_id> [limit]")
+                return 1
+            c_id = args[2]
+            n_id = args[3]
+            limit = int(args[4]) if len(args) > 4 else 50
+            msgs = kernel.get_node_messages(canvas_id=c_id, node_id=n_id, limit=limit)
+            print(json.dumps(msgs, indent=2, ensure_ascii=False))
+            return 0
+        elif sub == "crystallize":
+            if len(args) < 5:
+                print("Usage: node crystallize <canvas_path> <node_id> <summary> [artifacts_json]")
+                return 1
+            c_path = Path(args[2])
+            n_id = args[3]
+            summary = args[4]
+            artifacts = json.loads(args[5]) if len(args) > 5 else []
+            res = kernel.session_router.crystallize_node(
+                canvas_path=c_path, node_id=n_id, summary=summary, artifact_refs=artifacts
+            )
+            print(json.dumps(res.model_dump() if hasattr(res, "model_dump") else str(res), indent=2, ensure_ascii=False))
+            return 0
+        else:
+            print(f"Unknown node command: {sub}. Use context, post, messages, or crystallize.")
+            return 1
     else:
         print(f"Unknown CLI command: {cmd}")
         return 1

@@ -69,6 +69,22 @@ canvas-pipeline:
 run-node canvas node_id summary="":
     @uv run python3 core/orchestrator/quad_runner.py {{canvas}} {{node_id}} {{summary}}
 
+# Compile node session context with L2 Project DNA and upstream contracts
+node-context canvas node_id:
+    @uv run python3 core/kernel.py --cli node context {{canvas}} {{node_id}}
+
+# Post message to an isolated node chat session
+node-post canvas_id node_id role message:
+    @uv run python3 core/kernel.py --cli node post {{canvas_id}} {{node_id}} {{role}} "{{message}}"
+
+# Read discussion messages for an isolated node chat session
+node-messages canvas_id node_id limit="50":
+    @uv run python3 core/kernel.py --cli node messages {{canvas_id}} {{node_id}} {{limit}}
+
+# Crystallize node output contract into .canvas and SQLite WAL
+node-crystallize canvas node_id summary artifacts_json="[]":
+    @uv run python3 core/kernel.py --cli node crystallize {{canvas}} {{node_id}} "{{summary}}" '{{artifacts_json}}'
+
 # -----------------------------------------------------------------------------
 # 🌐 API SERVER & FASTMCP
 # -----------------------------------------------------------------------------

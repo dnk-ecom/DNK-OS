@@ -24,16 +24,17 @@ workstreams:
     kind: "core_rnd"
     title: "Track 1: R&D & Theme Core Foundry"
     assigned_workhorse: "dnk_shopify"
-    repo_root: "./services/dnk_shopify/DNK_Sovereign_Apex"
+    repo_root: "../DNKEcom/DNK-Ecom_git_mirrow/main"
+    git_remote: "https://github.com/DNKShopify/DNK-e.com"
     canvas: "./docs/canvas/projects/dnk_ecom/track_theme_core.canvas"
-    definition_of_done: "100% 7-Gate Theme Integrity pass on DNK Sovereign 1.0.0 Apex, zero liquid syntax errors"
+    definition_of_done: "100% 7-Gate Theme Integrity pass on DNK-Ecom main worktree, zero liquid syntax errors"
 
   track_2_marketing_sales:
     track_id: "track-marketing-sales"
     kind: "marketing_sales"
     title: "Track 2: Marketing, Sales & Conversion Funnels"
     assigned_workhorse: "dnk_distribution"
-    repo_root: "./services/dnk_shopify"
+    repo_root: "./docs/projects/dnk_ecom"
     canvas: "./docs/canvas/projects/dnk_ecom/track_marketing_sales.canvas"
     definition_of_done: "PDP conversion blocks with direct response copy, zero AI-slop"
 
@@ -42,6 +43,6 @@ workstreams:
     kind: "donor_audit"
     title: "Track 3: SOTA Competitor Audit & Reverse-Engineering"
     assigned_workhorse: "dnk_shopify"
-    repo_root: "./docs/notes/sota_audits"
+    repo_root: "../DNKEcom/DNK-Ecom_git_mirrow"
     canvas: "./docs/canvas/projects/dnk_ecom/track_donor_audit.canvas"
     definition_of_done: "Reverse engineering audits complete for Sugar, Story, Ella and integrated into atomic block backlog"

@@ -13,7 +13,7 @@
     {
       "id": "node_track_1_core_rnd",
       "type": "text",
-      "text": "### 🛠️ Track 1: R&D & Theme Core Foundry\n\n**Track ID**: `track-theme-core`\n**Workhorse**: `dnk_shopify`\n**Repo Root**: `./services/dnk_shopify/DNK_Horizon_Tinker`\n**Mission**: Maintain immutable SemVer master theme on Tinker 4.2.0.\n\n**Agent**: `dnk_shopify`\n**Gate**: `shopify theme check`",
+      "text": "### 🛠️ Track 1: R&D & Theme Core Foundry\n\n**Track ID**: `track-theme-core`\n**Workhorse**: `dnk_shopify`\n**Repo Root**: `../DNKEcom/DNK-Ecom_git_mirrow/main`\n**Remote**: `https://github.com/DNKShopify/DNK-e.com`\n**Mission**: Maintain immutable SemVer master theme on DNK-Ecom main worktree.\n\n**Agent**: `dnk_shopify`\n**Gate**: `tools/verify_theme_integrity.py`",
       "x": 100,
       "y": 400,
       "width": 380,
@@ -33,7 +33,7 @@
     {
       "id": "node_track_3_donor_audit",
       "type": "text",
-      "text": "### 🔍 Track 3: SOTA Competitor Audit & Benchmarks\n\n**Track ID**: `track-donor-audit`\n**Workhorse**: `dnk_shopify` / `gerych`\n**Repo Root**: `./docs/notes/sota_audits`\n**Mission**: Reverse-engineer top competitor themes (Sugar, Story, Ella, Shrine).\n\n**Agent**: `gerych`\n**Gate**: `verify_donor_audit`",
+      "text": "### 🔍 Track 3: SOTA Competitor Audit & Benchmarks\n\n**Track ID**: `track-donor-audit`\n**Workhorse**: `dnk_shopify` / `gerych`\n**Repo Root**: `../DNKEcom/DNK-Ecom_git_mirrow`\n**Mission**: Reverse-engineer top competitor themes (Sugar, Story, Ella, Shrine, Elixir).\n\n**Agent**: `gerych`\n**Gate**: `verify_donor_audit`",
       "x": 1140,
       "y": 400,
       "width": 380,
@@ -43,7 +43,7 @@
     {
       "id": "node_t1_dual_ready_blocks",
       "type": "text",
-      "text": "### 🧱 T1.1: Dual-Ready Theme Blocks v2.0 Synthesis\n\n**Parent**: `node_track_1_core_rnd`\n**Target**: `services/dnk_shopify/DNK_Horizon_Tinker/blocks/`\n**Agent**: `dnk_shopify`\n\n**Tasks**:\n1. Construct atomic blocks with {% doc %} param typing.\n2. Ensure closest.product fallback.\n3. Validate under Tinker 4.2.0 runtime.",
+      "text": "### 🧱 T1.1: Dual-Ready Theme Blocks v2.0 Synthesis\n\n**Parent**: `node_track_1_core_rnd`\n**Target**: `../DNKEcom/DNK-Ecom_git_mirrow/main/blocks/`\n**Agent**: `dnk_shopify` / `denchik`\n\n**Tasks**:\n1. Construct atomic blocks with {% doc %} param typing.\n2. Ensure closest.product fallback.\n3. Validate under 7-Gate Theme Integrity.",
       "x": 100,
       "y": 700,
       "width": 380,
@@ -63,12 +63,12 @@
     {
       "id": "node_t3_sugar_theme_audit",
       "type": "text",
-      "text": "### 🔬 T3.1: Sugar Theme Reverse-Engineering Dossier\n\n**Parent**: `node_track_3_donor_audit`\n**Target**: `docs/notes/sota_audits/`\n**Agent**: `gerych`\n\n**Tasks**:\n1. Deconstruct Sugar theme cart drawer & sticky ATC.\n2. Extract Liquid AST interpolation patterns.\n3. Feed crystallized block specs into T1.1.",
+      "text": "### 🔬 T3.1: Sugar Theme Reverse-Engineering Dossier\n\n**Agent**: `gerych`\n**Status**: 📌 CRYSTALLIZED\n**Output Contract**:\nЗавершено аудит Sugar Theme (SugarCart cache, StickyProduct, VendorRuntimeLoader, ProductForm). Створено досьє docs/notes/sota_audits/SUGAR_THEME_AUDIT.md\n\n**Artifacts**:\n- `docs/notes/sota_audits/SUGAR_THEME_AUDIT.md`",
       "x": 1140,
       "y": 700,
       "width": 380,
       "height": 240,
-      "color": "1"
+      "color": "4"
     }
   ],
   "edges": [

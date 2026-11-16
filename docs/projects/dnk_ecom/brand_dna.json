@@ -66,13 +66,13 @@
       "title": "Track 1: R&D & Theme Core Foundry",
       "mission": "Develop and maintain immutable SemVer master theme engine on DNK Sovereign 1.0.0 Apex with Theme Blocks 2.0 and High-CRO Cart Drawer",
       "assigned_workhorse": "dnk_shopify",
-      "repo_root_rel": "./services/dnk_shopify/DNK_Sovereign_Apex",
+      "repo_root_rel": "../DNKEcom/DNK-Ecom_git_mirrow/main",
       "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_theme_core.canvas",
       "default_actions": [
         {
           "action_id": "shopify.run_theme_check",
           "label_uk": "Запустити Theme Check & 7-Gate Integrity",
-          "description_en": "Run official Shopify theme check and 7-gate integrity on DNK Sovereign Apex",
+          "description_en": "Run official Shopify theme check and 7-gate integrity on DNK-Ecom main worktree",
           "surface_mode": "dual",
           "mcp_brick": "dnk_shopify",
           "mcp_tool_name": "shopify_verify_7gates",
@@ -85,7 +85,7 @@
         }
       ],
       "deterministic_gates": [
-        "python3 services/dnk_shopify/DNK_Sovereign_Apex/tools/verify_theme_integrity.py services/dnk_shopify/DNK_Sovereign_Apex"
+        "python3 ../DNKEcom/DNK-Ecom_git_mirrow/main/tools/verify_theme_integrity.py ../DNKEcom/DNK-Ecom_git_mirrow/main"
       ]
     },
     {
@@ -124,7 +124,7 @@
       "title": "Track 3: SOTA Competitor Audit & Reverse-Engineering",
       "mission": "Deconstruct leading themes (Sugar, Story, Ella, Shrine, Horizon), extract CRO patterns into atomic blocks",
       "assigned_workhorse": "dnk_shopify",
-      "repo_root_rel": "./docs/notes/sota_audits",
+      "repo_root_rel": "../DNKEcom/DNK-Ecom_git_mirrow",
       "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_donor_audit.canvas",
       "default_actions": [
         {

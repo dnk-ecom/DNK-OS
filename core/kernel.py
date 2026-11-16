@@ -340,13 +340,14 @@ class FastMCPKernel:
     # Spatial Canvas Per-Node Session & Context Surgery (ADR-092 / DEC-110)
     # -------------------------------------------------------------------------
     def compile_node_session_context(
-        self, canvas_id: str, node_id: str, canvas_path: Optional[str] = None, max_tokens: int = 1500
+        self, canvas_id: str, node_id: str, canvas_path: Optional[str] = None
     ) -> Dict[str, Any]:
         """Compiles upstream context wires + L2 DNA + L1 Account for an isolated node session."""
         c_path = Path(canvas_path) if canvas_path else Path(f"docs/canvas/{canvas_id}.canvas")
-        return self.session_router.compile_node_context(
-            canvas_path=c_path, target_node_id=node_id, max_tokens=max_tokens
+        prompt = self.session_router.compile_node_context(
+            canvas_path=c_path, node_id=node_id
         )
+        return prompt.model_dump() if hasattr(prompt, "model_dump") else dict(prompt)
 
     def post_node_message(
         self, canvas_id: str, node_id: str, role: str, content: str, artifact_refs: Optional[List[str]] = None

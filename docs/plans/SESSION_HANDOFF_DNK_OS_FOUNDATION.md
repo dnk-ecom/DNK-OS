@@ -51,6 +51,7 @@ version: "1.0.0"
 | **DEC-115** | **Apex 1.0.0 CRO Architecture & Theme Blocks 2.0** | Workhorse #1 (`services/dnk_shopify`): SaaP Dual-Ready блоки (Tinker 4.2.0 + Liquid AST), 7-gate валідація, Zero-App-Bloat. `[🔒 LOCKED]` |
 | **DEC-116** | **Dynamic Client Proposal Engine** | Генератор комерційних пропозицій та клієнтський портал (`proposal_client_portal.html`) з ін'єкцією Brand DNA та матрицею цінності. `[🔒 LOCKED]` |
 | **DEC-117** | **Sovereign Unified Microkernel v2.5.0** | Єдине ядро `core/kernel.py`, що нативно об'єднує 4 SOTA підсистеми: Spatial Canvas Router, Fan-In Aggregator, Quarantine Sentinel, SCONES FTS5 Memory. `[🔒 LOCKED]` |
+| **DEC-118** | **Node Session Lifecycle & Competitor Theme Extraction** | Narrow-Waist CLI (`core/kernel_cli.py`, `Justfile`), Graph Context Surgery ($\le 1500$ tok), досьє Sugar Theme (`docs/notes/sota_audits/SUGAR_THEME_AUDIT.md`), кристалізація `node_t3_sugar_theme_audit` та передача контракту в `node_t1_dual_ready_blocks`. 42/42 tests pass. `[🔒 LOCKED]` |
 
 ---
 
@@ -145,11 +146,15 @@ just mcp-stdio
 
 ## 6. 📋 Активний беклог задач у `DNK_OS`
 
+### Трек 3: Аудит та адаптація донорських репозиторіїв
+- [x] Здійснити аудит Sugar Theme (`node_t3_sugar_theme_audit`): екстраговано патерни `SugarCart`, `StickyProduct`, `vendor-runtime-loader`, `ProductForm` у [SUGAR_THEME_AUDIT.md](../notes/sota_audits/SUGAR_THEME_AUDIT.md).
+- [ ] Витягти найкращі CRO UI-паттерни в бібліотеку компонентів Apex (наступні донори: Story, Shrine, Ella).
+
 ### Трек 1: Shopify Apex CRO Theme (Workhorse #1)
-- [ ] Завершити набір SaaP Dual-Ready v2.0 блоків у `services/dnk_shopify/theme_blocks/`:
-  - `trust_badge_grid.liquid`
+- [ ] Фізичний синтез SaaP Dual-Ready v2.0 блоків у `services/dnk_shopify/DNK_Sovereign_Apex/blocks/` (`node_t1_dual_ready_blocks`):
+  - `sticky_atc_bar.liquid` + `dnk-cart-bus.js` (на основі Sugar)
   - `tiered_discount_table.liquid`
-  - `sticky_atc_bar.liquid`
+  - `trust_badge_grid.liquid`
   - `social_proof_marquee.liquid`
 - [ ] Перевірити сумісність з Shopify Tinker 4.2.0 та Theme Store стандартами (`shopify theme check`).
 
@@ -158,10 +163,6 @@ just mcp-stdio
   - Підключення реального розрахунку ROI та конверсійного сплеску.
   - Інтерактивна генерація PDF/HTML аудиту магазину клієнта.
   - Синхронізація з `brand_dna.json` та `project.manifest.yaml`.
-
-### Трек 3: Аудит та адаптація донорських репозиторіїв
-- [ ] Здійснити аудит донорських тем у `../DNKEcom/GitHub_Shopify_Themes/` за 3-етапним протоколом (Quarantine $\to$ Purge $\to$ Packaging).
-- [ ] Витягти найкращі CRO UI-паттерни в бібліотеку компонентів Apex.
 
 ---
 

@@ -116,12 +116,13 @@ class DNKShopifyService:
                 / "DNK-Ecom_git_mirrow"
                 / "main"
             )
-            if local_apex.exists():
-                self.default_theme_path = local_apex
-            elif git_mirrow_main.exists():
+            # Prioritize the canonical Git Bare Mirror worktree over local snapshot
+            if git_mirrow_main.exists():
                 self.default_theme_path = git_mirrow_main
-            else:
+            elif local_apex.exists():
                 self.default_theme_path = local_apex
+            else:
+                self.default_theme_path = git_mirrow_main
 
     def validate_liquid(self, code: str) -> LiquidValidationResult:
         """
