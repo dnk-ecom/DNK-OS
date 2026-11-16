@@ -3,7 +3,7 @@
     {
       "id": "node_project_root",
       "type": "text",
-      "text": "### 🚀 Project: Shopify Theme DNK-Ecom (L2 Project DNA)\n\n**Account**: `acct-dnk-maxim`\n**Project ID**: `proj-shopify-dnk-ecom`\n**Domain**: `shopify_theme`\n**Manifest**: `docs/projects/dnk_ecom/project.manifest.yaml`\n**Brand DNA**: `docs/projects/dnk_ecom/brand_dna.json`\n\n**Mission**:\nBuild an ultra-fast, modular, high-converting sovereign Shopify theme engine on Horizon Tinker 4.2.0 with Theme Blocks 2.0 and native CRO capabilities.",
+      "text": "### 🚀 Project: Shopify Theme DNK-Ecom (L2 Project DNA)\n\n**Account**: `acct-dnk-maksym`\n**Project ID**: `proj-shopify-dnk-ecom`\n**Domain**: `shopify_theme`\n**Manifest**: `docs/projects/dnk_ecom/project.manifest.yaml`\n**Brand DNA**: `docs/projects/dnk_ecom/brand_dna.json`\n\n**Mission**:\nBuild an ultra-fast, modular, high-converting sovereign Shopify theme engine on Horizon Tinker 4.2.0 with Theme Blocks 2.0 and native CRO capabilities.",
       "x": 600,
       "y": 50,
       "width": 420,

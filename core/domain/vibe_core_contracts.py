@@ -96,7 +96,7 @@ class AccountSpec(BaseModel):
     """L1 Account Level: Sovereign Vibe-Coder Workstation & Global Memory."""
     model_config = ConfigDict(extra="ignore")
 
-    account_id: str = Field(..., description="e.g. 'acct-dnk-maxim'")
+    account_id: str = Field(..., description="e.g. 'acct-dnk-maksym'")
     owner_name: str
     comms_language: Literal["uk"] = "uk"
     code_language: Literal["en"] = "en"

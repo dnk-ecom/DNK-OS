@@ -65,11 +65,11 @@ def test_l1_account_spec_and_project_engine_integrity():
     router = SpatialCanvasSessionRouter()
     account_spec = router.find_account_spec()
     assert account_spec is not None, "find_account_spec() returned None"
-    assert account_spec.account_id == "acct-dnk-maxim"
+    assert account_spec.account_id == "acct-dnk-maksym"
     assert "Canonical 8-Root Directory Invariant" in str(account_spec.system_invariants)
 
     engine = ProjectEngine()
     loaded_account = engine.load_account()
-    assert loaded_account.account_id == "acct-dnk-maxim"
+    assert loaded_account.account_id == "acct-dnk-maksym"
     project_manifest = engine.get_project_manifest("proj-shopify-dnk-ecom")
     assert project_manifest["project_id"] == "proj-shopify-dnk-ecom"
