@@ -1,0 +1,79 @@
+{%- comment -%}
+  Quantity breaks V2: the <option> list of one product option, for the native select of a picker.
+  Values without a variant (with the other selected values) are disabled and hidden; sold-out values
+  get the __QB_SOLDOUT_ATTR__ token, which the wrapper turns into "disabled hidden" when
+  "Show sold-out values" is off. Classes and texts match the ones main.js writes on variant changes.
+
+  Accepts:
+  - product: {Object}
+  - option: {Object} product_option from product.options_with_values
+  - plain: {Boolean} optional, no image or swatch data (selects that only ever show as native selects)
+
+  Usage:
+  {%- capture options_html -%}{%- render 'qb-v2-option-values', product: product, option: option -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign qb_colors = settings.swatches_predefined_colors_list | split: '</p><p>'
+
+  # A value's variant is the one with the other selected values, so the values of an option such as Size all show
+  # the image of the selected color: their images say nothing and are left out (no stale image after a color
+  # change). Variant images only make swatches when at least two values show different images.
+  assign qb_first_image = ''
+  assign qb_first_src = ''
+  assign qb_compared = false
+  assign qb_variant_images = false
+  assign qb_value_images = false
+  unless plain
+    for qb_val in option.values
+      if qb_val.variant != nil
+        assign qb_src = ''
+        if qb_val.variant.featured_image
+          assign qb_src = qb_val.variant.featured_image | image_url: width: 120
+          if qb_first_image == blank
+            assign qb_first_image = qb_src
+          elsif qb_src != qb_first_image
+            assign qb_variant_images = true
+          endif
+        endif
+        if qb_compared == false
+          assign qb_first_src = qb_src
+          assign qb_compared = true
+        elsif qb_src != qb_first_src
+          assign qb_value_images = true
+        endif
+      endif
+    endfor
+  endunless
+-%}
+{%- for qb_val in option.values -%}
+  {%- liquid
+    assign qb_cls = ''
+    assign qb_nonexistent = false
+    assign qb_unavailable = false
+    if qb_val.variant == nil
+      assign qb_nonexistent = true
+      assign qb_cls = 'non-existent'
+    elsif qb_val.available == false
+      assign qb_unavailable = true
+      assign qb_cls = 'unavailable'
+    endif
+    assign qb_img = ''
+    assign qb_swatch = ''
+    unless plain
+      if qb_value_images and qb_val.variant.featured_image
+        assign qb_img = qb_val.variant.featured_image | image_url: width: 120
+      endif
+      capture qb_swatch
+        render 'qb-v2-swatch', value: qb_val, colors: qb_colors, variant_images: qb_variant_images
+      endcapture
+    endunless
+    assign qb_text = qb_val | escape
+  -%}
+  <option value="{{ qb_text }}"{% if qb_val.selected %} selected="selected"{% endif %}{% if qb_cls != blank %} class="{{ qb_cls }}"{% endif %}{{ qb_swatch }}{% if qb_img != blank %} data-image="{{ qb_img }}"{% endif %}{% if qb_nonexistent %} disabled hidden{% elsif qb_unavailable %} __QB_SOLDOUT_ATTR__{% endif %}>
+    {%- if qb_nonexistent or qb_unavailable -%}
+      {{- 'products.product.value_unavailable' | t: option_value: qb_text -}}
+    {%- else -%}
+      {{- qb_text -}}
+    {%- endif -%}
+  </option>
+{%- endfor -%}

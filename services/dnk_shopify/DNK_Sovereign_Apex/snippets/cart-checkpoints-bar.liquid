@@ -1,0 +1,340 @@
+{%- comment -%}
+  Checkpoints bar (blocks/cart_checkpoints-bar.liquid).
+  Accepts:
+  - block: the Checkpoints bar block
+  - items_count: the cart's item count without cart-hidden products
+  - bar_style {String} the resolved Bar style: line_icons (today's look), steps, minimal, status, text (default line_icons)
+  - in_drawer {Boolean} rendered inside the cart drawer (the style CSS then loads through the cart core)
+  - override {String} theme editor only: "Checkpoints bar|Bar style" when the block overrides the cart style
+{%- endcomment -%}
+{% liquid
+  assign is_quantity = false
+  if block.settings.goal_type == 'quantity'
+    assign is_quantity = true
+  endif
+
+  if is_quantity
+    assign goal_multiplier = 1.0
+    assign goal_max_reference = items_count
+  else
+    assign goal_multiplier = 100.00
+    assign goal_max_reference = cart.total_price
+  endif
+
+  # T11: with no enabled goal the bar renders nothing for customers; a highest goal of 0 never divides
+  assign has_goal = false
+  assign goals_out_of_order = false
+  assign prev_goal_amount = nil
+  if block.settings.enable_goal_1
+    assign highest_goal = block.settings.goal_1_amount | times: goal_multiplier
+    assign has_goal = true
+    assign prev_goal_amount = block.settings.goal_1_amount | plus: 0
+  endif
+  if block.settings.enable_goal_2
+    assign highest_goal = block.settings.goal_2_amount | times: goal_multiplier
+    assign has_goal = true
+    assign this_goal_amount = block.settings.goal_2_amount | plus: 0
+    if prev_goal_amount != nil and this_goal_amount < prev_goal_amount
+      assign goals_out_of_order = true
+    endif
+    assign prev_goal_amount = this_goal_amount
+  endif
+  if block.settings.enable_goal_3
+    assign highest_goal = block.settings.goal_3_amount | times: goal_multiplier
+    assign has_goal = true
+    assign this_goal_amount = block.settings.goal_3_amount | plus: 0
+    if prev_goal_amount != nil and this_goal_amount < prev_goal_amount
+      assign goals_out_of_order = true
+    endif
+  endif
+
+  if has_goal and highest_goal > 0
+    assign bar_progress = goal_max_reference | divided_by: highest_goal | times: 100.00
+  else
+    assign bar_progress = 100
+  endif
+  assign all_goals_reached = false
+  if bar_progress >= 100.00
+    assign all_goals_reached = true
+    assign bar_progress = 100
+  endif
+
+  assign next_goal_text = null
+  if block.settings.enable_goal_1
+    if highest_goal > 0
+      assign goal_1_position = block.settings.goal_1_amount | divided_by: highest_goal | times: goal_multiplier | times: 100.00
+    else
+      assign goal_1_position = 100
+    endif
+    if goal_1_position > bar_progress and next_goal_text == null
+      assign next_goal_text = block.settings.goal_1_text
+      assign next_goal = block.settings.goal_1_amount | times: goal_multiplier
+    endif
+  endif
+  if block.settings.enable_goal_2
+    if highest_goal > 0
+      assign goal_2_position = block.settings.goal_2_amount | divided_by: highest_goal | times: goal_multiplier | times: 100.00
+    else
+      assign goal_2_position = 100
+    endif
+    if goal_2_position > bar_progress and next_goal_text == null
+      assign next_goal_text = block.settings.goal_2_text
+      assign next_goal = block.settings.goal_2_amount | times: goal_multiplier
+    endif
+  endif
+  if block.settings.enable_goal_3
+    if highest_goal > 0
+      assign goal_3_position = block.settings.goal_3_amount | divided_by: highest_goal | times: goal_multiplier | times: 100.00
+    else
+      assign goal_3_position = 100
+    endif
+    if goal_3_position > bar_progress and next_goal_text == null
+      assign next_goal_text = block.settings.goal_3_text
+      assign next_goal = block.settings.goal_3_amount | times: goal_multiplier
+    endif
+  endif
+  # T6: the 1.9.0 default text uses [next_goal_lowercase]
+  assign next_goal_lower = next_goal_text | downcase
+
+  assign icon_size = block.settings.icon_size | divided_by: 10.0
+  assign icon_scale = block.settings.icon_scale | divided_by: 100.0
+  assign icon_corner_radius = block.settings.icon_corner_radius | divided_by: 2.0
+  assign border_thickness = block.settings.border_thickness | divided_by: 10.0
+  assign line_height = block.settings.line_height | divided_by: 10.0
+
+  # Bar style (Same as cart is resolved by the block): line_icons is today's markup exactly
+  assign cp_style = bar_style | default: 'line_icons'
+  assign cp_align = block.settings.text_alignment | default: 'center'
+%}
+
+{%- capture goals_json -%}
+  [
+  {%- assign has_prev = false -%}
+  {%- if block.settings.enable_goal_1 -%}
+    {"cents":{{ block.settings.goal_1_amount | times: goal_multiplier }},"text":{{ block.settings.goal_1_text | default: '' | json }}}
+    {%- assign has_prev = true -%}
+  {%- endif -%}
+  {%- if block.settings.enable_goal_2 -%}
+    {% if has_prev %},{% endif %}{"cents":{{ block.settings.goal_2_amount | times: goal_multiplier }},"text":{{ block.settings.goal_2_text | default: '' | json }}}
+    {%- assign has_prev = true -%}
+  {%- endif -%}
+  {%- if block.settings.enable_goal_3 -%}
+    {% if has_prev %},{% endif %}{"cents":{{ block.settings.goal_3_amount | times: goal_multiplier }},"text":{{ block.settings.goal_3_text | default: '' | json }}}
+  {%- endif -%}
+  ]
+{%- endcapture -%}
+
+{% capture goal_difference_html %}
+  {% if is_quantity %}
+    {{ next_goal | minus: items_count | round }}
+  {% else %}
+    <span>{{ next_goal | minus: cart.total_price | money_without_trailing_zeros }}</span>
+  {% endif %}
+{% endcapture %}
+{%- if has_goal == false -%}
+  {%- render 'cart-editor-notice', code: 'rewards-checkpoints-no-goal', level: 'warning', title: 'Checkpoints bar', text: "no goal is enabled, so customers don't see the bar. Enable at least one goal.", attrs: block.shopify_attributes -%}
+{%- else -%}
+{%- if goals_out_of_order and request.design_mode -%}
+  {% render 'cart-editor-notice', code: 'rewards-checkpoints-order', level: 'warning', title: 'Checkpoints bar', text: 'goal amounts are out of order, so markers sit past the end of the bar. Enter them from smallest to largest.' %}
+{%- endif -%}
+
+<style>
+  .cart-checkpoints-{{ block.id }} {
+    margin-top: {{ block.settings.margin_top | divided_by: 10.0 }}rem;
+    margin-bottom: {{ block.settings.margin_bottom | divided_by: 10.0 }}rem;
+    --mobile-text-size: {{ block.settings.labels_mobile_text_size | divided_by: 10.0 }}rem;
+    --desktop-text-size: {{ block.settings.labels_desktop_text_size | divided_by: 10.0 }}rem;
+  }
+  .cart-checkpoints-{{ block.id }} .cart-progress__bar {
+    height: {{ line_height }}rem;
+  }
+  .cart-checkpoints-{{ block.id }} .cart-progress__bar__badge {
+    width: {{ icon_size }}rem;
+    height: {{ icon_size }}rem;
+    border-radius: {{ icon_corner_radius }}%;
+    {% if block.settings.border_thickness > 0 %}
+      border: {{ border_thickness }}rem {{ block.settings.border_style }} {% if block.settings.border_color == 'custom' %}{{ block.settings.border_custom_color }}{% else %}rgb(var(--color-base-{{ block.settings.border_color }})){% endif %};
+    {% endif %}
+    {% if block.settings.icon_bg == 'custom_color' %}
+      background: {{ block.settings.icon_bg_color }};
+    {% elsif block.settings.icon_bg == 'gradient' %}
+      background: {{ block.settings.icon_bg_gradient }};
+    {% else %}
+      background: rgb(var(--color-base-{{ block.settings.icon_bg }}));
+    {% endif %}
+  }
+  .cart-checkpoints-{{ block.id }} .cart-progress__bar__badge .material-symbols-outlined,
+  .cart-checkpoints-{{ block.id }} .cart-progress__bar__badge img {
+    font-size: calc({{ icon_size }}rem * {{ icon_scale }});
+    width: calc({{ icon_size }}rem * {{ icon_scale }});
+    height: calc({{ icon_size }}rem * {{ icon_scale }});
+    {% if block.settings.icon_color == 'custom' %}
+      color: {{ block.settings.icon_custom_color }};
+    {% else %}
+      color: rgb(var(--accent-color));
+    {% endif %}
+  }
+  .cart-checkpoints-{{ block.id }} .cart-checkpoints__icon--dot::before {
+    content: '';
+    display: block;
+    width: calc({{ icon_size }}rem * {{ icon_scale }});
+    height: calc({{ icon_size }}rem * {{ icon_scale }});
+    border-radius: 50%;
+    flex-shrink: 0;
+    {% if block.settings.icon_color == 'custom' %}
+      background: {{ block.settings.icon_custom_color }};
+    {% else %}
+      background: rgb(var(--accent-color));
+    {% endif %}
+  }
+  .cart-checkpoints-{{ block.id }} .cart-progress__bar__progress {
+    {% unless block.settings.display_stripes %}
+      background-image: none !important;
+      animation: none !important;
+    {% endunless %}
+    {% if block.settings.line_color == 'custom_color' %}
+      background-color: {{ block.settings.line_custom_color }} !important;
+    {% elsif block.settings.line_color == 'gradient' %}
+      background: {{ block.settings.line_gradient }} !important;
+    {% endif %}
+  }
+</style>
+{%- if cp_style != 'line_icons' and in_drawer != true -%}
+  {{ 'component-cart-rewards.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+{%- capture cp_check -%}<svg class="cart-checkpoints__check" viewBox="0 0 12 9" focusable="false" aria-hidden="true"><path d="M1 4.6l3.1 3.1L11 1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>{%- endcapture -%}
+
+<cart-checkpoints-bar
+  class="cart-progress cart-checkpoints cart-checkpoints-{{ block.id }} {% if block.settings.icon_color != 'custom' %}accent-color-{{ block.settings.icon_color }}{% endif %}{% if cp_style != 'line_icons' %} cart-progress--{{ cp_style }}{% endif %}"
+  data-is-quantity="{{ is_quantity }}"
+  data-shop-currency="{{ shop.currency }}"
+  data-goals="{{ goals_json | strip | escape }}"
+  data-cart-total-cents="{{ cart.total_price }}"
+  data-progress-message="{{ block.settings.progress_message | escape }}"
+  data-success-message="{{ block.settings.success_message | escape }}"
+  data-block-id="{{ block.id }}"
+  data-bar-style="{{ cp_style }}"
+  {%- if cp_style != 'line_icons' and in_drawer %} data-cart-feature="rewards:css"{% endif %}
+  {%- if override != blank and request.design_mode %} data-cart-override="{{ override | escape }}"{% endif %}
+  {{ block.shopify_attributes }}
+>
+  <p class="cart-progress__text" id="CartCheckpoints-{{ block.id }}-text"{% if cp_align != 'center' %} style="text-align: {{ cp_align }}"{% endif %}>
+    {% if all_goals_reached == false %}
+      {{
+        block.settings.progress_message
+        | replace: '[amount]', goal_difference_html
+        | replace: '[next_goal_lowercase]', next_goal_lower
+        | replace: '[next_goal]', next_goal_text
+      }}
+    {% else %}
+      {{ block.settings.success_message }}
+    {% endif %}
+  </p>
+  {%- if cp_style != 'text' -%}
+    {%- capture cp_goals -%}
+      {%- assign cp_index = 0 -%}
+      {%- for n in (1..3) -%}
+        {%- liquid
+          assign cp_key = 'enable_goal_' | append: n
+          assign cp_enabled = block.settings[cp_key]
+          if cp_enabled
+            assign cp_index = cp_index | plus: 1
+            assign cp_key = 'goal_' | append: n | append: '_amount'
+            assign cp_amount = block.settings[cp_key]
+            if highest_goal > 0
+              assign cp_position = cp_amount | divided_by: highest_goal | times: goal_multiplier | times: 100.00
+            else
+              assign cp_position = 100
+            endif
+            assign cp_reached = false
+            if cp_position <= bar_progress
+              assign cp_reached = true
+            endif
+            assign cp_key = 'goal_' | append: n | append: '_icon_type'
+            assign cp_icon_type = block.settings[cp_key]
+            assign cp_key = 'goal_' | append: n | append: '_custom_icon'
+            assign cp_custom_icon = block.settings[cp_key]
+            assign cp_key = 'goal_' | append: n | append: '_icon'
+            assign cp_icon = block.settings[cp_key]
+            assign cp_key = 'goal_' | append: n | append: '_icon_filled'
+            assign cp_icon_filled = block.settings[cp_key]
+            assign cp_key = 'goal_' | append: n | append: '_label'
+            assign cp_label = block.settings[cp_key]
+            assign cp_key = 'goal_' | append: n | append: '_label_2'
+            assign cp_label_2 = block.settings[cp_key]
+          endif
+        -%}
+        {%- if cp_enabled -%}
+          {%- capture cp_icon_html -%}
+            {% if cp_icon_type == 'custom_icon' and cp_custom_icon != blank %}
+              <img
+                src="{{ cp_custom_icon | image_url }}"
+                {% if cp_custom_icon.alt != blank %}
+                  alt="{{ cp_custom_icon.alt | escape }}"
+                {% else %}
+                  role="presentation"
+                {% endif %}
+                height="200"
+                width="200"
+                loading="lazy"
+              >
+            {% elsif cp_icon_type == 'icon' and cp_icon != blank %}
+              <span class="material-symbols-outlined{% if cp_icon_filled %} filled{% endif %}">
+                {{ cp_icon | strip | downcase | replace: ' ', '_' }}
+              </span>
+            {% elsif cp_icon_type == 'dot' %}
+              {%- comment -%}Dot is rendered via CSS pseudo-element{%- endcomment -%}
+            {% endif %}
+          {%- endcapture -%}
+          {%- if cp_style == 'status' -%}
+            {%- liquid
+              if cp_reached
+                assign cp_status = 'sections.cart.rewards_status_unlocked' | t
+              else
+                assign cp_goal = cp_amount | times: goal_multiplier
+                if is_quantity
+                  assign cp_left = cp_goal | minus: items_count | round | at_least: 0
+                else
+                  assign cp_left = cp_goal | minus: cart.total_price | at_least: 0 | money_without_trailing_zeros | strip_html
+                endif
+                assign cp_status = 'sections.cart.rewards_status_locked' | t: amount: cp_left
+              endif
+            -%}
+            <div class="cart-checkpoints__row{% if cp_reached %} is-reached{% endif %}" data-goal-index="{{ cp_index }}">
+              <span class="cart-progress__bar__badge cart-checkpoints__row-icon{% if cp_icon_type == 'dot' %} cart-checkpoints__icon--dot{% endif %}" aria-hidden="true">{{ cp_icon_html }}{{ cp_check }}</span>
+              <span class="cart-checkpoints__row-label">
+                {%- if cp_label != blank -%}<span>{{ cp_label }}</span>{%- endif -%}
+                {%- if cp_label_2 != blank -%}<span>{{ cp_label_2 }}</span>{%- endif -%}
+              </span>
+              <span class="cart-checkpoints__status">{{ cp_status }}</span>
+            </div>
+          {%- elsif cp_style != 'minimal' -%}
+            <div class="cart-progress__bar__badge cart-checkpoints__icon{% if cp_icon_type == 'dot' %} cart-checkpoints__icon--dot{% endif %}{% if cp_style == 'steps' and cp_reached %} is-reached{% endif %}" style="--position:{{ cp_position }}%;">
+              {{ cp_icon_html }}
+              {%- if cp_style == 'steps' -%}{{ cp_check }}{%- endif -%}
+              {% if cp_label != blank or cp_label_2 != blank %}
+                <span class="cart-checkpoints__label cart-checkpoints__label--level-one custom-font-size">
+                  {% if cp_label != blank %}
+                    <span>{{ cp_label }}</span>
+                  {% endif %}
+                  {% if cp_label_2 != blank %}
+                    <span>{{ cp_label_2 }}</span>
+                  {% endif %}
+                </span>
+              {% endif %}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if cp_style == 'status' -%}
+      {{ cp_goals }}
+    {%- else -%}
+      <div class="cart-progress__bar {% if block.settings.line_color != 'custom_color' and block.settings.line_color != 'gradient' %}accent-color-{{ block.settings.line_color }}{% endif %}" role="progressbar" aria-labelledby="CartCheckpoints-{{ block.id }}-text" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ bar_progress | round }}">
+        <div class="cart-progress__bar__progress{% if block.settings.display_stripes %} cart-progress__bar__progress--striped{% endif %}" style="width: {{ bar_progress }}%;">&nbsp</div>
+        {{ cp_goals }}
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+</cart-checkpoints-bar>
+{%- endif -%}

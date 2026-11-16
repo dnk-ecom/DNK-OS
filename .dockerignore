@@ -1,0 +1,31 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: ".dockerignore"
+# purpose: "Zero-Leak dockerignore for DNK OS Sovereign Kernel container builds."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-16"
+# author: "Antigravity & DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+.git
+.gitignore
+.env
+.env.*
+config/config.toml
+data/
+.data/
+logs/
+*.log
+*.sqlite*
+*.db*
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+node_modules
+.DS_Store
+docs
+tests

@@ -1,0 +1,46 @@
+/* Shrine cart styles (Clean, Cards, Soft, Bold): the drawer-level parts and the style variables. Linked only when the
+   cart style isn't Classic. Every selector starts with cart-drawer.cart-root.cart-style--… or .cart-root.cart-style--…
+   (at least (0,2,1) / (0,3,0)), so it wins over component-cart.css and base.css in any load order. Each owner writes the
+   style-only parts of its own markup in its own file under the same prefixes. */
+
+/* Clean and Cards: a muted item count in the heading */
+.cart-root.cart-style--clean .cart-header__count,
+.cart-root.cart-style--cards .cart-header__count {
+  opacity: 0.55;
+  font-weight: var(--font-body-weight);
+}
+
+/* Clean: a hairline above the footer */
+cart-drawer.cart-root.cart-style--clean .drawer__footer {
+  border-top-color: var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+}
+
+/* Cards: tinted body behind the item cards (only while Body background is None) */
+cart-drawer.cart-root.cart-style--cards:not(.cart-drawer--body-bg) .cart-drawer__body {
+  background-color: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+}
+
+/* Soft: accent tint (the header while Header background is None; --cart-tint feeds the other owners' parts) */
+cart-drawer.cart-root.cart-style--soft .drawer__inner,
+cart-page.cart-root.cart-style--soft {
+  --cart-tint: rgba(var(--color-button), 0.08);
+}
+cart-drawer.cart-root.cart-style--soft:not(.cart-drawer--header-bg) .drawer__header {
+  background-color: var(--cart-tint);
+  border-bottom-color: transparent;
+}
+
+/* Bold: accent header band (while Header background is None) and a footer shadow (yields to a footer shape) */
+cart-drawer.cart-root.cart-style--bold:not(.cart-drawer--header-bg) .drawer__header {
+  --color-background: var(--color-button);
+  --color-foreground: var(--color-button-text);
+  background-color: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  border-bottom-color: transparent;
+}
+cart-drawer.cart-root.cart-style--bold .drawer__footer:not(.cart-footer-shape) {
+  position: relative;
+  z-index: 1;
+  border-top-color: transparent;
+  box-shadow: 0 -0.8rem 2.4rem rgba(var(--color-foreground), 0.1);
+}

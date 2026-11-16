@@ -1,0 +1,32 @@
+{%- comment -%}
+  Compare price of one cart line: the price the line is compared against, as a line total in cents, or 0.
+  One rule for Cart items and Subtotals (Subtotals passes mode 'product').
+  Accepts:
+  - item: the line item
+  - mode: Cart items' "Compare price source" value: discounts, product or automatic
+  - include_plan: true to compare a subscribed line against its price without the subscription
+  Usage:
+  {%- capture c -%}{%- render 'cart-line-compare-price', item: item, mode: 'product', include_plan: false -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign compare = 0
+  assign variant_compare = item.variant.compare_at_price | default: 0
+  if mode == 'automatic'
+    if item.original_line_price != item.final_line_price
+      assign compare = item.original_line_price
+    elsif variant_compare > item.final_price
+      assign compare = variant_compare | times: item.quantity
+    endif
+  elsif mode == 'product' and variant_compare > item.final_price
+    assign compare = variant_compare | times: item.quantity
+  elsif item.original_line_price != item.final_line_price
+    assign compare = item.original_line_price
+  endif
+  if include_plan and item.selling_plan_allocation
+    assign plan_compare = item.selling_plan_allocation.compare_at_price | times: item.quantity
+    if plan_compare > compare and plan_compare > item.final_line_price
+      assign compare = plan_compare
+    endif
+  endif
+-%}
+{{- compare -}}

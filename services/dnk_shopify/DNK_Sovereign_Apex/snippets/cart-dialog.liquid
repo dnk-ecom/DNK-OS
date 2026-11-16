@@ -1,0 +1,68 @@
+{% if settings.cart_type == 'drawer' and request.page_type != 'cart' %}
+  <theme-dialog>
+    <dialog
+      id="cart-dialog"
+      class="dialog drawer drawer-right cart-dialog"
+      aria-labelledby="cart-dialog-title"
+    >
+      <s-view-event
+        view-event-payload="{{ cart | standard_event_data: 'view', context: 'dialog' | escape }}"
+        data-cart-view-event
+      ></s-view-event>
+
+      <div class="dialog-header">
+        <h2 id="cart-dialog-title" class="dialog-title">
+          {{ 'accessibility.cart' | t }}
+        </h2>
+
+        <button
+          class="icon-button dialog-close"
+          type="button"
+          data-dialog-close
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {% render 'svg-icons', icon: 'close' %}
+        </button>
+      </div>
+
+      <div class="cart-drawer-alert alert alert-with-icon" data-cart-drawer-alert hidden>
+        <span class="cart-drawer-alert-message" data-cart-drawer-alert-message></span>
+        <button
+          type="button"
+          class="cart-drawer-alert-close icon-button"
+          data-cart-drawer-alert-close
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {% render 'svg-icons', icon: 'close', icon_size: 16 %}
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        {% render 'cart-items', context: 'drawer' %}
+        <div
+          class="cart-options"
+          data-cart-options
+          data-context="drawer"
+          {% if cart.empty? %}
+            hidden
+          {% endif %}
+        >
+          {% render 'cart-note', context: 'drawer' %}
+          {% render 'cart-discount', context: 'drawer' %}
+        </div>
+      </div>
+
+      <div
+        id="cart-drawer-summary"
+        class="dialog-footer"
+        data-cart-summary
+        data-context="drawer"
+        {% if cart.empty? %}
+          hidden
+        {% endif %}
+      >
+        {% render 'cart-summary' %}
+      </div>
+    </dialog>
+  </theme-dialog>
+{% endif %}

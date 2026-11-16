@@ -1,0 +1,98 @@
+{% doc %}
+  Renders the cart totals and checkout controls shared by cart summary containers.
+{% enddoc %}
+
+{% capture tax_information %}
+  {% if cart.duties_included and cart.taxes_included %}
+    {{ 'products.price.duties_and_taxes_included' | t }}
+  {% elsif cart.taxes_included %}
+    {{ 'products.price.taxes_included' | t }}
+  {% elsif cart.duties_included %}
+    {{ 'products.price.duties_included' | t }}
+  {% endif %}
+
+  {% if shop.shipping_policy.body != blank %}
+    {{ 'products.price.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+  {% endif %}
+{% endcapture %}
+{% assign tax_information = tax_information | strip %}
+
+{% if cart.cart_level_discount_applications.size > 0 %}
+  <ul class="cart-summary-discounts" aria-label="{{ 'cart.applied_discounts' | t }}">
+    {% for discount_application in cart.cart_level_discount_applications %}
+      {% assign discount_percentage = discount_application.value | round: 2 %}
+      {% assign discount_percentage_remainder = discount_percentage | modulo: 1 %}
+      {% if discount_percentage_remainder == 0 %}
+        {% assign discount_percentage = discount_percentage | round %}
+      {% endif %}
+      <li class="cart-summary-discount">
+        <span class="cart-summary-discount-label">
+          {% render 'svg-icons', icon: 'tag', icon_size: 16 %}
+          <span>{{ discount_application.title | escape }}</span>
+          {% if discount_application.value_type == 'percentage' %}
+            <span>({{ 'cart.percentage_off' | t: value: discount_percentage }})</span>
+          {% endif %}
+        </span>
+        <span>-{{ discount_application.total_allocated_amount | money }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<div class="cart-summary-subtotal {{ settings.cart_subtotal_size }}">
+  <p class="cart-summary-subtotal-label">{{ 'cart.subtotal' | t }}</p>
+  <p class="cart-summary-subtotal-price">
+    {% if cart.cart_level_discount_applications.size > 0 and cart.original_total_price > cart.total_price %}
+      <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
+      <span class="cart-summary-subtotal-price-current">{{ cart.total_price | money_with_currency }}</span>
+      <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+      <s class="cart-summary-subtotal-price-compare">{{ cart.original_total_price | money_with_currency }}</s>
+    {% else %}
+      {{ cart.total_price | money_with_currency }}
+    {% endif %}
+  </p>
+</div>
+
+{% if settings.cart_show_tax_information and tax_information != blank %}
+  <p class="cart-summary-tax-information fs-sm">{{ tax_information }}</p>
+{% endif %}
+
+{% if request.page_type == 'cart' %}
+  <div
+    class="cart-options"
+    data-cart-options
+    data-context="page"
+    {% if cart.empty? %}
+      hidden
+    {% endif %}
+  >
+    {% render 'cart-note', context: 'page' %}
+    {% render 'cart-discount', context: 'page' %}
+  </div>
+{% endif %}
+
+<form class="cart-summary-form" action="{{ routes.cart_url }}" method="post">
+  <button
+    class="cart-summary-checkout btn {{ settings.cart_checkout_button_color }} {{ settings.cart_checkout_button_size }}"
+    type="submit"
+    name="checkout"
+  >
+    {% render 'svg-icons', icon: 'lock', icon_size: 16, stroke_width: 2 %}
+    {{ 'cart.checkout' | t }}
+  </button>
+</form>
+
+{% if settings.cart_show_dynamic_checkout_buttons and additional_checkout_buttons %}
+  <div class="cart-summary-additional-checkout-buttons">
+    {{ content_for_additional_checkout_buttons }}
+  </div>
+{% endif %}
+
+{% if settings.cart_show_view_cart_button and request.page_type != 'cart' %}
+  <a
+    class="cart-summary-view-cart btn btn-text-outline btn-sm"
+    href="{{ routes.cart_url }}"
+  >
+    {{ 'cart.view_cart' | t }}
+  </a>
+{% endif %}

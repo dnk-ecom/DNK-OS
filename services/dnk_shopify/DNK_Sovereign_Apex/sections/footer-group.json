@@ -1,0 +1,148 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "menu_mc8rAw": {
+          "type": "menu",
+          "settings": {
+            "heading": "Collections",
+            "heading_size": "fs-xl",
+            "link_1_label": "Men",
+            "link_1_url": "shopify://collections/men",
+            "link_2_label": "Women",
+            "link_2_url": "shopify://collections/women",
+            "link_3_label": "Children",
+            "link_3_url": "shopify://collections/children",
+            "link_4_label": "Babies",
+            "link_4_url": "shopify://collections/babies",
+            "link_5_label": "Latest arrivals",
+            "link_5_url": "shopify://collections/latest-arrivals",
+            "link_6_label": "Best selling",
+            "link_6_url": "shopify://collections/best-selling",
+            "link_7_label": "",
+            "link_7_url": "",
+            "link_8_label": "",
+            "link_8_url": "",
+            "link_9_label": "",
+            "link_9_url": "",
+            "link_10_label": "",
+            "link_10_url": ""
+          }
+        },
+        "menu_n6HqK8": {
+          "type": "menu",
+          "settings": {
+            "heading": "Help",
+            "heading_size": "fs-xl",
+            "link_1_label": "Contact",
+            "link_1_url": "shopify://pages/contact",
+            "link_2_label": "FAQs",
+            "link_2_url": "shopify://pages/faq",
+            "link_3_label": "Shipping & delivery",
+            "link_3_url": "#",
+            "link_4_label": "Returns & exchanges",
+            "link_4_url": "#",
+            "link_5_label": "Size guide",
+            "link_5_url": "shopify://pages/size-guide",
+            "link_6_label": "Track your order",
+            "link_6_url": "#",
+            "link_7_label": "",
+            "link_7_url": "",
+            "link_8_label": "",
+            "link_8_url": "",
+            "link_9_label": "",
+            "link_9_url": "",
+            "link_10_label": "",
+            "link_10_url": ""
+          }
+        },
+        "menu_44FEe7": {
+          "type": "menu",
+          "settings": {
+            "heading": "Company",
+            "heading_size": "fs-xl",
+            "link_1_label": "About us",
+            "link_1_url": "shopify://pages/about-us",
+            "link_2_label": "Blog",
+            "link_2_url": "shopify://blogs/news",
+            "link_3_label": "Our stores",
+            "link_3_url": "#",
+            "link_4_label": "Careers",
+            "link_4_url": "#",
+            "link_5_label": "Sustainability",
+            "link_5_url": "#",
+            "link_6_label": "",
+            "link_6_url": "",
+            "link_7_label": "",
+            "link_7_url": "",
+            "link_8_label": "",
+            "link_8_url": "",
+            "link_9_label": "",
+            "link_9_url": "",
+            "link_10_label": "",
+            "link_10_url": ""
+          }
+        },
+        "text_qyraHm": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "heading": "About",
+            "heading_size": "fs-xl",
+            "text": "<p>Share information about your brand with your customers.</p>",
+            "text_size": "fs-md",
+            "button_1_label": "Learn more",
+            "button_1_link": "",
+            "button_1_style": "btn-accent-solid",
+            "button_1_size": "btn-sm",
+            "button_2_label": "Contact us",
+            "button_2_link": "",
+            "button_2_style": "btn-text-solid",
+            "button_2_size": "btn-sm"
+          }
+        },
+        "newsletter_LGJp9E": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Join our newsletter",
+            "heading_size": "fs-xl",
+            "text": "<p>Sign up for new arrivals, exclusive offers, inspiring updates delivered to your inbox.</p>",
+            "text_size": "fs-md",
+            "input_size": "md",
+            "show_social_links": true,
+            "social_icon_size": 16
+          }
+        }
+      },
+      "block_order": [
+        "menu_mc8rAw",
+        "menu_n6HqK8",
+        "menu_44FEe7",
+        "text_qyraHm",
+        "newsletter_LGJp9E"
+      ],
+      "settings": {
+        "background_color": "{{ settings.colors.text }}",
+        "text_color": "{{ settings.colors.background }}",
+        "accent_color": "#66a5cb",
+        "show_social_links": false,
+        "social_icon_size": 18,
+        "show_country_selector": true,
+        "show_language_selector": true,
+        "show_payment_icons": true,
+        "show_policy_links": true,
+        "enable_follow_on_shop": true,
+        "show_theme_credits": false,
+        "show_powered_by_shopify": true,
+        "pt": 60,
+        "pb": 50
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

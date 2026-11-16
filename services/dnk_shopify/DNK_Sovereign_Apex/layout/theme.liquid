@@ -1,0 +1,43 @@
+<!doctype html>
+<html
+  lang="{{ request.locale.iso_code }}"
+  data-page-type="{{ request.page_type }}"
+  data-template-name="{{ template.name }}"
+  data-template-suffix="{{ template.suffix }}"
+  data-cart-type="{{ settings.cart_type }}"
+  data-cart-url="{{ routes.cart_url }}"
+  data-design-mode="{{ request.design_mode }}">
+  <head>
+    {% render 'theme-head' %}
+    {{ content_for_header }}
+    {% render 'theme-assets' %}
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">
+      {{ 'accessibility.skip_to_content' | t }}
+    </a>
+
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div> 
+
+    <main id="main">
+      {{ content_for_layout }}
+    </main>
+
+    <div id="footer-group">
+      {% sections 'footer-group' %}
+    </div>
+
+    {% liquid
+      render 'search-dialog'
+      render 'quick-add-dialog'
+      render 'cart-dialog'
+      render 'cart-feedback'
+      render 'localization-countries-dialog'
+      render 'localization-languages-dialog'
+      render 'theme-toast'
+    %}
+  </body>
+</html>

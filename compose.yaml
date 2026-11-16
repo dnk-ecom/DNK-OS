@@ -1,0 +1,38 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "compose.yaml"
+# purpose: "Production Docker Compose Manifest for DNK OS Sovereign Kernel (DEC-070, DEC-071)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-12"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+services:
+  dnk_os_kernel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dnk_os_kernel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

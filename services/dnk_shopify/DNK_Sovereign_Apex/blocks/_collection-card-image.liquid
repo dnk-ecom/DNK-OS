@@ -1,0 +1,103 @@
+{% liquid
+  assign collection = closest.collection
+  assign collection_image = collection.image | default: collection.products.first.featured_image
+  assign collection_image_alt = collection_image.alt | default: collection.title
+  assign collection_image_class = 'collection-card-image'
+  assign image_loading = 'lazy'
+  assign image_fetchpriority = 'auto'
+
+  if section.index <= 3
+    assign image_loading = 'eager'
+    assign image_fetchpriority = 'high'
+  endif
+
+  unless block.settings.image_ratio == 'adapt'
+    assign collection_image_class = collection_image_class | append: ' aspect-ratio aspect-ratio-' | append: block.settings.image_ratio
+  endunless
+
+  assign collection_image_placeholder_class = collection_image_class | append: ' placeholder-svg'
+  assign block_id_parts = block.id | split: '-'
+  assign placeholder_index = block_id_parts.last | default: 0
+  assign placeholder_variant = placeholder_index | modulo: 4 | plus: 1
+  assign placeholder_name = 'collection-apparel-' | append: placeholder_variant
+%}
+
+<div
+  class="collection-card-image-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  data-carousel-control-alignment
+  {{ block.shopify_attributes }}
+>
+  {% if collection_image != blank %}
+    {{ collection_image
+      | image_url: width: 2400
+      | image_tag:
+        alt: collection_image_alt,
+        class: collection_image_class,
+        widths: '320, 640, 960, 1280, 1600, 2000, 2400',
+        sizes: 'auto, 100vw',
+        loading: image_loading,
+        fetchpriority: image_fetchpriority
+    }}
+  {% elsif collection != blank %}
+    {{ 'image' | placeholder_svg_tag: collection_image_placeholder_class }}
+  {% else %}
+    {{ placeholder_name | placeholder_svg_tag: collection_image_placeholder_class }}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Collection image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        { "group": "Adapt", "value": "adapt", "label": "Adapt to image" },
+        { "group": "Square", "value": "square", "label": "Square (1:1)" },
+        { "group": "Horizontal", "value": "landscape", "label": "Landscape (4:3)" },
+        { "group": "Horizontal", "value": "widescreen", "label": "Widescreen (16:9)" },
+        { "group": "Vertical", "value": "portrait", "label": "Portrait (3:4)" },
+        { "group": "Vertical", "value": "vertical", "label": "Vertical (9:16)" }
+      ],
+      "default": "landscape"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection image",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

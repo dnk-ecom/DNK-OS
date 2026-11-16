@@ -1,0 +1,683 @@
+/* Cart lines (Cart items, the classic cart page, Cart page V2's items) and the Subscribe & save block: controls, item
+   looks, line notes. Loaded by the cart loader (data-cart-feature="lines" / "lines:css") or linked by the cart page
+   sections. Logical properties only; every rule out-specifies the base.css rule it overrides (never file order). */
+
+/* ---------- Subscribe & save per line ---------- */
+.cart-sub {
+  display: block;
+  margin-block-start: .8rem;
+  font-size: 1.3rem;
+  line-height: 1.35;
+}
+
+.cart-sub[hidden] {
+  display: none;
+}
+
+/* sized to its content, so the switch (or checkbox) sits right by the label - full width put it at the edge of the line's
+   text column, which isn't the line's far edge either (the remove button and price have their own column) */
+.cart-sub .cart-sub__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  inline-size: auto;
+  max-inline-size: 100%;
+  min-block-size: 2.4rem;
+  padding: .4rem 0;
+  border-radius: var(--cart-radius-small, .4rem);
+  text-align: start;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cart-sub .cart-sub__toggle:focus-visible {
+  outline: .2rem solid rgba(var(--color-foreground), .5);
+  outline-offset: .2rem;
+}
+
+.cart-sub__text {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+}
+
+.cart-sub__caption {
+  display: block;
+  margin-block-start: .2rem;
+  font-size: .92em;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-sub .cart-sub__caption:empty {
+  display: none;
+}
+
+.cart-sub__label {
+  display: block;
+}
+
+.cart-sub .cart-sub__frequency,
+.cart-sub .cart-sub__select {
+  margin-block-start: .6rem;
+  max-inline-size: 26rem;
+}
+
+.cart-sub__sample {
+  display: inline-block;
+  margin-block-start: .4rem;
+  font-size: 1.1rem;
+  padding: .1rem .6rem;
+  border-radius: 10rem;
+  background: rgba(var(--color-foreground), .08);
+}
+
+.cart-sub__relock:not([hidden]) {
+  display: block;
+  margin-block-start: .4rem;
+  font-size: .92em;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-sub .cart-sub__policy {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.4rem;
+  margin-block-start: .4rem;
+  font-size: 1.2rem;
+  /* a link should look like one */
+  text-decoration: underline;
+  text-underline-offset: .3rem;
+}
+
+/* Toggle switch */
+.cart-sub__switch {
+  position: relative;
+  flex-shrink: 0;
+  inline-size: 3.4rem;
+  block-size: 2rem;
+  border-radius: 1rem;
+  background: rgba(var(--color-foreground), .55);
+}
+
+.cart-sub__knob {
+  position: absolute;
+  inset-block-start: .3rem;
+  inset-inline-start: .3rem;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  border-radius: 50%;
+  background: rgb(var(--color-background));
+}
+
+.cart-sub [aria-checked="true"] > .cart-sub__switch {
+  background: rgb(var(--accent-color));
+}
+
+.cart-sub [aria-checked="true"] > .cart-sub__switch .cart-sub__knob {
+  inset-inline-start: 1.7rem;
+}
+
+/* Checkbox */
+.cart-sub__box {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  inline-size: 1.8rem;
+  block-size: 1.8rem;
+  border: .15rem solid rgba(var(--color-foreground), .55);
+  border-radius: var(--cart-radius-small, .3rem);
+}
+
+.cart-sub__box .cart-sub__check {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  opacity: 0;
+}
+
+.cart-sub [aria-checked="true"] > .cart-sub__box {
+  background: rgb(var(--accent-color));
+  border-color: rgb(var(--accent-color));
+  color: rgb(var(--color-background));
+}
+
+.cart-sub [aria-checked="true"] > .cart-sub__box .cart-sub__check {
+  opacity: 1;
+}
+
+/* Pill button */
+.cart-sub.cart-sub--pill .cart-sub__toggle {
+  display: inline-flex;
+  inline-size: auto;
+  gap: .6rem;
+  padding: .5rem 1.2rem;
+  border-radius: 10rem;
+  border: .1rem solid rgb(var(--accent-color));
+  color: rgb(var(--accent-color));
+}
+
+.cart-sub.cart-sub--pill .cart-sub__toggle[aria-pressed="true"] {
+  background: rgb(var(--accent-color));
+  color: rgb(var(--color-background));
+}
+
+.cart-sub--pill .cart-sub__text {
+  flex: 0 1 auto;
+}
+
+.cart-sub__pill-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.cart-sub__pill-icon svg {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+}
+
+.cart-sub [aria-pressed="false"] .cart-sub__check,
+.cart-sub [aria-pressed="true"] .cart-sub__plus {
+  display: none;
+}
+
+/* Dropdown */
+.cart-sub--dropdown .cart-sub__label {
+  display: block;
+}
+
+/* States */
+.cart-sub[aria-busy="true"] {
+  opacity: .6;
+}
+
+.cart-sub [aria-disabled="true"] {
+  pointer-events: none;
+}
+
+/* The line's plan name hides only while the control shows the current plan name itself */
+.cart-item:has(.cart-sub[data-shows-plan]:not([hidden])) .cart-item__plan-name {
+  display: none;
+}
+
+/* ---------- Subscribe & save block ---------- */
+cart-subscription-upgrade {
+  display: block;
+}
+
+cart-subscription-upgrade[hidden],
+.cart-upgrade .cart-upgrade__offer[hidden] {
+  display: none;
+}
+
+.cart-upgrade__offer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.2rem;
+  padding: var(--cart-pad, 1.6rem);
+  border-radius: var(--cart-radius, 1.2rem);
+  border: .1rem solid var(--cart-hairline, rgba(var(--color-foreground), .12));
+  background-color: rgb(var(--color-background));
+}
+
+.cart-upgrade__offer > .cart-sub__relock {
+  grid-column: 1 / -1;
+}
+
+.cart-upgrade__media {
+  inline-size: 6.4rem;
+  aspect-ratio: 1;
+  border-radius: var(--cart-radius-small, .6rem);
+  overflow: hidden;
+  background: var(--cart-tint, rgba(var(--color-foreground), .04));
+}
+
+.cart-upgrade__media img,
+.cart-upgrade__media svg {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.cart-upgrade__title {
+  margin: 0;
+  font-size: 1.3rem;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-upgrade__heading {
+  margin: .2rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.cart-upgrade__benefits {
+  margin-block-start: .6rem;
+  font-size: 1.3rem;
+}
+
+.cart-upgrade__frequency {
+  margin-block-start: .8rem;
+  max-inline-size: 26rem;
+}
+
+.cart-upgrade .cart-upgrade__button {
+  grid-column: 1 / -1;
+  margin: .4rem 0 0;
+}
+
+.cart-upgrade__policy {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.4rem;
+  margin-block-start: .8rem;
+  font-size: 1.2rem;
+}
+
+.cart-upgrade__stack {
+  display: flex;
+  align-items: center;
+}
+
+.cart-upgrade__stack > * + * {
+  margin-inline-start: -1.2rem;
+}
+
+.cart-upgrade__stack img,
+.cart-upgrade__dot,
+.cart-upgrade__more {
+  display: grid;
+  place-items: center;
+  inline-size: 4.8rem;
+  block-size: 4.8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 .2rem rgb(var(--color-background));
+  background: var(--cart-tint, rgba(var(--color-foreground), .08));
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Banner: one row where there is room; under the text in narrow containers (the drawer, V2's summary) */
+cart-subscription-upgrade.cart-upgrade--banner {
+  container-type: inline-size;
+}
+
+.cart-upgrade--banner .cart-upgrade__offer {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border: 0;
+  border-radius: var(--cart-radius-small, .8rem);
+  background-image: linear-gradient(var(--cart-tint, rgba(var(--color-foreground), .05)), var(--cart-tint, rgba(var(--color-foreground), .05)));
+}
+
+.cart-upgrade--banner .cart-upgrade__media {
+  inline-size: 4.4rem;
+}
+
+.cart-upgrade.cart-upgrade--banner .cart-upgrade__button {
+  grid-column: auto;
+  inline-size: auto;
+  min-block-size: 3.6rem;
+  padding-inline: 1.4rem;
+  margin: 0;
+}
+
+@container (max-width: 520px) {
+  cart-subscription-upgrade.cart-upgrade--banner .cart-upgrade__offer {
+    grid-template-columns: auto 1fr;
+  }
+
+  cart-subscription-upgrade.cart-upgrade.cart-upgrade--banner .cart-upgrade__button {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+  }
+}
+
+/* ---------- Item looks (the "Same as cart" values; Classic prints none of these classes) ---------- */
+.cart-root .cart-items.cart-line-list--divided {
+  row-gap: 0;
+}
+
+.cart-root .cart-line-list--divided > .cart-item {
+  padding-block: var(--cart-pad, 1.6rem);
+  border-block-start: .1rem solid var(--cart-hairline, rgba(var(--color-foreground), .1));
+}
+
+.cart-root .cart-line-list--divided > .cart-item:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.cart-root .cart-items.cart-line-list--cards {
+  row-gap: var(--cart-gap, 1.2rem);
+}
+
+.cart-root .cart-line-list--cards > .cart-item {
+  padding: var(--cart-pad, 1.2rem);
+  border-radius: var(--cart-radius, .8rem);
+  background-image: linear-gradient(var(--cart-tint, rgba(var(--color-foreground), .04)), var(--cart-tint, rgba(var(--color-foreground), .04)));
+}
+
+.cart-root .cart-items.cart-line-list--compact {
+  row-gap: 1.2rem;
+}
+
+.cart-root .cart-line-list--compact .cart-drawer-item__quantity-and-prices {
+  margin-block-start: .6rem;
+}
+
+.cart-root .cart-line-list--compact .cart-item__details > * + * {
+  margin-block-start: .3rem;
+}
+
+.cart-root .cart-line-list--compact .product-option {
+  font-size: 1.2rem;
+}
+
+/* Image tiles */
+.cart-root [class*="cart-line-list--ratio-"] .cart-item__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--cart-radius-small, .4rem);
+  background: var(--cart-tint, rgba(var(--color-foreground), .04));
+}
+
+.cart-root .cart-line-list--ratio-portrait .cart-item__media {
+  aspect-ratio: 4 / 5;
+}
+
+.cart-root [class*="cart-line-list--ratio-"] .cart-item__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  box-shadow: none;
+}
+
+/* Savings and discount names */
+.cart-root .cart-line-list--savings-pill .cart-drawer-item__saving {
+  display: inline-block;
+  padding: .2rem .8rem;
+  border-radius: 10rem;
+  background: var(--cart-tint, rgba(var(--color-foreground), .06));
+  font-size: 1.2rem;
+  /* one line: a pill that wraps looks broken */
+  white-space: nowrap;
+  max-inline-size: none;
+}
+/* a discounted line whose pill doesn't fit next to the stepper puts its prices under it, at the end side */
+.cart-root .cart-line-list--savings-pill .cart-drawer-item__quantity-and-prices {
+  flex-wrap: wrap;
+  row-gap: .6rem;
+}
+.cart-root .cart-line-list--savings-pill .cart-drawer-item__quantity-and-prices > .cart-item__totals {
+  margin-inline-start: auto;
+}
+.cart-root .cart-line-list--savings-pill .cart-drawer-item__right {
+  min-inline-size: 0;
+}
+
+.cart-root.cart-style--cards .cart-drawer__discounts .badge,
+.cart-root.cart-style--soft .cart-drawer__discounts .badge,
+.cart-root.cart-style--bold .cart-drawer__discounts .badge {
+  border-radius: 10rem;
+  padding: .2rem .8rem;
+  font-size: 1.1rem;
+  background: var(--cart-tint, rgba(var(--color-foreground), .06));
+}
+
+/* Free items (Highlight) */
+.cart-root .cart-line-list--free-highlight > .cart-item--free {
+  padding: .8rem;
+  border-radius: var(--cart-radius-small, .6rem);
+  background-image: linear-gradient(var(--cart-tint, rgba(var(--color-foreground), .05)), var(--cart-tint, rgba(var(--color-foreground), .05)));
+}
+
+.cart-root .cart-line-list--free-highlight > .cart-item--free .quantity {
+  display: none;
+}
+
+.cart-line-tag {
+  display: inline-flex;
+  margin-block-start: .4rem;
+  font-size: 1.1rem;
+}
+
+/* ---------- Line notes and extras ---------- */
+.cart-line-badge {
+  display: inline-flex;
+  margin-block-start: .4rem;
+  padding: .2rem .8rem;
+  border-radius: 10rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: var(--cart-tint, rgba(var(--color-foreground), .08));
+}
+
+.cart-item .cart-line-note {
+  margin: 0;
+  font-size: 1.2rem;
+  color: rgba(var(--color-foreground), .8);
+}
+
+.cart-line-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.cart-line-pill {
+  display: inline-flex;
+  padding: .1rem .7rem;
+  border-radius: 10rem;
+  border: .1rem solid var(--cart-hairline, rgba(var(--color-foreground), .15));
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.cart-line-variant {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+
+.cart-line-variant .cart-line-variant__option {
+  inline-size: auto;
+  min-inline-size: 9rem;
+}
+
+.cart-item .cart-save-later {
+  font-size: 1.2rem;
+  min-block-size: 2.4rem;
+}
+
+/* Product disclosures (shown automatically when set to show in the cart) */
+.cart-line-disclosures {
+  margin-block-start: .4rem;
+  font-size: 1.2rem;
+}
+
+.cart-line-disclosures .cart-line-disclosures__summary {
+  display: flex;
+  align-items: center;
+  min-block-size: 2.4rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .3rem;
+  list-style: none;
+}
+
+.cart-line-disclosures .cart-line-disclosures__summary::-webkit-details-marker {
+  display: none;
+}
+
+.cart-line-disclosures__title {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin: .6rem 0 0;
+  font-weight: 600;
+}
+
+.cart-line-disclosures__symbol {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+}
+
+.cart-line-disclosures__content {
+  margin-block-start: .2rem;
+}
+
+/* Remove button: Cart page V2's icon control mirrors the drawer's; Text style */
+.cart-root .cart-drawer-item .cart-line-remove,
+.cart-root .cart-drawer-item .cart-line-remove .button {
+  --button-shadow: 0 0 0 0 transparent;
+  display: flex;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  min-inline-size: auto;
+  min-block-size: auto;
+  padding: 0;
+  margin: 0;
+  color: rgb(var(--color-foreground));
+}
+
+.cart-root .cart-drawer-item .cart-line-remove .button:hover {
+  color: rgb(var(--accent-color));
+}
+
+.cart-line-remove .button::before,
+.cart-line-remove .button::after {
+  content: none;
+}
+
+.cart-line-remove .icon-remove {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+.cart-root .cart-drawer-item cart-remove-button.cart-line-remove--text,
+.cart-root .cart-drawer-item .cart-line-remove.cart-line-remove--text {
+  inline-size: auto;
+  block-size: auto;
+}
+
+.cart-item .cart-line-remove__text {
+  font-size: 1.2rem;
+  min-block-size: 2.4rem;
+  padding-inline: .2rem;
+}
+
+/* Quantity selector with the theme's Quantity pickers look */
+.cart-root .cart-drawer-item .quantity.cart-quantity--theme {
+  position: relative;
+  align-items: stretch;
+  inline-size: auto;
+  min-block-size: calc(var(--inputs-border-width) * 2 + 3.6rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--inputs-radius);
+  font-size: 1.4rem;
+}
+
+.cart-root .cart-drawer-item .cart-quantity--theme::before,
+.cart-root .cart-drawer-item .cart-quantity--theme::after {
+  display: block;
+}
+
+.cart-root .cart-drawer-item .cart-quantity--theme .quantity__button,
+.cart-root .cart-drawer-item .cart-quantity--theme .quantity__input {
+  inline-size: 3.6rem;
+  block-size: auto;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+  font-weight: 500;
+}
+
+/* the custom stepper sizes its icons from inline variables the theme preset doesn't print */
+.cart-root .cart-drawer-item .cart-quantity--theme .quantity__button svg {
+  inline-size: 1rem;
+}
+
+@media (pointer: coarse) {
+  .cart-root .cart-drawer-item .quantity.cart-quantity--theme {
+    min-block-size: calc(var(--inputs-border-width) * 2 + 4rem);
+  }
+}
+
+/* ---------- Purchase-type groups ---------- */
+.cart-group[hidden] {
+  display: none;
+}
+
+.cart-group + .cart-group {
+  margin-block-start: 2.4rem;
+}
+
+.cart-group__heading {
+  margin: 0 0 1.2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(var(--color-foreground), .75);
+}
+
+/* ---------- Cart page V2 lines (the drawer's line markup in page context) ---------- */
+cart-page-items {
+  display: block;
+}
+
+.cart-page-items .cart-items {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--cart-gap, 2.5rem);
+}
+
+.cart-page-items .cart-item .loading-overlay {
+  inset: 0;
+  inline-size: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-page-items .cart-item .loading-overlay:not(.hidden) ~ * {
+  visibility: visible;
+  opacity: .4;
+}
+
+.cart-page-items .cart-drawer-item .cart-item__media {
+  max-inline-size: 12rem;
+}
+
+/* ---------- Motion (none under reduced motion) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .cart-sub__switch {
+    transition: background .2s;
+  }
+
+  .cart-sub__knob {
+    transition: inset-inline-start .2s;
+  }
+
+  .cart-root .cart-item.cart-line--enter {
+    animation: cart-line-in .2s ease-out both;
+  }
+}
+
+@keyframes cart-line-in {
+  from {
+    opacity: 0;
+    translate: 0 .6rem;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}

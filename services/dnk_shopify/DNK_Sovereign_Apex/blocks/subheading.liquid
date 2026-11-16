@@ -1,0 +1,70 @@
+<div
+  class="subheading-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <p class="subheading-block-subheading subheading {{ block.settings.subheading_size }}">
+    {{ block.settings.subheading }}
+  </p>
+</div>
+
+{% schema %}
+{
+  "name": "Subheading",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "A thoughtful subheading"
+    },
+    {
+      "type": "select",
+      "id": "subheading_size",
+      "label": "Size",
+      "options": [
+        { "value": "fs-xs", "label": "Extra small" },
+        { "value": "fs-sm", "label": "Small" },
+        { "value": "fs-md", "label": "Medium" },
+        { "value": "fs-lg", "label": "Large" },
+        { "value": "fs-xl", "label": "Extra large" }
+      ],
+      "default": "fs-sm"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Subheading",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

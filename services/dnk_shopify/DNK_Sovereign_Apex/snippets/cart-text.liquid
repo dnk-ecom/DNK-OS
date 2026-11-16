@@ -1,0 +1,71 @@
+{%- comment -%}
+  Keyword replacement for cart texts. Replaces [name] with the parameter of the same name for every parameter that
+  is not nil; other text stays as it is. Values are inserted as given: callers format money and escape.
+  Accepts: text, plus any of amount, percentage, subtotal, count, items, next_goal, next_goal_lowercase, title,
+  quantity, plan_name, amount_saved, percentage_saved, price, compare_price, timer, savings, savings_percentage,
+  compare_subtotal, free_shipping_goal.
+  JS twin: ShrineCart.keywords(text, { name: value }).
+  Usage:
+  {% render 'cart-text', text: block.settings.label, amount: amount_html, percentage: percent %}
+{%- endcomment -%}
+{%- liquid
+  assign ct = text
+  if amount != nil
+    assign ct = ct | replace: '[amount]', amount
+  endif
+  if percentage != nil
+    assign ct = ct | replace: '[percentage]', percentage
+  endif
+  if subtotal != nil
+    assign ct = ct | replace: '[subtotal]', subtotal
+  endif
+  if count != nil
+    assign ct = ct | replace: '[count]', count
+  endif
+  if items != nil
+    assign ct = ct | replace: '[items]', items
+  endif
+  if next_goal != nil
+    assign ct = ct | replace: '[next_goal]', next_goal
+  endif
+  if next_goal_lowercase != nil
+    assign ct = ct | replace: '[next_goal_lowercase]', next_goal_lowercase
+  endif
+  if title != nil
+    assign ct = ct | replace: '[title]', title
+  endif
+  if quantity != nil
+    assign ct = ct | replace: '[quantity]', quantity
+  endif
+  if plan_name != nil
+    assign ct = ct | replace: '[plan_name]', plan_name
+  endif
+  if amount_saved != nil
+    assign ct = ct | replace: '[amount_saved]', amount_saved
+  endif
+  if percentage_saved != nil
+    assign ct = ct | replace: '[percentage_saved]', percentage_saved
+  endif
+  if price != nil
+    assign ct = ct | replace: '[price]', price
+  endif
+  if compare_price != nil
+    assign ct = ct | replace: '[compare_price]', compare_price
+  endif
+  if timer != nil
+    assign ct = ct | replace: '[timer]', timer
+  endif
+  if savings != nil
+    assign ct = ct | replace: '[savings]', savings
+  endif
+  if savings_percentage != nil
+    assign ct = ct | replace: '[savings_percentage]', savings_percentage
+  endif
+  if compare_subtotal != nil
+    assign ct = ct | replace: '[compare_subtotal]', compare_subtotal
+  endif
+  if free_shipping_goal != nil
+    assign ct = ct | replace: '[free_shipping_goal]', free_shipping_goal
+  endif
+  echo ct
+-%}

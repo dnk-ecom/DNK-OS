@@ -1,0 +1,1690 @@
+/*
+  Components script
+
+  This file defines reusable custom elements shared across theme components.
+*/
+
+/*
+  Intersection observer
+*/
+const intersectionObservers = new Map();
+const elementObservers = new WeakMap();
+const intersectionObserverSelector = "[data-intersection-observer]";
+const initializedIntersectionObserverSelector = "[data-intersection-initialized]";
+
+function getMatchingElements(root, selector) {
+  const elements = Array.from(root.querySelectorAll(selector));
+
+  if (root instanceof Element && root.matches(selector)) {
+    elements.unshift(root);
+  }
+
+  return elements;
+}
+
+function enterWithoutIntersectionObserver(element) {
+  element.dataset.intersectionInitialized = "true";
+  element.dataset.intersectionState = "entered";
+  element.dispatchEvent(
+    new CustomEvent("theme:intersection", {
+      detail: { isIntersecting: true, target: element },
+    }),
+  );
+}
+
+function getIntersectionObserver(rootMargin, threshold) {
+  const observerKey = `${rootMargin}:${threshold}`;
+
+  if (intersectionObservers.has(observerKey)) {
+    return intersectionObservers.get(observerKey);
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const element = entry.target;
+        const observeOnce = element.dataset.intersectionOnce !== "false";
+
+        element.dataset.intersectionState = entry.isIntersecting ? "entered" : "exited";
+        element.dispatchEvent(
+          new CustomEvent("theme:intersection", {
+            detail: entry,
+          }),
+        );
+
+        if (entry.isIntersecting && observeOnce) {
+          observer.unobserve(element);
+          elementObservers.delete(element);
+        }
+      });
+    },
+    { rootMargin, threshold },
+  );
+
+  intersectionObservers.set(observerKey, observer);
+  return observer;
+}
+
+function initIntersectionObservers(root = document) {
+  const elements = getMatchingElements(root, `${intersectionObserverSelector}:not([data-intersection-initialized])`);
+
+  elements.forEach((element) => {
+    if (!("IntersectionObserver" in window)) {
+      enterWithoutIntersectionObserver(element);
+      return;
+    }
+
+    const rootMargin = element.dataset.intersectionRootMargin || "0px";
+    const parsedThreshold = Number.parseFloat(element.dataset.intersectionThreshold || "0");
+    const threshold = Math.min(1, Math.max(0, Number.isFinite(parsedThreshold) ? parsedThreshold : 0));
+    let observer;
+
+    try {
+      observer = getIntersectionObserver(rootMargin, threshold);
+      observer.observe(element);
+    } catch {
+      try {
+        observer = getIntersectionObserver("0px", threshold);
+        observer.observe(element);
+      } catch {
+        enterWithoutIntersectionObserver(element);
+        return;
+      }
+    }
+
+    elementObservers.set(element, observer);
+    element.dataset.intersectionInitialized = "true";
+  });
+}
+
+function cleanupIntersectionObservers(root) {
+  getMatchingElements(root, initializedIntersectionObserverSelector).forEach((element) => {
+    elementObservers.get(element)?.unobserve(element);
+    elementObservers.delete(element);
+    delete element.dataset.intersectionInitialized;
+    delete element.dataset.intersectionState;
+  });
+}
+
+initIntersectionObservers();
+document.addEventListener("shopify:section:load", (event) => {
+  initIntersectionObservers(event.target);
+});
+document.addEventListener("shopify:section:unload", (event) => {
+  cleanupIntersectionObservers(event.target);
+});
+
+/*
+  Deferred video
+*/
+class DeferredVideo extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.posterButton = this.querySelector("[data-deferred-video-button]");
+    this.videoTemplate = this.querySelector("template");
+
+    if (!this.posterButton || !this.videoTemplate) return;
+
+    this.listenerController = new AbortController();
+    this.posterButton.addEventListener("click", this.onPosterClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+
+    if (this.hasAttribute("autoplay")) {
+      this.addEventListener("theme:intersection", this.onIntersection.bind(this), {
+        signal: this.listenerController.signal,
+      });
+
+      if (this.dataset.intersectionState === "entered") {
+        this.showVideo();
+      }
+    }
+
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.mediaController?.abort();
+
+    if (this.dataset.mediaLoading === "true") {
+      this.activeMedia?.remove();
+      delete this.dataset.mediaLoading;
+      this.posterButton?.removeAttribute("aria-busy");
+    }
+
+    this.activeMedia = undefined;
+    this.shouldMoveMediaFocus = false;
+    this.isInitialized = false;
+  }
+
+  onPosterClick() {
+    this.shouldMoveMediaFocus = true;
+    this.showVideo();
+  }
+
+  onIntersection(event) {
+    if (event.detail.isIntersecting) {
+      this.showVideo();
+    }
+  }
+
+  showVideo() {
+    if (this.dataset.mediaLoading === "true" || this.dataset.mediaLoaded === "true") {
+      return;
+    }
+
+    const content = this.videoTemplate.content.cloneNode(true);
+    const media = content.querySelector("video, iframe");
+
+    if (!media) return;
+
+    this.dataset.mediaLoading = "true";
+    this.posterButton.setAttribute("aria-busy", "true");
+    this.mediaController?.abort();
+    this.mediaController = new AbortController();
+    this.activeMedia = media;
+
+    const readyEvent = media instanceof HTMLVideoElement ? "playing" : "load";
+    const listenerOptions = {
+      once: true,
+      signal: this.mediaController.signal,
+    };
+
+    media.addEventListener(readyEvent, () => this.onMediaReady(media), listenerOptions);
+    media.addEventListener("error", () => this.onMediaError(media), listenerOptions);
+    this.videoTemplate.before(content);
+
+    if (media instanceof HTMLVideoElement) {
+      media.play().catch(() => this.onMediaError(media));
+    }
+  }
+
+  onMediaReady(media) {
+    if (this.activeMedia !== media || this.dataset.mediaLoading !== "true") {
+      return;
+    }
+
+    const shouldMoveMediaFocus = this.shouldMoveMediaFocus && document.activeElement === this.posterButton;
+
+    this.mediaController?.abort();
+    delete this.dataset.mediaLoading;
+    this.dataset.mediaLoaded = "true";
+    this.posterButton.removeAttribute("aria-busy");
+    this.posterButton.disabled = true;
+    this.posterButton.setAttribute("aria-hidden", "true");
+    this.activeMedia = undefined;
+    this.shouldMoveMediaFocus = false;
+
+    if (!shouldMoveMediaFocus) return;
+
+    if (media instanceof HTMLVideoElement && !media.controls) {
+      media.tabIndex = -1;
+    }
+
+    media.focus({ preventScroll: true });
+  }
+
+  onMediaError(media) {
+    if (this.activeMedia !== media || this.dataset.mediaLoading !== "true") {
+      return;
+    }
+
+    this.mediaController?.abort();
+    media.remove();
+    delete this.dataset.mediaLoading;
+    this.posterButton.removeAttribute("aria-busy");
+    this.posterButton.disabled = false;
+    this.posterButton.removeAttribute("aria-hidden");
+    this.activeMedia = undefined;
+    this.shouldMoveMediaFocus = false;
+  }
+}
+
+if (!customElements.get("deferred-video")) {
+  customElements.define("deferred-video", DeferredVideo);
+}
+
+/*
+  Dialogs
+*/
+class ThemeDialog extends HTMLElement {
+  static instanceCount = 0;
+  static closeDurationMs = 300;
+
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.dialog = this.querySelector("dialog");
+
+    if (!this.dialog) return;
+
+    this.openedByPointer = false;
+
+    if (!this.dialog.id) {
+      ThemeDialog.instanceCount += 1;
+      this.dialog.id = `theme-dialog-${ThemeDialog.instanceCount}`;
+    }
+
+    this.listenerController = new AbortController();
+    this.triggers = [];
+    this.onDialogClose = this.onDialogClose.bind(this);
+    this.onDialogCancel = this.onDialogCancel.bind(this);
+    this.onDialogClick = this.onDialogClick.bind(this);
+    this.onDialogKeydown = this.onDialogKeydown.bind(this);
+    this.onInternalClick = this.onInternalClick.bind(this);
+    this.onSectionLoad = this.onSectionLoad.bind(this);
+
+    this.bindTriggers(document);
+
+    document.addEventListener("shopify:section:load", this.onSectionLoad, {
+      signal: this.listenerController.signal,
+    });
+    this.dialog.addEventListener("close", this.onDialogClose, {
+      signal: this.listenerController.signal,
+    });
+    this.dialog.addEventListener("cancel", this.onDialogCancel, {
+      signal: this.listenerController.signal,
+    });
+    this.dialog.addEventListener("click", this.onDialogClick, {
+      signal: this.listenerController.signal,
+    });
+    this.dialog.addEventListener("keydown", this.onDialogKeydown, {
+      signal: this.listenerController.signal,
+    });
+    this.addEventListener("click", this.onInternalClick, {
+      signal: this.listenerController.signal,
+    });
+    this.isInitialized = true;
+
+    if (this.dialog.hasAttribute("data-open-on-load")) {
+      this.dialog.removeAttribute("data-open-on-load");
+      window.requestAnimationFrame(() => {
+        if (this.isConnected) this.openDialog();
+      });
+    }
+  }
+
+  bindTriggers(root) {
+    this.triggers = this.triggers.filter((trigger) => trigger.isConnected);
+
+    const selector = `[data-toggle="${this.dialog.id}"]`;
+
+    getMatchingElements(root, selector).forEach((trigger) => {
+      if (this.triggers.includes(trigger)) return;
+
+      trigger.setAttribute("aria-controls", this.dialog.id);
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.setAttribute("aria-haspopup", "dialog");
+      trigger.addEventListener("click", this.onTriggerClick.bind(this, trigger), {
+        signal: this.listenerController.signal,
+      });
+      this.triggers.push(trigger);
+    });
+  }
+
+  onSectionLoad(event) {
+    this.bindTriggers(event.target);
+  }
+
+  disconnectedCallback() {
+    this.unlockPageScroll();
+    this.listenerController?.abort();
+    window.clearTimeout(this.closeTimer);
+    this.isInitialized = false;
+  }
+
+  onTriggerClick(trigger, event) {
+    event.preventDefault();
+    this.lastTrigger = trigger;
+    this.openedByPointer = event.detail !== 0;
+    this.openDialog();
+  }
+
+  setReturnFocus(element) {
+    if (element instanceof HTMLElement) this.lastTrigger = element;
+  }
+
+  openDialog() {
+    if (this.dialog.open) {
+      this.requestClose();
+      return;
+    }
+
+    this.closeOtherOpenDialogs();
+    this.dialog.classList.remove("is-closing");
+    this.isClosing = false;
+    this.dialog.dataset.openedBy = this.openedByPointer ? "pointer" : "keyboard";
+    this.dialog.showModal();
+    this.setExpandedState(true);
+    this.lockPageScroll();
+  }
+
+  onDialogClose() {
+    this.dialog.classList.remove("is-closing");
+    delete this.dialog.dataset.openedBy;
+    this.setExpandedState(false);
+    this.isClosing = false;
+
+    if (!document.querySelector("dialog:modal")) {
+      this.unlockPageScroll();
+    }
+
+    window.clearTimeout(this.closeTimer);
+    this.closeTimer = null;
+    const returnFocusElement = this.lastTrigger;
+    const restoreFocusFromPointer = this.openedByPointer;
+
+    this.lastTrigger = null;
+    this.openedByPointer = false;
+
+    if (returnFocusElement && restoreFocusFromPointer) {
+      returnFocusElement.dataset.focusedBy = "pointer";
+      returnFocusElement.addEventListener("blur", () => delete returnFocusElement.dataset.focusedBy, { once: true });
+    }
+
+    returnFocusElement?.focus();
+  }
+
+  onDialogCancel(event) {
+    event.preventDefault();
+    this.requestClose();
+  }
+
+  onDialogClick(event) {
+    if (event.target !== this.dialog) return;
+
+    const rect = this.dialog.getBoundingClientRect();
+    const clickedOutside =
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom;
+
+    if (clickedOutside) this.requestClose();
+  }
+
+  onDialogKeydown(event) {
+    if (event.key === "Tab") {
+      this.dialog.dataset.openedBy = "keyboard";
+    }
+  }
+
+  onInternalClick(event) {
+    const closeButton = event.target.closest("[data-dialog-close]");
+
+    if (closeButton && this.contains(closeButton)) {
+      this.requestClose();
+    }
+  }
+
+  requestClose() {
+    if (!this.dialog?.open || this.isClosing) return;
+
+    this.isClosing = true;
+    this.dialog.classList.add("is-closing");
+
+    const closeDurationMs = this.getCloseDurationMs();
+
+    if (closeDurationMs === 0) {
+      this.dialog.close();
+      return;
+    }
+
+    window.clearTimeout(this.closeTimer);
+    this.closeTimer = window.setTimeout(() => this.dialog.close(), closeDurationMs);
+  }
+
+  getCloseDurationMs() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const designMode = document.documentElement.dataset.designMode === "true";
+
+    if (reduceMotion || designMode) return 0;
+
+    const duration = window.getComputedStyle(this.dialog).getPropertyValue("--dialog-transition-duration").trim();
+    const parsedDuration = Number.parseFloat(duration);
+
+    if (!Number.isFinite(parsedDuration) || parsedDuration < 0) {
+      return ThemeDialog.closeDurationMs;
+    }
+
+    return duration.endsWith("ms") ? parsedDuration : parsedDuration * 1000;
+  }
+
+  setExpandedState(isExpanded) {
+    this.triggers.forEach((trigger) => {
+      trigger.setAttribute("aria-expanded", String(isExpanded));
+    });
+  }
+
+  closeOtherOpenDialogs() {
+    document.querySelectorAll("dialog[open]").forEach((openDialog) => {
+      if (openDialog === this.dialog) return;
+
+      const dialogHost = openDialog.closest("theme-dialog");
+
+      if (dialogHost?.requestClose) {
+        dialogHost.requestClose();
+      } else {
+        openDialog.close();
+      }
+    });
+  }
+
+  lockPageScroll() {
+    if (document.body.dataset.scrollLocked === "true") return;
+    if (document.body.dataset.mobileMenuScrollLocked === "true") return;
+
+    const scrollY = window.scrollY;
+
+    document.body.dataset.scrollLocked = "true";
+    document.body.dataset.scrollLockTop = String(scrollY);
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+  }
+
+  unlockPageScroll() {
+    if (document.body.dataset.scrollLocked !== "true") return;
+
+    const scrollY = Number(document.body.dataset.scrollLockTop || 0);
+
+    delete document.body.dataset.scrollLocked;
+    delete document.body.dataset.scrollLockTop;
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    window.scrollTo(0, scrollY);
+  }
+}
+
+if (!customElements.get("theme-dialog")) {
+  customElements.define("theme-dialog", ThemeDialog);
+}
+
+class ThemeDropdown extends HTMLElement {
+  static instanceCount = 0;
+
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.button = this.querySelector(".theme-dropdown-btn");
+    this.content = this.querySelector(".theme-dropdown-content");
+
+    if (!this.button || !this.content) return;
+
+    if (!this.content.id) {
+      ThemeDropdown.instanceCount += 1;
+      this.content.id = `theme-dropdown-${ThemeDropdown.instanceCount}`;
+    }
+
+    this.listenerController = new AbortController();
+    this.button.setAttribute("aria-controls", this.content.id);
+    this.button.setAttribute("aria-expanded", "false");
+    this.button.setAttribute("aria-haspopup", "true");
+    this.content.hidden = true;
+
+    this.button.addEventListener("click", this.onButtonClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    document.addEventListener("click", this.onDocumentClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.addEventListener("keydown", this.onKeydown.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.addEventListener("focusout", this.onFocusOut.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.addEventListener("pointerdown", this.onPointerDown.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    document.addEventListener("pointerup", this.onPointerEnd.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    document.addEventListener("pointercancel", this.onPointerEnd.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    window.clearTimeout(this.focusOutTimer);
+    this.isPointerInteracting = false;
+    this.isInitialized = false;
+  }
+
+  onButtonClick(event) {
+    event.preventDefault();
+    this.toggle();
+  }
+
+  onDocumentClick(event) {
+    if (this.contains(event.target)) return;
+
+    this.close();
+  }
+
+  onKeydown(event) {
+    if (event.key === "Escape") {
+      if (!this.isOpen()) return;
+
+      event.preventDefault();
+      this.close();
+      this.button.focus();
+      return;
+    }
+
+    if (event.key === "ArrowDown" && event.target === this.button) {
+      event.preventDefault();
+      this.open();
+      this.focusFirstItem();
+    }
+  }
+
+  onFocusOut() {
+    if (this.isPointerInteracting) return;
+
+    window.clearTimeout(this.focusOutTimer);
+    this.focusOutTimer = window.setTimeout(() => {
+      if (!this.contains(document.activeElement)) this.close();
+    });
+  }
+
+  onPointerDown() {
+    this.isPointerInteracting = true;
+  }
+
+  onPointerEnd() {
+    this.isPointerInteracting = false;
+  }
+
+  isOpen() {
+    return this.button?.getAttribute("aria-expanded") === "true";
+  }
+
+  toggle() {
+    if (this.isOpen()) {
+      this.close();
+    } else {
+      this.open();
+    }
+  }
+
+  open() {
+    if (!this.button || !this.content || this.isOpen()) return;
+
+    this.closeOtherDropdowns();
+    this.button.setAttribute("aria-expanded", "true");
+    this.content.hidden = false;
+  }
+
+  close() {
+    if (!this.button || !this.content || !this.isOpen()) return;
+
+    this.button.setAttribute("aria-expanded", "false");
+    this.content.hidden = true;
+  }
+
+  closeOtherDropdowns() {
+    document.querySelectorAll("theme-dropdown").forEach((dropdown) => {
+      if (dropdown !== this) dropdown.close?.();
+    });
+  }
+
+  focusFirstItem() {
+    const firstItem = this.content.querySelector(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+
+    firstItem?.focus();
+  }
+}
+
+if (!customElements.get("theme-dropdown")) {
+  customElements.define("theme-dropdown", ThemeDropdown);
+}
+
+class ThemeCollapse extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.details = this.querySelector(".theme-collapse-details");
+    this.summary = this.querySelector(".theme-collapse-summary");
+
+    if (!this.details || !this.summary) return;
+
+    this.listenerController = new AbortController();
+    this.reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.desktopQuery = window.matchMedia("(min-width: 1200px)");
+    this.summary.addEventListener("click", this.onSummaryClick.bind(this), { signal: this.listenerController.signal });
+
+    if (this.hasAttribute("data-collapse-mobile")) {
+      this.desktopQuery.addEventListener("change", this.onDesktopQueryChange.bind(this), {
+        signal: this.listenerController.signal,
+      });
+      this.syncResponsiveState();
+    }
+
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.finishAnimation?.();
+    window.clearTimeout(this.animationTimer);
+    this.isInitialized = false;
+  }
+
+  onSummaryClick(event) {
+    event.preventDefault();
+
+    if (this.details.dataset.animating === "true") return;
+
+    const isOpen = this.details.open;
+
+    if (this.reduceMotionQuery.matches) {
+      this.details.open = !isOpen;
+      if (!isOpen) this.scrollContainerToBottom();
+      return;
+    }
+
+    const startHeight = this.details.offsetHeight;
+
+    if (!isOpen) {
+      this.details.open = true;
+    }
+
+    const endHeight = isOpen ? this.summary.offsetHeight : this.details.scrollHeight;
+
+    this.details.dataset.animating = "true";
+    this.details.style.height = `${startHeight}px`;
+    this.details.style.overflow = "hidden";
+
+    window.requestAnimationFrame(() => {
+      this.details.style.height = `${endHeight}px`;
+    });
+
+    const cleanup = () => {
+      if (isOpen) {
+        this.details.open = false;
+      }
+
+      this.details.style.height = "";
+      this.details.style.overflow = "";
+      delete this.details.dataset.animating;
+      this.details.removeEventListener("transitionend", onTransitionEnd);
+      window.clearTimeout(this.animationTimer);
+      this.finishAnimation = null;
+      if (!isOpen) this.scrollContainerToBottom();
+    };
+
+    const onTransitionEnd = (transitionEvent) => {
+      if (transitionEvent.target !== this.details || transitionEvent.propertyName !== "height") {
+        return;
+      }
+
+      cleanup();
+    };
+
+    this.finishAnimation = cleanup;
+    this.details.addEventListener("transitionend", onTransitionEnd);
+    this.animationTimer = window.setTimeout(cleanup, 350);
+  }
+
+  scrollContainerToBottom() {
+    if (!this.hasAttribute("data-scroll-to-bottom")) return;
+
+    const scrollContainer = this.closest(".dialog-body");
+
+    scrollContainer?.scrollTo({
+      top: scrollContainer.scrollHeight,
+      behavior: this.reduceMotionQuery.matches ? "auto" : "smooth",
+    });
+  }
+
+  onDesktopQueryChange() {
+    this.finishAnimation?.();
+    this.syncResponsiveState();
+  }
+
+  syncResponsiveState() {
+    this.details.open = this.desktopQuery.matches;
+  }
+}
+
+if (!customElements.get("theme-collapse")) {
+  customElements.define("theme-collapse", ThemeCollapse);
+}
+
+/*
+  Quantity input
+*/
+class QuantityInput extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.input = this.querySelector("[data-quantity-input]");
+    this.decreaseButton = this.querySelector("[data-quantity-decrease]");
+    this.increaseButton = this.querySelector("[data-quantity-increase]");
+
+    if (!this.input || !this.decreaseButton || !this.increaseButton) return;
+
+    this.listenerController = new AbortController();
+    const listenerOptions = { signal: this.listenerController.signal };
+
+    this.decreaseButton.addEventListener("click", () => this.changeQuantity("decrease"), listenerOptions);
+    this.increaseButton.addEventListener("click", () => this.changeQuantity("increase"), listenerOptions);
+    this.input.addEventListener("input", this.sync.bind(this), listenerOptions);
+    this.input.addEventListener("change", this.onInputChange.bind(this), listenerOptions);
+
+    this.sync();
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.isInitialized = false;
+  }
+
+  changeQuantity(direction) {
+    const previousValue = this.input.value;
+
+    if (direction === "decrease") {
+      this.input.stepDown();
+    } else {
+      this.input.stepUp();
+    }
+
+    this.sync();
+
+    if (this.input.value === previousValue) return;
+
+    this.input.dispatchEvent(new Event("input", { bubbles: true }));
+    this.input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  onInputChange() {
+    const minimum = Number.parseFloat(this.input.min);
+    const maximum = Number.parseFloat(this.input.max);
+    let value = this.input.valueAsNumber;
+
+    if (!Number.isFinite(value)) {
+      value = Number.isFinite(minimum) ? minimum : 1;
+    }
+
+    if (Number.isFinite(minimum)) value = Math.max(value, minimum);
+    if (Number.isFinite(maximum)) value = Math.min(value, maximum);
+
+    this.input.value = String(value);
+    this.sync();
+  }
+
+  sync() {
+    if (!this.input || !this.decreaseButton || !this.increaseButton) return;
+
+    const value = this.input.valueAsNumber;
+    const minimum = Number.parseFloat(this.input.min);
+    const maximum = Number.parseFloat(this.input.max);
+    const inputDisabled = this.input.disabled;
+
+    this.decreaseButton.disabled =
+      inputDisabled || (Number.isFinite(value) && Number.isFinite(minimum) && value <= minimum);
+    this.increaseButton.disabled =
+      inputDisabled || (Number.isFinite(value) && Number.isFinite(maximum) && value >= maximum);
+  }
+}
+
+if (!customElements.get("quantity-input")) {
+  customElements.define("quantity-input", QuantityInput);
+}
+
+/*
+  Buy it now
+*/
+class ThemeBuyItNow extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.form = this.closest("form");
+    this.link = this.querySelector("[data-buy-it-now]");
+    this.variantInput = this.form?.elements.namedItem("id");
+    this.quantityInput = this.form?.elements.namedItem("quantity");
+
+    if (!this.form || !this.link || !this.variantInput || !this.dataset.cartUrl) return;
+
+    this.listenerController = new AbortController();
+    const listenerOptions = { signal: this.listenerController.signal };
+
+    this.variantInput.addEventListener("change", this.updateLink.bind(this), listenerOptions);
+    this.quantityInput?.addEventListener("input", this.updateLink.bind(this), listenerOptions);
+    this.link.addEventListener("click", this.onClick.bind(this), listenerOptions);
+    this.updateLink();
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.isInitialized = false;
+  }
+
+  updateLink() {
+    const variantId = this.variantInput.value;
+    const quantity = Math.max(1, Number.parseInt(this.quantityInput?.value, 10) || 1);
+
+    if (variantId) this.link.href = `${this.dataset.cartUrl}/${encodeURIComponent(variantId)}:${quantity}`;
+  }
+
+  onClick(event) {
+    if (this.link.getAttribute("aria-disabled") === "true" || !this.form.reportValidity()) event.preventDefault();
+  }
+}
+
+if (!customElements.get("theme-buy-it-now")) {
+  customElements.define("theme-buy-it-now", ThemeBuyItNow);
+}
+
+class ThemeCarousel extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.track = this.querySelector("[data-carousel-track]");
+    this.items = Array.from(this.querySelectorAll("[data-carousel-item]"));
+    this.previousButton = this.querySelector("[data-carousel-previous]");
+    this.nextButton = this.querySelector("[data-carousel-next]");
+    this.progressBar = this.querySelector("[data-carousel-progress-bar]");
+    this.trackWrapper = this.querySelector(".theme-carousel-track-wrapper");
+    this.controlAlignmentElement =
+      this.dataset.alignNavigationToMedia === "false"
+        ? this.items[0]
+        : this.items[0]?.querySelector("[data-carousel-control-alignment]");
+
+    if (!this.track || !this.items.length) return;
+
+    this.listenerController = new AbortController();
+    this.reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    this.addEventListener("click", this.onClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.addEventListener("shopify:block:select", this.onBlockSelect.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.track.addEventListener("scroll", this.onScroll.bind(this), {
+      passive: true,
+      signal: this.listenerController.signal,
+    });
+    this.track.addEventListener("keydown", this.onKeydown.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    window.addEventListener("resize", this.scheduleUpdate.bind(this), {
+      signal: this.listenerController.signal,
+    });
+
+    if (this.controlAlignmentElement instanceof HTMLImageElement) {
+      this.controlAlignmentElement.addEventListener("load", this.scheduleUpdate.bind(this), {
+        once: true,
+        signal: this.listenerController.signal,
+      });
+    }
+
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver(() => this.scheduleUpdate());
+      this.resizeObserver.observe(this.track);
+
+      if (this.controlAlignmentElement) {
+        this.resizeObserver.observe(this.controlAlignmentElement);
+      }
+    }
+
+    this.isInitialized = true;
+    this.scheduleUpdate();
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.resizeObserver?.disconnect();
+    window.cancelAnimationFrame(this.scrollFrame);
+    window.cancelAnimationFrame(this.updateFrame);
+    this.isInitialized = false;
+  }
+
+  onClick(event) {
+    if (event.target.closest("[data-carousel-previous]")) {
+      this.goPrevious();
+    }
+
+    if (event.target.closest("[data-carousel-next]")) {
+      this.goNext();
+    }
+  }
+
+  onScroll() {
+    window.cancelAnimationFrame(this.scrollFrame);
+    this.scrollFrame = window.requestAnimationFrame(() => this.update());
+  }
+
+  onKeydown(event) {
+    if (event.target !== this.track) return;
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+
+    event.preventDefault();
+
+    if (event.key === "ArrowRight") {
+      this.goNext();
+    } else {
+      this.goPrevious();
+    }
+  }
+
+  onBlockSelect(event) {
+    const item = event.target.closest("[data-carousel-item]");
+    const index = this.items.indexOf(item);
+
+    if (index >= 0) {
+      this.goTo(index, false);
+    }
+  }
+
+  getCurrentIndex() {
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    this.items.forEach((item, index) => {
+      const itemPosition = item.offsetLeft - this.track.offsetLeft;
+      const distance = Math.abs(itemPosition - this.track.scrollLeft);
+
+      if (distance < closestDistance) {
+        closestIndex = index;
+        closestDistance = distance;
+      }
+    });
+
+    return closestIndex;
+  }
+
+  goPrevious() {
+    if (this.track.scrollLeft <= 1) {
+      this.scrollToPosition(this.getMaxScroll());
+      return;
+    }
+
+    this.goTo(this.getCurrentIndex() - 1);
+  }
+
+  goNext() {
+    if (this.track.scrollLeft >= this.getMaxScroll() - 1) {
+      this.scrollToPosition(0);
+      return;
+    }
+
+    this.goTo(this.getCurrentIndex() + 1);
+  }
+
+  goTo(index, smooth = true) {
+    const nextIndex = Math.max(0, Math.min(index, this.items.length - 1));
+    const item = this.items[nextIndex];
+
+    if (!item) return;
+
+    this.scrollToPosition(item.offsetLeft - this.track.offsetLeft, smooth);
+  }
+
+  getMaxScroll() {
+    return Math.max(0, this.track.scrollWidth - this.track.clientWidth);
+  }
+
+  scrollToPosition(left, smooth = true) {
+    const designMode = window.Shopify?.designMode === true;
+
+    this.track.scrollTo({
+      left,
+      behavior: smooth && !designMode && !this.reduceMotionQuery.matches ? "smooth" : "auto",
+    });
+  }
+
+  scheduleUpdate() {
+    if (this.updateFrame) return;
+
+    this.updateFrame = window.requestAnimationFrame(() => {
+      this.updateFrame = null;
+      this.update();
+    });
+  }
+
+  positionControls() {
+    if (!this.controlAlignmentElement || !this.previousButton || !this.nextButton || !this.trackWrapper) {
+      return;
+    }
+
+    let offsetTop = 0;
+    let offsetElement = this.controlAlignmentElement;
+
+    while (offsetElement && offsetElement !== this.trackWrapper) {
+      offsetTop += offsetElement.offsetTop;
+      offsetElement = offsetElement.offsetParent;
+    }
+
+    if (offsetElement !== this.trackWrapper) return;
+
+    const controlTop = offsetTop + this.controlAlignmentElement.offsetHeight / 2;
+
+    if (controlTop <= 0) return;
+
+    this.previousButton.style.top = `${controlTop}px`;
+    this.nextButton.style.top = `${controlTop}px`;
+  }
+
+  updateItemAccessibility() {
+    const firstItem = this.items[0];
+
+    if (!firstItem) return;
+
+    const gap = Number.parseFloat(getComputedStyle(this.track).columnGap) || 0;
+    const itemWidth = firstItem.getBoundingClientRect().width;
+
+    if (itemWidth <= 0 || this.track.clientWidth <= 0) return;
+
+    const visibleItemCount = Math.max(1, Math.round((this.track.clientWidth + gap) / (itemWidth + gap)));
+    const maxStartIndex = Math.max(0, this.items.length - visibleItemCount);
+    const startIndex = Math.min(this.getCurrentIndex(), maxStartIndex);
+    const endIndex = startIndex + visibleItemCount;
+
+    this.items.forEach((item, index) => {
+      const isVisible = index >= startIndex && index < endIndex;
+
+      if (!isVisible && item.contains(document.activeElement)) {
+        this.track.focus({ preventScroll: true });
+      }
+
+      item.toggleAttribute("inert", !isVisible);
+      item.setAttribute("aria-hidden", String(!isVisible));
+    });
+  }
+
+  updateProgress() {
+    if (!this.progressBar || this.track.scrollWidth <= 0) return;
+
+    const maxScroll = this.getMaxScroll();
+    const scrollLeft = Math.min(Math.max(this.track.scrollLeft, 0), maxScroll);
+    const progressWidth = (this.track.clientWidth / this.track.scrollWidth) * 100;
+    const progressTrackWidth = this.progressBar.parentElement?.clientWidth || 0;
+    const progressOffset = progressTrackWidth * (scrollLeft / this.track.scrollWidth);
+
+    this.progressBar.style.width = `${progressWidth}%`;
+    this.progressBar.style.transform = `translateX(${progressOffset}px)`;
+  }
+
+  update() {
+    const isScrollable = this.getMaxScroll() > 1;
+
+    this.dataset.scrollable = String(isScrollable);
+    this.positionControls();
+    this.updateItemAccessibility();
+    this.updateProgress();
+  }
+}
+
+if (!customElements.get("theme-carousel")) {
+  customElements.define("theme-carousel", ThemeCarousel);
+}
+
+class MobileMenuDialog extends HTMLElement {
+  static closeDurationMs = 180;
+  static submenuOpenDurationMs = 300;
+
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.panel = this.querySelector("[data-mobile-menu-panel]");
+    this.backdrop = this.querySelector("[data-mobile-menu-backdrop]");
+    this.trigger = document.querySelector(`[data-toggle="${this.panel?.id}"]`);
+
+    if (!this.panel || !this.backdrop || !this.trigger) return;
+
+    this.listenerController = new AbortController();
+    this.desktopQuery = window.matchMedia("(min-width: 1200px)");
+
+    this.trigger.setAttribute("aria-controls", this.panel.id);
+    this.trigger.setAttribute("aria-expanded", "false");
+    this.trigger.removeAttribute("aria-haspopup");
+    this.trigger.addEventListener("click", this.onTriggerClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.panel.addEventListener("click", this.onMobileMenuClick.bind(this), { signal: this.listenerController.signal });
+    this.panel.addEventListener("keydown", this.onMobileMenuKeydown.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.panel.addEventListener("transitionend", this.onPanelTransitionEnd.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.backdrop.addEventListener("click", this.onBackdropClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    document.addEventListener("click", this.onDocumentClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    window.addEventListener("resize", this.updatePanelTop.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.desktopQuery.addEventListener("change", this.onDesktopQueryChange.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.closeMenu(false, true);
+    this.listenerController?.abort();
+    window.clearTimeout(this.closeTimer);
+    this.isInitialized = false;
+  }
+
+  onTriggerClick(event) {
+    event.preventDefault();
+
+    if (this.isOpen) {
+      this.closeMenu(true);
+    } else {
+      this.openMenu();
+    }
+  }
+
+  openMenu() {
+    if (this.isOpen) return;
+
+    window.clearTimeout(this.closeTimer);
+    this.closeTimer = null;
+    document.querySelector("#header-group")?.classList.remove("header-hidden");
+    this.updatePanelTop();
+    this.panel.hidden = false;
+    this.backdrop.hidden = false;
+    this.setPageInteractive(false);
+    this.lockPageScroll();
+    this.panel.getBoundingClientRect();
+    this.dataset.open = "true";
+    this.trigger.setAttribute("aria-expanded", "true");
+  }
+
+  closeMenu(returnFocus = false, immediate = false) {
+    if (!this.isOpen && this.panel?.hidden) return;
+
+    delete this.dataset.open;
+    this.trigger?.setAttribute("aria-expanded", "false");
+    this.resetSubmenus();
+    this.setPageInteractive(true);
+    this.unlockPageScroll();
+
+    if (returnFocus) {
+      this.trigger?.focus();
+    }
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (immediate || reduceMotion) {
+      this.hidePanel();
+      return;
+    }
+
+    window.clearTimeout(this.closeTimer);
+    this.closeTimer = window.setTimeout(() => this.hidePanel(), this.getCloseDurationMs());
+  }
+
+  get isOpen() {
+    return this.dataset.open === "true";
+  }
+
+  onPanelTransitionEnd(event) {
+    if (event.propertyName === "transform" && !this.isOpen) {
+      this.hidePanel();
+    }
+  }
+
+  onBackdropClick(event) {
+    event.stopPropagation();
+    this.closeMenu(true);
+  }
+
+  onDocumentClick(event) {
+    if (!this.isOpen) return;
+    if (event.target.closest("dialog[open]")) return;
+    if (this.panel.contains(event.target) || this.trigger.contains(event.target)) return;
+
+    this.closeMenu(false);
+  }
+
+  hidePanel() {
+    if (this.isOpen) return;
+
+    window.clearTimeout(this.closeTimer);
+    this.closeTimer = null;
+    this.panel.hidden = true;
+    this.backdrop.hidden = true;
+  }
+
+  getCloseDurationMs() {
+    const duration = window.getComputedStyle(this).getPropertyValue("--mobile-menu-close-duration").trim();
+    const parsedDuration = Number.parseFloat(duration);
+
+    if (!Number.isFinite(parsedDuration) || parsedDuration < 0) {
+      return MobileMenuDialog.closeDurationMs;
+    }
+
+    return duration.endsWith("ms") ? parsedDuration : parsedDuration * 1000;
+  }
+
+  updatePanelTop() {
+    const headerGroup = document.querySelector("#header-group");
+    const headerBottom = Math.max(headerGroup?.getBoundingClientRect().bottom || 0, 0);
+
+    this.style.setProperty("--mobile-menu-top", `${headerBottom}px`);
+  }
+
+  setPageInteractive(isInteractive) {
+    const main = document.querySelector("#main");
+    const footer = document.querySelector("#footer-group");
+
+    if (main) main.inert = !isInteractive;
+    if (footer) footer.inert = !isInteractive;
+    this.setBackgroundControlsInteractive(isInteractive);
+  }
+
+  setBackgroundControlsInteractive(isInteractive) {
+    if (!isInteractive) {
+      const controls = document.querySelectorAll(
+        "#header-group a, #header-group button, #header-group input, " +
+          "#header-group select, #header-group textarea, " +
+          "#header-group [tabindex], body > .skip-link",
+      );
+
+      this.backgroundControlStates = Array.from(controls)
+        .filter((control) => control !== this.trigger && !this.panel.contains(control))
+        .map((control) => ({
+          control,
+          wasInert: control.inert,
+        }));
+
+      this.backgroundControlStates.forEach(({ control }) => {
+        control.inert = true;
+      });
+      return;
+    }
+
+    this.backgroundControlStates?.forEach(({ control, wasInert }) => {
+      if (control.isConnected) {
+        control.inert = wasInert;
+      }
+    });
+    this.backgroundControlStates = [];
+  }
+
+  lockPageScroll() {
+    if (document.body.dataset.mobileMenuScrollLocked === "true") return;
+
+    document.body.dataset.mobileMenuScrollLocked = "true";
+    document.body.style.overflow = "hidden";
+  }
+
+  unlockPageScroll() {
+    if (document.body.dataset.mobileMenuScrollLocked !== "true") return;
+
+    delete document.body.dataset.mobileMenuScrollLocked;
+    document.body.style.overflow = "";
+  }
+
+  onMobileMenuClick(event) {
+    const toggle = event.target.closest("[data-submenu-toggle]");
+
+    if (toggle && this.panel.contains(toggle)) {
+      const submenu = document.getElementById(toggle.getAttribute("aria-controls"));
+      const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+
+      if (!submenu) return;
+
+      toggle.setAttribute("aria-expanded", String(!isExpanded));
+      submenu.hidden = isExpanded;
+
+      if (isExpanded) {
+        this.setMenuLayerInteractive(toggle, true);
+      } else {
+        this.setMenuLayerInteractive(toggle, false);
+
+        if (event.detail === 0) {
+          window.setTimeout(() => {
+            if (!submenu.hidden) {
+              submenu.querySelector("a, button")?.focus();
+            }
+          }, MobileMenuDialog.submenuOpenDurationMs);
+        } else {
+          toggle.blur();
+        }
+      }
+
+      return;
+    }
+
+    const backButton = event.target.closest("[data-submenu-back]");
+
+    if (backButton && this.panel.contains(backButton)) {
+      this.closeSubmenu(backButton.closest(".mobile-menu-submenu"));
+    }
+  }
+
+  onMobileMenuKeydown(event) {
+    if (event.key !== "Escape") return;
+
+    const submenu = event.target.closest(".mobile-menu-submenu");
+
+    if (!submenu) {
+      event.preventDefault();
+      this.closeMenu(true);
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.closeSubmenu(submenu);
+  }
+
+  onDesktopQueryChange(event) {
+    if (event.matches) {
+      this.closeMenu(false, true);
+    }
+  }
+
+  closeSubmenu(submenu) {
+    if (!submenu) return;
+
+    const toggle = submenu.previousElementSibling;
+
+    if (!toggle?.matches("[data-submenu-toggle]")) return;
+
+    this.setMenuLayerInteractive(toggle, true);
+    toggle.setAttribute("aria-expanded", "false");
+    submenu.hidden = true;
+    toggle.focus();
+  }
+
+  setMenuLayerInteractive(toggle, isInteractive) {
+    const item = toggle.closest("li");
+    const list = item?.parentElement;
+
+    if (!item || !list) return;
+
+    Array.from(list.children).forEach((listItem) => {
+      if (listItem !== item) {
+        listItem.inert = !isInteractive;
+      }
+    });
+
+    if (list.matches(".mobile-menu-list")) {
+      const secondaryList = this.panel.querySelector(".mobile-menu-secondary-list");
+
+      if (secondaryList) {
+        secondaryList.inert = !isInteractive;
+      }
+    }
+
+    if (isInteractive) {
+      toggle.removeAttribute("aria-hidden");
+      toggle.removeAttribute("tabindex");
+    } else {
+      toggle.setAttribute("aria-hidden", "true");
+      toggle.setAttribute("tabindex", "-1");
+    }
+  }
+
+  resetSubmenus() {
+    this.panel.querySelectorAll("[data-submenu-toggle]").forEach((toggle) => {
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.removeAttribute("aria-hidden");
+      toggle.removeAttribute("tabindex");
+    });
+    this.panel.querySelectorAll(".mobile-menu-submenu").forEach((submenu) => {
+      submenu.hidden = true;
+    });
+    this.panel.querySelectorAll("[inert]").forEach((element) => {
+      element.inert = false;
+    });
+  }
+}
+
+if (!customElements.get("mobile-menu-dialog")) {
+  customElements.define("mobile-menu-dialog", MobileMenuDialog);
+}
+
+class LocalizationCountryFilter extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.input = this.querySelector("[data-localization-country-filter-input]");
+    this.items = Array.from(this.querySelectorAll("[data-localization-country-item]"));
+    this.emptyMessage = this.querySelector(".localization-filter-empty");
+    this.status = this.querySelector("[data-localization-country-filter-status]");
+
+    if (!this.input) return;
+
+    this.listenerController = new AbortController();
+    this.input.addEventListener("input", this.onInput.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.updateStatus(this.items.length);
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    this.isInitialized = false;
+  }
+
+  onInput() {
+    const query = this.input.value.trim().toLowerCase();
+    let visibleCount = 0;
+
+    this.items.forEach((item) => {
+      const itemText = item.dataset.filterText?.toLowerCase() || "";
+      const isVisible = !query || itemText.includes(query);
+
+      item.hidden = !isVisible;
+
+      if (isVisible) {
+        visibleCount += 1;
+      }
+    });
+
+    if (this.emptyMessage) {
+      this.emptyMessage.hidden = visibleCount > 0;
+    }
+
+    this.updateStatus(visibleCount);
+  }
+
+  updateStatus(visibleCount) {
+    if (!this.status) return;
+
+    if (visibleCount === 0) {
+      this.status.textContent = this.status.dataset.textNoResults;
+      return;
+    }
+
+    const statusText = visibleCount === 1 ? this.status.dataset.textResultsOne : this.status.dataset.textResultsOther;
+
+    this.status.textContent = statusText?.replace("[count]", visibleCount) || "";
+  }
+}
+
+if (!customElements.get("localization-country-filter")) {
+  customElements.define("localization-country-filter", LocalizationCountryFilter);
+}
+
+/*
+  Share
+*/
+class ShareComponent extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.shareButton = this.querySelector("[data-share-button]");
+    this.copyButton = this.querySelector("[data-share-copy]");
+    this.urlInput = this.querySelector("[data-share-url-input]");
+    this.dialog = this.querySelector("theme-dialog");
+
+    if (!this.shareButton) return;
+
+    this.listenerController = new AbortController();
+    this.addEventListener("click", this.onShareClick.bind(this), {
+      capture: true,
+      signal: this.listenerController.signal,
+    });
+    this.copyButton?.addEventListener("click", this.onCopyClick.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    window.clearTimeout(this.copyResetTimer);
+    this.isInitialized = false;
+  }
+
+  async onShareClick(event) {
+    const shareButton = event.target.closest("[data-share-button]");
+
+    if (!shareButton || !this.contains(shareButton) || !navigator.share) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    try {
+      await navigator.share({
+        title: shareButton.dataset.shareTitle,
+        url: shareButton.dataset.shareUrl,
+      });
+    } catch (error) {
+      if (error.name === "AbortError") return;
+
+      this.dialog.lastTrigger = shareButton;
+      this.dialog.openedByPointer = event.detail !== 0;
+      this.dialog.openDialog();
+    }
+  }
+
+  async onCopyClick() {
+    if (!this.urlInput || !this.copyButton) return;
+
+    let copied;
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(this.urlInput.value);
+        copied = true;
+      } catch {
+        copied = this.copyWithLegacyCommand();
+      }
+    } else {
+      copied = this.copyWithLegacyCommand();
+    }
+
+    if (!copied) return;
+
+    this.copyButton.textContent = this.copyButton.dataset.textCopied;
+    window.clearTimeout(this.copyResetTimer);
+    this.copyResetTimer = window.setTimeout(() => {
+      this.copyButton.textContent = this.copyButton.dataset.textCopy;
+    }, 2000);
+  }
+
+  copyWithLegacyCommand() {
+    try {
+      this.urlInput.select();
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    }
+  }
+}
+
+if (!customElements.get("share-component")) {
+  customElements.define("share-component", ShareComponent);
+}
+
+
+/*
+  Toast
+*/
+class ThemeToast extends HTMLElement {
+  connectedCallback() {
+    if (this.isInitialized) return;
+
+    this.alert = this.querySelector(".theme-toast-alert");
+    this.message = this.querySelector("[data-theme-toast-message]");
+    this.closeButton = this.querySelector("[data-theme-toast-close]");
+    this.statusRegion = this.querySelector("[data-theme-toast-status-region]");
+    this.alertRegion = this.querySelector("[data-theme-toast-alert-region]");
+
+    if (!this.alert || !this.message || !this.statusRegion || !this.alertRegion) return;
+
+    this.listenerController = new AbortController();
+    this.closeButton?.addEventListener("click", this.hide.bind(this), {
+      signal: this.listenerController.signal,
+    });
+    this.isInitialized = true;
+  }
+
+  disconnectedCallback() {
+    this.listenerController?.abort();
+    window.clearTimeout(this.hideTimer);
+    cancelAnimationFrame(this.showFrame);
+    cancelAnimationFrame(this.announcementFrame);
+    this.isInitialized = false;
+  }
+
+  show(message, type = "success") {
+    if (!message || !this.alert || !this.message) return;
+
+    window.clearTimeout(this.hideTimer);
+    cancelAnimationFrame(this.showFrame);
+
+    this.alert.classList.remove("alert-error", "alert-warning", "alert-success");
+    this.alert.classList.add(`alert-${type}`);
+    this.message.textContent = "";
+    this.alert.hidden = false;
+    this.announce(message, type === "error" ? "alert" : "status");
+
+    this.showFrame = requestAnimationFrame(() => {
+      this.message.textContent = message;
+      this.hideTimer = window.setTimeout(() => this.hide(), 6000);
+    });
+  }
+
+  announce(message, type = "status") {
+    if (!message || !this.statusRegion || !this.alertRegion) return;
+
+    const region = type === "alert" ? this.alertRegion : this.statusRegion;
+
+    cancelAnimationFrame(this.announcementFrame);
+    this.statusRegion.textContent = "";
+    this.alertRegion.textContent = "";
+    this.announcementFrame = requestAnimationFrame(() => {
+      region.textContent = message;
+    });
+  }
+
+  hide() {
+    window.clearTimeout(this.hideTimer);
+    cancelAnimationFrame(this.showFrame);
+    this.alert.hidden = true;
+    this.message.textContent = "";
+  }
+}
+
+if (!customElements.get("theme-toast")) {
+  customElements.define("theme-toast", ThemeToast);
+}

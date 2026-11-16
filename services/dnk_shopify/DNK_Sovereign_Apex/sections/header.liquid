@@ -1,0 +1,345 @@
+{% liquid
+  assign mobile_logo = section.settings.mobile_logo | default: section.settings.desktop_logo
+  assign mobile_logo_image_height = section.settings.mobile_logo_height | times: 2
+  assign desktop_logo_image_height = section.settings.desktop_logo_height | times: 2
+%}
+
+<div
+  class="header header-decoration-{{ section.settings.bottom_decoration }} section-spacing"
+  data-header-behavior="{{ section.settings.header_behavior }}"
+  data-megamenu-image-ratio="{{ section.settings.megamenu_image_ratio }}"
+  style="
+    --background-color: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --text-color: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --accent-color: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+    --mobile-logo-height: {{ section.settings.mobile_logo_height | append: 'px' }};
+    --desktop-logo-height: {{ section.settings.desktop_logo_height | append: 'px' }};
+    --pt: {{ section.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ section.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+>
+  <div class="container {{ settings.container_width }}">
+  <div class="header-inner header-inner-mobile">
+    <div class="header-icons header-icons-left">
+      <button
+        class="icon-button header-icon-link header-menu-button"
+        type="button"
+        data-toggle="mobile-menu-dialog"
+        aria-controls="mobile-menu-dialog"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+        aria-label="{{ 'accessibility.menu' | t }}"
+      >
+        {% render 'svg-icons', icon: 'menu' %}
+      </button>
+
+      <a
+        class="icon-button header-icon-link"
+        href="{{ routes.search_url }}"
+        data-toggle="search-dialog"
+        aria-controls="search-dialog"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+        aria-label="{{ 'accessibility.search' | t }}"
+      >
+        {% render 'svg-icons', icon: 'search' %}
+      </a>
+    </div>
+
+    <a
+      class="header-logo"
+      href="{{ routes.root_url }}"
+      aria-label="{{ shop.name | escape }}"
+    >
+      {% if mobile_logo != blank %}
+        {{ mobile_logo
+          | image_url: height: mobile_logo_image_height
+          | image_tag:
+            class: 'header-logo-image',
+            loading: 'eager',
+            fetchpriority: 'high',
+            alt: shop.name
+        }}
+      {% else %}
+        <span class="header-logo-text">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    <div class="header-icons header-icons-right">
+      <a
+        class="icon-button header-icon-link"
+        href="{{ routes.account_url }}"
+        aria-label="{{ 'accessibility.account' | t }}"
+      >
+        {% render 'svg-icons', icon: 'account' %}
+      </a>
+
+      <a
+        class="icon-button header-icon-link header-cart-link"
+        href="{{ routes.cart_url }}"
+        {% if settings.cart_type == 'drawer' and request.page_type != 'cart' %}
+          data-toggle="cart-dialog"
+          aria-controls="cart-dialog"
+          aria-expanded="false"
+          aria-haspopup="dialog"
+        {% endif %}
+        aria-label="{{ 'accessibility.cart' | t }}"
+      >
+        {% render 'svg-icons', icon: 'bag' %}
+        <cart-badge class="cart-count-badge" data-item-count="{{ cart.item_count }}">
+          {{ cart.item_count }}
+        </cart-badge>
+      </a>
+    </div>
+  </div>
+
+  <div class="header-inner header-inner-desktop">
+    <a class="header-logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+      {% if section.settings.desktop_logo != blank %}
+        {{ section.settings.desktop_logo
+          | image_url: height: desktop_logo_image_height
+          | image_tag:
+            class: 'header-logo-image',
+            loading: 'eager',
+            fetchpriority: 'high',
+            alt: shop.name
+        }}
+      {% else %}
+        <span class="header-logo-text">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    {% if section.settings.desktop_menu.links.size > 0 %}
+      <div class="header-nav" data-desktop-menu>
+        {% render 'header-desktop-menu', menu: section.settings.desktop_menu %}
+      </div>
+    {% endif %}
+
+    <div class="header-icons">
+      {% if localization.available_languages.size > 1 %}
+        <button
+          class="icon-button header-icon-link"
+          type="button"
+          data-toggle="languages-dialog"
+          aria-controls="languages-dialog"
+          aria-haspopup="dialog"
+          aria-label="{{ 'general.localization.language' | t }}: {{ localization.language.endonym_name | capitalize | escape }}"
+        >
+          {% render 'svg-icons', icon: 'translate' %}
+        </button>
+      {% endif %}
+
+      {% if localization.available_countries.size > 1 %}
+        <button
+          class="icon-button header-icon-link"
+          type="button"
+          data-toggle="countries-dialog"
+          aria-controls="countries-dialog"
+          aria-haspopup="dialog"
+          aria-label="{{ 'general.localization.country' | t }}: {{ localization.country.name | escape }}"
+        >
+          <span class="localization-country-code" aria-hidden="true">
+            {{ localization.country.iso_code }}
+          </span>
+        </button>
+      {% endif %}
+
+      <a
+        class="icon-button header-icon-link"
+        href="{{ routes.search_url }}"
+        data-toggle="search-dialog"
+        aria-controls="search-dialog"
+        aria-expanded="false"
+        aria-haspopup="dialog"
+        aria-label="{{ 'accessibility.search' | t }}"
+      >
+        {% render 'svg-icons', icon: 'search' %}
+      </a>
+
+      <a
+        class="icon-button header-icon-link"
+        href="{{ routes.account_url }}"
+        aria-label="{{ 'accessibility.account' | t }}"
+      >
+        {% render 'svg-icons', icon: 'account' %}
+      </a>
+
+      <a
+        class="icon-button header-icon-link header-cart-link"
+        href="{{ routes.cart_url }}"
+        {% if settings.cart_type == 'drawer' and request.page_type != 'cart' %}
+          data-toggle="cart-dialog"
+          aria-controls="cart-dialog"
+          aria-expanded="false"
+          aria-haspopup="dialog"
+        {% endif %}
+        aria-label="{{ 'accessibility.cart' | t }}"
+      >
+        {% render 'svg-icons', icon: 'bag' %}
+        <cart-badge class="cart-count-badge" data-item-count="{{ cart.item_count }}">
+          {{ cart.item_count }}
+        </cart-badge>
+      </a>
+    </div>
+  </div>
+  </div>
+
+  {% render 'mobile-menu-dialog',
+    menu: section.settings.mobile_menu,
+    section_id: section.id
+  %}
+</div>
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "mobile_logo_height",
+      "label": "Logo height",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "link_list",
+      "id": "mobile_menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "desktop_logo_height",
+      "label": "Logo height",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "link_list",
+      "id": "desktop_menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "megamenu_image_ratio",
+      "label": "Mega menu image aspect ratio",
+      "options": [
+        { "group": "Adapt", "value": "adapt", "label": "Adapt to image" },
+        { "group": "Square", "value": "square", "label": "Square" },
+        { "group": "Horizontal", "value": "landscape", "label": "Landscape" },
+        { "group": "Vertical", "value": "portrait", "label": "Portrait" }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "select",
+      "id": "header_behavior",
+      "label": "Header behavior",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "sticky", "label": "Sticky" },
+        { "value": "reveal", "label": "Reveal" }
+      ],
+      "default": "sticky"
+    },
+    {
+      "type": "select",
+      "id": "bottom_decoration",
+      "label": "Bottom decoration",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "border-bottom", "label": "Border bottom" },
+        { "value": "box-shadow", "label": "Box shadow" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "presets": [
+    {
+      "name": "Header",
+      "category": "Header"
+    }
+  ]
+}
+{% endschema %}

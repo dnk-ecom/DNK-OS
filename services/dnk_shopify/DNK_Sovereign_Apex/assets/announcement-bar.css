@@ -1,0 +1,36 @@
+/*
+  Announcement bar stylesheet
+
+  This file contains the layout and presentation styles for the announcement bar section.
+*/
+
+
+.announcement-bar {
+  color: rgb(var(--text-color));
+  font-size: var(--fs-mobile);
+  text-align: center;
+  background-color: rgb(var(--background-color));
+}
+
+.announcement-bar-text {
+  margin: 0;
+}
+
+.announcement-bar-link {
+  display: block;
+  color: rgb(var(--text-color));
+}
+
+.announcement-bar-link:hover {
+  color: rgb(var(--text-color) / 0.8);
+}
+
+.announcement-bar-link:active {
+  color: rgb(var(--text-color) / 0.6);
+}
+
+@media (min-width: 600px) {
+  .announcement-bar {
+    font-size: var(--fs-desktop);
+  }
+}

@@ -1,0 +1,81 @@
+{%- comment -%}
+  Quantity breaks V2: the "Discount setup" panel under the widget, in the theme editor only.
+  blocks/product_quantity-breaks-v2.liquid renders it inside <quantity-breaks-v2> while request.design_mode is true, so
+  nothing of it reaches the storefront. The panel starts collapsed; assets/component-quantity-breaks-v2-editor.js
+  fills it with the discounts to create in Shopify admin, warnings about the setup and the result of a test-cart
+  discount check, and opens it when something is wrong. The options and child blocks print their own setup JSON;
+  this snippet adds the shop and product facts the script needs.
+
+  Accepts:
+  - product {Object} the widget's product
+  - block_id {String} id of the Quantity breaks V2 block
+  - option_count {Number} options rendered (at most 8)
+  - dormant_count {Number} options 5-8, which need the Shrine update
+  - dropped_count {Number} options after the 8th, which are not rendered
+  - hidden_reason {String} why storefront visitors get the plain quantity field instead: '' | b2b | country | tag | price_breaks | rules
+  - has_schedule {Boolean} a Schedule block is inside the widget
+  - schedule_count {Number} number of Schedule blocks
+
+  Usage:
+  {% render 'qb-v2-setup', product: qb_product, block_id: block.id, option_count: qb_count, dormant_count: qb_dormant_count, dropped_count: qb_dropped_count, hidden_reason: qb_hidden_reason, has_schedule: qb_has_schedule, schedule_count: qb_schedule_count %}
+{%- endcomment -%}
+{%- if request.design_mode and product != blank -%}
+  {%- liquid
+    assign qb_setup_variant = product.selected_or_first_available_variant
+    assign qb_setup_variants_count = product.variants_count | default: product.variants.size
+    assign qb_setup_plans = 0
+  -%}
+  {{ 'component-quantity-breaks-v2-editor.css' | asset_url | stylesheet_tag }}
+  <details class="qb-v2-setup" data-qbv2-setup-root>
+    <summary class="qb-v2-setup__summary"><span>Discount setup — only you see this</span> <span class="qb-v2-setup__status" data-qbv2-status></span></summary>
+    <div class="qb-v2-setup__body" data-qbv2-setup-body><p>Loading the discount setup…</p></div>
+  </details>
+  {%- comment -%}Selling plans in the order Quantity option > Selling plan position counts them (groups, then plans), positions 1-10{%- endcomment -%}
+  <script type="application/json" data-qbv2-setup="shop">
+    {
+      "domain": {{ shop.permanent_domain | json }},
+      "shop_url": {{ shop.secure_url | json }},
+      "shop_currency": {{ shop.currency | json }},
+      "presentment_currency": {{ cart.currency.iso_code | json }},
+      "enabled_currencies_count": {{ shop.enabled_currencies.size | plus: 0 }},
+      "country": {{ localization.country.iso_code | json }},
+      "market": {{ localization.market.handle | json }},
+      "api_version": "2026-10",
+      "section_id": {{ section.id | json }},
+      "block_id": {{ block_id | json }},
+      "option_count": {{ option_count | plus: 0 }},
+      "dormant_count": {{ dormant_count | plus: 0 }},
+      "dropped_count": {{ dropped_count | plus: 0 }},
+      "hidden_reason": {{ hidden_reason | default: '' | json }},
+      "has_schedule": {% if has_schedule %}true{% else %}false{% endif %},
+      "schedule_count": {{ schedule_count | plus: 0 }},
+      "product": {
+        "id": {{ product.id | json }},
+        "handle": {{ product.handle | json }},
+        "title": {{ product.title | json }},
+        "url": {{ product.url | json }},
+        "admin_url": {{ 'https://' | append: shop.permanent_domain | append: '/admin/products/' | append: product.id | json }},
+        "has_selling_plans": {% if product.selling_plan_groups.size > 0 %}true{% else %}false{% endif %},
+        "selling_plans": [
+          {%- for qb_setup_group in product.selling_plan_groups -%}
+            {%- for qb_setup_plan in qb_setup_group.selling_plans -%}
+              {%- if qb_setup_plans < 10 -%}
+                {%- assign qb_setup_plans = qb_setup_plans | plus: 1 -%}
+                {%- if qb_setup_plans > 1 -%},{%- endif -%}
+                {"position": {{ qb_setup_plans }}, "id": {{ qb_setup_plan.id | json }}, "name": {{ qb_setup_plan.name | json }}, "group": {{ qb_setup_group.name | json }}}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        ],
+        "requires_selling_plan": {% if product.requires_selling_plan %}true{% else %}false{% endif %},
+        "variants_count": {{ qb_setup_variants_count | plus: 0 }},
+        "variant_id": {{ qb_setup_variant.id | json }},
+        "price": {{ qb_setup_variant.price | plus: 0 }},
+        "compare_at_price": {{ qb_setup_variant.compare_at_price | json }},
+        "variant_prices_differ": {% if product.price_varies %}true{% else %}false{% endif %},
+        "collections": {{ product.collections | map: 'handle' | json }}
+      }
+    }
+  </script>
+  <script src="{{ 'component-quantity-breaks-v2-editor.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}

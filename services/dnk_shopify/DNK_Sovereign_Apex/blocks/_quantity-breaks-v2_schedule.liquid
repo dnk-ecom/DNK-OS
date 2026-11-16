@@ -1,0 +1,148 @@
+{%- comment -%}
+  Schedule, a child of Quantity breaks V2: the widget shows only between two dates. Pages are cached, so the check
+  runs in the browser. The wrapper moves this block's chunk (between the qbv2:schedule markers) behind
+  </quantity-breaks> and the fallback quantity field, so the inline script runs when both are parsed and before the
+  deferred main.js: with the window closed it unchecks and disables the option radios and shows the plain quantity
+  field. component-quantity-breaks-v2-extras.js switches live at the next start or end, with the same date rules.
+  Only the first Schedule counts. Not printed in the editor, where the widget always shows.
+{%- endcomment -%}
+<!--qbv2:schedule-->
+<span
+  class="qb-v2-schedule"
+  data-qb-child="schedule"
+  data-qb-block="{{ block.id }}"
+  data-qb-start="{{ block.settings.start | strip | escape }}"
+  data-qb-end="{{ block.settings.end | strip | escape }}"
+  data-qb-timezone="{{ block.settings.timezone }}"
+  data-qb-utc-offset="{{ block.settings.utc_offset }}"
+  hidden
+  {{ block.shopify_attributes }}
+></span>
+{%- unless request.design_mode -%}
+  <script>
+    (function (el) {
+      if (!el) return;
+      var w = el.closest('quantity-breaks-v2');
+      if (!w || w.hasAttribute('data-qb-schedule')) return;
+      function parse(str) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::\d{2})?/.exec(str || '');
+        if (!m) return null;
+        if (el.getAttribute('data-qb-timezone') === 'fixed') {
+          var off = parseFloat(el.getAttribute('data-qb-utc-offset')) || 0;
+          return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5] - Math.round(off * 60));
+        }
+        return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime();
+      }
+      var now = Date.now(), start = parse(el.getAttribute('data-qb-start')), end = parse(el.getAttribute('data-qb-end'));
+      var on = (start === null || now >= start) && (end === null || now < end);
+      w.setAttribute('data-qb-schedule', on ? 'on' : 'off');
+      if (on) return;
+      w.querySelectorAll('.qb-v2__qb input[name="quantity"]').forEach(function (r) {
+        if (r.hasAttribute('checked')) { r.setAttribute('data-qb-was-checked', ''); r.removeAttribute('checked'); }
+        r.disabled = true; r.setAttribute('data-qb-schedule-disabled', '');
+      });
+      var f = w.querySelector(':scope > .qb-v2-fallback-qty');
+      if (f) { f.hidden = false; var i = f.querySelector('input[name="quantity"]'); if (i) i.disabled = false; }
+    })(document.currentScript && document.currentScript.previousElementSibling);
+  </script>
+{%- endunless -%}
+{%- if request.design_mode -%}
+  {%- liquid
+    # The editor flags dates the script can't read: YYYY-MM-DDTHH:MM, seconds optional
+    assign qb_start = block.settings.start | strip
+    assign qb_end = block.settings.end | strip
+    assign qb_start_valid = true
+    if qb_start != blank
+      assign qb_start_valid = false
+      assign qb_size = qb_start | size
+      assign qb_c4 = qb_start | slice: 4, 1
+      assign qb_c10 = qb_start | slice: 10, 1
+      assign qb_c13 = qb_start | slice: 13, 1
+      assign qb_c16 = qb_start | slice: 16, 1
+      if qb_c4 == '-' and qb_c10 == 'T' and qb_c13 == ':'
+        if qb_size == 16
+          assign qb_start_valid = true
+        elsif qb_size == 19 and qb_c16 == ':'
+          assign qb_start_valid = true
+        endif
+      endif
+    endif
+    assign qb_end_valid = true
+    if qb_end != blank
+      assign qb_end_valid = false
+      assign qb_size = qb_end | size
+      assign qb_c4 = qb_end | slice: 4, 1
+      assign qb_c10 = qb_end | slice: 10, 1
+      assign qb_c13 = qb_end | slice: 13, 1
+      assign qb_c16 = qb_end | slice: 16, 1
+      if qb_c4 == '-' and qb_c10 == 'T' and qb_c13 == ':'
+        if qb_size == 16
+          assign qb_end_valid = true
+        elsif qb_size == 19 and qb_c16 == ':'
+          assign qb_end_valid = true
+        endif
+      endif
+    endif
+  -%}
+  <script type="application/json" data-qbv2-setup="child">
+    {"type":"schedule","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"start":{{ qb_start | json }},"end":{{ qb_end | json }},"timezone":{{ block.settings.timezone | json }},"utc_offset":{{ block.settings.utc_offset | json }},"start_valid":{{ qb_start_valid }},"end_valid":{{ qb_end_valid }}},"products":[]}
+  </script>
+{%- endif -%}
+<!--/qbv2:schedule-->
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its markers{%- endcomment -%}
+{% schema %}
+{
+  "name": "Schedule",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The widget shows only between these dates. Outside them, customers get a plain quantity field."
+    },
+    {
+      "type": "text",
+      "id": "start",
+      "label": "Start date and time",
+      "info": "Format YYYY-MM-DDTHH:MM, such as 2026-11-27T00:00. Seconds are optional, as in the Countdown timer. Leave empty to start now."
+    },
+    {
+      "type": "text",
+      "id": "end",
+      "label": "End date and time",
+      "info": "Same format. Leave empty for no end."
+    },
+    {
+      "type": "select",
+      "id": "timezone",
+      "label": "Timezone",
+      "options": [
+        {
+          "value": "visitor",
+          "label": "Visitor's local time"
+        },
+        {
+          "value": "fixed",
+          "label": "Fixed UTC offset"
+        }
+      ],
+      "default": "visitor"
+    },
+    {
+      "type": "range",
+      "id": "utc_offset",
+      "label": "UTC offset",
+      "min": -11,
+      "max": 14,
+      "step": 0.5,
+      "default": 0,
+      "info": "Hours from UTC. Example: 5.5 for India.",
+      "visible_if": "{{ block.settings.timezone == 'fixed' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Schedule"
+    }
+  ]
+}
+{% endschema %}

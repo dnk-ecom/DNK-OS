@@ -1,0 +1,410 @@
+{%- comment -%}
+  Product choice, a child of a Quantity option: one slot the customer fills with a product from a list or a
+  collection (mix & match). "First product" starts on the first available candidate and adds it like a bundle item;
+  "Customer chooses" starts empty and keeps Add to cart disabled until a product is picked; until then the option
+  shows "From" its total with the cheapest product (data-qb-from-total, read by the option). The candidates are
+  rendered into a <template> (snippets/qb-v2-candidates.liquid) that component-quantity-breaks-v2-extras.js opens
+  in a popup; component-quantity-breaks-v2.js fills the slot and adds the line.
+{%- endcomment -%}
+{%- liquid
+  assign qb_main = closest.product
+
+  assign qb_currency_ok = true
+  if cart.currency.iso_code != shop.currency
+    assign qb_currency_ok = false
+  endif
+
+  # Discount values as the widget reads them: percentage as an integer, amounts in shop-currency cents
+  assign qb_amount_cents = block.settings.discount_amount | times: 100 | round | at_least: 0
+  assign qb_discount_value = 0
+  if block.settings.discount_type == 'percentage'
+    assign qb_discount_value = block.settings.discount_percentage
+  elsif block.settings.discount_type == 'amount_each'
+    assign qb_discount_value = qb_amount_cents
+  endif
+  assign qb_k = block.settings.quantity | plus: 0 | at_least: 1
+
+  # Candidates: the chosen products, else the collection's first products
+  assign qb_source = 'products'
+  assign qb_list = block.settings.products
+  assign qb_limit = 12
+  if block.settings.products == blank
+    assign qb_source = 'collection'
+    assign qb_list = block.settings.collection.products
+    assign qb_limit = block.settings.limit | plus: 0 | at_least: 1
+  endif
+
+  # Labels: each falls back on the other, so the button never ends up without a name
+  assign qb_choose_label = block.settings.empty_label | strip
+  assign qb_change_label = block.settings.button_label | strip
+  if qb_choose_label == blank
+    assign qb_choose_label = qb_change_label
+  endif
+  if qb_change_label == blank
+    assign qb_change_label = qb_choose_label
+  endif
+  assign qb_heading = block.settings.title | strip_html | strip
+  if qb_heading == blank
+    assign qb_heading = block.settings.button_label
+  endif
+  # "Customer chooses" prices its "From" total from the cheapest card
+  assign qb_with_lows = false
+  if block.settings.default_choice == 'customer'
+    assign qb_with_lows = true
+  endif
+-%}
+{%- comment -%}
+  Candidates: the chosen products, else the collection's first ones, without subscription-only products. The
+  template may hold fewer (products with many variants, see snippets/qb-v2-candidates.liquid), so the counts and
+  the first product come from what it printed.
+{%- endcomment -%}
+{%- capture qb_template -%}
+  {%- if qb_source == 'products' or block.settings.collection != blank -%}
+    {%- render 'qb-v2-candidates',
+      products: qb_list,
+      limit: qb_limit,
+      kind: 'choice',
+      block: block,
+      heading: qb_heading,
+      choose_label: qb_choose_label,
+      quantity: qb_k,
+      discount_type: block.settings.discount_type,
+      discount_value: qb_discount_value,
+      show_price: block.settings.show_price,
+      show_picker: block.settings.show_variant_picker,
+      low_prices: qb_with_lows
+    -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- liquid
+  assign qb_candidates = 0
+  assign qb_available = 0
+  assign qb_taken = 0
+  assign qb_first = nil
+  if qb_template contains 'data-qb-count="'
+    assign qb_candidates = qb_template | split: 'data-qb-count="' | last | split: '"' | first | plus: 0
+    assign qb_available = qb_template | split: 'data-qb-available="' | last | split: '"' | first | plus: 0
+    assign qb_taken = qb_template | split: 'data-qb-taken="' | last | split: '"' | first | plus: 0
+  endif
+  if qb_available > 0 and qb_taken > 0
+    for qb_p in qb_list limit: qb_taken
+      unless qb_p.requires_selling_plan
+        if qb_p.available
+          assign qb_first = qb_p
+          break
+        endif
+      endunless
+    endfor
+  endif
+
+  # "First product" adds the first available candidate from the first paint, like a bundle item. "Customer chooses"
+  # starts empty: the option shows "From" its total with the cheapest product a customer can pick (contract 5.4)
+  assign qb_prefilled = false
+  if block.settings.default_choice == 'first' and qb_first != nil
+    assign qb_prefilled = true
+  endif
+  assign qb_from = false
+  assign qb_x = nil
+  if qb_prefilled
+    assign qb_v = qb_first.selected_or_first_available_variant
+    assign qb_x = qb_v.price
+  elsif block.settings.default_choice == 'customer' and qb_available > 0
+    assign qb_low_prices = qb_template | split: 'data-qb-low-prices="' | last | split: '"' | first | split: ','
+    for qb_low_price in qb_low_prices
+      assign qb_low = qb_low_price | plus: 0
+      if qb_x == nil or qb_low < qb_x
+        assign qb_x = qb_low
+      endif
+    endfor
+    if qb_x != nil
+      assign qb_from = true
+    endif
+  endif
+  if qb_x != nil
+    assign qb_kx = qb_x | times: qb_k
+    assign qb_disc = 0
+    case block.settings.discount_type
+      when 'percentage'
+        assign qb_disc = qb_kx | times: qb_discount_value | divided_by: 100.0 | round
+      when 'amount_each'
+        if qb_currency_ok
+          assign qb_disc = qb_discount_value | at_most: qb_x | times: qb_k
+        endif
+      when 'free'
+        assign qb_disc = qb_kx
+    endcase
+    assign qb_line_total = qb_kx | minus: qb_disc | at_least: 0
+  endif
+  if qb_prefilled
+    assign qb_unit_cat = qb_x
+    if qb_v.compare_at_price > qb_x
+      assign qb_unit_cat = qb_v.compare_at_price
+    endif
+    assign qb_line_cat = qb_unit_cat | times: qb_k
+  endif
+  assign qb_pending = false
+  if qb_x != nil and block.settings.discount_type == 'amount_each' and qb_currency_ok == false
+    assign qb_pending = true
+  endif
+
+  assign qb_slot_prefix = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-slot'
+-%}
+<div
+  class="qb-v2-choice{% unless qb_prefilled %} qb-v2-choice--empty{% endunless %}"
+  data-qb-child="choice"
+  data-qb-ext="true"
+  data-qb-block="{{ block.id }}"
+  data-qb-default-choice="{{ block.settings.default_choice }}"
+  data-qb-quantity="{{ qb_k }}"
+  data-qb-discount-type="{{ block.settings.discount_type }}"
+  data-qb-discount-value="{{ qb_discount_value }}"
+  data-qb-required-message="{{ block.settings.required_message | escape }}"
+  data-qb-empty-label="{{ qb_choose_label | escape }}"
+  data-qb-change-label="{{ qb_change_label | escape }}"
+  data-qb-show-price="{{ block.settings.show_price }}"
+  data-qb-show-picker="{{ block.settings.show_variant_picker }}"
+  {%- if block.settings.default_choice == 'customer' %} data-qb-must-choose="true"{% endif %}
+  {%- if qb_candidates == 0 %} data-qb-require-missing="true"{% elsif qb_available == 0 %} data-qb-blocks-option="true"{% endif %}
+  {%- if qb_prefilled %} data-qb-sum-total="{{ qb_line_total }}" data-qb-sum-cat="{{ qb_line_cat }}" data-qb-sum-creg="{{ qb_kx }}"{% endif %}
+  {%- if qb_from %} data-qb-from-total="{{ qb_line_total }}"{% endif %}
+  {%- if qb_pending %} data-qb-pending="true"{% endif %}
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.title != blank -%}
+    <div class="qb-v2-choice__title" id="{{ qb_slot_prefix }}-heading">{{ block.settings.title }}</div>
+  {%- endif -%}
+  {%- if qb_candidates > 0 -%}
+    <div class="qb-v2-choice__slot" data-qb-choice-slot>
+      {%- if qb_prefilled -%}
+        {%- render 'qb-v2-extra-item',
+          product: qb_first,
+          variant: qb_v,
+          quantity: qb_k,
+          role: 'choice',
+          discount_type: block.settings.discount_type,
+          discount_value: qb_discount_value,
+          line_total: qb_line_total,
+          line_compare: qb_line_cat,
+          show_price: block.settings.show_price,
+          show_picker: block.settings.show_variant_picker,
+          id_prefix: qb_slot_prefix,
+          layout: 'row'
+        -%}
+      {%- else -%}
+        {%- comment -%}The empty title only keeps the id the chosen product's title takes over (the button already says the label){%- endcomment -%}
+        <div class="qb-v2-item qb-v2-item--row qb-v2-item--empty">
+          <span class="qb-v2-item__placeholder" aria-hidden="true">?</span>
+          <span class="qb-v2-item__title" id="{{ qb_slot_prefix }}-title"></span>
+        </div>
+      {%- endif -%}
+      <button
+        type="button"
+        class="qb-v2-choice__button button button--secondary"
+        data-qb-action="choice"
+        aria-haspopup="dialog"
+        aria-describedby="{% if block.settings.title != blank %}{{ qb_slot_prefix }}-heading {% endif %}{{ qb_slot_prefix }}-title"
+      >
+        {%- if qb_prefilled %}{{ qb_change_label | escape }}{% else %}{{ qb_choose_label | escape }}{% endif -%}
+      </button>
+    </div>
+    {{- qb_template -}}
+  {%- endif -%}
+  {%- if request.design_mode -%}
+    {%- comment -%}The chosen products for the editor's checks; a collection is named by its handle and title{%- endcomment -%}
+    {%- assign qb_products_json = '' -%}
+    {%- if qb_source == 'products' -%}
+      {%- for qb_p in block.settings.products -%}
+        {%- liquid
+          assign qb_pv = qb_p.selected_or_first_available_variant
+          assign qb_is_main = false
+          if qb_p.id == qb_main.id
+            assign qb_is_main = true
+          endif
+          assign qb_requires_plan = false
+          if qb_p.requires_selling_plan
+            assign qb_requires_plan = true
+          endif
+          assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+        -%}
+        {%- capture qb_entry -%}
+          {"id":{{ qb_p.id }},"handle":{{ qb_p.handle | json }},"title":{{ qb_p.title | json }},"available":{{ qb_p.available }},"requires_selling_plan":{{ qb_requires_plan }},"variants_count":{{ qb_variants_count | plus: 0 }},"price":{{ qb_pv.price | plus: 0 }},"compare_at_price":{{ qb_pv.compare_at_price | json }},"is_main":{{ qb_is_main }}}
+        {%- endcapture -%}
+        {%- liquid
+          if forloop.first
+            assign qb_products_json = qb_entry
+          else
+            assign qb_products_json = qb_products_json | append: ',' | append: qb_entry
+          endif
+        -%}
+      {%- endfor -%}
+    {%- endif -%}
+    {%- if qb_candidates == 0 -%}
+      <div class="qb-v2-placeholder">Choose products or a collection in Product choice.</div>
+    {%- elsif qb_available == 0 -%}
+      <div class="qb-v2-placeholder">Every product in Product choice is sold out, so customers can't choose this option.</div>
+    {%- endif -%}
+    {%- for qb_p in qb_list limit: qb_limit -%}
+      {%- if qb_p.requires_selling_plan and qb_source == 'products' -%}
+        <div class="qb-v2-placeholder">{{ qb_p.title | escape }} can only be sold with a subscription.</div>
+      {%- endif -%}
+    {%- endfor -%}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"choice","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"default_choice":{{ block.settings.default_choice | json }},"quantity":{{ qb_k }},"discount_type":{{ block.settings.discount_type | json }},"discount_percentage":{{ block.settings.discount_percentage | json }},"discount_amount_cents":{{ qb_amount_cents }},"source":{{ qb_source | json }},"collection_handle":{{ block.settings.collection.handle | default: '' | json }},"collection_title":{{ block.settings.collection.title | default: '' | json }},"candidate_count":{{ qb_candidates }}},"products":[{{ qb_products_json }}]}
+    </script>
+  {%- endif -%}
+</div>
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Product choice",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 12
+    },
+    {
+      "type": "paragraph",
+      "content": "Or"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Used when no products are chosen."
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products shown",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 12,
+      "info": "Used for collections. Products with many variants may show fewer."
+    },
+    {
+      "type": "select",
+      "id": "default_choice",
+      "label": "Default choice",
+      "options": [
+        {
+          "value": "first",
+          "label": "First product"
+        },
+        {
+          "value": "customer",
+          "label": "Customer chooses"
+        }
+      ],
+      "default": "first",
+      "info": "Customer chooses blocks Add to cart until a product is picked."
+    },
+    {
+      "type": "range",
+      "id": "quantity",
+      "label": "Quantity",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Title",
+      "info": "Shown above the item. Leave empty to hide it."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Change button label",
+      "default": "Change"
+    },
+    {
+      "type": "text",
+      "id": "empty_label",
+      "label": "Choose button label",
+      "default": "Choose"
+    },
+    {
+      "type": "text",
+      "id": "required_message",
+      "label": "Error message",
+      "default": "Choose an item first",
+      "visible_if": "{{ block.settings.default_choice == 'customer' }}"
+    },
+    {
+      "type": "header",
+      "content": "Discount"
+    },
+    {
+      "type": "select",
+      "id": "discount_type",
+      "label": "Discount type",
+      "options": [
+        {
+          "value": "none",
+          "label": "No discount"
+        },
+        {
+          "value": "percentage",
+          "label": "Percentage off"
+        },
+        {
+          "value": "amount_each",
+          "label": "Amount off each item"
+        },
+        {
+          "value": "free",
+          "label": "Free"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Percentage",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15,
+      "visible_if": "{{ block.settings.discount_type == 'percentage' }}"
+    },
+    {
+      "type": "number",
+      "id": "discount_amount",
+      "label": "Amount",
+      "default": 5,
+      "info": "In your shop's currency, without the currency symbol. Example: 4.99",
+      "visible_if": "{{ block.settings.discount_type == 'amount_each' }}"
+    },
+    {
+      "type": "header",
+      "content": "Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_picker",
+      "label": "Show variant picker",
+      "default": true,
+      "info": "Not shown for products with over 100 variants."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product choice"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,250 @@
+/*
+  Main product stylesheet
+
+  This file owns the primary product media and details layout, including its private product-detail blocks.
+*/
+
+
+/*
+  Product layout
+*/
+.main-product {
+  padding-top: 1rem;
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
+}
+
+.main-product-skip-link {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.main-product-skip-link:focus {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.main-product-layout {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.main-product-media {
+  min-width: 0;
+}
+
+.main-product-details {
+  min-width: 0;
+}
+
+@media (min-width: 1200px) {
+  .main-product {
+    padding-top: calc(var(--pt) * var(--spacing-scale));
+  }
+
+  .main-product-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .main-product-media {
+    position: sticky;
+    top: 1rem;
+    transition: top 300ms ease-out;
+  }
+
+  body:has(#header-group[data-header-behavior="sticky"]) .main-product-media {
+    top: calc(var(--header-group-height, 0px) + 1rem);
+  }
+
+  body:has(#header-group[data-header-behavior="reveal"]:not(.header-hidden)) .main-product-media {
+    top: calc(var(--header-group-height, 0px) + 1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-product-media {
+    transition: none;
+  }
+}
+
+
+/*
+  Product title
+*/
+.product-main-title {
+  margin: 0;
+}
+
+/*
+  Product price
+*/
+.product-main-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5em;
+  margin: 0;
+  line-height: normal;
+  font-weight: 500;
+}
+
+.product-main-price-sale {
+  color: rgb(var(--color-accent));
+}
+
+.product-main-price-compare {
+  color: rgb(var(--color-text) / 0.6);
+}
+
+.product-main-price-sale-badge {
+  align-self: center;
+  white-space: nowrap;
+  margin-left: 0.125em;
+  background-color: rgb(var(--color-accent) / 0.1);
+  color: rgb(var(--color-accent));
+  padding: 0.25em 0.5em;
+}
+
+.product-main-price-tax-information {
+  margin: 0.25em 0 0;
+  color: rgb(var(--color-text) / 0.7);
+}
+
+.product-main-price-installments {
+  margin-top: 0.5em;
+}
+
+.product-main-price-installments:not(:has(shopify-payment-terms)) {
+  display: none;
+}
+
+.product-main-price-payment-terms {
+  margin: 0;
+}
+
+
+/*
+  Product share
+*/
+.product-main-share {
+  display: flex;
+}
+
+.product-main-share[data-text-alignment="left"] {
+  justify-content: flex-start;
+}
+
+.product-main-share[data-text-alignment="center"] {
+  justify-content: center;
+}
+
+.product-main-share[data-text-alignment="right"] {
+  justify-content: flex-end;
+}
+
+
+/*
+  Product trust badges
+*/
+.product-main-trust-badges-list{
+  display: grid;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.product-main-trust-badges-list[data-layout="horizontal"] {
+  grid-template-columns: repeat(var(--trust-badge-columns), minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.product-main-trust-badges-list[data-layout="vertical"] {
+  gap: 0.75rem;
+}
+
+.product-main-trust-badges-list[data-layout="horizontal"] .product-main-trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.product-main-trust-badges-list[data-layout="vertical"] .product-main-trust-badge {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  text-align: left;
+}
+
+.product-main-trust-badge-image {
+  display: block;
+  width: var(--trust-badge-icon-size);
+  height: auto;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.product-main-trust-badge-text {
+  line-height: 1.2;
+}
+
+.product-main-trust-badge-text > :first-child {
+  margin-top: 0;
+}
+
+.product-main-trust-badge-text > :last-child {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1200px) {
+  .product-main-trust-badges-list[data-layout="horizontal"] {
+    max-width: 600px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+
+/*
+  Product buy buttons
+*/
+.product-main-buy-buttons {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.product-main-buy-buttons-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.product-main-buy-buttons-primary {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.product-main-buy-buttons .btn {
+  width: 100%;
+}
+
+.product-main-buy-buttons-primary .btn {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.product-main-buy-buttons .shopify-payment-button__button {
+  border-radius: var(--border-radius);
+}
+
+.product-main-buy-buttons .alert {
+  margin: 0;
+}

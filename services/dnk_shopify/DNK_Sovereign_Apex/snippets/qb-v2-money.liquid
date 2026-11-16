@@ -1,0 +1,21 @@
+{%- comment -%}
+  Quantity breaks V2: one money amount.
+  Amounts with trailing zeros print both forms ($50.00 and $50); the wrapper's
+  "Show zero decimals" setting picks one with CSS (class qb-v2--trim-zeros).
+
+  Accepts:
+  - cents: {Number} amount in the subunit of the customer's currency
+
+  Usage:
+  {% render 'qb-v2-money', cents: 1999 %}
+{%- endcomment -%}
+{%- liquid
+  assign qb_cents = cents | plus: 0
+  assign qb_full = qb_cents | money
+  assign qb_trim = qb_cents | money_without_trailing_zeros
+-%}
+{%- if qb_full == qb_trim -%}
+  {{- qb_full -}}
+{%- else -%}
+  <span class="qb-v2-m"><span class="qb-v2-m__f">{{ qb_full }}</span><span class="qb-v2-m__t">{{ qb_trim }}</span></span>
+{%- endif -%}

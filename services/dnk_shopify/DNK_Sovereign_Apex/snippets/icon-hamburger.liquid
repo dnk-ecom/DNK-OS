@@ -1,0 +1,77 @@
+<style>
+  .icon-hamburger {
+    display: flex !important;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: calc(8px - var(--icons-thickness));
+  }
+  .icon-hamburger span {
+    display: block;
+    width: 100%;
+    height: var(--icons-thickness);
+    background: currentColor;
+    border-radius: 4px;
+  }
+  .icon-hamburger--style_2 {
+    align-items: center;
+  }
+  .icon-hamburger--style_2 span:nth-child(2),
+  .icon-hamburger--style_3 span:nth-child(2),
+  .icon-hamburger--style_6 span:nth-child(1),
+  .icon-hamburger--style_6 span:nth-child(3) {
+    width: 70%;
+  }
+  .icon-hamburger--style_4 span:nth-child(2),
+  .icon-hamburger--style_5 span:nth-child(2) {
+    width: 75%;
+  }
+  .icon-hamburger--style_4 span:nth-child(1),
+  .icon-hamburger--style_5 span:nth-child(3) {
+    width: 50%;
+  }
+  .icon-hamburger--style_6 span:nth-child(1) {
+    align-self: flex-end;
+  }
+  /* 2.0.0: two lines / two lines offset / three dots */
+  .icon-hamburger--style_7 span:nth-child(3),
+  .icon-hamburger--style_8 span:nth-child(3) {
+    display: none;
+  }
+  .icon-hamburger--style_7,
+  .icon-hamburger--style_8 {
+    justify-content: center;
+    gap: calc(9px - var(--icons-thickness));
+  }
+  .icon-hamburger--style_8 span:nth-child(2) {
+    width: 60%;
+    align-self: flex-end;
+  }
+  .icon-hamburger.icon-hamburger--style_9 {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+  .icon-hamburger--style_9 span {
+    flex-shrink: 0;
+    width: calc(var(--icons-thickness) + 2.5px);
+    height: calc(var(--icons-thickness) + 2.5px);
+    border-radius: 50%;
+  }
+</style>
+
+{% case section.settings.menu_icon %}
+  {% when 'text' %}
+    <span class="header__text-icon icon icon-hamburger">
+      {{ section.settings.menu_icon_text }}
+    </span>
+  {% else %}
+    <div
+      class="icon icon-hamburger icon-hamburger--{{ section.settings.menu_icon }} icon-hamburger--thickness-{{ section.settings.icons_thickness }}"
+      focusable="false"
+    >
+      <span>&nbsp</span>
+      <span>&nbsp</span>
+      <span>&nbsp</span>
+    </div>
+{% endcase %}

@@ -1,0 +1,77 @@
+{% unless closest.product == blank or closest.product.has_only_default_variant %}
+  <div
+    class="product-main-variant-picker-block block-spacing"
+    style="
+      --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+      --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% render 'product-variant-picker',
+      product: closest.product,
+      id: block.id,
+      option_style: block.settings.option_style,
+      swatch_size: block.settings.swatch_size
+    %}
+  </div>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Variant picker",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "option_style",
+      "label": "Option style",
+      "options": [
+        { "value": "select", "label": "Select fields" },
+        { "value": "radio", "label": "Radio buttons" }
+      ],
+      "default": "radio",
+      "info": "Options with Shopify swatches always display as swatches."
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "label": "Swatch size",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Variant picker",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

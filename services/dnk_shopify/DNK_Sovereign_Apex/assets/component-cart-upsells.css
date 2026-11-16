@@ -1,0 +1,436 @@
+/* Shrine PRO - cart upsells (Product upsells and Product upsells V2). Loaded with component-cart-upsells.js (loader key
+   "upsells") or linked by Cart page V2. Scoped to the cart's upsell markup, so the product page's Upsell block is
+   untouched. Logical properties only; every override wins by specificity (noted), never by file order.
+   Card layouts: Row is today's look (no rules). Style-only parts of the cart styles apply to .cart-upsells--styled. */
+
+/* ---------------------------------------------------------------- base */
+cart-upsells,
+cart-upsell-item {
+  display: block;
+}
+.cart-upsells--v2 {
+  --ups-gap: var(--cart-gap, 1.2rem);
+  --image-size: 5rem;
+  --image-size-number: 5;
+  --image-border-radius: var(--cart-radius-small, 0.2rem);
+  --title-font-size: 1.4rem;
+  --desc-font-size: 1.2rem;
+  --price-font-size: 1.4rem;
+  --border-radius: var(--cart-radius, 1rem);
+}
+/* (0,3,0) beats .upsell:not(.color-background-1) and .upsell ~ .upsell */
+.cart-upsells.cart-upsells--v2 .upsell {
+  --padding: 0;
+  margin: 0;
+}
+.cart-upsells--v2 .cart-upsells__title {
+  margin: 0 0 var(--ups-gap);
+  text-align: start;
+}
+.cart-upsells--v2 .cart-upsells__title:not(.cart-title--label) {
+  font-size: 1.6rem;
+}
+.cart-upsells--v2 .cart-upsells__fixed,
+.cart-upsells--v2 .cart-upsells__list {
+  display: grid;
+  gap: var(--ups-gap);
+  grid-template-columns: minmax(0, 1fr);
+}
+.cart-upsells--v2 .cart-upsells__fixed + .cart-upsells__list {
+  margin-block-start: var(--ups-gap);
+}
+.cart-upsells.cart-upsells--v2 .cart-upsells__list:empty {
+  display: none;
+}
+.cart-upsells__list--contents {
+  display: contents;
+}
+.cart-upsells.cart-upsells--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.cart-upsells--grid > .upsell__outside-title {
+  grid-column: 1 / -1;
+}
+.cart-upsells.cart-upsells--grid .upsell {
+  margin: 0;
+}
+.cart-upsell__error:not([hidden]) {
+  display: block;
+  margin-block-start: 0.4rem;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  color: rgb(var(--color-foreground));
+}
+.cart-upsell__per-item {
+  margin-inline-start: 0.3rem;
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+.cart-upsell__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block-start: 0.3rem;
+  font-size: 1.2rem;
+}
+.cart-upsell__rating .rating-star {
+  --letter-spacing: 0.2;
+  --font-size: 1.2;
+}
+.cart-upsell__savings {
+  display: inline-block;
+  margin-block-start: 0.3rem;
+  font-size: 1.2rem;
+}
+/* Quantity "Show quantity selector": a compact stepper under the add-on's text */
+.cart-upsell__quantity {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-block-start: 0.6rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.2);
+  border-radius: 10rem;
+}
+.cart-upsell__quantity-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+}
+.cart-upsell__quantity-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.cart-upsell__quantity-button .icon {
+  width: 1rem;
+  height: 1rem;
+}
+.cart-upsell__quantity-input {
+  width: 2.8rem;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: 1.3rem;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.cart-upsell__quantity-input::-webkit-inner-spin-button,
+.cart-upsell__quantity-input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.cart-upsell__quantity-input:focus-visible,
+.cart-upsell__quantity-button:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.1rem;
+}
+.cart-upsell[aria-busy="true"] .cart-upsell__quantity {
+  opacity: 0.6;
+}
+.cart-upsell--sample {
+  opacity: 0.7;
+  outline: 1px dashed rgba(var(--color-foreground), 0.3);
+}
+/* a card that follows a coloured drawer keeps today's flush look (.upsell:not(.color-background-1) pads it) */
+.cart-upsell--inherit-scheme.upsell:not(.upsell--border):not(.upsell--box-shadow):not(.upsell--custom-bg) {
+  --padding: 0;
+}
+a.cart-upsell__choose {
+  text-decoration: none;
+}
+/* "Accent color: Text" is the text colour of the panel the card sits on, like the cart's other Text colour options
+   (component-cart.css): the theme's .accent-color-text is the base text colour, 1:1 on a dark cart. It applies in a cart
+   with a colour scheme or custom colours, and in V2 (own scheme included); the old block in a Theme default cart keeps
+   1.9.0's colour. (0,2,0)+ beats base.css's .accent-color-text */
+cart-drawer.cart-root .drawer__inner[class*='color-'] .cart-upsells .accent-color-text,
+cart-page.cart-root[class*='color-'] .cart-upsells .accent-color-text,
+cart-page.cart-root[style*='--color-foreground'] .cart-upsells .accent-color-text,
+.cart-upsells.cart-upsells--v2.accent-color-text {
+  --accent-color: var(--color-foreground);
+}
+/* An Empty cart whose upsell container lost its add-on switches (they are left out there) shows nothing */
+.drawer__inner-empty .cart-upsells:not(:has(.upsell)),
+.cart-empty .cart-upsells:not(:has(.upsell)) {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- V2 content switches and Custom styling */
+.cart-upsells--v2:not(.cart-upsells--rating) .cart-upsell__rating,
+.cart-upsells--v2:not(.cart-upsells--savings) .cart-upsell__savings {
+  display: none;
+}
+.cart-upsell__icon-tile {
+  display: none;
+}
+.cart-upsells--layout-addon .cart-upsell__icon-tile {
+  display: flex;
+}
+.cart-upsells--v2.cart-upsells--layout-addon .cart-upsell--has-icon .upsell__image {
+  display: none;
+}
+.cart-upsells--v2.cart-upsells--custom {
+  --image-size: var(--ups-image-size, 5rem);
+  --border-radius: var(--ups-radius, 1rem);
+  --title-font-size: var(--ups-text-size, 1.4rem);
+  --price-font-size: var(--ups-text-size, 1.4rem);
+  --desc-font-size: calc(var(--ups-text-size, 1.4rem) * 0.86);
+}
+/* (0,4,0) beats the V2 reset above */
+.cart-upsells.cart-upsells--custom.cart-upsells--border .upsell {
+  border: 0.1rem solid var(--ups-border-color);
+  --padding: 1rem;
+}
+.cart-upsells.cart-upsells--custom.cart-upsells--bg .upsell {
+  background: var(--ups-bg);
+  --padding: 1rem;
+}
+
+/* ---------------------------------------------------------------- card layouts (V2: tile and feature shape the upsell list;
+   add-ons and upgrades above it stay rows). (0,3,0)+ beats base.css's .upsell--btn-under / stacked-columns rules */
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+}
+/* a slider takes the whole row: its own slides make the columns ((0,4,0) beats the tile grid above) */
+.cart-upsells.cart-upsells--v2.cart-upsells--slider .cart-upsells__list {
+  grid-template-columns: minmax(0, 1fr);
+}
+.cart-upsells.cart-upsells--v1.cart-upsells--layout-tile:not(.upsells-container--stacked-columns):not(.side-margins-negative) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.cart-upsells--v1.cart-upsells--layout-tile > .upsell__outside-title {
+  grid-column: 1 / -1;
+}
+.cart-upsells.cart-upsells--v1.cart-upsells--layout-tile .upsell {
+  margin: 0;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__container,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__container {
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__image,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__image {
+  margin: 0 0 0.8rem;
+  align-self: stretch;
+  width: auto;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__image img,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__image img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__title,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__title {
+  flex-direction: column;
+  align-items: center;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__title .upsell__price,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__title .upsell__price {
+  padding: 0.4rem 0 0;
+  text-align: center;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__add-btn,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__add-btn {
+  margin: 0.8rem 0 0;
+  width: 100%;
+  justify-content: center;
+}
+/* the variant dropdown centered like the title and price above it */
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__variant-picker,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__variant-picker {
+  justify-content: center;
+}
+/* tiles and slides of a row share one height and the Add button sits at the bottom, so a variant picker doesn't push
+   it below its neighbour's ((0,3,0) beats base.css's flex-start slide list) */
+.cart-upsells.cart-upsells--v2.cart-upsells--slider .splide__list {
+  align-items: stretch;
+}
+.cart-upsells--v2.cart-upsells--slider .splide__slide__container,
+.cart-upsells--v2.cart-upsells--slider .splide__slide__container > .upsell,
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__container,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__container {
+  height: 100%;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell__content,
+.cart-upsells--v2.cart-upsells--layout-tile .cart-upsells__list .upsell__content {
+  flex-grow: 1;
+}
+.cart-upsells--v1.cart-upsells--layout-tile .upsell-toggle-btn:not(.upsell__container),
+.cart-upsells--v1.cart-upsells--layout-feature .upsell-toggle-btn:not(.upsell__container) {
+  position: absolute;
+  inset-block-start: var(--padding, 0);
+  inset-inline-end: var(--padding, 0);
+  margin: 0;
+}
+/* Feature: large image, description and a full-width button */
+.cart-upsells--v1.cart-upsells--layout-feature .upsell__container,
+.cart-upsells--v2.cart-upsells--layout-feature .cart-upsells__list .upsell__container {
+  flex-direction: column;
+  align-items: stretch;
+}
+.cart-upsells--v1.cart-upsells--layout-feature .upsell__image,
+.cart-upsells--v2.cart-upsells--layout-feature .cart-upsells__list .upsell__image {
+  margin: 0 0 1rem;
+  align-self: stretch;
+  width: auto;
+}
+.cart-upsells--v1.cart-upsells--layout-feature .upsell__image img,
+.cart-upsells--v2.cart-upsells--layout-feature .cart-upsells__list .upsell__image img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.cart-upsells--v1.cart-upsells--layout-feature .upsell__title,
+.cart-upsells--v2.cart-upsells--layout-feature .cart-upsells__list .upsell__title {
+  font-size: 1.6rem;
+}
+.cart-upsells--v1.cart-upsells--layout-feature .upsell__add-btn,
+.cart-upsells--v2.cart-upsells--layout-feature .cart-upsells__list .upsell__add-btn {
+  margin: 1rem 0 0;
+  width: 100%;
+  min-height: 4.4rem;
+  justify-content: center;
+}
+/* Add-on row: icon tile, title, "description · price", switch at the end */
+.cart-upsells--layout-addon .cart-upsell__icon-tile {
+  flex: 0 0 4rem;
+  height: 4rem;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: 1rem;
+  border-radius: var(--cart-radius-small, 0.4rem);
+  background: rgba(var(--color-foreground), 0.06);
+  font-size: 2.2rem;
+}
+.cart-upsells.cart-upsells--layout-addon .upsell__image img {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+}
+.cart-upsells.cart-upsells--layout-addon .upsell__content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.4rem;
+}
+.cart-upsells.cart-upsells--layout-addon .upsell__title {
+  flex-basis: 100%;
+}
+.cart-upsells.cart-upsells--layout-addon .upsell__desc {
+  margin: 0;
+}
+.cart-upsells--layout-addon .upsell__desc:has(+ .upsell__price)::after {
+  content: '\00B7';
+  margin-inline-start: 0.4rem;
+}
+.cart-upsells.cart-upsells--layout-addon .upsell__price--separate {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- headings */
+/* Same as cart card styling: the label's size wins over today's 2rem heading variables */
+.cart-upsells--v1.cart-upsells--cart-styling .upsell__outside-title.cart-title--label.custom-font-size {
+  font-size: 1.2rem;
+}
+/* Custom card styling: the merchant's heading size ranges win (ranges always win) */
+.cart-upsells--v1:not(.cart-upsells--cart-styling) .upsell__outside-title.cart-title--label.custom-font-size {
+  font-size: var(--desktop-text-size);
+}
+@media screen and (max-width: 749px) {
+  .cart-upsells--v1:not(.cart-upsells--cart-styling) .upsell__outside-title.cart-title--label.custom-font-size {
+    font-size: var(--mobile-text-size);
+  }
+}
+
+/* ---------------------------------------------------------------- states, reduced motion */
+/* Add-on switches, off: the track at 55 % of the text colour, like the cart's Subscribe & save switch, so the switch
+   and its state stand out at 3:1 (WCAG 1.4.11; today's 20 % gives 1.5:1). On keeps base.css's accent track. The old
+   block under Classic keeps 1.9.0's switch: Classic stays pixel-identical to 1.9.0. (0,4,0) beats base.css's
+   .toggle-switch; :not() leaves its [data-selected=true] rule alone. */
+.cart-upsells--v2 .upsell:not([data-selected='true']) .toggle-switch,
+.cart-style--clean .cart-upsells--v1 .upsell:not([data-selected='true']) .toggle-switch,
+.cart-style--cards .cart-upsells--v1 .upsell:not([data-selected='true']) .toggle-switch,
+.cart-style--soft .cart-upsells--v1 .upsell:not([data-selected='true']) .toggle-switch,
+.cart-style--bold .cart-upsells--v1 .upsell:not([data-selected='true']) .toggle-switch {
+  background: rgba(var(--color-foreground), 0.55);
+}
+.cart-upsell--soldout .toggle-switch,
+.cart-upsell--soldout .upsell__checkbox,
+.cart-upsell--soldout .upsell__plus-btn {
+  opacity: 0.4;
+}
+cart-upsell-item[aria-busy='true'] [data-ups-part='control'] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cart-upsells .toggle-switch,
+  .cart-upsells .toggle-switch__slider,
+  .cart-upsells .upsell__plus-btn,
+  cart-upsell-item .toggle-switch,
+  cart-upsell-item .toggle-switch__slider {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- cart styles (style-only parts; Classic and Bold add none) */
+/* Clean: hairlines between the rows of a one-column list, with straight ends (a rounded card would bend it into an
+   arc); tiles, grids, columns and sliders keep only their gap, so the cards of a row stay level */
+.cart-style--clean .cart-upsells.cart-upsells--styled:not(.cart-upsells--layout-tile):not(.cart-upsells--slider):not(.cart-upsells--grid):not(.upsells-container--stacked-columns):not(.side-margins-negative) .upsell ~ .upsell {
+  border-block-start: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.1));
+  padding-block-start: 1.2rem;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+.cart-style--clean .cart-upsells.cart-upsells--styled .upsell__image img {
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+  border-radius: var(--cart-radius-small, 0.2rem);
+}
+/* Cards: each card on its own panel */
+.cart-style--cards .cart-upsells.cart-upsells--styled .upsell {
+  background: rgb(var(--color-background));
+  border-radius: var(--cart-radius, 1rem);
+  --padding: var(--cart-pad, 1.2rem);
+  box-shadow: 0 0 0 0.1rem var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+}
+/* Soft: tinted cards */
+.cart-style--soft .cart-upsells.cart-upsells--styled .upsell {
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+  border-radius: var(--cart-radius, 1rem);
+  --padding: var(--cart-pad, 1.2rem);
+}
+.cart-style--soft .cart-upsells.cart-upsells--styled .cart-upsell__icon-tile {
+  background: rgba(var(--color-foreground), 0.08);
+}
+/* Cards and Soft pad each card on its panel, also when an old block's card follows a coloured cart scheme: (0,6,0) beats
+   the inherit-scheme flush rule in "base" (0,5,0) */
+.cart-style--cards .cart-upsells.cart-upsells--styled .upsell.cart-upsell.cart-upsell--inherit-scheme,
+.cart-style--soft .cart-upsells.cart-upsells--styled .upsell.cart-upsell.cart-upsell--inherit-scheme {
+  --padding: var(--cart-pad, 1.2rem);
+}
+/* Cards and Soft: the saving as a pill */
+.cart-style--cards .cart-upsells.cart-upsells--styled .cart-upsell__savings,
+.cart-style--soft .cart-upsells.cart-upsells--styled .cart-upsell__savings {
+  padding: 0.1rem 0.6rem;
+  border-radius: 99rem;
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.06));
+}

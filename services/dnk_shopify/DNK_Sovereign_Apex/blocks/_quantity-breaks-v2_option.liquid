@@ -1,0 +1,1014 @@
+{%- comment -%}
+  Quantity option, a child of Quantity breaks V2: one offer card (a native radio and its label) plus its child
+  blocks (bundle items, gifts, add-ons, product choices, bundle builders, scratch cards, personalisation fields)
+  in the card body. It prints exactly one element, between the
+  <!--qbv2:option--> markers. The wrapper numbers the options, checks the default one, copies gifts into
+  bigger options and replaces the __QB_*__ tokens; children get this option's values through
+  the __QB_Q__, __QB_QX__, __QB_MAIN_PRICE__, __QB_MAIN_COMPARE__ and __QB_OPTION_ID__ tokens.
+  Prices are the first paint; component-quantity-breaks-v2.js keeps them live with the same model.
+{%- endcomment -%}
+{%- liquid
+  assign qb_product = closest.product
+  if qb_product == blank
+    assign qb_product = product
+  endif
+-%}
+{%- if qb_product != blank -%}
+  {%- capture qb_children -%}{%- content_for 'blocks', closest.product: qb_product -%}{%- endcapture -%}
+  {%- liquid
+    assign v = qb_product.selected_or_first_available_variant
+    assign q = block.settings.quantity | plus: 0 | at_least: 1
+    assign qb_idp = 'qbv2-' | append: section.id | append: '-' | append: block.id
+    assign qb_children = qb_children | strip
+
+    # What the children need: a scratch cover, a choice, products that resolved blank, a sold-out item, a currency conversion
+    assign qb_has_scratch = false
+    if qb_children contains 'data-qb-child="scratch"'
+      assign qb_has_scratch = true
+    endif
+    assign qb_must_choose = false
+    if qb_children contains 'data-qb-must-choose="true"'
+      assign qb_must_choose = true
+    endif
+    assign qb_require_missing = false
+    if qb_children contains 'data-qb-require-missing="true"'
+      assign qb_require_missing = true
+    endif
+    assign qb_blocks_option = false
+    if qb_children contains 'data-qb-blocks-option="true"'
+      assign qb_blocks_option = true
+    endif
+    assign qb_child_pending = false
+    if qb_children contains 'data-qb-pending="true"'
+      assign qb_child_pending = true
+    endif
+
+    # Cents the children add to this option's first paint; "per q" amounts are multiplied by the quantity
+    assign qb_sums = ''
+    assign qb_sum_names = 'total,cat,creg,total-per-q,cat-per-q,creg-per-q' | split: ','
+    for qb_sum_name in qb_sum_names
+      assign qb_sum = 0
+      assign qb_sum_key = 'data-qb-sum-' | append: qb_sum_name | append: '="'
+      if qb_children contains qb_sum_key
+        assign qb_sum_parts = qb_children | split: qb_sum_key
+        for qb_sum_part in qb_sum_parts offset: 1
+          assign qb_sum_value = qb_sum_part | split: '"' | first | plus: 0
+          assign qb_sum = qb_sum | plus: qb_sum_value
+        endfor
+      endif
+      assign qb_sums = qb_sums | append: qb_sum | append: ','
+    endfor
+    assign qb_sums = qb_sums | split: ','
+    assign qb_sum_total = qb_sums[0] | plus: 0
+    assign qb_sum_cat = qb_sums[1] | plus: 0
+    assign qb_sum_creg = qb_sums[2] | plus: 0
+    assign qb_sum_total_pq = qb_sums[3] | plus: 0 | times: q
+    assign qb_sum_cat_pq = qb_sums[4] | plus: 0 | times: q
+    assign qb_sum_creg_pq = qb_sums[5] | plus: 0 | times: q
+
+    # Picks the customer still has to make (an empty "Customer chooses" slot, a Bundle builder): their cheapest lines
+    # join the total, and the option shows "From" it, without compare price or saving, until the picks are made
+    assign qb_from = false
+    assign qb_from_total = 0
+    if qb_children contains 'data-qb-from-total="'
+      assign qb_from = true
+      assign qb_from_parts = qb_children | split: 'data-qb-from-total="'
+      for qb_from_part in qb_from_parts offset: 1
+        assign qb_from_value = qb_from_part | split: '"' | first | plus: 0
+        assign qb_from_total = qb_from_total | plus: qb_from_value
+      endfor
+    endif
+    assign qb_extra_total = qb_sum_total | plus: qb_sum_total_pq | plus: qb_from_total
+    if block.settings.compare_price_source == 'compare_price'
+      assign qb_extra_compare = qb_sum_cat | plus: qb_sum_cat_pq
+    else
+      assign qb_extra_compare = qb_sum_creg | plus: qb_sum_creg_pq
+    endif
+    assign qb_has_extras = false
+    if qb_extra_total > 0 or qb_extra_compare > 0
+      assign qb_has_extras = true
+    endif
+    # A price per item repeats the total with 1 item and misstates it once other products are in the total, which
+    # a Product choice or Bundle builder adds as soon as the customer chooses; a stepper's quantity can grow
+    assign qb_show_each = false
+    if block.settings.quantity_stepper
+      assign qb_show_each = true
+    elsif q > 1 and qb_has_extras == false
+      unless qb_children contains 'data-qb-child="choice"' or qb_children contains 'data-qb-child="builder"'
+        assign qb_show_each = true
+      endunless
+    endif
+
+    # Pack variant: an option value such as "3-pack" sold as one unit; the other options stay as selected
+    assign qb_method = block.settings.discount_method
+    assign qb_pack_value = block.settings.pack_value | strip
+    assign qb_pack_variant = nil
+    assign qb_unit_variant = nil
+    assign qb_pack_position = 0
+    assign qb_unit_value = ''
+    if qb_method == 'pack' and qb_pack_value != blank and qb_product.has_only_default_variant == false
+      assign qb_pack_down = qb_pack_value | downcase
+      for qb_opt in qb_product.options_with_values
+        for qb_val in qb_opt.values
+          assign qb_val_down = qb_val.name | downcase
+          if qb_val_down == qb_pack_down
+            assign qb_pack_position = qb_opt.position
+            assign qb_pack_name = qb_val.name
+            break
+          endif
+        endfor
+        if qb_pack_position > 0
+          # The single unit is the cheapest other value next to the page variant (the admin may list packs first)
+          assign qb_unit_price = nil
+          for qb_val in qb_opt.values
+            if qb_val.name != qb_pack_name and qb_val.variant != nil
+              if qb_unit_price == nil or qb_val.variant.price < qb_unit_price
+                assign qb_unit_value = qb_val.name
+                assign qb_unit_price = qb_val.variant.price
+              endif
+            endif
+          endfor
+          break
+        endif
+      endfor
+      if qb_pack_position > 0
+        assign qb_pack_index = qb_pack_position | minus: 1
+        for qb_var in qb_product.variants
+          assign qb_match = true
+          for qb_var_option in qb_var.options
+            if forloop.index0 == qb_pack_index
+              if qb_var_option != qb_pack_name
+                assign qb_match = false
+                break
+              endif
+            elsif qb_var_option != v.options[forloop.index0]
+              assign qb_match = false
+              break
+            endif
+          endfor
+          if qb_match
+            assign qb_pack_variant = qb_var
+            break
+          endif
+        endfor
+        if qb_unit_value != blank
+          for qb_var in qb_product.variants
+            assign qb_match = true
+            for qb_var_option in qb_var.options
+              if forloop.index0 == qb_pack_index
+                if qb_var_option != qb_unit_value
+                  assign qb_match = false
+                  break
+                endif
+              elsif qb_var_option != v.options[forloop.index0]
+                assign qb_match = false
+                break
+              endif
+            endfor
+            if qb_match
+              assign qb_unit_variant = qb_var
+              break
+            endif
+          endfor
+        endif
+      endif
+    endif
+    assign qb_is_pack = false
+    assign qb_pack_missing = false
+    assign qb_units = q
+    assign qb_target = v
+    if qb_pack_variant != nil
+      assign qb_is_pack = true
+      assign qb_units = 1
+      assign qb_target = qb_pack_variant
+      if qb_unit_variant == nil
+        assign qb_unit_variant = v
+      endif
+    elsif qb_method == 'pack' and qb_pack_position > 0
+      # The pack value exists, but not with the page variant's other values (3-pack/Black but no 3-pack/White): the
+      # option keeps a pack option's markup on every variant (main.js copies the unit pickers by index) and can't be bought
+      assign qb_units = 1
+      assign qb_pack_missing = true
+    elsif qb_method == 'pack'
+      # No variant with the pack value: the option works as an automatic-discount option (the editor flags it)
+      assign qb_method = 'automatic'
+    endif
+
+    # Availability: sold out, fewer in stock than this option needs, or outside the variant's quantity rules
+    assign qb_rule_min = qb_target.quantity_rule.min | default: 1
+    assign qb_rule_increment = qb_target.quantity_rule.increment | default: 1 | at_least: 1
+    assign qb_rule_max = qb_target.quantity_rule.max
+    assign qb_rule_remainder = qb_units | modulo: qb_rule_increment
+    assign qb_tracked = false
+    if qb_target.inventory_management == 'shopify' and qb_target.inventory_policy == 'deny'
+      assign qb_tracked = true
+    endif
+    assign qb_reason = ''
+    if qb_pack_missing
+      assign qb_reason = 'missing'
+    elsif qb_target.available == false
+      assign qb_reason = 'soldout'
+    elsif qb_tracked and qb_target.inventory_quantity < qb_units
+      assign qb_reason = 'stock'
+    elsif qb_units < qb_rule_min or qb_rule_remainder != 0
+      assign qb_reason = 'rules'
+    elsif qb_rule_max != nil and qb_units > qb_rule_max
+      assign qb_reason = 'rules'
+    elsif qb_blocks_option
+      assign qb_reason = 'bundle'
+    endif
+    assign qb_available = false
+    if qb_reason == blank
+      assign qb_available = true
+    endif
+    assign qb_hidden = false
+    assign qb_hidden_preview = false
+    if qb_require_missing
+      if request.design_mode
+        assign qb_hidden_preview = true
+      else
+        assign qb_hidden = true
+      endif
+    endif
+    assign qb_selectable = false
+    if qb_available and qb_hidden == false and qb_has_scratch == false
+      assign qb_selectable = true
+    endif
+
+    # Stepper: from this option's quantity up to the setting, the quantity rule's maximum and the stock
+    assign qb_stepper = block.settings.quantity_stepper
+    assign qb_stepper_max = block.settings.stepper_max | plus: 0
+    if qb_rule_max != nil
+      assign qb_stepper_max = qb_stepper_max | at_most: qb_rule_max
+    endif
+    if qb_tracked
+      assign qb_stepper_max = qb_stepper_max | at_most: qb_target.inventory_quantity
+    endif
+    assign qb_stepper_max = qb_stepper_max | at_least: q
+
+    # Selling plan: the n-th plan of the product, counted over its groups in order
+    assign qb_plan = nil
+    assign qb_plan_group = nil
+    assign qb_plan_type = ''
+    assign qb_plan_value = 0
+    assign qb_plan_name = ''
+    assign qb_plan_position = block.settings.subscription_plan | plus: 0
+    if qb_plan_position > 0
+      assign qb_plan_count = 0
+      for qb_group in qb_product.selling_plan_groups
+        for qb_selling_plan in qb_group.selling_plans
+          assign qb_plan_count = qb_plan_count | plus: 1
+          if qb_plan_count == qb_plan_position
+            assign qb_plan = qb_selling_plan
+            assign qb_plan_group = qb_group
+            break
+          endif
+        endfor
+        if qb_plan != nil
+          break
+        endif
+      endfor
+      if qb_plan != nil
+        assign qb_plan_name = qb_plan.name
+        assign qb_adjustment = qb_plan.price_adjustments | first
+        if qb_adjustment != nil
+          assign qb_plan_type = qb_adjustment.value_type
+          assign qb_plan_value = qb_adjustment.value
+          if qb_plan_type == 'price' and qb_adjustment.price != blank
+            assign qb_plan_value = qb_adjustment.price
+          endif
+        endif
+      endif
+    endif
+
+    # Gallery image shown when this option is selected
+    assign qb_gallery_key = ''
+    assign qb_gallery_position = block.settings.gallery_image | plus: 0
+    if qb_gallery_position > 0 and qb_product.media.size >= qb_gallery_position
+      assign qb_gallery_index = qb_gallery_position | minus: 1
+      assign qb_gallery_key = section.id | append: '-' | append: qb_product.media[qb_gallery_index].id
+    endif
+
+    # Discount values as the scripts read them: percentage as an integer, amounts in shop-currency cents
+    assign qb_discount_type = block.settings.discount_type
+    assign qb_amount_cents = block.settings.discount_amount | times: 100 | round | at_least: 0
+    assign qb_total_cents = block.settings.total_price | times: 100 | round | at_least: 0
+    assign qb_discount_value = 0
+    case qb_discount_type
+      when 'percentage'
+        assign qb_discount_value = block.settings.discount_percentage
+      when 'amount_each', 'amount_total'
+        assign qb_discount_value = qb_amount_cents
+      when 'set_price'
+        assign qb_discount_value = qb_total_cents
+    endcase
+    assign qb_currency_ok = false
+    if cart.currency.iso_code == shop.currency
+      assign qb_currency_ok = true
+    endif
+
+    capture qb_price_csv
+      render 'qb-v2-price', variant: v, units: qb_units, q: q, discount_type: qb_discount_type, discount_percentage: block.settings.discount_percentage, discount_amount_cents: qb_amount_cents, total_price_cents: qb_total_cents, free_quantity: block.settings.free_quantity, compare_source: block.settings.compare_price_source, plan_type: qb_plan_type, plan_value: qb_plan_value, pack_variant: qb_pack_variant, unit_variant: qb_unit_variant, extra_total: qb_extra_total, extra_compare: qb_extra_compare, has_extras: qb_has_extras, currency_ok: qb_currency_ok
+    endcapture
+    assign qb_prices = qb_price_csv | strip | split: ','
+    assign qb_m = qb_prices[0] | plus: 0
+    assign qb_cm = qb_prices[1] | plus: 0
+    assign qb_t = qb_prices[2] | plus: 0
+    assign qb_c = qb_prices[3] | plus: 0
+    assign qb_s = qb_prices[4] | plus: 0
+    assign qb_p = qb_prices[5] | plus: 0
+    assign qb_e = qb_prices[6] | plus: 0
+    assign qb_ce = qb_prices[7] | plus: 0
+    if qb_from
+      assign qb_c = qb_t
+      assign qb_s = 0
+      assign qb_p = 0
+      assign qb_ce = qb_e
+    endif
+    assign qb_pending = false
+    assign qb_price_pending = qb_prices[8] | plus: 0
+    if qb_price_pending > 0 or qb_child_pending
+      assign qb_pending = true
+    endif
+
+    assign qb_free = 0
+    if qb_discount_type == 'free_items' and qb_is_pack == false
+      assign qb_free_max = qb_units | minus: 1
+      assign qb_free = block.settings.free_quantity | plus: 0 | at_most: qb_free_max | at_least: 0
+    endif
+    assign qb_paid = qb_units | minus: qb_free
+
+    # This option's values for its children: "2× " before the page product, its prices in the main tile
+    assign qb_qx = ''
+    if q > 1
+      assign qb_qx = q | append: '× '
+    endif
+    capture qb_main_price
+      render 'qb-v2-money', cents: qb_m
+    endcapture
+    assign qb_main_compare = ''
+    if qb_cm > qb_m
+      capture qb_main_compare
+        render 'qb-v2-money', cents: qb_cm
+      endcapture
+    endif
+    assign qb_children_html = qb_children | replace: '__QB_QX__', qb_qx | replace: '__QB_Q__', q | replace: '__QB_MAIN_PRICE__', qb_main_price | replace: '__QB_MAIN_COMPARE__', qb_main_compare | replace: '__QB_OPTION_ID__', block.id
+
+    # Texts with keywords
+    capture qb_title_html
+      render 'qb-v2-text', text: block.settings.title, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    capture qb_label_html
+      render 'qb-v2-text', text: block.settings.label, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    capture qb_subtitle_html
+      render 'qb-v2-text', text: block.settings.subtitle, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    capture qb_badge_text_html
+      render 'qb-v2-text', text: block.settings.badge_text, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    capture qb_price_html
+      render 'qb-v2-text', text: block.settings.price_text, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    capture qb_compare_html
+      render 'qb-v2-text', text: block.settings.compare_price_text, ctx: 'option', T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+    # Savings line under the price: shown only while the option saves (never in the "From" state), keywords or not
+    capture qb_savings_html
+      render 'qb-v2-text', text: block.settings.savings_text, ctx: 'option', saving: true, T: qb_t, C: qb_c, S: qb_s, P: qb_p, quantity: q, title: qb_product.title, price_each: qb_e, compare_price_each: qb_ce, free_quantity: qb_free, paid_quantity: qb_paid, plan_name: qb_plan_name, from: qb_from
+    endcapture
+
+    # Plain title for the cart lines, the nudges, analytics and the checklist: never blank, never a keyword. qb-v2-text
+    # writes [ and \ of inserted values as &#91; and &#92; (decoded before &amp;, so a typed "&#91;" stays as typed)
+    assign qb_plain_title = qb_title_html | strip_html | strip | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&quot;', '"' | replace: '&#39;', "'" | replace: '&#x27;', "'" | replace: '&nbsp;', ' ' | replace: '&#91;', '[' | replace: '&#92;', '\' | replace: '&amp;', '&' | strip
+    if qb_plain_title == blank
+      assign qb_plain_title = q | append: '×'
+    endif
+    assign qb_badge_plain = qb_badge_text_html | strip_html | strip | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&quot;', '"' | replace: '&#39;', "'" | replace: '&#x27;', "'" | replace: '&nbsp;', ' ' | replace: '&#91;', '[' | replace: '&#92;', '\' | replace: '&amp;', '&' | strip
+
+    # Badge: an image badge without its image shows the text as a pill
+    assign qb_badge_style = block.settings.badge_style
+    if qb_badge_style == 'image' and block.settings.badge_image == blank
+      assign qb_badge_style = 'pill'
+    endif
+    assign qb_badge_visible = false
+    if block.settings.badge_text != blank or qb_badge_style == 'image'
+      assign qb_badge_visible = true
+    endif
+
+    # Per-item pickers: one row per unit, for up to 10 units of a product with 2 to 250 variants (never on a pack
+    # option, whether or not this variant has its pack)
+    assign qb_variants_count = qb_product.variants_count | default: qb_product.variants.size
+    assign qb_has_pickers = false
+    if block.settings.show_variant_pickers and qb_product.has_only_default_variant == false and qb_variants_count <= 250 and qb_units <= 10 and qb_stepper == false and qb_pack_position == 0
+      assign qb_has_pickers = true
+    endif
+
+    assign qb_describedby = ''
+    if qb_badge_visible
+      assign qb_describedby = qb_describedby | append: qb_idp | append: '-badge '
+    endif
+    if qb_label_html != blank
+      assign qb_describedby = qb_describedby | append: qb_idp | append: '-label '
+    endif
+    if qb_subtitle_html != blank
+      assign qb_describedby = qb_describedby | append: qb_idp | append: '-sub '
+    endif
+    if qb_plan != nil
+      assign qb_describedby = qb_describedby | append: qb_idp | append: '-plan '
+    endif
+    assign qb_describedby = qb_describedby | append: qb_idp | append: '-status ' | append: qb_idp | append: '-contents'
+
+    # Card colors of this option as R, G, B (the CSS turns them into the card's scheme); tinted cards are a CSS class
+    assign qb_card_vars = ''
+    case block.settings.card_style
+      when 'inverse'
+        assign qb_card_vars = '--qb-v2-card-bg: var(--color-base-text); --qb-v2-card-text: var(--color-base-background-1);'
+      when 'custom'
+        assign qb_bg = block.settings.custom_card_bg_color
+        assign qb_fg = block.settings.custom_card_text_color
+        assign qb_bg_rgb = qb_bg.red | append: ', ' | append: qb_bg.green | append: ', ' | append: qb_bg.blue
+        assign qb_fg_rgb = qb_fg.red | append: ', ' | append: qb_fg.green | append: ', ' | append: qb_fg.blue
+        assign qb_card_vars = '--qb-v2-card-bg: ' | append: qb_bg_rgb | append: '; --qb-v2-card-text: ' | append: qb_fg_rgb | append: ';'
+    endcase
+    if block.settings.badge_color == 'custom' and qb_badge_style != 'image'
+      assign qb_card_vars = qb_card_vars | append: ' --qb-v2-badge-bg: ' | append: block.settings.custom_badge_bg_color | append: '; --qb-v2-badge-text: ' | append: block.settings.custom_badge_text_color | append: ';'
+    endif
+    if qb_savings_html != blank and block.settings.savings_text_color != blank
+      assign qb_card_vars = qb_card_vars | append: ' --qb-v2-savings-color: ' | append: block.settings.savings_text_color | append: ';'
+    endif
+    assign qb_card_vars = qb_card_vars | strip
+  -%}
+  {%- capture qb_badge -%}
+    {%- if qb_badge_visible -%}
+      <span class="qb-v2-badge qb-v2-badge--{{ qb_badge_style }} qb-v2-badge--{{ block.settings.badge_position }} qb-v2-badge--color-{{ block.settings.badge_color }}" id="{{ qb_idp }}-badge">
+        {%- case qb_badge_style -%}
+          {%- when 'image' -%}
+            {{ block.settings.badge_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80, 160', sizes: '80px', alt: '', class: 'qb-v2-badge__img' }}
+            {%- if qb_badge_text_html != blank -%}<span class="visually-hidden">{{ qb_badge_text_html }}</span>{%- endif -%}
+          {%- when 'border' -%}
+            <span class="qb-v2-badge__ring" aria-hidden="true"></span><span class="qb-v2-badge__text">{{ qb_badge_text_html }}</span>
+          {%- else -%}
+            {{ qb_badge_text_html }}
+        {%- endcase -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+  <!--qbv2:option--><div
+    class="qb-v2-option qb-v2-option--card-{{ block.settings.card_style }}{% if qb_pending %} qb-v2-pending{% endif %}{% if qb_hidden_preview %} qb-v2-option--hidden-preview{% endif %} __QB_PENDING__"
+    data-qb-v2-option="{{ block.id }}"
+    data-qb-index="__QB_N__"
+    data-qb-q="{{ q }}"
+    data-qb-units="{{ qb_units }}"
+    data-qb-default="{{ block.settings.selected_by_default }}"
+    data-qb-available="{{ qb_available }}"
+    data-qb-hidden="{{ qb_hidden }}"
+    data-qb-scratch="{{ qb_has_scratch }}"
+    data-qb-must-choose="{{ qb_must_choose }}"
+    data-qb-unavailable-reason="{{ qb_reason }}"
+    data-qb-discount-type="{{ qb_discount_type }}"
+    data-qb-discount-value="{{ qb_discount_value }}"
+    data-qb-free="{{ block.settings.free_quantity }}"
+    data-qb-method="{{ qb_method }}"
+    data-qb-code="{{ block.settings.discount_code | strip | escape }}"
+    data-qb-pack="{{ qb_pack_value | escape }}"
+    data-qb-pack-variant="{{ qb_pack_variant.id }}"
+    {%- if qb_pack_position > 0 %} data-qb-pack-position="{{ qb_pack_position }}" data-qb-unit-value="{{ qb_unit_value | escape }}"{% endif %}
+    data-qb-compare-source="{{ block.settings.compare_price_source }}"
+    data-qb-plan="{{ qb_plan_position }}"
+    data-qb-plan-id="{{ qb_plan.id }}"
+    data-qb-plan-type="{{ qb_plan_type }}"
+    data-qb-plan-value="{{ qb_plan_value }}"
+    data-qb-stepper="{{ qb_stepper }}"
+    data-qb-stepper-max="{{ qb_stepper_max }}"
+    data-qb-gallery-media="{{ qb_gallery_key }}"
+    data-qb-default-options="{{ block.settings.default_options | escape }}"
+    data-qb-title="{{ qb_plain_title | escape }}"
+    data-qb-total="{{ qb_t }}"
+    data-qb-compare="{{ qb_c }}"
+    data-qb-saving="{{ qb_s }}"
+    data-qb-percent="{{ qb_p }}"
+    {%- if qb_from %} data-qb-from="true"{% endif %}
+    __QB_DORMANT__
+    {%- if qb_card_vars != blank %} style="{{ qb_card_vars }}"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    <input
+      type="radio"
+      class="qb-v2-option__input visually-hidden"
+      id="{{ qb_idp }}"
+      name="__QB_NAME__"
+      value="{{ qb_units }}"
+      form="product-form-{{ section.id }}"
+      data-input="input___QB_N__"
+      autocomplete="off"
+      aria-labelledby="{{ qb_idp }}-title {{ qb_idp }}-price{% if qb_savings_html != blank %} {{ qb_idp }}-save{% endif %}"
+      aria-describedby="{{ qb_describedby }}"
+      {% unless qb_selectable %}disabled {% endunless %}__QB_DORMANT_INPUT__
+      __QB_CHECKED__
+    >
+    <label
+      class="__QB_CARD_CLASS__ qb-v2-card"
+      for="{{ qb_idp }}"
+      data-input="input___QB_N__"
+      data-quantity="{{ qb_units }}"
+      data-percentage-left="1"
+      data-fixed-discount="0"
+      data-base-compare-price="{{ v.price }}"
+      data-compare-mode="price"
+    >
+      <span class="qb-v2-card__indicator" aria-hidden="true"></span>
+      {%- unless qb_badge_style == 'inline' -%}{{ qb_badge }}{%- endunless -%}
+      {%- if block.settings.image != blank -%}
+        <span class="qb-v2-card__media">
+          {{- block.settings.image | image_url: width: 320 | image_tag: loading: 'lazy', widths: '80, 160, 240, 320', sizes: '__QB_IMG_SIZES__', alt: '', class: 'qb-v2-card__img' -}}
+        </span>
+      {%- endif -%}
+      <span class="qb-v2-card__main">
+        <span class="qb-v2-card__head">
+          <span class="qb-v2-card__title" id="{{ qb_idp }}-title">{{ qb_title_html }}</span>
+          {%- if qb_label_html != blank -%}
+            <span class="qb-v2-card__label" id="{{ qb_idp }}-label">{{ qb_label_html }}</span>
+          {%- endif -%}
+          {%- if qb_badge_style == 'inline' -%}{{ qb_badge }}{%- endif -%}
+        </span>
+        {%- if qb_subtitle_html != blank -%}
+          <span class="qb-v2-card__subtitle" id="{{ qb_idp }}-sub">{{ qb_subtitle_html }}</span>
+        {%- endif -%}
+        {%- if qb_plan != nil -%}
+          <span class="qb-v2-card__plan" id="{{ qb_idp }}-plan" data-qb-plan-name>{{ qb_plan_group.name | escape }} · {{ qb_plan.name | escape }}</span>
+        {%- endif -%}
+        {%- if block.settings.highlights != blank -%}
+          <span class="qb-v2-card__highlights">{{ block.settings.highlights }}</span>
+        {%- endif -%}
+      </span>
+      <span class="qb-v2-card__prices">
+        <span class="qb-v2-card__price" id="{{ qb_idp }}-price">{{ qb_price_html }}</span>
+        {%- if qb_compare_html != blank -%}
+          <span class="qb-v2-card__compare{% if qb_c <= qb_t %} hidden{% endif %}" data-qb-compare-text>{{ qb_compare_html }}</span>
+        {%- endif -%}
+        {%- comment -%}Part of the radio's name: never hidden itself (a hidden referenced element is still read), only its text{%- endcomment -%}
+        {%- if qb_savings_html != blank -%}
+          <span class="qb-v2-card__savings" id="{{ qb_idp }}-save">{{ qb_savings_html }}</span>
+        {%- endif -%}
+        {%- if qb_show_each -%}
+          <span class="qb-v2-card__each{% if qb_from and qb_t > qb_m %} hidden{% endif %}" data-qb-each><span class="qb-v2-card__each-amount">{%- render 'qb-v2-money', cents: qb_e -%}</span> __QB_EACH_LABEL__</span>
+        {%- endif -%}
+      </span>
+      {%- comment -%}Empty while the option can be bought, so the radio's description only carries a reason when there is one{%- endcomment -%}
+      <span class="qb-v2-card__status" id="{{ qb_idp }}-status"{% if qb_reason == blank %} hidden{% endif %}>
+        {%- if qb_reason == 'soldout' or qb_reason == 'bundle' -%}
+          {{- 'products.product.sold_out' | t -}}
+        {%- elsif qb_reason != blank -%}
+          {{- 'products.product.unavailable' | t -}}
+        {%- endif -%}
+      </span>
+      {%- if qb_stepper -%}
+        <span class="qb-v2-stepper" data-qb-stepper>
+          <button type="button" class="qb-v2-stepper__btn" data-qb-step="-1" aria-label="{{ 'products.product.quantity.decrease' | t: product: qb_product.title | escape }}">
+            {%- render 'icon-minus' -%}
+          </button>
+          <input
+            type="number"
+            class="qb-v2-stepper__input"
+            id="{{ qb_idp }}-step"
+            value="{{ q }}"
+            min="{{ q }}"
+            max="{{ qb_stepper_max }}"
+            step="{{ qb_rule_increment }}"
+            inputmode="numeric"
+            autocomplete="off"
+            aria-label="{{ 'products.product.quantity.label' | t }}"
+          >
+          <button type="button" class="qb-v2-stepper__btn" data-qb-step="1" aria-label="{{ 'products.product.quantity.increase' | t: product: qb_product.title | escape }}">
+            {%- render 'icon-plus' -%}
+          </button>
+        </span>
+      {%- endif -%}
+      {%- if qb_has_pickers -%}
+        {%- comment -%}Every unit starts on the selected variant, so each option list is built once and reused{%- endcomment -%}
+        {%- liquid
+          assign qb_opts1 = ''
+          assign qb_opts2 = ''
+          assign qb_opts3 = ''
+          for qb_option in qb_product.options_with_values
+            case qb_option.position
+              when 1
+                capture qb_opts1
+                  render 'qb-v2-option-values', product: qb_product, option: qb_option
+                endcapture
+              when 2
+                capture qb_opts2
+                  render 'qb-v2-option-values', product: qb_product, option: qb_option
+                endcapture
+              when 3
+                capture qb_opts3
+                  render 'qb-v2-option-values', product: qb_product, option: qb_option
+                endcapture
+            endcase
+          endfor
+        -%}
+        <span class="quantity-break__variants qb-v2-units" id="{{ qb_idp }}-units" data-qb-units>
+          <span class="qb-v2-units__head">
+            <span class="qb-v2-units__names">{{ qb_product.options | join: ' / ' | escape }}</span>
+            <button type="button" class="qb-v2-units__toggle link" aria-expanded="false" aria-controls="{{ qb_idp }}-units">__QB_PER_ITEM__</button>
+          </span>
+          {%- for qb_unit in (1..qb_units) -%}
+            {%- assign qb_unit_prefix = qb_idp | append: '-u' | append: forloop.index -%}
+            <span class="quantity-break__selector-item qb-v2-unit" data-select-index="{{ forloop.index0 }}" data-selected-id="{{ v.id }}">
+              <span class="qb-v2-unit__number" id="{{ qb_unit_prefix }}-n" aria-hidden="true">#{{ forloop.index }}</span>
+              {%- render 'qb-v2-picker', product: qb_product, role: 'unit', id_prefix: qb_unit_prefix, options_html_1: qb_opts1, options_html_2: qb_opts2, options_html_3: qb_opts3, index: forloop.index -%}
+            </span>
+          {%- endfor -%}
+        </span>
+      {%- endif -%}
+      <span class="visually-hidden" id="{{ qb_idp }}-contents"></span>
+    </label>
+    <div class="qb-v2-option__body">{{ qb_children_html }}<!--qbv2:inherit--></div>
+    {%- if request.design_mode -%}
+      <script type="application/json" data-qbv2-setup="option">
+        {"type":"option","block_id":{{ block.id | json }},"index":"__QB_N__","title":{{ qb_plain_title | json }},"quantity":{{ q }},"units":{{ qb_units }},"discount_type":{{ qb_discount_type | json }},"discount_percentage":{{ block.settings.discount_percentage | json }},"discount_amount_cents":{{ qb_amount_cents }},"total_price_cents":{{ qb_total_cents }},"free_quantity":{{ block.settings.free_quantity | json }},"method":{{ block.settings.discount_method | json }},"code":{{ block.settings.discount_code | strip | json }},"pack_value":{{ qb_pack_value | json }},"pack_variant_id":{% if qb_is_pack %}{{ qb_pack_variant.id | json }}{% else %}null{% endif %},"compare_source":{{ block.settings.compare_price_source | json }},"selected_by_default":{{ block.settings.selected_by_default | json }},"available":{{ qb_available | json }},"reason":{{ qb_reason | json }},"hidden":{{ qb_require_missing | json }},"has_pickers":{{ qb_has_pickers | json }},"stepper":{{ qb_stepper | json }},"stepper_max":{{ block.settings.stepper_max | plus: 0 }},"gallery_image":{{ qb_gallery_position }},"default_options":{{ block.settings.default_options | default: '' | json }},"plan":{"position":{{ qb_plan_position }},"id":{{ qb_plan.id | json }},"name":{{ qb_plan_name | json }},"group":{{ qb_plan_group.name | default: '' | json }},"type":{{ qb_plan_type | default: '' | json }},"value":{{ qb_plan_value | json }}},"badge":{{ qb_badge_plain | json }}}
+      </script>
+    {%- endif -%}
+  </div><!--/qbv2:option-->
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Quantity option",
+  "tag": null,
+  "blocks": [
+    { "type": "_quantity-breaks-v2_bundle" },
+    { "type": "_quantity-breaks-v2_gift" },
+    { "type": "_quantity-breaks-v2_upsell" },
+    { "type": "_quantity-breaks-v2_choice" },
+    { "type": "_quantity-breaks-v2_builder" },
+    { "type": "_quantity-breaks-v2_scratch" },
+    { "type": "_quantity-breaks-v2_field" }
+  ],
+  "settings": [
+    {
+      "type": "range",
+      "id": "quantity",
+      "label": "Quantity",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "selected_by_default",
+      "label": "Selected by default",
+      "default": false,
+      "info": "If none is ticked, the first available option is selected."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "Buy [quantity]",
+      "info": "Also names the option in the sidebar."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "You save [amount_saved]",
+      "info": "Texts with a saving are hidden when nothing is saved."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "label",
+      "label": "Label",
+      "info": "Tag next to the title. Example: FREE SHIPPING."
+    },
+    {
+      "type": "richtext",
+      "id": "highlights",
+      "label": "Highlights",
+      "info": "Use a bulleted list."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "paragraph",
+      "content": "Keywords: [quantity], [title], [price], [compare_price], [price_each], [compare_price_each], [amount_saved], [amount_saved_rounded], [percentage_saved], [free_quantity], [paid_quantity], [plan_name]."
+    },
+    {
+      "type": "header",
+      "content": "Discount"
+    },
+    {
+      "type": "select",
+      "id": "discount_method",
+      "label": "Discount method",
+      "options": [
+        { "value": "automatic", "label": "Automatic discount" },
+        { "value": "code", "label": "Discount code" },
+        { "value": "pack", "label": "Pack variant" }
+      ],
+      "default": "automatic"
+    },
+    {
+      "type": "paragraph",
+      "content": "Create the discount in Shopify admin. Discount setup under the widget shows how.",
+      "visible_if": "{{ block.settings.discount_method == 'automatic' and block.settings.discount_type != 'none' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "The code is added to the cart when customers choose this option. Create the code in Shopify admin.",
+      "visible_if": "{{ block.settings.discount_method == 'code' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Adds one variant priced as a pack, such as 3-pack, instead of separate units. No discount needed.",
+      "visible_if": "{{ block.settings.discount_method == 'pack' }}"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount code",
+      "visible_if": "{{ block.settings.discount_method == 'code' }}"
+    },
+    {
+      "type": "text",
+      "id": "pack_value",
+      "label": "Pack variant",
+      "info": "The option value of the pack variant. Example: 3-pack",
+      "visible_if": "{{ block.settings.discount_method == 'pack' }}"
+    },
+    {
+      "type": "select",
+      "id": "discount_type",
+      "label": "Discount type",
+      "options": [
+        { "value": "none", "label": "No discount" },
+        { "value": "percentage", "label": "Percentage off" },
+        { "value": "amount_each", "label": "Amount off each item" },
+        { "value": "amount_total", "label": "Amount off total" },
+        { "value": "set_price", "label": "Set total price" },
+        { "value": "free_items", "label": "Free items" }
+      ],
+      "default": "none",
+      "info": "Discounts this product's units. In bundles, put the discount on the bundle products.",
+      "visible_if": "{{ block.settings.discount_method != 'pack' }}"
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Percentage",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 10,
+      "visible_if": "{{ block.settings.discount_method != 'pack' and block.settings.discount_type == 'percentage' }}"
+    },
+    {
+      "type": "number",
+      "id": "discount_amount",
+      "label": "Amount",
+      "default": 5,
+      "info": "In your shop's currency, without the currency symbol. Example: 4.99",
+      "visible_if": "{{ block.settings.discount_method != 'pack' and block.settings.discount_type == 'amount_each' or block.settings.discount_type == 'amount_total' }}"
+    },
+    {
+      "type": "number",
+      "id": "total_price",
+      "label": "Total price",
+      "default": 50,
+      "info": "In your shop's currency, without the currency symbol. Example: 49.99",
+      "visible_if": "{{ block.settings.discount_method != 'pack' and block.settings.discount_type == 'set_price' }}"
+    },
+    {
+      "type": "range",
+      "id": "free_quantity",
+      "label": "Free items",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 1,
+      "info": "Quantity 3 with 1 free item means Buy 2, get 1 free.",
+      "visible_if": "{{ block.settings.discount_method != 'pack' and block.settings.discount_type == 'free_items' }}"
+    },
+    {
+      "type": "header",
+      "content": "Prices"
+    },
+    {
+      "type": "select",
+      "id": "compare_price_source",
+      "label": "Compare price based on",
+      "options": [
+        { "value": "compare_price", "label": "Compare price" },
+        { "value": "price", "label": "Regular price" }
+      ],
+      "default": "compare_price",
+      "info": "Products without a compare price use the regular price."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "price_text",
+      "label": "Price",
+      "default": "<strong>[price]</strong>"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "compare_price_text",
+      "label": "Compare price",
+      "default": "[compare_price]",
+      "info": "Hidden when it isn't higher than the price."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "savings_text",
+      "label": "Savings text",
+      "info": "Line under the price. Use [percentage_saved] or [amount_saved]. Hidden when nothing is saved."
+    },
+    {
+      "type": "color",
+      "id": "savings_text_color",
+      "label": "Savings text color",
+      "info": "If empty, the accent color.",
+      "visible_if": "{{ block.settings.savings_text != blank }}"
+    },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "badge_text",
+      "label": "Text",
+      "info": "Leave empty to hide a text badge. Image badges use it for screen readers."
+    },
+    {
+      "type": "select",
+      "id": "badge_style",
+      "label": "Style",
+      "options": [
+        { "value": "pill", "label": "Pill on border" },
+        { "value": "tab", "label": "Tab" },
+        { "value": "ribbon", "label": "Corner ribbon" },
+        { "value": "sticker", "label": "Sticker" },
+        { "value": "inline", "label": "Next to title" },
+        { "value": "image", "label": "Image" },
+        { "value": "border", "label": "Animated border" }
+      ],
+      "default": "pill"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_image",
+      "label": "Image",
+      "info": "Badge text is read by screen readers.",
+      "visible_if": "{{ block.settings.badge_style == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "badge_position",
+      "label": "Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "right",
+      "visible_if": "{{ block.settings.badge_style == 'pill' or block.settings.badge_style == 'tab' or block.settings.badge_style == 'border' }}"
+    },
+    {
+      "type": "select",
+      "id": "badge_color",
+      "label": "Color",
+      "options": [
+        { "value": "accent", "label": "Accent" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "accent",
+      "visible_if": "{{ block.settings.badge_style != 'image' }}"
+    },
+    {
+      "type": "color",
+      "id": "custom_badge_bg_color",
+      "label": "Background color",
+      "default": "#121212",
+      "visible_if": "{{ block.settings.badge_color == 'custom' and block.settings.badge_style != 'image' }}"
+    },
+    {
+      "type": "color",
+      "id": "custom_badge_text_color",
+      "label": "Text color",
+      "default": "#FFFFFF",
+      "visible_if": "{{ block.settings.badge_color == 'custom' and block.settings.badge_style != 'image' }}"
+    },
+    {
+      "type": "header",
+      "content": "Variant pickers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_pickers",
+      "label": "Show variant pickers",
+      "default": true,
+      "info": "One row per item, up to 10 items. Not shown for products with one variant or over 250 variants.",
+      "visible_if": "{{ block.settings.quantity_stepper == false and block.settings.discount_method != 'pack' }}"
+    },
+    {
+      "type": "text",
+      "id": "default_options",
+      "label": "Default options",
+      "info": "Values per item, separated by commas. Example: Black / M, Red / L",
+      "visible_if": "{{ block.settings.show_variant_pickers and block.settings.quantity_stepper == false and block.settings.discount_method != 'pack' }}"
+    },
+    {
+      "type": "header",
+      "content": "Quantity"
+    },
+    {
+      "type": "checkbox",
+      "id": "quantity_stepper",
+      "label": "Show quantity stepper",
+      "default": false,
+      "info": "Lets customers raise the quantity, such as 5+. Use it on the last option."
+    },
+    {
+      "type": "range",
+      "id": "stepper_max",
+      "label": "Maximum quantity",
+      "min": 2,
+      "max": 100,
+      "step": 1,
+      "default": 20,
+      "visible_if": "{{ block.settings.quantity_stepper }}"
+    },
+    {
+      "type": "header",
+      "content": "Gallery"
+    },
+    {
+      "type": "range",
+      "id": "gallery_image",
+      "label": "Gallery image position",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 0,
+      "info": "Position of the product image shown when this option is selected. 0 keeps the current image."
+    },
+    {
+      "type": "header",
+      "content": "Subscription"
+    },
+    {
+      "type": "range",
+      "id": "subscription_plan",
+      "label": "Selling plan position",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 0,
+      "info": "Position in the product's selling plans, listed in Discount setup. 0 sells one-time."
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card style",
+      "options": [
+        { "value": "default", "label": "Same as other options" },
+        { "value": "tint", "label": "Accent tint" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "color",
+      "id": "custom_card_bg_color",
+      "label": "Background color",
+      "default": "#F2EAF6",
+      "visible_if": "{{ block.settings.card_style == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "custom_card_text_color",
+      "label": "Text color",
+      "default": "#121212",
+      "visible_if": "{{ block.settings.card_style == 'custom' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quantity option"
+    }
+  ]
+}
+{% endschema %}

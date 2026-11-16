@@ -1,0 +1,91 @@
+{
+  "current": {
+    "color_surface": "{{ settings.colors.surface }}",
+    "type_heading_font": "lato_n5",
+    "heading_size_scale": 100,
+    "body_size_scale": 100,
+    "container_width": "container-narrow",
+    "border_radius": 6,
+    "quick_add_image_ratio": "square",
+    "cart_type": "drawer",
+    "cart_show_dynamic_checkout_buttons": false,
+    "cart_show_view_cart_button": false,
+    "social_threads": "",
+    "social_pinterest": "",
+    "social_snapchat": "",
+    "sections": {
+      "password-footer": {
+        "type": "password-footer",
+        "settings": {
+          "background_color": "{{ settings.colors.background }}",
+          "text_color": "{{ settings.colors.text }}",
+          "accent_color": "{{ settings.colors.accent }}",
+          "pt": 24,
+          "pb": 24
+        }
+      }
+    },
+    "content_for_index": [],
+    "blocks": {},
+    "colors": {
+      "background": "#ffffff",
+      "text": "#0a0a0a",
+      "surface": "#F6F6F6",
+      "accent": "#0069a9"
+    },
+    "button_border_radius": 6,
+    "button_border_width": 1,
+    "button_uppercase": false,
+    "input_border_radius": 4,
+    "input_border_width": 1,
+    "product_card_image_ratio": "portrait",
+    "product_card_show_secondary_image": true,
+    "product_card_show_vendor": false,
+    "product_card_show_rating": true,
+    "badge_position": "top_left",
+    "badge_corner_radius": 4,
+    "brand_headline": "DNK Sovereign",
+    "brand_description": "World-class e-commerce performance and sovereign design."
+  },
+  "presets": {
+    "Apex D2C": {
+      "button_border_radius": 8,
+      "button_border_width": 1,
+      "button_uppercase": false,
+      "input_border_radius": 6,
+      "badge_corner_radius": 6,
+      "colors": {
+        "background": "#ffffff",
+        "text": "#0a0a0a",
+        "surface": "#F6F6F6",
+        "accent": "#0066CC"
+      }
+    },
+    "Luxury Editorial": {
+      "button_border_radius": 0,
+      "button_border_width": 1,
+      "button_uppercase": true,
+      "input_border_radius": 0,
+      "badge_corner_radius": 0,
+      "colors": {
+        "background": "#FAF9F6",
+        "text": "#1A1A1A",
+        "surface": "#F2EFE9",
+        "accent": "#997A44"
+      }
+    },
+    "High-Volume Direct": {
+      "button_border_radius": 12,
+      "button_border_width": 2,
+      "button_uppercase": true,
+      "input_border_radius": 8,
+      "badge_corner_radius": 8,
+      "colors": {
+        "background": "#ffffff",
+        "text": "#111827",
+        "surface": "#F3F4F6",
+        "accent": "#E11D48"
+      }
+    }
+  }
+}

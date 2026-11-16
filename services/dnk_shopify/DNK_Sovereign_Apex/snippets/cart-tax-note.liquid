@@ -1,0 +1,43 @@
+{%- comment -%}
+  Taxes, duties and shipping note of the cart totals (Subtotals block, the classic cart page's Subtotal block).
+  Parameter: shipping (true: the sentence also says that shipping is calculated at checkout).
+  Prints the translated sentence; with a shipping policy it links it.
+{%- endcomment -%}
+{%- liquid
+  assign has_policy = false
+  if shop.shipping_policy.body != blank
+    assign has_policy = true
+  endif
+  if shipping
+    if cart.duties_included and cart.taxes_included
+      assign note_key = 'checkout_duties_taxes_included_shipping'
+    elsif cart.duties_included
+      assign note_key = 'checkout_duties_included_taxes_shipping'
+    elsif cart.taxes_included
+      assign note_key = 'taxes_included_but_shipping_at_checkout'
+      if has_policy
+        assign note_key = 'taxes_included_and_shipping_policy'
+      endif
+    else
+      assign note_key = 'taxes_and_shipping_at_checkout'
+      if has_policy
+        assign note_key = 'taxes_and_shipping_policy_at_checkout'
+      endif
+    endif
+    if has_policy
+      assign note_key = note_key | append: '_html'
+    endif
+  else
+    if cart.duties_included and cart.taxes_included
+      assign note_key = 'checkout_duties_taxes_included'
+    elsif cart.duties_included
+      assign note_key = 'checkout_duties_included_taxes_at_checkout'
+    elsif cart.taxes_included
+      assign note_key = 'checkout_taxes_included'
+    else
+      assign note_key = 'checkout_taxes_at_checkout'
+    endif
+  endif
+  assign note_key = 'sections.cart.' | append: note_key
+-%}
+{{- note_key | t: link: shop.shipping_policy.url -}}

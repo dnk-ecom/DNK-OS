@@ -1,0 +1,667 @@
+/* Shrine PRO cart rewards: Rewards bar, old bar styles, Free gift states (04-rewards §8). Loaded by the cart core for
+   [data-cart-feature="rewards"] / "rewards:css", or linked by blocks outside the cart drawer. Logical properties only;
+   no transform on markers (Cart page V2 sits in animated sections). */
+
+/* ---------------------------------------------------------------- Rewards bar: wrapper, root, message */
+.cart-rewards-wrap [hidden] {
+  display: none !important;
+}
+
+.cart-rewards-wrap--bg {
+  background: var(--rw-bg);
+  border-radius: var(--rw-radius);
+  padding: 1.2rem 1.5rem;
+}
+
+.cart-drawer__body > .cart-rewards-wrap--full,
+.drawer__footer > .cart-rewards-wrap--full,
+.cart-side-panel > .cart-rewards-wrap--full {
+  margin-inline: calc(-1 * var(--cart-pad, 1.5rem));
+  border-radius: 0;
+  padding-inline: var(--cart-pad, 1.5rem);
+}
+
+cart-rewards-bar {
+  display: block;
+}
+
+.cart-rewards__message {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.cart-rewards--text-below .cart-rewards__message {
+  margin: 1rem 0 0;
+}
+
+.cart-rewards--align-start .cart-rewards__message {
+  text-align: start;
+}
+
+.cart-rewards--align-end .cart-rewards__message {
+  text-align: end;
+}
+
+/* ---------------------------------------------------------------- track and fill */
+.cart-rewards__body {
+  position: relative;
+}
+
+.cart-rewards__track {
+  position: relative;
+  height: var(--rw-line-height, 0.8rem);
+  border-radius: 5rem;
+  background: rgba(var(--color-foreground), 0.12);
+}
+
+.cart-rewards__fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  max-width: 100%;
+  border-radius: inherit;
+  background: var(--rw-fill, rgb(var(--accent-color)));
+}
+
+.cart-rewards__fill--striped {
+  background-image: linear-gradient(315deg, rgba(255, 255, 255, 0.4) 25%, transparent 0, transparent 50%, rgba(255, 255, 255, 0.4) 0, rgba(255, 255, 255, 0.4) 75%, transparent 0, transparent);
+  background-size: 1rem 1rem;
+}
+
+/* ---------------------------------------------------------------- steps (shared parts) */
+.cart-rewards__steps,
+.cart-rewards__inactive {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cart-rewards__marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--rw-dot, 2.4rem);
+  block-size: var(--rw-dot, 2.4rem);
+  border-radius: 50%;
+  border: 0.2rem solid var(--rw-marker, rgb(var(--accent-color)));
+  background: rgb(var(--color-background));
+  color: var(--rw-marker, rgb(var(--accent-color)));
+  box-sizing: border-box;
+}
+
+.cart-rewards__icon,
+.cart-rewards__lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.cart-rewards__icon .material-symbols-outlined,
+.cart-rewards__lock .material-symbols-outlined {
+  font-size: 1.4rem;
+  color: inherit;
+}
+
+.cart-rewards__icon img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+
+.cart-rewards__marker .cart-rewards__icon img {
+  width: calc(var(--rw-dot, 2.4rem) * 0.6);
+  height: calc(var(--rw-dot, 2.4rem) * 0.6);
+}
+
+.cart-rewards__check {
+  width: 55%;
+  height: 55%;
+}
+
+.cart-rewards__mystery {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cart-rewards__label {
+  display: block;
+}
+
+.cart-rewards__check,
+.cart-rewards__lock,
+.cart-rewards__mystery,
+.cart-rewards__label--mystery,
+.cart-rewards__goal {
+  display: none;
+}
+
+/* parts by state: the check replaces the icon once unlocked, the locked icon while locked, the "?" for a mystery gift */
+.cart-rewards:not(.cart-rewards--checks-off) .is-unlocked .cart-rewards__icon {
+  display: none;
+}
+
+.cart-rewards:not(.cart-rewards--checks-off) .is-unlocked .cart-rewards__check {
+  display: block;
+}
+
+.cart-rewards--locks .is-locked .cart-rewards__icon {
+  display: none;
+}
+
+.cart-rewards--locks .is-locked .cart-rewards__lock {
+  display: flex;
+}
+
+.cart-rewards__step[data-rw-mystery].is-locked .cart-rewards__icon,
+.cart-rewards__step[data-rw-mystery].is-locked .cart-rewards__lock,
+.cart-rewards__step[data-rw-mystery].is-locked .cart-rewards__label:not(.cart-rewards__label--mystery) {
+  display: none;
+}
+
+.cart-rewards__step[data-rw-mystery].is-locked .cart-rewards__mystery,
+.cart-rewards__step[data-rw-mystery].is-locked .cart-rewards__label--mystery {
+  display: block;
+}
+
+.cart-rewards--amounts-on .cart-rewards__goal {
+  display: block;
+  font-size: 1.1rem;
+  opacity: 0.75;
+}
+
+/* status texts and labels stay readable for screen readers where they aren't shown */
+.cart-rewards:not(.cart-rewards--status) .cart-rewards__steps .cart-rewards__status,
+.cart-rewards--labels-off .cart-rewards__label,
+.cart-rewards--minimal .cart-rewards__steps,
+.cart-rewards--text .cart-rewards__steps {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* unlocked marker (line with icons, label and status) */
+.cart-rewards__step.is-unlocked .cart-rewards__marker {
+  background: var(--rw-marker, rgb(var(--accent-color)));
+  color: rgb(var(--color-background));
+}
+
+/* ---------------------------------------------------------------- Line with icons / Steps: markers on the line */
+.cart-rewards--line_icons {
+  --rw-dot: 2.4rem;
+}
+
+.cart-rewards--steps {
+  --rw-dot: 2.2rem;
+}
+
+.cart-rewards--line_icons .cart-rewards__body,
+.cart-rewards--steps .cart-rewards__body {
+  margin-inline: calc(var(--rw-dot) / 2);
+  padding-block-end: 3rem;
+}
+
+.cart-rewards--line_icons.cart-rewards--amounts-on .cart-rewards__body,
+.cart-rewards--steps.cart-rewards--amounts-on .cart-rewards__body {
+  padding-block-end: 4.4rem;
+}
+
+.cart-rewards--line_icons.cart-rewards--labels-off .cart-rewards__body,
+.cart-rewards--steps.cart-rewards--labels-off .cart-rewards__body {
+  padding-block-end: 1.6rem;
+}
+
+.cart-rewards--line_icons .cart-rewards__steps,
+.cart-rewards--steps .cart-rewards__steps {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: var(--rw-line-height, 0.8rem);
+}
+
+.cart-rewards--line_icons .cart-rewards__steps > .cart-rewards__step,
+.cart-rewards--steps .cart-rewards__steps > .cart-rewards__step {
+  position: absolute;
+  inset-inline-start: var(--rw-pos);
+  inset-block-start: 50%;
+  width: 0;
+  height: 0;
+}
+
+.cart-rewards--line_icons .cart-rewards__steps .cart-rewards__marker,
+.cart-rewards--steps .cart-rewards__steps .cart-rewards__marker {
+  position: absolute;
+  margin-inline-start: calc(var(--rw-dot) / -2);
+  margin-block-start: calc(var(--rw-dot) / -2);
+}
+
+.cart-rewards--line_icons .cart-rewards__steps .cart-rewards__text,
+.cart-rewards--steps .cart-rewards__steps .cart-rewards__text {
+  position: absolute;
+  inset-block-start: calc(var(--rw-dot) / 2 + 0.6rem);
+  inline-size: 7.2rem;
+  margin-inline-start: -3.6rem;
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.cart-rewards--many .cart-rewards__steps .cart-rewards__text {
+  inline-size: 5.6rem;
+  margin-inline-start: -2.8rem;
+  font-size: 1.1rem;
+}
+
+.cart-rewards__steps .is-edge-start .cart-rewards__text,
+.cart-rewards--many .cart-rewards__steps .is-edge-start .cart-rewards__text {
+  margin-inline-start: calc(var(--rw-dot) / -2);
+  text-align: start;
+}
+
+.cart-rewards__steps .is-edge-end .cart-rewards__text {
+  margin-inline-start: calc(-7.2rem + var(--rw-dot) / 2);
+  text-align: end;
+}
+
+.cart-rewards--many .cart-rewards__steps .is-edge-end .cart-rewards__text {
+  margin-inline-start: calc(-5.6rem + var(--rw-dot) / 2);
+  text-align: end;
+}
+
+/* labels at the ends of the bar open towards the middle and fit their text ("Free shipping" on one line), up to a
+   limit that keeps them clear of the next label */
+.cart-rewards--line_icons .cart-rewards__steps .is-edge-start .cart-rewards__text,
+.cart-rewards--line_icons .cart-rewards__steps .is-edge-end .cart-rewards__text,
+.cart-rewards--steps .cart-rewards__steps .is-edge-start .cart-rewards__text,
+.cart-rewards--steps .cart-rewards__steps .is-edge-end .cart-rewards__text {
+  inline-size: max-content;
+  max-inline-size: 11rem;
+}
+
+.cart-rewards--line_icons .cart-rewards__steps .is-edge-end .cart-rewards__text,
+.cart-rewards--steps .cart-rewards__steps .is-edge-end .cart-rewards__text {
+  margin-inline-start: 0;
+  inset-inline-start: auto;
+  inset-inline-end: calc(var(--rw-dot) / -2);
+}
+
+.cart-rewards--many.cart-rewards--line_icons .cart-rewards__steps :is(.is-edge-start, .is-edge-end) .cart-rewards__text,
+.cart-rewards--many.cart-rewards--steps .cart-rewards__steps :is(.is-edge-start, .is-edge-end) .cart-rewards__text {
+  max-inline-size: 8.4rem;
+}
+
+/* Steps: neutral markers until reached, the next one in the bar colour */
+.cart-rewards--steps .cart-rewards__step.is-locked .cart-rewards__marker {
+  border-color: rgba(var(--color-foreground), 0.25);
+  color: rgba(var(--color-foreground), 0.6);
+}
+
+.cart-rewards--steps .cart-rewards__step.is-locked.is-next .cart-rewards__marker {
+  border-color: var(--rw-marker, rgb(var(--accent-color)));
+}
+
+/* ---------------------------------------------------------------- Label and status: one row per reward */
+.cart-rewards--status {
+  --rw-dot: 2rem;
+}
+
+.cart-rewards--status .cart-rewards__steps {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.cart-rewards--status .cart-rewards__step,
+.cart-rewards__inactive .cart-rewards__step {
+  display: grid;
+  grid-template-columns: var(--rw-dot, 2rem) 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding-block: 0.4rem;
+  border-block-end: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+}
+
+.cart-rewards--status .cart-rewards__step:last-child,
+.cart-rewards__inactive .cart-rewards__step:last-child {
+  border-block-end: 0;
+}
+
+.cart-rewards--status .cart-rewards__label,
+.cart-rewards__inactive .cart-rewards__label {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.cart-rewards--status .cart-rewards__status,
+.cart-rewards__inactive .cart-rewards__status {
+  font-size: 1.3rem;
+  text-align: end;
+}
+
+.cart-rewards--status .cart-rewards__step.is-unlocked .cart-rewards__status {
+  color: var(--rw-marker, rgb(var(--accent-color)));
+}
+
+/* theme editor only: rewards that are switched off (no goal, no gift products) */
+.cart-rewards__inactive {
+  display: grid;
+  gap: 0.4rem;
+  margin-block-start: 1rem;
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------- gift areas (choose, remove, add back) */
+.cart-rewards__areas {
+  display: grid;
+  gap: 1rem;
+  margin-block-start: 1.4rem;
+}
+
+.cart-rewards.is-gifts-off .cart-rewards__areas {
+  display: none;
+}
+
+.cart-reward__title {
+  margin: 0 0 0.6rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.cart-reward__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.8rem;
+}
+
+.cart-reward__option {
+  display: grid;
+  gap: 0.4rem;
+  min-height: 4.4rem;
+  padding: 0.8rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+  border-radius: var(--cart-radius-small, 0.6rem);
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.cart-reward__option[aria-pressed='true'] {
+  border-color: rgb(var(--accent-color));
+  box-shadow: inset 0 0 0 0.1rem rgb(var(--accent-color));
+}
+
+.cart-reward__option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cart-reward__option:focus-visible,
+.cart-reward__remove:focus-visible,
+.cart-reward__add-back:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.2rem;
+}
+
+.cart-reward__image {
+  display: block;
+  width: 5.6rem;
+  height: 5.6rem;
+  object-fit: contain;
+  border-radius: var(--cart-radius-small, 0.4rem);
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+.cart-reward__name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.cart-reward__price {
+  font-size: 1.2rem;
+}
+
+.cart-reward__price s {
+  opacity: 0.75;
+}
+
+.cart-reward__row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.cart-reward__row .cart-reward__image {
+  width: 4.8rem;
+  height: 4.8rem;
+}
+
+.cart-reward__row .cart-reward__name {
+  flex: 1;
+}
+
+.cart-reward__remove,
+.cart-reward__add-back {
+  min-height: 2.4rem;
+  padding-block: 0;
+  padding-inline: 0.2rem;
+  font-size: 1.3rem;
+  text-decoration: underline;
+}
+
+.cart-reward__removed {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.cart-reward__error {
+  display: block;
+  font-size: 1.2rem;
+}
+
+.cart-reward__error:not(:empty) {
+  margin-block-start: 0.4rem;
+}
+
+/* what shows per state (§3.8): JS toggles only hidden and data-state */
+.cart-reward[data-state='removed'] > :not(.cart-reward__removed):not(.cart-reward__error),
+.cart-reward[data-state='unlocked'] .cart-reward__removed,
+.cart-reward .cart-reward__remove {
+  display: none;
+}
+
+.cart-reward[data-in-cart='true'][data-display='hidden']:not([data-readd='true']):not([data-state='removed']) .cart-reward__remove {
+  display: inline-block;
+}
+
+/* ---------------------------------------------------------------- pending recompute (other currencies) */
+.cart-rewards.is-pending .cart-rewards__message,
+.cart-rewards.is-pending .cart-rewards__body {
+  visibility: hidden;
+  animation: cart-rewards-reveal 0s 2.5s forwards;
+}
+
+@keyframes cart-rewards-reveal {
+  to {
+    visibility: visible;
+  }
+}
+
+/* ---------------------------------------------------------------- cart styles (A3: only while the merchant set no background) */
+.cart-style--cards .cart-rewards-wrap:not(.cart-rewards-wrap--bg) {
+  background: rgb(var(--color-background));
+  border-radius: var(--cart-radius, 1.2rem);
+  padding: var(--cart-pad, 1.2rem);
+}
+
+.cart-style--soft .cart-rewards-wrap:not(.cart-rewards-wrap--bg) {
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+  border-radius: var(--cart-radius, 1.6rem);
+  padding: var(--cart-pad, 1.2rem);
+}
+
+.cart-style--bold .cart-rewards--steps .cart-rewards__marker {
+  border-width: 0.25rem;
+}
+
+.cart-style--bold .cart-rewards__message {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1.3rem;
+}
+
+/* ---------------------------------------------------------------- gifts that wait for main.js's cart root support (stores without a drawer) */
+cart-rewards-gate {
+  display: none;
+}
+
+[data-rw-engine-wait] {
+  display: none !important;
+}
+
+.cart-drawer-gift-container.is-gifts-off {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- Progress bar and Checkpoints bar styles (§8.3) */
+.cart-progress__check,
+.cart-checkpoints__check {
+  display: none;
+}
+
+.cart-progress--steps .cart-progress__end .cart-progress__check {
+  width: 55%;
+  height: 55%;
+  color: rgb(var(--accent-color));
+}
+
+.cart-progress--steps .cart-progress__end.is-reached .material-symbols-outlined,
+.cart-progress--steps .cart-progress__end.is-reached img {
+  display: none;
+}
+
+.cart-progress--steps .cart-progress__end.is-reached .cart-progress__check {
+  display: block;
+}
+
+.cart-progress--status .cart-progress__row,
+.cart-checkpoints__row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.cart-progress__row .cart-progress__bar__badge,
+.cart-checkpoints__row .cart-progress__bar__badge {
+  position: static;
+  transform: none;
+  flex: 0 0 auto;
+}
+
+.cart-progress--status .cart-progress__text {
+  flex: 1;
+  margin: 0;
+  text-align: start;
+}
+
+.cart-progress__status,
+.cart-checkpoints__status {
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cart-progress__status.is-reached,
+.cart-checkpoints__row.is-reached .cart-checkpoints__status {
+  color: rgb(var(--accent-color));
+}
+
+.cart-progress--steps .cart-checkpoints__icon.is-reached > :not(.cart-checkpoints__check):not(.cart-checkpoints__label) {
+  display: none;
+}
+
+.cart-progress--steps .cart-checkpoints__icon.is-reached .cart-checkpoints__check,
+.cart-checkpoints__row.is-reached .cart-checkpoints__check {
+  display: block;
+  width: 55%;
+  height: 55%;
+  color: rgb(var(--accent-color));
+}
+
+.cart-checkpoints__row.is-reached .cart-checkpoints__row-icon > :not(.cart-checkpoints__check) {
+  display: none;
+}
+
+.cart-checkpoints__row {
+  margin-block-start: 0.6rem;
+}
+
+.cart-checkpoints__row-label {
+  flex: 1;
+  font-size: 1.3rem;
+}
+
+.cart-checkpoints__row-label span + span::before {
+  content: ' ';
+}
+
+.cart-checkpoints.cart-progress--status,
+.cart-checkpoints.cart-progress--minimal,
+.cart-checkpoints.cart-progress--text {
+  padding-bottom: 1.5rem;
+}
+
+/* Free gift: the lock overlay carries [hidden] in other currencies (base.css gives it display: flex) */
+.cart-drawer-gift__image__locked[hidden] {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------- motion (A11): none under reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .cart-rewards__fill {
+    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .cart-rewards__fill--striped {
+    animation: slideBar 4s linear infinite;
+  }
+
+  body[data-rtl='true'] .cart-rewards__fill--striped {
+    animation-name: slideBarRtl;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 25%, transparent 0, transparent 50%, rgba(255, 255, 255, 0.4) 0, rgba(255, 255, 255, 0.4) 75%, transparent 0, transparent);
+  }
+
+  .cart-rewards__step.is-new .cart-rewards__marker {
+    animation: cart-rewards-pulse 0.6s ease-out;
+  }
+}
+
+@keyframes cart-rewards-pulse {
+  0% {
+    scale: 1;
+  }
+
+  40% {
+    scale: 1.18;
+  }
+
+  100% {
+    scale: 1;
+  }
+}

@@ -1,0 +1,149 @@
+{% liquid
+  assign video_loading = 'lazy'
+  assign video_media_width = 2400
+  assign video_sizes = '100vw'
+
+  if section.settings.mobile_columns != blank and section.settings.desktop_columns != blank
+    assign mobile_video_size = 100.0 | divided_by: section.settings.mobile_columns | append: 'vw'
+    assign desktop_video_size = 100.0 | divided_by: section.settings.desktop_columns | append: 'vw'
+    assign video_sizes = '(min-width: 1200px) ' | append: desktop_video_size | append: ', ' | append: mobile_video_size
+  endif
+
+  if section.index == 1
+    assign video_loading = 'eager'
+  else
+    assign video_sizes = 'auto, ' | append: video_sizes
+  endif
+%}
+
+<div
+  class="video-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="video-block-media">
+    {% render 'video-media',
+      source: block.settings.source,
+      uploaded_video: block.settings.video,
+      external_video: block.settings.external_video,
+      cover_image: block.settings.cover_image,
+      external_video_alt: block.settings.external_video_alt,
+      autoplay: block.settings.autoplay,
+      muted: block.settings.muted,
+      loop: block.settings.loop,
+      show_controls: block.settings.show_controls,
+      media_width: video_media_width,
+      sizes: video_sizes,
+      loading: video_loading,
+      section_index: section.index
+    %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Video source",
+      "options": [
+        { "value": "uploaded", "label": "Uploaded video" },
+        { "value": "url", "label": "External URL" }
+      ],
+      "default": "uploaded"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "visible_if": "{{ block.settings.source == 'uploaded' }}"
+    },
+    {
+      "type": "video_url",
+      "id": "external_video",
+      "label": "YouTube or Vimeo URL",
+      "accept": ["youtube", "vimeo"],
+      "info": "Supports YouTube and Vimeo URLs.",
+      "visible_if": "{{ block.settings.source == 'url' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "cover_image",
+      "label": "Cover image",
+      "info": "Used as the poster for deferred external video.",
+      "visible_if": "{{ block.settings.source == 'url' }}"
+    },
+    {
+      "type": "text",
+      "id": "external_video_alt",
+      "label": "Video description",
+      "info": "Describe the video for customers using screen readers.",
+      "visible_if": "{{ block.settings.source == 'url' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "info": "Autoplay videos are muted.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Muted",
+      "info": "Autoplay videos are always muted.",
+      "default": false,
+      "visible_if": "{{ block.settings.source == 'uploaded' and block.settings.autoplay == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show controls",
+      "default": true,
+      "visible_if": "{{ block.settings.source == 'uploaded' }}"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video",
+      "category": "Media"
+    }
+  ]
+}
+{% endschema %}

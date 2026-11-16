@@ -1,0 +1,147 @@
+/*
+  Main collection stylesheet
+
+  This file owns the collection page structure, header presentation, and toolbar layout.
+*/
+
+
+/*
+  Collection header
+*/
+.main-collection {
+  display: block;
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
+}
+
+.collection-header-block {
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
+}
+
+.collection-header-block:has(.main-collection-header-with-image) {
+  padding-top: 1rem;
+}
+
+.main-collection-header {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.main-collection-header-content {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.main-collection-title {
+  margin: 0;
+}
+
+.main-collection-description {
+  width: 100%;
+  max-width: 720px;
+}
+
+.main-collection-header .breadcrumb-list {
+  justify-content: var(--mobile-text-alignment);
+}
+
+.main-collection-header[data-mobile-text-alignment="center"]
+  .main-collection-description {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.main-collection-header[data-mobile-text-alignment="right"]
+  .main-collection-description {
+  margin-left: auto;
+}
+
+.main-collection-image {
+  width: 100%;
+  border-radius: var(--border-radius);
+}
+
+@media (min-width: 600px) {
+  .collection-header-block:has(.main-collection-header-with-image) {
+    padding-top: calc(var(--pt) * var(--spacing-scale));
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-collection-header .breadcrumb-list {
+    justify-content: var(--desktop-text-alignment);
+  }
+
+  .main-collection-header-with-image {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .main-collection-header-with-image[data-desktop-image-width="one-third"] {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .main-collection-header-content {
+    gap: 0.75rem;
+  }
+
+  .main-collection-header-with-image .main-collection-header-content {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .main-collection-header-with-image .main-collection-image {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  .main-collection-header[data-desktop-text-alignment="left"]
+    .main-collection-description {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .main-collection-header[data-desktop-text-alignment="center"]
+    .main-collection-description {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .main-collection-header[data-desktop-text-alignment="right"]
+    .main-collection-description {
+    margin-right: 0;
+    margin-left: auto;
+  }
+}
+
+
+/*
+  Collection toolbar
+*/
+.collection-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.collection-toolbar-product-count {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+.collection-toolbar-actions {
+  flex-wrap: nowrap;
+  margin-left: auto;
+}
+
+.collection-toolbar .btn {
+  min-width: auto;
+}
+
+.main-collection .faceted-results-grid {
+  margin-top: 0;
+}

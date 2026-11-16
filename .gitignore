@@ -1,0 +1,53 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: ".gitignore"
+# purpose: "Zero-Leak gitignore for DNK OS Sovereign Kernel (DEC-070 / DEC-117)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "2.0.0"
+# updated_at: "2026-11-16"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+# Python runtime & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node runtime & package managers
+node_modules/
+.pnpm-store/
+.npm/
+.next/
+out/
+
+# Local state & logs (DEC-071)
+data/
+.data/
+logs/
+*.log
+*.pid
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Secrets & Local overrides
+.env
+.env.*
+config/config.toml
+
+# OS Metadata
+.DS_Store
+Thumbs.db

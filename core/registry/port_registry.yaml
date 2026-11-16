@@ -1,0 +1,167 @@
+port_registry:
+  governance_policy:
+    host_binding_default: 127.0.0.1
+    allow_default_port_collisions: false
+    banned_unassigned_ports:
+    - 3000
+    - 5173
+    - 8000
+    new_repository_onboarding_rule: 'Every newly cloned or assimilated repository
+      in ../DNK_Vibe/ MUST be registered in this file BEFORE starting its dev server.
+      Default framework ports (3000, 5173, 8000, 8080) MUST be overridden in the repository''s
+      local .env / package.json / tools-dev flags to use its dedicated block in the
+      54100-54999 range (or assigned block below).
+
+      '
+  port_ranges:
+    dnk_core_platform: 3000-8999 (Core DNK_HUB & Infrastructure)
+    dnk_vibe_isolated_apps: 54100-54999 (Dedicated blocks of 10-30 ports per external
+      repo)
+  entries:
+    dnk_hub_frontend:
+      name: DNK OS Web Frontend (Next.js)
+      location: ./apps/web
+      host: 127.0.0.1
+      ports:
+        web: 3000
+        vite_dev: 5173
+      env_vars:
+        PORT: 3000
+    dnk_hub_backend:
+      name: DNK OS API Gateway & Orchestrator (FastAPI)
+      location: ./apps/api
+      host: 127.0.0.1
+      ports:
+        api: 8000
+      env_vars:
+        PORT: 8000
+    dnk_shopify_service:
+      name: DNK Shopify Microservice
+      location: ./services/dnk_shopify
+      host: 127.0.0.1
+      ports:
+        api: 8001
+    dnk_media_service:
+      name: DNK Media & Video AI Service
+      location: ./services/dnk_media
+      host: 127.0.0.1
+      ports:
+        api: 8002
+    dnk_distribution_service:
+      name: DNK Omnichannel Distribution Service
+      location: ./services/dnk_distribution
+      host: 127.0.0.1
+      ports:
+        api: 8003
+    dnk_infra_datastores:
+      name: DNK Infrastructure (Postgres, pgvector, Redis, Ollama)
+      location: ./infra/compose/docker-compose.yml
+      host: 127.0.0.1
+      ports:
+        postgres: 5432
+        pgvector: 5433
+        redis: 6379
+        ollama: 11434
+    coucou_vertex_bridge:
+      name: Coucou Vertex AI OpenAI Bridge (Localhost Ollama Proxy)
+      location: ./scripts/system/coucou_vertex_bridge.py
+      host: 127.0.0.1
+      ports:
+        http: 11435
+      env_vars:
+        COUCOU_VERTEX_BRIDGE_PORT: 11435
+    open_design_local:
+      name: Open Design Local (AI Design Studio + Vertex AI / OpenCode)
+      location: ../DNK_Vibe/Open Design Local
+      host: 127.0.0.1
+      ports:
+        daemon: 54301
+        web: 54330
+      env_vars:
+        OD_PORT: 54301
+        OD_WEB_PORT: 54330
+        PORT: 54330
+      start_command: pnpm tools-dev start web --daemon-port 54301 --web-port 54330
+      stop_command: pnpm tools-dev stop
+    hermes_agent_desktop:
+      name: Hermes Agent Desktop & Bootstrap Installer
+      location: ../DNK_Vibe/Hermes Agent
+      host: 127.0.0.1
+      ports:
+        desktop_renderer: 5174
+        bootstrap_installer: 5175
+        electron_inspect: 9229
+    tributary:
+      name: Tributary (Causal Tree Layout & Branching Chat)
+      location: ../DNK_Vibe/tributary
+      host: 127.0.0.1
+      ports:
+        web: 5180
+        api: 8787
+        prod_preview: 8788
+      env_vars:
+        VITE_PORT: 5180
+        PORT: 8787
+    pmx_canvas:
+      name: PMX Canvas
+      location: ../DNK_Vibe/pmx-canvas
+      host: 127.0.0.1
+      ports:
+        app: 4313
+      env_vars:
+        PORT: 4313
+    scriptwriter:
+      name: Scriptwriter
+      location: ../DNK_Vibe/scriptwriter
+      host: 127.0.0.1
+      ports:
+        web: 1421
+    octop:
+      name: Octop Agent Platform
+      location: ../DNK_Vibe/Octop
+      host: 127.0.0.1
+      ports:
+        api: 8088
+        dashboard: 54110
+      env_vars:
+        OCTOP_PORT: 8088
+    thoughtdag:
+      name: ThoughtDAG
+      location: ../DNK_Vibe/thoughtdag
+      host: 127.0.0.1
+      ports:
+        api: 54120
+        web: 54121
+      env_vars:
+        PORT: 54120
+        VITE_PORT: 54121
+    creator_os_starter:
+      name: Creator OS Starter (+ Laya Sidecar)
+      location: ../DNK_Vibe/creator-os-starter
+      host: 127.0.0.1
+      ports:
+        web: 54130
+        laya_sidecar: 54131
+      env_vars:
+        PORT: 54130
+        LAYA_PORT: 54131
+    deepseek_harness:
+      name: DeepSeek Harness (DSH)
+      location: ../DNK_Vibe/DeepSeek HArness
+      host: 127.0.0.1
+      ports:
+        web: 54140
+        docs: 54141
+    codegraph:
+      name: Codegraph Telemetry & UI
+      location: ../DNK_Vibe/codegraph
+      host: 127.0.0.1
+      ports:
+        ui: 54150
+        telemetry: 54151
+    comfy_ui:
+      name: ComfyUI Local Diffusion Engine
+      location: ../DNK_Vibe/Comfy UI
+      host: 127.0.0.1
+      ports:
+        web: 8188

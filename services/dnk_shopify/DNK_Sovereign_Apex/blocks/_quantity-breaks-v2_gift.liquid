@@ -1,0 +1,419 @@
+{%- liquid
+  assign qb_main = closest.product
+  assign qb_product_gift = false
+  if block.settings.gift_type == 'product'
+    assign qb_product_gift = true
+  endif
+  assign qb_gift_qty = block.settings.quantity
+  assign qb_counts = false
+  if qb_product_gift and block.settings.include_value_in_savings
+    assign qb_counts = true
+  endif
+
+  # Gift candidates: every product except subscription-only ones, which can't be added as extras
+  assign qb_first = nil
+  assign qb_first_available = nil
+  assign qb_candidates = 0
+  assign qb_value_all = 0
+  if qb_product_gift
+    for qb_p in block.settings.products
+      unless qb_p.requires_selling_plan
+        assign qb_candidates = qb_candidates | plus: 1
+        if qb_first == nil
+          assign qb_first = qb_p
+        endif
+        if qb_p.available
+          if qb_first_available == nil
+            assign qb_first_available = qb_p
+          endif
+          assign qb_value = qb_p.selected_or_first_available_variant.price | times: qb_gift_qty
+          assign qb_value_all = qb_value_all | plus: qb_value
+        endif
+      endunless
+    endfor
+  endif
+
+  # "One product of their choice" starts on the first available product
+  assign qb_chosen = qb_first_available | default: qb_first
+
+  # Value added to the option's compare price when "Add value to savings" is on (only gifts that are added count)
+  assign qb_counted = 0
+  if qb_counts
+    if block.settings.selection == 'one'
+      if qb_chosen.available
+        assign qb_counted = qb_chosen.selected_or_first_available_variant.price | times: qb_gift_qty
+      endif
+    else
+      assign qb_counted = qb_value_all
+    endif
+  endif
+
+  assign qb_show_change = false
+  if block.settings.selection == 'one' and qb_candidates > 1 and block.settings.choose_label != blank
+    assign qb_show_change = true
+  endif
+-%}
+{%- capture qb_rows -%}
+  {%- if qb_product_gift -%}
+    {%- for qb_p in block.settings.products -%}
+      {%- liquid
+        assign qb_show_row = false
+        unless qb_p.requires_selling_plan
+          if block.settings.selection != 'one' or qb_p.id == qb_chosen.id
+            assign qb_show_row = true
+          endif
+        endunless
+      -%}
+      {%- if qb_show_row -%}
+        {%- liquid
+          assign qb_v = qb_p.selected_or_first_available_variant
+          assign qb_value = qb_v.price | times: qb_gift_qty
+          assign qb_row_prefix = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-g' | append: forloop.index
+        -%}
+        <div class="qb-v2-gift__row" data-qb-gift-row data-qb-chosen="true">
+          {%- render 'qb-v2-extra-item',
+            product: qb_p,
+            variant: qb_v,
+            quantity: qb_gift_qty,
+            role: 'gift',
+            discount_type: 'free',
+            show_price: false,
+            show_picker: block.settings.show_variant_picker,
+            image: block.settings.image,
+            id_prefix: qb_row_prefix,
+            layout: 'row'
+          -%}
+          <span class="qb-v2-gift__text">
+            {%- render 'qb-v2-text',
+              text: block.settings.gift_text,
+              ctx: 'gift',
+              title: qb_p.title,
+              quantity: qb_gift_qty,
+              value: qb_value
+            -%}
+          </span>
+          {%- if block.settings.show_value -%}
+            <s class="qb-v2-gift__value" data-qb-gift-value>{%- render 'qb-v2-money', cents: qb_value -%}</s>
+          {%- endif -%}
+          {%- if qb_show_change -%}
+            <button
+              type="button"
+              class="qb-v2-gift__change link"
+              data-qb-action="gift-choice"
+              aria-haspopup="dialog"
+              aria-describedby="{{ qb_row_prefix }}-title"
+            >
+              {{- block.settings.choose_label | escape -}}
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- comment -%}
+  A product gift without a usable product prints nothing on the storefront (the editor shows a placeholder).
+  The carry markers let the widget copy this gift into the options after this one with the same or a higher quantity.
+{%- endcomment -%}
+{%- if qb_product_gift == false or qb_rows != blank or request.design_mode -%}
+  {%- if block.settings.include_in_bigger_options -%}<!--qbv2:carry-->{%- endif -%}
+  <div
+    class="qb-v2-gift qb-v2-gift--{{ block.settings.style }} qb-v2-gift--{{ block.settings.gift_type }}{% if block.settings.image_shape == 'square' or block.settings.image_shape == 'circle' %} qb-v2-gift--image-{{ block.settings.image_shape }}{% endif %}"
+    data-qb-child="gift"
+    data-qb-block="{{ block.id }}"
+    data-qb-gift-type="{{ block.settings.gift_type }}"
+    data-qb-selection="{{ block.settings.selection }}"
+    data-qb-quantity="{{ qb_gift_qty }}"
+    data-qb-counts-value="{{ qb_counts }}"
+    data-qb-carry="{{ block.settings.include_in_bigger_options }}"
+    data-qb-gift-origin="self"
+    data-qb-sum-total="0"
+    data-qb-sum-cat="{{ qb_counted }}"
+    data-qb-sum-creg="{{ qb_counted }}"
+    {%- if qb_show_change %} data-qb-ext="true"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {{- qb_rows -}}
+    {%- unless qb_product_gift -%}
+      <div class="qb-v2-gift__row qb-v2-gift__row--note">
+        {%- if block.settings.image != blank -%}
+          {%- assign qb_note_ratio = block.settings.image.aspect_ratio | default: 1 -%}
+          <span class="qb-v2-item__media">
+            {%- comment -%}Decorative: the text names the gift{%- endcomment -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 160 }}"
+              alt=""
+              width="160"
+              height="{{ 160 | divided_by: qb_note_ratio | round }}"
+              loading="lazy"
+              class="qb-v2-item__img"
+            >
+          </span>
+        {%- else %}
+        <span class="qb-v2-gift__icon material-symbols-outlined" aria-hidden="true">
+          {{- block.settings.icon | strip | downcase | replace: ' ', '_' -}}
+        </span>
+        {%- endif %}
+        <span class="qb-v2-gift__text">{{ block.settings.note_text }}</span>
+      </div>
+    {%- endunless -%}
+    {%- if qb_show_change -%}
+      {%- comment -%}The gifts the Change button offers, for the extras script's popup (copies in bigger options drop the product JSON){%- endcomment -%}
+      {%- liquid
+        assign qb_select_label = block.settings.select_label | strip | default: block.settings.choose_label
+        assign qb_popup_heading = block.settings.popup_heading | strip | default: qb_select_label
+      -%}
+      {%- render 'qb-v2-candidates',
+        products: block.settings.products,
+        limit: 6,
+        kind: 'gift',
+        block: block,
+        heading: qb_popup_heading,
+        choose_label: qb_select_label,
+        quantity: qb_gift_qty,
+        discount_type: 'free',
+        show_price: block.settings.show_value,
+        show_picker: block.settings.show_variant_picker
+      -%}
+    {%- endif -%}
+    {%- if request.design_mode -%}
+      {%- assign qb_products_json = '' -%}
+      {%- if qb_product_gift -%}
+        {%- if block.settings.products == blank -%}
+          <div class="qb-v2-placeholder">Choose products in Free gift.</div>
+        {%- endif -%}
+        {%- for qb_p in block.settings.products -%}
+          {%- liquid
+            assign qb_v = qb_p.selected_or_first_available_variant
+            assign qb_is_main = false
+            if qb_p.id == qb_main.id
+              assign qb_is_main = true
+            endif
+            assign qb_requires_plan = false
+            if qb_p.requires_selling_plan
+              assign qb_requires_plan = true
+            endif
+            assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+          -%}
+          {%- if qb_requires_plan -%}
+            <div class="qb-v2-placeholder">{{ qb_p.title | escape }} can only be sold with a subscription.</div>
+          {%- endif -%}
+          {%- capture qb_entry -%}
+            {"id":{{ qb_p.id }},"handle":{{ qb_p.handle | json }},"title":{{ qb_p.title | json }},"available":{{ qb_p.available }},"requires_selling_plan":{{ qb_requires_plan }},"variants_count":{{ qb_variants_count | plus: 0 }},"price":{{ qb_v.price | plus: 0 }},"compare_at_price":{{ qb_v.compare_at_price | json }},"is_main":{{ qb_is_main }}}
+          {%- endcapture -%}
+          {%- liquid
+            if forloop.first
+              assign qb_products_json = qb_entry
+            else
+              assign qb_products_json = qb_products_json | append: ',' | append: qb_entry
+            endif
+          -%}
+        {%- endfor -%}
+      {%- endif -%}
+      <script type="application/json" data-qbv2-setup="child">
+        {"type":"gift","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"gift_type":{{ block.settings.gift_type | json }},"selection":{{ block.settings.selection | json }},"quantity":{{ qb_gift_qty }},"include_in_bigger_options":{{ block.settings.include_in_bigger_options }},"include_value_in_savings":{{ block.settings.include_value_in_savings }},"origin":"self"},"products":[{{ qb_products_json }}]}
+      </script>
+    {%- endif -%}
+  </div>
+  {%- if block.settings.include_in_bigger_options -%}<!--/qbv2:carry-->{%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Free gift",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "gift_type",
+      "label": "Gift type",
+      "options": [
+        {
+          "value": "product",
+          "label": "Product"
+        },
+        {
+          "value": "shipping",
+          "label": "Free shipping"
+        },
+        {
+          "value": "text",
+          "label": "Text only"
+        }
+      ],
+      "default": "product"
+    },
+    {
+      "type": "paragraph",
+      "content": "Free shipping and text rows only display. Shopify can't limit free shipping to this product.",
+      "visible_if": "{{ block.settings.gift_type != 'product' }}"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 6,
+      "info": "Used when Gift type is Product."
+    },
+    {
+      "type": "select",
+      "id": "selection",
+      "label": "Customer gets",
+      "options": [
+        {
+          "value": "all",
+          "label": "All products"
+        },
+        {
+          "value": "one",
+          "label": "One product of their choice"
+        }
+      ],
+      "default": "all",
+      "info": "With several products, customers get all of them or choose one.",
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "range",
+      "id": "quantity",
+      "label": "Quantity",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 1,
+      "info": "Per gift product.",
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "gift_text",
+      "label": "Text",
+      "default": "+ FREE [title]",
+      "info": "Use [title], [quantity] and [value].",
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "note_text",
+      "label": "Text",
+      "default": "+ FREE SHIPPING",
+      "visible_if": "{{ block.settings.gift_type != 'product' }}"
+    },
+    {
+      "type": "text",
+      "id": "choose_label",
+      "label": "Change button label",
+      "default": "Change",
+      "visible_if": "{{ block.settings.selection == 'one' and block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "text",
+      "id": "popup_heading",
+      "label": "Popup heading",
+      "default": "Choose your gift",
+      "visible_if": "{{ block.settings.selection == 'one' and block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "text",
+      "id": "select_label",
+      "label": "Choose button label",
+      "default": "Choose",
+      "visible_if": "{{ block.settings.selection == 'one' and block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_value",
+      "label": "Show value",
+      "default": true,
+      "info": "Shows the gift's price crossed out.",
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "include_value_in_savings",
+      "label": "Add value to savings",
+      "default": false,
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "include_in_bigger_options",
+      "label": "Bigger options include this gift",
+      "default": true,
+      "info": "Options below this one with the same or a higher quantity include it too."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_picker",
+      "label": "Show variant picker",
+      "default": false,
+      "visible_if": "{{ block.settings.gift_type == 'product' }}"
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "If empty, the product image or icon."
+    },
+    {
+      "type": "text",
+      "id": "icon",
+      "label": "Icon",
+      "default": "local_shipping",
+      "info": "[View all available icons](https://fonts.google.com/icons?icon.set=Material+Symbols&icon.platform=web).",
+      "visible_if": "{{ block.settings.gift_type != 'product' }}"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "tint",
+          "label": "Tinted"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        },
+        {
+          "value": "plain",
+          "label": "Plain"
+        }
+      ],
+      "default": "tint"
+    },
+    {
+      "type": "select",
+      "id": "image_shape",
+      "label": "Image shape",
+      "options": [
+        {
+          "value": "rounded",
+          "label": "Rounded"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "circle",
+          "label": "Circle"
+        }
+      ],
+      "default": "rounded",
+      "info": "Circle shows the whole image.",
+      "visible_if": "{{ block.settings.gift_type == 'product' or block.settings.image != blank }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Free gift"
+    }
+  ]
+}
+{% endschema %}

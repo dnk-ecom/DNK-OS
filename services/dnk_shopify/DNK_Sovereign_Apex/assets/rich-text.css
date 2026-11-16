@@ -1,0 +1,17 @@
+/*
+  Rich text stylesheet
+
+  This file contains the layout and presentation styles for the Rich text section.
+*/
+
+.rich-text {
+  color: rgb(var(--color-text));
+  text-align: var(--mobile-text-alignment);
+  background-color: rgb(var(--color-background));
+}
+
+@media (min-width: 1200px) {
+  .rich-text {
+    text-align: var(--desktop-text-alignment);
+  }
+}

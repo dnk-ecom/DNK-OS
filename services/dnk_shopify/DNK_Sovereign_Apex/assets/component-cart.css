@@ -1,0 +1,751 @@
+/* Shrine cart shell: drawer layout options, toast, notices, compact bar, sheet, floating cart button, icon animation,
+   Cart announcement, line lock, shared looks. Every override wins by specificity (noted), never by file order. */
+
+/* 1. hidden inside cart roots beats any display rule */
+.cart-root [hidden] {
+  display: none !important;
+}
+
+/* 2. spacing: Normal prints no variables, every fallback is today's value */
+.cart-root.cart-spacing--compact {
+  --cart-gap: 1.6rem;
+  --cart-pad: 1.2rem;
+}
+.cart-root.cart-spacing--relaxed {
+  --cart-gap: 3.2rem;
+  --cart-pad: 2rem;
+}
+cart-drawer.cart-root:not(.is-empty) .drawer__header {
+  padding: var(--cart-pad, 1.5rem);
+} /* (0,3,1) > .drawer__header */
+cart-drawer.cart-root:not(.is-empty) .cart-drawer__body {
+  padding-inline: var(--cart-pad, 1.5rem);
+}
+cart-drawer.cart-root:not(.is-empty) .drawer__footer {
+  padding-inline: var(--cart-pad, 1.5rem);
+}
+.cart-root .cart-drawer__body .side-margins-negative,
+.cart-root .drawer__footer .side-margins-negative,
+.cart-root .cart-side-panel .side-margins-negative {
+  margin-inline: calc(-1 * var(--cart-pad, 1.5rem));
+}
+
+/* 3. corner styles (Theme settings prints none); each class carries its complete set */
+.cart-root.cart-corners--square {
+  --cart-radius: 0rem;
+  --cart-radius-small: 0rem;
+  --cart-radius-button: 0rem;
+  --buttons-radius: 0rem;
+  --buttons-radius-outset: 0rem;
+  --inputs-radius: 0rem;
+  --inputs-radius-outset: 0rem;
+  --quantity-radius: 0rem;
+  --quantity-small-radius: 0rem;
+  --quantity-radius-outset: 0rem;
+  --pickers-radius: 0rem;
+  --pickers-small-radius: 0rem;
+  --pickers-radius-outset: 0rem;
+  --badge-corner-radius: 0rem;
+  --shopify-accelerated-checkout-button-border-radius: 0rem;
+}
+.cart-root.cart-corners--rounded {
+  --cart-radius: 1.2rem;
+  --cart-radius-small: 0.8rem;
+  --cart-radius-button: 0.8rem;
+  --buttons-radius: 0.8rem;
+  --buttons-radius-outset: calc(0.8rem + var(--buttons-border-width, 0px));
+  --inputs-radius: 0.8rem;
+  --inputs-radius-outset: calc(0.8rem + var(--inputs-border-width, 0px));
+  --quantity-radius: 0.8rem;
+  --quantity-small-radius: 0.32rem;
+  --quantity-radius-outset: calc(0.8rem + var(--quantity-border-width, 0px));
+  --pickers-radius: 0.8rem;
+  --pickers-small-radius: 0.32rem;
+  --pickers-radius-outset: calc(0.8rem + var(--pickers-border-width, 0px));
+  --badge-corner-radius: 0.8rem;
+  --shopify-accelerated-checkout-button-border-radius: 0.8rem;
+}
+.cart-root.cart-corners--pill {
+  --cart-radius: 2rem;
+  --cart-radius-small: 1.2rem;
+  --cart-radius-button: 10rem;
+  --buttons-radius: 10rem;
+  --buttons-radius-outset: calc(10rem + var(--buttons-border-width, 0px));
+  --inputs-radius: 1.2rem;
+  --inputs-radius-outset: calc(1.2rem + var(--inputs-border-width, 0px));
+  --quantity-radius: 1.2rem;
+  --quantity-small-radius: 0.48rem;
+  --quantity-radius-outset: calc(1.2rem + var(--quantity-border-width, 0px));
+  --pickers-radius: 1.2rem;
+  --pickers-small-radius: 0.48rem;
+  --pickers-radius-outset: calc(1.2rem + var(--pickers-border-width, 0px));
+  --badge-corner-radius: 1.2rem;
+  --shopify-accelerated-checkout-button-border-radius: 10rem;
+}
+
+/* 4. panel variables (where the scheme class sits) and widths */
+cart-drawer.cart-root .drawer__inner,
+cart-page.cart-root {
+  --cart-tint: rgba(var(--color-foreground), 0.04);
+  --cart-hairline: rgba(var(--color-foreground), 0.08);
+}
+cart-drawer.cart-root.cart-drawer--desktop-width-large {
+  --cart-width: 50rem;
+}
+/* the blocks' "Text" color options follow the cart's color scheme: the theme's .text-color-text / .color-foreground-text
+   are the base text color, which disappears on a dark panel. Only inside a scheme-colored panel (Theme default prints no
+   class), (0,3,1) */
+cart-drawer.cart-root .drawer__inner[class*='color-'] :is(.text-color-text, .color-foreground-text),
+cart-page.cart-root[class*='color-'] :is(.text-color-text, .color-foreground-text) {
+  --color-foreground: inherit;
+}
+cart-drawer.cart-root .drawer__inner[class*='color-'] .text-color-text,
+cart-page.cart-root[class*='color-'] .text-color-text {
+  color: rgb(var(--color-foreground));
+}
+/* blocks whose accent color is still at its default follow a coloured cart: they print cart-accent--follow only when
+   the section's Color scheme isn't Theme default (Accent 1 on a dark panel drops below 3:1). Prices, savings and
+   controls take the scheme's text color; (0,2,0)+ beats the palette classes */
+.cart-root .cart-accent--follow,
+.cart-root .cart-accent--follow .accent-color-accent-1 {
+  --accent-color: var(--color-foreground);
+}
+.cart-root .cart-accent--follow.text-color-accent-1 {
+  --color-foreground: inherit;
+  color: rgb(var(--color-foreground));
+}
+
+/* 5. position and slide direction (right, non-floating drawers keep base and rtl.css) */
+cart-drawer.cart-root {
+  --cart-slide-dir: 1;
+}
+body[data-rtl='true'] cart-drawer.cart-root {
+  --cart-slide-dir: -1;
+}
+cart-drawer.cart-root.cart-drawer--position-left {
+  --cart-slide-dir: -1;
+  justify-content: flex-start;
+} /* (0,2,1) > .drawer */
+body[data-rtl='true'] cart-drawer.cart-root.cart-drawer--position-left {
+  --cart-slide-dir: 1;
+}
+cart-drawer.cart-root:is(.cart-drawer--position-left, .cart-drawer--floating):not(.active) .drawer__inner {
+  transform: translateX(calc(var(--cart-slide-dir) * (100% + var(--cart-closed-extra, 0px))));
+} /* (0,4,1) */
+
+/* 6. close button side */
+cart-drawer.cart-root.cart-drawer--close-start .drawer__header .drawer__close {
+  right: auto;
+  left: var(--btn-offset);
+} /* (0,4,1) > .cart-drawer .drawer__close */
+body[data-rtl='true'] cart-drawer.cart-root.cart-drawer--close-start .drawer__header .drawer__close {
+  left: auto;
+  right: var(--btn-offset);
+}
+cart-drawer.cart-root.cart-root.cart-drawer--close-start:not(.is-empty) .drawer__header {
+  padding-inline-start: calc(var(--btn-size) + var(--btn-offset) + 1rem);
+} /* (0,5,1) beats #2 */
+cart-drawer.cart-root.cart-drawer--close-start .cart-drawer__warnings .drawer__close {
+  right: auto;
+  left: 5px;
+}
+body[data-rtl='true'] cart-drawer.cart-root.cart-drawer--close-start .cart-drawer__warnings .drawer__close {
+  left: auto;
+  right: 5px;
+}
+/* Right (the default) is the end side: in right-to-left languages it moves to the left, clear of the right-aligned
+   heading. Classic keeps 1.9.0's right side */
+body[data-rtl='true'] cart-drawer.cart-root:not(.cart-style--classic):not(.cart-drawer--close-start) .drawer__header .drawer__close {
+  right: auto;
+  left: var(--btn-offset);
+} /* (0,6,2) > .cart-drawer .drawer__close */
+body[data-rtl='true'] cart-drawer.cart-root.cart-root:not(.cart-style--classic):not(.cart-drawer--close-start):not(.is-empty) .drawer__header {
+  padding-inline-end: calc(var(--btn-size) + var(--btn-offset) + 1rem);
+} /* (0,7,2) beats #2 */
+body[data-rtl='true'] cart-drawer.cart-root:not(.cart-style--classic):not(.cart-drawer--close-start) .cart-drawer__warnings .drawer__close {
+  right: auto;
+  left: 5px;
+}
+
+/* 7. header: divider, logo */
+cart-drawer.cart-root.cart-drawer--no-header-divider .drawer__header {
+  border-bottom: 0;
+}
+.cart-header__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--alignment);
+  gap: 0.6rem;
+  min-width: 0;
+}
+.cart-header__logo {
+  display: inline-flex;
+}
+.cart-header__logo img {
+  display: block;
+  width: var(--cart-logo-width, 9rem);
+  max-width: 100%;
+  height: auto;
+}
+.cart-header--logo-instead .drawer__heading {
+  line-height: 0;
+}
+
+/* 8. custom desktop width */
+@media screen and (min-width: 750px) {
+  cart-drawer.cart-root.cart-drawer--desktop-width-custom .drawer__inner {
+    width: var(--cart-width, 40rem);
+  }
+}
+
+/* 9. overlay */
+cart-drawer.cart-root.cart-drawer--overlay-custom.active {
+  background-color: rgba(var(--color-foreground), var(--cart-overlay-opacity, 0.5));
+} /* (0,4,1) > .drawer.active */
+cart-drawer.cart-root.cart-drawer--overlay-blur.active {
+  -webkit-backdrop-filter: blur(0.4rem);
+  backdrop-filter: blur(0.4rem);
+}
+
+/* 10. floating drawer (desktop) */
+@media screen and (min-width: 750px) {
+  cart-drawer.cart-root.cart-drawer--floating {
+    --cart-float-gap: 1.6rem;
+    --cart-closed-extra: calc(2 * var(--cart-float-gap));
+  }
+  cart-drawer.cart-root.cart-drawer--floating .drawer__inner {
+    height: calc(100% - 2 * var(--cart-float-gap));
+    margin: var(--cart-float-gap);
+    border: 0.1rem solid rgba(var(--color-foreground), 0.12);
+    border-radius: var(--cart-radius, 1.6rem);
+    box-shadow: 0 1.2rem 4rem rgba(0, 0, 0, 0.18);
+  }
+}
+
+/* 11. mobile bottom sheet */
+.cart-sheet__handle {
+  display: none;
+}
+@media screen and (max-width: 749px) {
+  cart-drawer.cart-root.cart-drawer--mobile-bottom {
+    align-items: flex-end;
+    justify-content: center;
+  }
+  cart-drawer.cart-root.cart-drawer--mobile-bottom .drawer__inner {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 90vh;
+    max-height: 90dvh;
+    border-width: 0.1rem 0 0;
+    border-radius: var(--cart-radius, 1.6rem) var(--cart-radius, 1.6rem) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  cart-drawer.cart-root.cart-drawer--mobile-bottom[data-type]:not(.active) .drawer__inner {
+    transform: translateY(100%);
+  } /* (0,5,1) > #5 (0,4,1) */
+  cart-drawer.cart-root.cart-drawer--mobile-bottom.is-empty .drawer__inner {
+    min-height: min(50dvh, 42rem);
+  }
+  cart-drawer.cart-root.cart-drawer--mobile-bottom .cart-sheet__handle {
+    display: block;
+    position: absolute;
+    top: 0.6rem;
+    left: 50%;
+    translate: -50% 0;
+    width: 4rem;
+    height: 0.4rem;
+    border-radius: 0.2rem;
+    background: rgba(var(--color-foreground), 0.25);
+    z-index: 1;
+  }
+  cart-drawer.cart-root.cart-drawer--mobile-bottom .cart-sheet__handle,
+  cart-drawer.cart-root.cart-drawer--mobile-bottom .drawer__header {
+    touch-action: none;
+  }
+  cart-drawer.cart-root.cart-drawer--mobile-bottom .drawer__inner.is-dragging {
+    transition: none;
+  }
+}
+
+/* 12. two columns (desktop, filled Side panel, not in fit scroll mode) */
+.cart-side-panel--filled {
+  margin-inline: calc(-1 * var(--cart-pad, 1.5rem));
+  padding: var(--cart-pad, 1.5rem);
+}
+.cart-side-panel--filled:not([class*='color-']) {
+  background-color: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+}
+.cart-side-panel > * {
+  margin-top: var(--margin-top);
+  margin-bottom: var(--margin-bottom);
+}
+@media screen and (min-width: 990px) {
+  cart-drawer.cart-root.cart-drawer--two-columns:not(.is-empty):not([data-cart-fit='scroll']) .drawer__inner:has(.cart-side-panel--filled) {
+    position: relative;
+    width: calc(var(--cart-width, 40rem) + var(--cart-side-width, 34rem));
+    padding-inline-start: var(--cart-side-width, 34rem);
+  }
+  cart-drawer.cart-root.cart-drawer--two-columns:not(.is-empty):not([data-cart-fit='scroll']) .cart-side-panel--filled {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    width: var(--cart-side-width, 34rem);
+    margin: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-inline-end: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+  }
+  cart-drawer.cart-root.cart-drawer--position-left.cart-drawer--two-columns:not(.is-empty):not([data-cart-fit='scroll']) .drawer__inner:has(.cart-side-panel--filled) {
+    padding-inline-start: 0;
+    padding-inline-end: var(--cart-side-width, 34rem);
+  }
+  cart-drawer.cart-root.cart-drawer--position-left.cart-drawer--two-columns:not(.is-empty):not([data-cart-fit='scroll']) .cart-side-panel--filled {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    border-inline-end: 0;
+    border-inline-start: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+  }
+}
+
+/* 13. footer fit (T12): with the setting off or without JS, base.css's short-screen rule applies unchanged */
+cart-drawer.cart-root[data-cart-fit='pinned'] .drawer__inner {
+  overflow: hidden;
+} /* (0,3,1) */
+cart-drawer.cart-root[data-cart-fit='pinned'] .cart-drawer__body {
+  overflow: auto;
+}
+cart-drawer.cart-root[data-cart-fit='scroll'] .drawer__inner {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-bottom: var(--cart-compact-bar-height, 0px);
+}
+cart-drawer.cart-root[data-cart-fit='scroll'] .cart-drawer__body {
+  overflow: visible;
+  flex: 0 0 auto;
+}
+cart-drawer.cart-root[data-cart-fit='scroll'] .drawer__header,
+cart-drawer.cart-root[data-cart-fit='scroll'] .drawer__footer {
+  flex-shrink: 0;
+}
+/* the bar takes no layout space, so the footer's end would always sit under it: room to scroll the Checkout button above it */
+cart-drawer.cart-root[data-cart-fit='scroll'] .drawer__footer {
+  padding-bottom: var(--cart-compact-bar-height, 0px);
+}
+
+/* 14. compact checkout bar */
+.cart-compact-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-top: calc(-1 * var(--cart-compact-bar-height, 0px));
+  padding: 1rem var(--cart-pad, 1.5rem) calc(1rem + env(safe-area-inset-bottom));
+  background: rgb(var(--color-background));
+  border-top: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+  box-shadow: 0 -0.4rem 1.6rem rgba(var(--color-foreground), 0.08);
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+.cart-compact-bar.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.cart-compact-bar__total {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.cart-compact-bar__label {
+  font-size: 1.2rem;
+  opacity: 0.75;
+}
+.cart-compact-bar__amount {
+  font-size: 1.6rem;
+  font-weight: var(--font-body-weight-bold);
+}
+.cart-compact-bar__checkout {
+  flex: 0 1 auto;
+  min-width: 14rem;
+}
+
+/* 15. footer top edge shapes (mask the footer's own top edge) */
+.drawer__footer.cart-footer-shape {
+  --cart-shape-h: 1.6rem;
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--cart-shape-h));
+  padding-top: var(--cart-shape-h);
+  border-top: 0;
+  box-shadow: none;
+  -webkit-mask: var(--cart-shape) top / 100% var(--cart-shape-h) no-repeat, linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--cart-shape-h) + 0.1rem) no-repeat;
+  mask: var(--cart-shape) top / 100% var(--cart-shape-h) no-repeat, linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--cart-shape-h) + 0.1rem) no-repeat;
+}
+cart-drawer.cart-root .cart-drawer__body:has(+ .drawer__footer.cart-footer-shape) {
+  padding-bottom: 1.6rem;
+}
+.cart-footer-shape--curved {
+  --cart-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 236.8 5.8' preserveAspectRatio='none'%3E%3Cpath d='M0,5.8c0-0.5,0.4-0.5,0.8-0.5c2.8-0.2,5.6-0.5,8.3-0.7c6.1-0.4,12.2-0.8,18.3-1.1c3.3-0.2,6.5-0.4,9.8-0.5 c6.6-0.3,13.2-0.5,19.7-0.8c4.5-0.2,9-0.3,13.5-0.5C76.9,1.5,83.5,1.5,90,1.3c5-0.1,9.9-0.1,14.8-0.2c10.3-0.3,20.7-0.2,31-0.1 c5.4,0.1,10.9,0.1,16.3,0.2c6.2,0.1,12.4,0.3,18.5,0.5c5.9,0.2,11.9,0.4,17.8,0.7c6,0.3,11.9,0.6,17.9,0.9 c5.6,0.3,11.3,0.7,16.9,1.2c4.3,0.3,8.6,0.7,12.9,1.1c0.2,0,0.5,0,0.6,0.2C157.9,5.8,78.9,5.8,0,5.8z'/%3E%3C/svg%3E");
+}
+.cart-footer-shape--sharp {
+  --cart-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 236.8 5.4' preserveAspectRatio='none'%3E%3Cpolygon points='236.8,5.4 0,5.4 118.4,0.1'/%3E%3C/svg%3E");
+}
+.cart-footer-shape--wavy {
+  --cart-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M0 6C20 0 40 0 60 6S100 12 120 6S160 0 180 6S220 12 240 6V12H0Z'/%3E%3C/svg%3E");
+}
+
+/* 16. toast */
+.cart-toast-region {
+  position: fixed;
+  z-index: 1002;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+[data-cart-toast-region='drawer'] {
+  left: var(--cart-toast-left, 1.6rem);
+  width: var(--cart-toast-width, calc(100% - 3.2rem));
+  bottom: var(--cart-toast-bottom, 1.6rem);
+}
+.cart-toast-region--page {
+  left: 1.6rem;
+  right: 1.6rem;
+  bottom: calc(1.6rem + env(safe-area-inset-bottom));
+}
+.cart-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  max-width: 48rem;
+  padding: 1.2rem 1.2rem 1.2rem 1.6rem;
+  border-radius: var(--cart-radius-small, 0.8rem);
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+  box-shadow: 0 0.8rem 2.4rem rgba(0, 0, 0, 0.2);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  animation: cart-toast-in 0.2s ease;
+}
+.cart-toast.is-leaving {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.cart-toast__text {
+  margin: 0;
+  flex: 1;
+}
+.cart-toast__action {
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+  min-height: 2.4rem;
+  padding: 0.4rem;
+  cursor: pointer;
+}
+.cart-toast__close {
+  color: inherit;
+  width: 2.8rem;
+  height: 2.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.cart-toast__action:focus-visible,
+.cart-toast__close:focus-visible {
+  outline: 0.2rem solid currentColor;
+  outline-offset: 0.2rem;
+}
+@keyframes cart-toast-in {
+  from {
+    opacity: 0;
+    translate: 0 0.8rem;
+  }
+}
+
+/* 17. inline editor notice (theme editor only) */
+.cart-editor-notice {
+  margin: 1rem 0;
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-align: start;
+  background: #e3f0ff;
+  color: #0b2e59;
+}
+.cart-editor-notice--warning {
+  background: #fff4d6;
+  color: #3d2f00;
+}
+.cart-editor-notice--error {
+  background: #fde2e1;
+  color: #5c1210;
+}
+.cart-editor-notice small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 1.1rem;
+  opacity: 0.75;
+}
+
+/* 18. view-event element: out of flow, never display: none */
+.drawer__inner > s-view-event {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* 19. floating cart button */
+.cart-floating-button {
+  position: fixed;
+  z-index: 2;
+  bottom: calc(var(--offset-y, 2rem) + var(--sticky-atc-offset, 0px) + var(--cart-floating-stack, 0px));
+  transition: opacity 0.2s ease, translate 0.2s ease, visibility 0.2s ease;
+}
+.cart-floating-button--bottom_right {
+  right: var(--offset-x, 2rem);
+}
+.cart-floating-button--bottom_left {
+  left: var(--offset-x, 2rem);
+}
+.cart-floating-button.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 1.2rem;
+  pointer-events: none;
+}
+.cart-floating-button__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 50%;
+  box-shadow: 0 0.6rem 1.8rem rgba(0, 0, 0, 0.18);
+}
+.cart-floating-button__icon svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+.cart-floating-button__count {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+}
+.cart-floating-button__count[hidden] {
+  display: none;
+} /* outside every .cart-root: the class's display would beat [hidden] */
+body:has(.scroll-to-top-btn-bottom-right) .cart-floating-button--bottom_right,
+body:has(.music-player-bottom-right) .cart-floating-button--bottom_right {
+  --cart-floating-stack: 6.4rem;
+}
+body:has(.scroll-to-top-btn-bottom-right):has(.music-player-bottom-right) .cart-floating-button--bottom_right {
+  --cart-floating-stack: 13rem;
+}
+body:has(.scroll-to-top-btn-bottom-left) .cart-floating-button--bottom_left,
+body:has(.music-player-bottom-left) .cart-floating-button--bottom_left {
+  --cart-floating-stack: 6.4rem;
+}
+body:has(.scroll-to-top-btn-bottom-left):has(.music-player-bottom-left) .cart-floating-button--bottom_left {
+  --cart-floating-stack: 13rem;
+}
+@media screen and (max-width: 749px) {
+  .cart-floating-button {
+    --offset-x: 1.5rem;
+    --offset-y: 1.5rem;
+  }
+}
+
+/* 20. cart icon animation (scale / rotate compose with the default icon's inline transform) */
+@keyframes cart-icon-bump {
+  0%,
+  100% {
+    scale: 1;
+  }
+  40% {
+    scale: 1.22;
+  }
+  70% {
+    scale: 0.94;
+  }
+}
+@keyframes cart-icon-shake {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  20% {
+    rotate: -12deg;
+  }
+  40% {
+    rotate: 10deg;
+  }
+  60% {
+    rotate: -6deg;
+  }
+  80% {
+    rotate: 4deg;
+  }
+}
+.header__icon--cart.cart-icon--bump .icon-cart,
+.header__icon--cart.cart-icon--bump .cart-count-bubble,
+.cart-floating-button__link.cart-icon--bump .icon-cart {
+  animation: cart-icon-bump 0.5s ease;
+}
+.header__icon--cart.cart-icon--shake .icon-cart,
+.cart-floating-button__link.cart-icon--shake .icon-cart {
+  animation: cart-icon-shake 0.6s ease;
+  transform-origin: 50% 25%;
+}
+
+/* 21. Cart announcement */
+.cart-announcement {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: var(--announcement-padding-y, 1rem) var(--cart-pad, 1.5rem);
+  font-size: var(--announcement-text-size, 1.3rem);
+  line-height: 1.4;
+  border-radius: var(--cart-radius-small, 0);
+}
+.cart-drawer__body > .cart-announcement--full,
+.drawer__footer > .cart-announcement--full,
+.cart-side-panel > .cart-announcement--full {
+  margin-inline: calc(-1 * var(--cart-pad, 1.5rem));
+  border-radius: 0;
+}
+.cart-announcement__track {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.cart-announcement__message {
+  margin: 0;
+  grid-area: 1 / 1;
+}
+.cart-announcement__message[hidden] {
+  display: none;
+}
+.cart-announcement--start {
+  text-align: start;
+}
+.cart-announcement--center {
+  text-align: center;
+}
+/* a spacer as wide as the pause button keeps centered messages in the middle of the band */
+.cart-announcement--center:has(> .cart-announcement__toggle)::before {
+  content: '';
+  flex: none;
+  inline-size: 2.4rem;
+}
+.cart-announcement--end {
+  text-align: end;
+}
+.cart-announcement__message.is-active {
+  animation: cart-ann-fade 0.35s ease;
+}
+.cart-announcement--slide .cart-announcement__message.is-active {
+  animation-name: cart-ann-slide;
+}
+@keyframes cart-ann-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cart-ann-slide {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+}
+.cart-announcement__toggle {
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+  cursor: pointer;
+}
+.cart-announcement__toggle svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: currentColor;
+}
+.cart-announcement__toggle svg[hidden] {
+  display: none;
+} /* the UA [hidden] rule doesn't reach SVG elements */
+
+/* 22. reduced motion (the drawer keeps base.css's 1 ms visibility transition for main.js's transitionend) */
+@media (prefers-reduced-motion: reduce) {
+  .cart-toast,
+  .cart-toast.is-leaving,
+  .cart-announcement__message.is-active,
+  .cart-compact-bar,
+  .cart-floating-button,
+  cart-drawer.cart-root .drawer__inner {
+    animation: none;
+    transition: none;
+  }
+  .header__icon--cart.cart-icon--bump .icon-cart,
+  .header__icon--cart.cart-icon--bump .cart-count-bubble,
+  .header__icon--cart.cart-icon--shake .icon-cart,
+  .cart-floating-button__link.cart-icon--bump .icon-cart,
+  .cart-floating-button__link.cart-icon--shake .icon-cart {
+    animation: none;
+  }
+}
+
+/* 23. line lock during plan changes without main.js's line keys */
+[data-cart-locked] {
+  pointer-events: none;
+}
+
+/* 24. shared looks: "Small label" titles and the "Pill" add button (both upsell blocks, Saved products) */
+.cart-title--label {
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.button.cart-add--pill {
+  --buttons-radius: 99rem;
+  --buttons-radius-outset: 99rem;
+  --buttons-padding-x: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 99rem;
+  padding-inline: 1.2rem;
+} /* (0,2,0) beats .button and .upsell__add-btn in any order */
+.cart-add__plus {
+  display: none;
+  width: 1rem;
+  height: 1rem;
+}
+.cart-add--pill .cart-add__plus {
+  display: inline-block;
+}

@@ -1,0 +1,883 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "DNK Sovereign",
+    "theme_version": "1.0.0",
+    "theme_author": "DNK Ecom",
+    "theme_documentation_url": "https://dnk-e.com/docs/sovereign",
+    "theme_support_url": "https://dnk-e.com/support"
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Color palette",
+        "info": "Create a reusable palette based on your brand colors, then use those colors in sections or assign them to the theme colors below."
+      },
+      {
+        "type": "color_palette",
+        "id": "colors",
+        "default": {
+          "background": "#FFFFFF",
+          "text": "#0A0A0A",
+          "surface": "#F6F6F6",
+          "accent": "#0069A9"
+        }
+      },
+      {
+        "type": "header",
+        "content": "Theme colors",
+        "info": "Set the global colors used by theme elements. Sections with their own color settings are configured separately."
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Background",
+        "default": "{{ settings.colors.background }}"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Text",
+        "default": "{{ settings.colors.text }}"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Surface",
+        "default": "{{ settings.colors.surface }}"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent",
+        "default": "{{ settings.colors.accent }}"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "label": "Headings",
+        "default": "assistant_n7"
+      },
+      {
+        "type": "range",
+        "id": "heading_size_scale",
+        "label": "Base heading size",
+        "min": 80,
+        "max": 150,
+        "step": 5,
+        "unit": "%",
+        "default": 100
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Body",
+        "default": "assistant_n4"
+      },
+      {
+        "type": "range",
+        "id": "body_size_scale",
+        "label": "Base body size",
+        "min": 90,
+        "max": 110,
+        "step": 1,
+        "unit": "%",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "select",
+        "id": "container_width",
+        "label": "Container width",
+        "options": [
+          {
+            "value": "container-narrow",
+            "label": "Narrow"
+          },
+          {
+            "value": "container-normal",
+            "label": "Normal"
+          },
+          {
+            "value": "container-wide",
+            "label": "Wide"
+          }
+        ],
+        "default": "container-narrow",
+        "info": "Narrow: 1440px, Normal: 1920px, Wide: 2400px"
+      }
+    ]
+  },
+  {
+    "name": "Borders",
+    "settings": [
+      {
+        "type": "range",
+        "id": "border_opacity",
+        "label": "Border opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "label": "Border radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 0
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon image",
+        "info": "32 x 32 px PNG recommended."
+      }
+    ]
+  },
+  {
+    "name": "Quick add",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "range",
+        "id": "quick_add_width",
+        "label": "Modal width",
+        "min": 700,
+        "max": 1200,
+        "step": 20,
+        "unit": "px",
+        "default": 1080
+      },
+      {
+        "type": "select",
+        "id": "quick_add_image_ratio",
+        "label": "Image aspect ratio",
+        "options": [
+          {
+            "group": "Adapt",
+            "value": "adapt",
+            "label": "Adapt to image"
+          },
+          {
+            "group": "Square",
+            "value": "square",
+            "label": "Square (1:1)"
+          },
+          {
+            "group": "Horizontal",
+            "value": "landscape",
+            "label": "Landscape (4:3)"
+          },
+          {
+            "group": "Horizontal",
+            "value": "widescreen",
+            "label": "Widescreen (16:9)"
+          },
+          {
+            "group": "Vertical",
+            "value": "portrait",
+            "label": "Portrait (3:4)"
+          },
+          {
+            "group": "Vertical",
+            "value": "vertical",
+            "label": "Vertical (9:16)"
+          }
+        ],
+        "default": "adapt"
+      },
+      {
+        "type": "header",
+        "content": "Product information"
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_add_show_vendor",
+        "label": "Show vendor",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "quick_add_vendor_size",
+        "label": "Vendor size",
+        "options": [
+          {
+            "value": "fs-xs",
+            "label": "Extra small"
+          },
+          {
+            "value": "fs-sm",
+            "label": "Small"
+          },
+          {
+            "value": "fs-md",
+            "label": "Medium"
+          },
+          {
+            "value": "fs-lg",
+            "label": "Large"
+          },
+          {
+            "value": "fs-xl",
+            "label": "Extra large"
+          }
+        ],
+        "default": "fs-sm",
+        "visible_if": "{{ settings.quick_add_show_vendor }}"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_title_font_family",
+        "label": "Title font family",
+        "options": [
+          {
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "body",
+            "label": "Body"
+          }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_title_size",
+        "label": "Title size",
+        "options": [
+          {
+            "value": "h1",
+            "label": "H1"
+          },
+          {
+            "value": "h2",
+            "label": "H2"
+          },
+          {
+            "value": "h3",
+            "label": "H3"
+          },
+          {
+            "value": "h4",
+            "label": "H4"
+          },
+          {
+            "value": "h5",
+            "label": "H5"
+          },
+          {
+            "value": "h6",
+            "label": "H6"
+          }
+        ],
+        "default": "h3",
+        "info": "Changes the visual size only. The HTML heading remains H3."
+      },
+      {
+        "type": "select",
+        "id": "quick_add_price_size",
+        "label": "Price size",
+        "options": [
+          {
+            "value": "fs-md",
+            "label": "Medium"
+          },
+          {
+            "value": "fs-lg",
+            "label": "Large"
+          },
+          {
+            "value": "fs-xl",
+            "label": "Extra large"
+          },
+          {
+            "value": "fs-2xl",
+            "label": "2XL"
+          },
+          {
+            "value": "fs-3xl",
+            "label": "3XL"
+          }
+        ],
+        "default": "fs-xl"
+      },
+      {
+        "type": "header",
+        "content": "Rating"
+      },
+      {
+        "type": "paragraph",
+        "content": "Requires a reviews app that writes to Shopify's standard product rating metafields."
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_add_show_rating",
+        "label": "Show product rating",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "quick_add_show_rating_count",
+        "label": "Show review count",
+        "default": true,
+        "visible_if": "{{ settings.quick_add_show_rating }}"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_rating_size",
+        "label": "Rating size",
+        "options": [
+          {
+            "value": "fs-xs",
+            "label": "Extra small"
+          },
+          {
+            "value": "fs-sm",
+            "label": "Small"
+          },
+          {
+            "value": "fs-md",
+            "label": "Medium"
+          },
+          {
+            "value": "fs-lg",
+            "label": "Large"
+          },
+          {
+            "value": "fs-xl",
+            "label": "Extra large"
+          }
+        ],
+        "default": "fs-sm",
+        "visible_if": "{{ settings.quick_add_show_rating }}"
+      },
+      {
+        "type": "header",
+        "content": "Variant picker"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_option_style",
+        "label": "Option style",
+        "options": [
+          {
+            "value": "select",
+            "label": "Select fields"
+          },
+          {
+            "value": "radio",
+            "label": "Radio buttons"
+          }
+        ],
+        "default": "radio",
+        "info": "Options with Shopify swatches always display as swatches."
+      },
+      {
+        "type": "range",
+        "id": "quick_add_swatch_size",
+        "label": "Swatch size",
+        "min": 20,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "default": 32
+      },
+      {
+        "type": "header",
+        "content": "Add to cart"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_button_style",
+        "label": "Button style",
+        "options": [
+          {
+            "value": "btn-accent-solid",
+            "label": "Accent solid"
+          },
+          {
+            "value": "btn-accent-outline",
+            "label": "Accent outline"
+          },
+          {
+            "value": "btn-text-solid",
+            "label": "Text solid"
+          },
+          {
+            "value": "btn-text-outline",
+            "label": "Text outline"
+          }
+        ],
+        "default": "btn-accent-solid"
+      },
+      {
+        "type": "select",
+        "id": "quick_add_button_size",
+        "label": "Button size",
+        "options": [
+          {
+            "value": "btn-sm",
+            "label": "Small"
+          },
+          {
+            "value": "btn-md",
+            "label": "Medium"
+          },
+          {
+            "value": "btn-lg",
+            "label": "Large"
+          }
+        ],
+        "default": "btn-md"
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Cart type",
+        "options": [
+          {
+            "value": "drawer",
+            "label": "Drawer"
+          },
+          {
+            "value": "page",
+            "label": "Page"
+          }
+        ],
+        "default": "drawer",
+        "info": "Choose whether cart links open a drawer or the cart page."
+      },
+      {
+        "type": "header",
+        "content": "Cart items",
+        "info": "These settings apply to both the cart drawer and cart page."
+      },
+      {
+        "type": "select",
+        "id": "cart_item_image_ratio",
+        "label": "Image aspect ratio",
+        "options": [
+          {
+            "group": "Adapt",
+            "value": "adapt",
+            "label": "Adapt to image"
+          },
+          {
+            "group": "Square",
+            "value": "square",
+            "label": "Square (1:1)"
+          },
+          {
+            "group": "Horizontal",
+            "value": "landscape",
+            "label": "Landscape (4:3)"
+          },
+          {
+            "group": "Horizontal",
+            "value": "widescreen",
+            "label": "Widescreen (16:9)"
+          },
+          {
+            "group": "Vertical",
+            "value": "portrait",
+            "label": "Portrait (3:4)"
+          },
+          {
+            "group": "Vertical",
+            "value": "vertical",
+            "label": "Vertical (9:16)"
+          }
+        ],
+        "default": "square"
+      },
+      {
+        "type": "select",
+        "id": "cart_item_title_font_family",
+        "label": "Title font family",
+        "options": [
+          {
+            "value": "heading",
+            "label": "Heading"
+          },
+          {
+            "value": "body",
+            "label": "Body"
+          }
+        ],
+        "default": "heading"
+      },
+      {
+        "type": "select",
+        "id": "cart_item_title_size",
+        "label": "Title size",
+        "options": [
+          {
+            "value": "fs-xs",
+            "label": "XS"
+          },
+          {
+            "value": "fs-sm",
+            "label": "SM"
+          },
+          {
+            "value": "fs-md",
+            "label": "MD"
+          },
+          {
+            "value": "fs-lg",
+            "label": "LG"
+          },
+          {
+            "value": "fs-xl",
+            "label": "XL"
+          }
+        ],
+        "default": "fs-md"
+      },
+      {
+        "type": "header",
+        "content": "Cart options",
+        "info": "These settings apply to both the cart drawer and cart page."
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_note",
+        "label": "Show order note",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_discount",
+        "label": "Show discount code",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Cart footer",
+        "info": "These settings apply to both the cart drawer and cart page."
+      },
+      {
+        "type": "select",
+        "id": "cart_subtotal_size",
+        "label": "Subtotal size",
+        "options": [
+          {
+            "value": "fs-md",
+            "label": "Medium"
+          },
+          {
+            "value": "fs-lg",
+            "label": "Large"
+          },
+          {
+            "value": "fs-xl",
+            "label": "Extra large"
+          },
+          {
+            "value": "fs-2xl",
+            "label": "2X large"
+          },
+          {
+            "value": "fs-3xl",
+            "label": "3X large"
+          }
+        ],
+        "default": "fs-lg"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_tax_information",
+        "label": "Show tax and shipping information",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "cart_checkout_button_color",
+        "label": "Checkout button color",
+        "options": [
+          {
+            "value": "btn-accent-solid",
+            "label": "Accent"
+          },
+          {
+            "value": "btn-text-solid",
+            "label": "Text"
+          }
+        ],
+        "default": "btn-accent-solid"
+      },
+      {
+        "type": "select",
+        "id": "cart_checkout_button_size",
+        "label": "Checkout button size",
+        "options": [
+          {
+            "value": "btn-md",
+            "label": "Medium"
+          },
+          {
+            "value": "btn-lg",
+            "label": "Large"
+          }
+        ],
+        "default": "btn-md"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_dynamic_checkout_buttons",
+        "label": "Show dynamic checkout buttons",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_view_cart_button",
+        "label": "Show View cart button",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Enter the full URL for each social media profile below (for example, https://www.facebook.com/shopify)."
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook",
+        "default": "https://www.facebook.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram",
+        "default": "https://www.instagram.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_threads",
+        "label": "Threads",
+        "default": "https://www.threads.com/@shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_x",
+        "label": "X",
+        "default": "https://x.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok",
+        "label": "TikTok",
+        "default": "https://www.tiktok.com/@shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest",
+        "label": "Pinterest",
+        "default": "https://www.pinterest.com/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_snapchat",
+        "label": "Snapchat",
+        "default": "https://www.snapchat.com/add/shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube",
+        "default": "https://www.youtube.com/@shopify"
+      },
+      {
+        "type": "text",
+        "id": "social_linkedin",
+        "label": "LinkedIn",
+        "default": "https://www.linkedin.com/company/shopify"
+      }
+    ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "range",
+        "id": "button_border_radius",
+        "min": 0,
+        "max": 32,
+        "step": 2,
+        "unit": "px",
+        "label": "Button corner radius",
+        "default": 6
+      },
+      {
+        "type": "range",
+        "id": "button_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "Button border width",
+        "default": 1
+      },
+      {
+        "type": "checkbox",
+        "id": "button_uppercase",
+        "label": "Uppercase button labels",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Inputs",
+    "settings": [
+      {
+        "type": "range",
+        "id": "input_border_radius",
+        "min": 0,
+        "max": 24,
+        "step": 2,
+        "unit": "px",
+        "label": "Input field corner radius",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "input_border_width",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "unit": "px",
+        "label": "Input field border width",
+        "default": 1
+      }
+    ]
+  },
+  {
+    "name": "Product cards",
+    "settings": [
+      {
+        "type": "select",
+        "id": "product_card_image_ratio",
+        "label": "Image ratio",
+        "options": [
+          {
+            "value": "adapt",
+            "label": "Adapt to image"
+          },
+          {
+            "value": "portrait",
+            "label": "Portrait (2:3)"
+          },
+          {
+            "value": "square",
+            "label": "Square (1:1)"
+          }
+        ],
+        "default": "portrait"
+      },
+      {
+        "type": "checkbox",
+        "id": "product_card_show_secondary_image",
+        "label": "Show second image on hover",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "product_card_show_vendor",
+        "label": "Show vendor",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "product_card_show_rating",
+        "label": "Show product rating",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Badges",
+    "settings": [
+      {
+        "type": "select",
+        "id": "badge_position",
+        "label": "Badge position on product cards",
+        "options": [
+          {
+            "value": "top_left",
+            "label": "Top left"
+          },
+          {
+            "value": "top_right",
+            "label": "Top right"
+          },
+          {
+            "value": "bottom_left",
+            "label": "Bottom left"
+          }
+        ],
+        "default": "top_left"
+      },
+      {
+        "type": "range",
+        "id": "badge_corner_radius",
+        "min": 0,
+        "max": 16,
+        "step": 2,
+        "unit": "px",
+        "label": "Badge corner radius",
+        "default": 4
+      }
+    ]
+  },
+  {
+    "name": "Brand information",
+    "settings": [
+      {
+        "type": "text",
+        "id": "brand_headline",
+        "label": "Brand headline",
+        "default": "DNK Sovereign"
+      },
+      {
+        "type": "textarea",
+        "id": "brand_description",
+        "label": "Brand description",
+        "default": "World-class e-commerce performance and sovereign design."
+      }
+    ]
+  }
+]

@@ -1,0 +1,5 @@
+name: scones
+version: 1.0.0
+description: "DNK OS SCONES Cognitive Memory — multi-tier SQLite WAL store with BM25 SOTA retrieval, session lessons distillation, and LOD context budgeting."
+hooks:
+  - on_session_end

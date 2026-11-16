@@ -1,0 +1,111 @@
+{% liquid
+  assign article = closest.article
+  assign article_image_alt = article.image.alt | default: article.title
+  assign article_image_class = 'article-card-image'
+
+  unless block.settings.image_ratio == 'adapt'
+    assign article_image_class = article_image_class | append: ' aspect-ratio aspect-ratio-' | append: block.settings.image_ratio
+  endunless
+
+  assign article_image_placeholder_class = article_image_class | append: ' placeholder-svg'
+  assign block_id_parts = block.id | split: '-'
+  assign placeholder_index = block_id_parts.last | default: 0
+  assign placeholder_variant = placeholder_index | modulo: 3 | plus: 1
+  assign placeholder_name = 'blog-apparel-' | append: placeholder_variant
+%}
+
+{% if article.image != blank or article == blank %}
+  <div
+    class="article-card-image-block block-spacing"
+    style="
+      --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+      --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+    "
+    data-carousel-control-alignment
+    {{ block.shopify_attributes }}
+  >
+    {% if article.image != blank %}
+      {{ article.image
+        | image_url: width: 2400
+        | image_tag:
+          alt: article_image_alt,
+          class: article_image_class,
+          widths: '320, 640, 960, 1280, 1600, 2000, 2400',
+          sizes: 'auto, 100vw',
+          loading: 'lazy'
+      }}
+    {% else %}
+      {{ placeholder_name | placeholder_svg_tag: article_image_placeholder_class }}
+    {% endif %}
+
+    {% if block.settings.show_tags and article.tags.size > 0 %}
+      <ul class="article-card-tags" role="list">
+        {% for tag in article.tags limit: 3 %}
+          <li class="article-card-tag badge">
+            {{ tag | escape }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Article image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        { "group": "Adapt", "value": "adapt", "label": "Adapt to image" },
+        { "group": "Square", "value": "square", "label": "Square (1:1)" },
+        { "group": "Horizontal", "value": "landscape", "label": "Landscape (4:3)" },
+        { "group": "Horizontal", "value": "widescreen", "label": "Widescreen (16:9)" },
+        { "group": "Vertical", "value": "portrait", "label": "Portrait (3:4)" },
+        { "group": "Vertical", "value": "vertical", "label": "Vertical (9:16)" }
+      ],
+      "default": "landscape"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show tags",
+      "default": true,
+      "info": "Shows up to three article tags over the image."
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Article image",
+      "category": "Blog"
+    }
+  ]
+}
+{% endschema %}

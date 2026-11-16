@@ -1,0 +1,55 @@
+{%- comment -%}sugar:snippets/media-sizes-scope.liquid@2.1.1{%- endcomment -%}
+{%- comment -%}
+  Narrows the `sizes` hint of every Media block inside a multi-column parent.
+
+  A Media block cannot know the column it lands in, so on its own it tells the browser it is
+  half the window wide on desktop and the full window on mobile. Inside a four-up grid the
+  browser then downloads a file four times wider than the cell. The parent does know its
+  column count, so it captures its children and passes them through here.
+
+  The Media block writes its hint in a form that can be divided more than once:
+    (min-width: 750px) calc(50vw / 1.0000), calc(100vw * 1.0000)
+  The first parent on the way up restarts the desktop figure from the full window and divides
+  by its own columns; every parent after that divides again, so a three-up grid inside a
+  half-width column ends up at a sixth of the window. A parent that is a single column on a
+  breakpoint leaves that half of the hint alone. Gaps and page padding are ignored, so the
+  figure always errs on the wide side: a slightly larger file, never a blurry one.
+
+  Accepts:
+  - html: {String} the captured children
+  - d: {Number} how many of this parent's children share a row on desktop (may be fractional)
+  - m: {Number} the same for mobile
+  - cap: {Number} optional, the parent's fixed maximum width in px (a Container set to a custom
+    width). Applied only to a hint no inner parent has narrowed yet; an outer parent still divides
+    the figure inside it.
+  - full: {Boolean} optional, the parent spans the section's width (a Custom Columns column). A
+    hint no inner parent has narrowed restarts from the full window even when d is 1, since the
+    Media block's own half-window guess is only right beside a product gallery.
+
+  Usage:
+  {%- capture _children -%}{% content_for 'blocks' %}{%- endcapture -%}
+  {%- render 'media-sizes-scope', html: _children, d: 3, m: 2 -%}
+{%- endcomment -%}
+{%- liquid
+  assign _mss_out = html
+  assign _mss_d = d | default: 1 | times: 100 | floor | divided_by: 100.0
+  assign _mss_m = m | default: 1 | times: 100 | floor | divided_by: 100.0
+  assign _mss_cap = cap | default: 0 | times: 1
+  if _mss_cap > 0
+    assign _mss_cap_d = 'min(' | append: _mss_cap | append: 'px, calc(50vw / 1.0000))'
+    assign _mss_cap_m = 'min(' | append: _mss_cap | append: 'px, calc(100vw * 1.0000))'
+    assign _mss_out = _mss_out | replace: 'calc(50vw / 1.0000)', _mss_cap_d | replace: 'calc(100vw * 1.0000)', _mss_cap_m
+  endif
+  if _mss_d > 1
+    assign _mss_again = '100vw / 1.0000 / ' | append: _mss_d | append: ' /'
+    assign _mss_first = '100vw / 1.0000 / ' | append: _mss_d | append: ')'
+    assign _mss_out = _mss_out | replace: '100vw / 1.0000 /', _mss_again | replace: '50vw / 1.0000)', _mss_first
+  elsif full
+    assign _mss_out = _mss_out | replace: '50vw / 1.0000)', '100vw / 1.0000 / 1)'
+  endif
+  if _mss_m > 1
+    assign _mss_mobile = '100vw * 1.0000 / ' | append: _mss_m
+    assign _mss_out = _mss_out | replace: '100vw * 1.0000', _mss_mobile
+  endif
+-%}
+{{- _mss_out -}}

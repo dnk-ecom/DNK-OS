@@ -1,0 +1,43 @@
+{%- comment -%}
+  First-paint pre-pass for gift elements whose unlock compares a store-currency amount (other currencies). Rendered
+  as the last element of the scope that holds the gifts (Free gift container, Rewards bar engines); the scope's first
+  child is <cart-rewards-sync></cart-rewards-sync>. Sets each [data-sync] gift's data-selected before main.js reads it:
+  - on first paint, this script runs right after its scope is parsed (before the deferred main.js);
+  - on every re-render, the <cart-rewards-sync> element runs inside main.js's own HTML swap.
+  Every renderer prints this same text: whichever runs first defines the element for the whole page.
+{%- endcomment -%}
+<script>
+  (function () {
+    var run = function (scope) {
+      var currency = window.Shopify && window.Shopify.currency;
+      var rate = currency ? parseFloat(currency.rate) : 0;
+      if (!rate || !scope) return;
+      var gifts = scope.querySelectorAll('[data-sync]');
+      for (var i = 0; i < gifts.length; i++) {
+        var d = gifts[i].dataset, shown = true, ok = d.syncUnlocked === 'true', items = parseFloat(d.syncItems) > 0, total = parseFloat(d.syncTotal);
+        if (d.syncDisplay) {
+          var p = d.syncDisplay.split(':');
+          var limit = Math.round(parseFloat(p[1]) * rate), cartTotal = parseFloat(d.syncCartTotal);
+          shown = p[0] === 'lt' ? cartTotal < limit : cartTotal > limit;
+          var wrap = gifts[i].closest('[data-sync-wrapper]');
+          if (wrap) wrap.hidden = !shown || d.syncEligible !== 'true';
+        }
+        if (d.syncGoal) ok = items && (d.syncSub === 'true' || total >= Math.round(parseFloat(d.syncGoal) * rate));
+        if (d.syncReplacedBy) d.syncReplacedBy.split(',').forEach(function (e) {
+          var r = e.split(':');
+          if (items && (r[1] === 'true' || total >= Math.round(parseFloat(r[0]) * rate))) ok = false;
+        });
+        gifts[i].setAttribute('data-selected', shown && ok && d.syncEligible === 'true' ? 'true' : 'false');
+      }
+    };
+    if (window.customElements && !customElements.get('cart-rewards-sync')) {
+      customElements.define('cart-rewards-sync', class extends HTMLElement {
+        connectedCallback() {
+          run(this.parentElement);
+        }
+      });
+    }
+    var s = document.currentScript;
+    if (s) run(s.parentElement);
+  })();
+</script>

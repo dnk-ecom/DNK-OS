@@ -1,0 +1,84 @@
+/* Shrine cart editor helper (theme editor only): the notice stacks and the block highlight. The inline notice look
+   (.cart-editor-notice) lives in component-cart.css, so Liquid and JS notices share it. */
+.cart-editor-notices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  z-index: 1003;
+  pointer-events: none;
+}
+.cart-editor-notices:empty {
+  display: none;
+}
+/* in the drawer: fixed at the bottom, on the side away from the drawer */
+cart-drawer .cart-editor-notices {
+  position: fixed;
+  bottom: 1.6rem;
+  inset-inline-start: 1.6rem;
+  max-width: min(42rem, calc(100vw - 3.2rem));
+}
+cart-drawer.cart-drawer--position-left .cart-editor-notices {
+  inset-inline-start: auto;
+  inset-inline-end: 1.6rem;
+}
+/* on Cart page V2: sticky inside the page root (a fixed element inside an animated section wouldn't stay fixed) */
+cart-page .cart-editor-notices {
+  position: sticky;
+  bottom: 1.6rem;
+  margin: 1.6rem auto 0;
+  padding-inline: 1.6rem;
+  max-width: 64rem;
+}
+/* phones: the drawer is full width, so the stack sits under the header over the items (which scroll) instead of over
+   Checkout; on Cart page V2 it clears the mobile checkout bar */
+@media screen and (max-width: 749px) {
+  cart-drawer .cart-editor-notices {
+    top: 8rem;
+    bottom: auto;
+    max-height: 35vh;
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+  cart-page .cart-editor-notices {
+    bottom: calc(1.6rem + 7.2rem);
+  }
+}
+.cart-editor-notices .cart-editor-notice {
+  margin: 0;
+  pointer-events: auto;
+  box-shadow: 0 0.6rem 2rem rgba(0, 0, 0, 0.18);
+}
+.cart-editor-notice--link {
+  cursor: pointer;
+}
+.cart-editor-notice__dismiss {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+  margin-inline-start: 0.4rem;
+  padding: 0 0.4rem;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+  cursor: pointer;
+}
+.cart-editor-flash {
+  outline: 0.2rem solid #2c6ecb;
+  outline-offset: 0.2rem;
+  animation: cart-editor-flash 2s ease;
+}
+@keyframes cart-editor-flash {
+  0%,
+  60% {
+    outline-color: #2c6ecb;
+  }
+  100% {
+    outline-color: rgba(44, 110, 203, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cart-editor-flash {
+    animation: none;
+  }
+}

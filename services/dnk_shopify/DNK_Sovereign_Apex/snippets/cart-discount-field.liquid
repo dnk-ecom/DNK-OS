@@ -1,0 +1,170 @@
+{%- comment -%}
+  Discount field of the cart drawer and Cart page V2 (blocks/cart_discount-field.liquid) and of the classic cart page
+  (sections/main-cart-footer.liquid, classic: true). Parameters: block, cart_style and cart_scheme (the section's
+  cart_style / color_scheme), classic. The element is defined in layout/theme.liquid (CartDiscountBlock); gift card
+  codes go through cart-gift-card (component-cart-checkout-extras.js, which component-cart-checkout.js loads from
+  data-checkout-extras).
+{%- endcomment -%}
+{%- liquid
+  assign s = block.settings
+  # The classic cart page's block has the same message settings since 2.0.0 (older saved blocks get the defaults);
+  # every text still has a fallback
+  assign t_placeholder = s.placeholder | default: 'Enter discount code'
+  assign t_button = s.btn_label | default: 'ADD'
+  assign t_empty = s.error_msg | default: 'Please enter a discount code!'
+  assign t_invalid = s.error_not_applicable_msg | default: "This code isn't valid or doesn't apply to your cart."
+  assign t_duplicate = s.error_already_applied_msg | default: 'This code is already applied to your order.'
+  assign t_shipping = s.shipping_code_msg | default: 'Shipping discounts are applied at checkout.'
+  if classic
+    assign field_style = 'open'
+    assign show_codes = true
+    assign gift_cards = false
+  else
+    capture field_style
+      render 'cart-style-value', option: 'field_style', value: s.field_style, cart_style: cart_style
+    endcapture
+    assign show_codes = s.show_applied_codes
+    assign gift_cards = s.enable_gift_cards
+  endif
+  assign collapsed = false
+  if field_style == 'collapsed'
+    assign collapsed = true
+  endif
+
+  # Applied codes: discount applications of type discount_code (Liquid has no cart.discount_codes)
+  assign applied_codes_arr = ''
+  assign has_shipping_code = false
+  for app in cart.discount_applications
+    if app.type == 'discount_code'
+      if applied_codes_arr == ''
+        assign applied_codes_arr = app.title
+      else
+        assign applied_codes_arr = applied_codes_arr | append: ',' | append: app.title
+      endif
+      if app.target_type == 'shipping_line'
+        assign has_shipping_code = true
+      endif
+    endif
+  endfor
+
+  # asset marker: the gift card element needs the JS; the collapsed link and the chips use only the CSS
+  assign feature = ''
+  if gift_cards
+    assign feature = 'checkout'
+  elsif collapsed
+    assign feature = 'checkout:css'
+  elsif show_codes and applied_codes_arr != ''
+    assign feature = 'checkout:css'
+  endif
+
+  # editor marker: a field style other than Same as cart in a styled cart (theme block, design mode only)
+  assign override = ''
+  if request.design_mode and classic != true
+    assign df_style = cart_style | default: 'classic'
+    assign df_scheme = cart_scheme | default: 'default'
+    if df_style != 'classic' or df_scheme != 'default'
+      if s.field_style != 'cart'
+        assign override = 'Field style'
+      endif
+    endif
+  endif
+-%}
+<cart-discount-block
+  class="cart-discount display-block{% if s.bottom_separator %} cart-discount--bottom-separator{% endif %}{% if collapsed %} cart-discount--collapsed{% endif %}"
+  style="margin-top: {{ s.margin_top | divided_by: 10.0 }}rem;margin-bottom: {{ s.margin_bottom | divided_by: 10.0 }}rem;"
+  data-block-id="{{ block.id }}"
+  data-applied-codes="{{ applied_codes_arr | escape }}"
+  data-success-duration="{{ s.success_msg_duration }}"
+  {%- if s.success_msg != blank %} data-success-enabled="true"{% endif -%}
+  {%- if gift_cards %} data-gift-cards="true"{% endif -%}
+  {%- if feature != '' %} data-cart-feature="{{ feature }}"{% endif -%}
+  {%- if override != '' %} data-cart-override="Discount field|{{ override }}"{% endif %}
+  {{ block.shopify_attributes }}
+>
+  {%- if show_codes -%}
+    <ul class="cart-discount__pills list-unstyled" role="list" aria-label="{{ 'sections.cart.checkout_discount_codes' | t | escape }}" data-discount-pills>
+      {%- for app in cart.discount_applications -%}
+        {%- if app.type == 'discount_code' -%}
+          <li class="cart-discount__pill badge" data-discount-code="{{ app.title | escape }}"{% if app.target_type == 'shipping_line' %} data-shipping="true"{% endif %}>
+            <span class="cart-discount__pill-icon" aria-hidden="true">{% render 'icon-discount' %}</span>
+            <span class="cart-discount__pill-code">{{ app.title | escape }}</span>
+            <button type="button" class="cart-discount__pill-remove" aria-label="{{ 'sections.cart.checkout_discount_remove' | t: code: app.title | escape }}">
+              {%- render 'icon-close-small' -%}
+            </button>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+    <template data-discount-pill-template data-remove-label="{{ 'sections.cart.checkout_discount_remove' | t: code: '[code]' | escape }}">
+      <li class="cart-discount__pill badge" data-discount-code="">
+        <span class="cart-discount__pill-icon" aria-hidden="true">{% render 'icon-discount' %}</span>
+        <span class="cart-discount__pill-code"></span>
+        <button type="button" class="cart-discount__pill-remove" aria-label="">
+          {%- render 'icon-close-small' -%}
+        </button>
+      </li>
+    </template>
+  {%- endif %}
+  {%- if gift_cards %}
+    <cart-gift-card class="cart-gift-card" data-checkout-extras="{{ 'component-cart-checkout-extras.js' | asset_url }}" data-chip-label="{{ 'sections.cart.checkout_gift_card_label' | t: last: '[last]' | escape }}" data-remove-label="{{ 'sections.cart.checkout_gift_card_remove' | t: last: '[last]' | escape }}">
+      <ul class="cart-gift-card__chips cart-discount__pills list-unstyled" role="list" data-gift-card-chips></ul>
+      <template data-gift-card-template>
+        <li class="cart-discount__pill badge cart-gift-card__chip">
+          <span class="cart-discount__pill-icon" aria-hidden="true">{% render 'icon-discount' %}</span>
+          <span class="cart-discount__pill-code"><span class="visually-hidden"></span><span aria-hidden="true"></span></span>
+          <button type="button" class="cart-discount__pill-remove cart-gift-card__remove" aria-label="">
+            {%- render 'icon-close-small' -%}
+          </button>
+        </li>
+      </template>
+    </cart-gift-card>
+  {%- endif %}
+  {%- if collapsed %}
+  <details class="cart-discount__toggle" id="CartDiscount-Toggle-{{ block.id }}" data-preserve>
+    <summary class="cart-discount__summary">{{ s.collapsed_label | default: 'Have a discount code?' | escape }}</summary>
+  {%- endif %}
+  <form class="cart-discount-form" novalidate>
+    <div class="cart-discount-form__row">
+      <div class="field">
+        <input
+          class="field__input"
+          autocomplete="off"
+          type="text"
+          name="cart-discount-field"
+          id="CartDiscount-{{ block.id }}"
+          placeholder="{{ t_placeholder | escape }}"
+          enterkeyhint="done"
+          data-preserve
+        >
+        <label class="field__label" for="CartDiscount-{{ block.id }}">{{ t_placeholder | escape }}</label>
+      </div>
+      <button class="button button--has-spinner cart-discount-form__submit" type="button">
+        <span class="cart-discount-form__submit-label">{{ t_button | escape }}</span>
+        <div class="loading-overlay__spinner hidden">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </button>
+    </div>
+    <p class="cart-discount-form__error cart-discount-form__error--empty" role="alert">{{ t_empty }}</p>
+    <p class="cart-discount-form__error cart-discount-form__error--invalid" role="alert">{{ t_invalid }}</p>
+    <p class="cart-discount-form__error cart-discount-form__error--duplicate" role="alert">{{ t_duplicate }}</p>
+    {%- if s.success_msg != blank -%}
+      <p class="cart-discount-form__success" role="status" style="display:none;margin:0;font-size:1.4rem;color:#108a30;">{{ s.success_msg }}</p>
+    {%- endif -%}
+    <p class="cart-discount-form__note cart-discount-form__note--shipping" role="status"{% unless has_shipping_code %} hidden{% endunless %}>{{ t_shipping }}</p>
+    {%- if gift_cards -%}
+      <p class="cart-discount-form__note cart-discount-form__note--gift" role="status" hidden>{{ s.gift_card_msg }}</p>
+    {%- endif -%}
+  </form>
+  {%- if collapsed %}
+  </details>
+  {%- endif %}
+</cart-discount-block>

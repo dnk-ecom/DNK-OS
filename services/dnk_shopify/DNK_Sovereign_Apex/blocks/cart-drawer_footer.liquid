@@ -1,0 +1,110 @@
+<div class="drawer__footer{% if section.settings.footer_shape != 'none' and section.settings.footer_shape != blank %}{% if section.settings.footer_bg_type != 'none' or section.settings.body_bg_type != 'none' %} cart-footer-shape cart-footer-shape--{{ section.settings.footer_shape }}{% endif %}{% endif %}" {{ block.shopify_attributes }}>
+  {%- if block.blocks.size == 0 -%}
+    {% render 'cart-editor-notice', code: 'core-footer-empty', level: 'info', title: 'Cart footer', text: 'no blocks yet. Add Subtotals and a Checkout button.' %}
+  {%- endif -%}
+  {% content_for 'blocks' %}
+  <!-- end footer -->
+</div>
+
+{% schema %}
+{
+  "name": "Cart footer",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "cart_discount-field"
+    },
+    {
+      "type": "cart_note"
+    },
+    {
+      "type": "cart_subtotals"
+    },
+    {
+      "type": "cart_checkout-btn"
+    },
+    {
+      "type": "cart_tnc-checkbox"
+    },
+        {
+      "type": "cart_gift"
+    },
+    {
+      "type": "text-with-icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "icon-with-text"
+    },
+    {
+      "type": "payment-badges"
+    },
+    {
+      "type": "custom-liquid"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "rating-stars"
+    },
+    {
+      "type": "trustpilot-stars"
+    },
+    {
+      "type": "review-avatars"
+    },
+    {
+      "type": "icon-with-content"
+    },
+    {
+      "type": "reviews"
+    },
+    {
+      "type": "cart_subscription-upgrade"
+    },
+    {
+      "type": "cart_rewards-bar"
+    },
+    {
+      "type": "cart_product-upsells-v2"
+    },
+    {
+      "type": "cart_field"
+    },
+    {
+      "type": "cart_saved-products"
+    },
+    {
+      "type": "cart_announcement"
+    },
+    {
+      "type": "product_estimated-shipping"
+    },
+    {
+      "type": "product_shipping-information"
+    },
+    {
+      "type": "product_shipping-checkpoints"
+    },
+    {
+      "type": "cart_shipping-estimator"
+    },
+    {
+      "type": "cart_countdown-timer"
+    },
+    {
+      "type": "container--cart"
+    }
+  ],
+  "settings": []
+}
+{% endschema %}

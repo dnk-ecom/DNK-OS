@@ -1,0 +1,113 @@
+{%- comment -%}
+  Quantity breaks V2: the plain quantity field (the classic Quantity selector's field) that customers
+  get whenever the widget is hidden or turned off, so the product can always be bought with its
+  quantity rules (B2B buyers, other markets, untagged products, a closed Schedule).
+
+  Accepts:
+  - product: {Object}
+  - block: {Object} the Quantity breaks V2 block
+  - mode: {String}
+    only: the block's whole output; carries the block attributes and margins
+    standby: inside the widget, hidden and disabled until the scripts turn the widget off
+
+  Usage:
+  {% render 'qb-v2-fallback-qty', product: product, block: block, mode: 'standby' %}
+{%- endcomment -%}
+{%- liquid
+  assign qb_variant = product.selected_or_first_available_variant
+  assign qb_rule = qb_variant.quantity_rule
+-%}
+<div
+  id="Quantity-Form-{{ section.id }}"
+  class="product-form__input product-form__quantity qb-v2-fallback-qty{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
+  {% if mode == 'standby' -%}
+    hidden
+    data-qb-fallback="standby"
+  {%- else -%}
+    data-qb-fallback="only"
+    style="margin-top: {{ block.settings.margin_top | divided_by: 10.0 }}rem; margin-bottom: {{ block.settings.margin_bottom | divided_by: 10.0 }}rem;"
+    {{ block.shopify_attributes }}
+  {%- endif %}
+>
+  {% comment %} Theme Check doesn't list the item_count_for_variant filter, which Shopify supports {% endcomment %}
+  {% # theme-check-disable %}
+  {%- assign qb_cart_qty = cart | item_count_for_variant: qb_variant.id -%}
+  {% # theme-check-enable %}
+  <label class="quantity__label form__label font-body-bold" for="Quantity-{{ section.id }}">
+    {{ 'products.product.quantity.label' | t }}
+    <span class="quantity__rules-cart no-js-hidden{% if qb_cart_qty == 0 %} hidden{% endif %}">
+      <span class="loading-overlay hidden">
+        <span class="loading-overlay__spinner">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </span>
+      </span>
+      <span
+        >(
+        {{- 'products.product.quantity.in_cart_html' | t: quantity: qb_cart_qty -}}
+        )</span
+      >
+    </span>
+  </label>
+  <quantity-input
+    class="quantity main-quantity no-background color-{{ settings.quantity_color_scheme }} accent-color-{{ settings.quantity_overlay_color }} accent-2-color-{{ settings.quantity_text_color }}"
+    data-section="{{ section.id }}"
+  >
+    <button class="quantity__button no-js-hidden" name="minus" type="button">
+      <span class="visually-hidden">
+        {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+      </span>
+      {% render 'icon-minus' %}
+    </button>
+    <input
+      class="quantity__input"
+      type="number"
+      name="quantity"
+      id="Quantity-{{ section.id }}"
+      form="product-form-{{ section.id }}"
+      autocomplete="off"
+      data-cart-quantity="{{ qb_cart_qty }}"
+      data-min="{{ qb_rule.min }}"
+      min="{{ qb_rule.min }}"
+      {% if qb_rule.max != null %}
+        data-max="{{ qb_rule.max }}"
+        max="{{ qb_rule.max }}"
+      {% endif %}
+      step="{{ qb_rule.increment }}"
+      value="{{ qb_rule.min }}"
+      {% if mode == 'standby' %}
+        disabled
+      {% endif %}
+    >
+    <button class="quantity__button no-js-hidden" name="plus" type="button">
+      <span class="visually-hidden">
+        {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+      </span>
+      {% render 'icon-plus' %}
+    </button>
+  </quantity-input>
+  <div class="quantity__rules caption no-js-hidden">
+    {%- if qb_rule.increment > 1 -%}
+      <span class="divider">
+        {{- 'products.product.quantity.multiples_of' | t: quantity: qb_rule.increment -}}
+      </span>
+    {%- endif -%}
+    {%- if qb_rule.min > 1 -%}
+      <span class="divider">
+        {{- 'products.product.quantity.minimum_of' | t: quantity: qb_rule.min -}}
+      </span>
+    {%- endif -%}
+    {%- if qb_rule.max != null -%}
+      <span class="divider">
+        {{- 'products.product.quantity.maximum_of' | t: quantity: qb_rule.max -}}
+      </span>
+    {%- endif -%}
+  </div>
+</div>

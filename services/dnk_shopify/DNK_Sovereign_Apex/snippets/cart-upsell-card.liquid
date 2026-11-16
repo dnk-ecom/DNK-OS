@@ -1,0 +1,713 @@
+{%- comment -%}
+  One cart upsell card for Product upsells (v1) and Product upsells V2 (v2). The product page's Upsell block keeps
+  snippets/upsell-block.liquid.
+
+  Engine card (drawer context, kind add / toggle, not per item): <cart-drawer-upsell>, driven by main.js. Each toggle
+  unit (its line-hiding <style>, the card, its placeholder wrapper and its slider slide) sits inside one
+  <!--cart-engine--> pair, so the Empty cart can strip it. Theme card (page context, per-item add-ons, upgrades):
+  <cart-upsell-item>, driven by component-cart-upsells-cards.js through ShrineCartRequests.
+
+  V2 mode prints a chunk the V2 block reads: <!--ups2:card|UID|KIND|HANDLE|STATE|ENGINE|IN_CART|SEL_SHOWN|SEL_HIDDEN|
+  CHOICE|SORT_CENTS|SAVE_PCT|SAVE_AMOUNT--> … <!--/ups2:card-->, with [[ups:…]] tokens the block fills (children can't
+  read the block's settings).
+
+  Parameters
+  - product (required), uid, form_id, section_key, section_id, v2, context ('drawer' / 'page'), kind ('add' / 'toggle' /
+    'upgrade'), per_item, per_item_target, hidden (V2 add-on not shown with its products)
+  - quantity (add-ons, 2.0.0): 'one' / 'selector' (a quantity selector on the card) / 'all' / 'product' (the quantity
+    matches the cart: per_item is true, per_item_target the printed count); match_ids: ',id,id,' of the products to
+    match for 'product'. Every mode but 'one' is a theme card, so main.js (which keeps its add-ons at 1) never owns it.
+  - v1: style (the block's button style), opts (the block's settings, never named `settings`: that would hide the theme
+    settings here), placeholder, placeholder_wrap ('' / 'soldout'), pending, slide, soldout_visible, scheme, inherit,
+    cart_styling, add_classes, title_classes, price_position, title_inside, show_rating, show_savings
+  - preselected, image, description, icon, percentage_discount, fixed_discount (cents), matching, match_line
+  - band_variant, bands, band_variants, band_base, attribute (V2 add-ons); upgrade_line, upgrade_quantity, button_label
+  - shopify_attributes (V2 children), design_tag (design mode: prints data-ups-tagged)
+{%- endcomment -%}
+{%- liquid
+  assign u_engine = false
+  if context == 'drawer' and per_item != true and quantity != 'selector'
+    if kind == 'add' or kind == 'toggle'
+      assign u_engine = true
+    endif
+  endif
+  assign u_qty_mode = ''
+  if kind == 'toggle'
+    if quantity == 'selector'
+      assign u_qty_mode = 'selector'
+    elsif per_item
+      assign u_qty_mode = 'all'
+      if quantity == 'product'
+        assign u_qty_mode = 'product'
+      endif
+    endif
+  endif
+  assign u_markers = false
+  if u_engine and kind == 'toggle'
+    assign u_markers = true
+  endif
+  assign u_type = 'cart-drawer'
+  if context == 'page'
+    assign u_type = 'cart-page'
+  endif
+
+  # The product's line in the cart (an upgrade's own product never counts here)
+  assign u_in_cart = false
+  assign u_line_key = ''
+  assign u_line_variant = ''
+  assign u_line_quantity = 0
+  assign u_cart_variant = nil
+  if kind != 'upgrade'
+    for item in cart.items
+      if item.product_id == product.id
+        assign u_in_cart = true
+        assign u_line_key = item.key
+        assign u_line_variant = item.variant_id
+        assign u_line_quantity = item.quantity
+        assign u_cart_variant = item.variant
+        break
+      endif
+    endfor
+  endif
+
+  # The variant shown is the one that will be added: a price band's, the one in the cart, one whose options match a
+  # cart line (variant matching), else the first available one
+  assign u_variant = product.first_available_variant
+  if u_variant == blank
+    assign u_variant = product.variants.first
+  endif
+  assign u_matched = false
+  if band_variant != blank
+    assign u_variant = band_variant
+  elsif u_cart_variant != blank
+    assign u_variant = u_cart_variant
+    assign u_matched = true
+  elsif matching and product.has_only_default_variant == false
+    assign u_found = nil
+    for u_item in cart.items
+      if match_line != blank and u_item.key != match_line.key
+        continue
+      endif
+      if u_item.product_id == product.id or u_item.product.has_only_default_variant
+        continue
+      endif
+      assign u_pool = product.variants
+      assign u_hit = false
+      for u_opt in product.options_with_values
+        assign u_name = u_opt.name | downcase
+        for u_line_opt in u_item.options_with_values
+          assign u_line_name = u_line_opt.name | downcase
+          if u_line_name == u_name
+            assign u_key = 'option' | append: u_opt.position
+            assign u_narrow = u_pool | where: u_key, u_line_opt.value
+            if u_narrow.size > 0
+              assign u_pool = u_narrow
+              assign u_hit = true
+            endif
+          endif
+        endfor
+      endfor
+      if u_hit
+        assign u_avail = u_pool | where: 'available'
+        if u_avail.size > 0
+          assign u_found = u_avail.first
+          break
+        endif
+      endif
+    endfor
+    if u_found != blank
+      assign u_variant = u_found
+      assign u_matched = true
+    endif
+  endif
+  assign u_available = false
+  if u_variant.available
+    assign u_available = true
+  endif
+
+  # V2: does the shopper still have to pick a variant? 0 no, 1 yes and a picker can show, 2 yes and no picker can show
+  assign u_choice = 0
+  if v2 and kind != 'toggle' and band_variant == blank and product.has_only_default_variant == false and u_matched == false
+    assign u_choice = 1
+    if product.variants.size > 100
+      assign u_choice = 2
+    endif
+  endif
+
+  # T2: a toggle shows the cart. On = in the cart, or Selected by default while the cart is empty.
+  # Placeholders (and sold-out toggles) stay inert: on only when in the cart.
+  assign u_pre = false
+  if preselected
+    assign u_pre = true
+  endif
+  assign u_sel_shown = u_pre
+  if kind == 'toggle'
+    assign u_sel_shown = false
+    if u_in_cart
+      assign u_sel_shown = true
+    elsif u_pre and cart.item_count == 0
+      assign u_sel_shown = true
+    endif
+  elsif kind == 'upgrade'
+    assign u_sel_shown = false
+  endif
+  assign u_selected = u_sel_shown
+  assign u_style_off = false
+  if placeholder or soldout_visible
+    assign u_selected = u_in_cart
+    assign u_style_off = true
+  endif
+
+  # T13: the discount settings only change the price shown. data-ups-offer-cents lets the editor check that an
+  # automatic discount charges the same.
+  assign u_pct = percentage_discount | default: 0
+  assign u_fixed = fixed_discount | default: 0
+  assign u_pct_left = 100.0 | minus: u_pct | divided_by: 100.0
+  assign u_price = u_variant.price | times: u_pct_left | minus: u_fixed
+  assign u_compare = u_variant.price
+  if u_variant.compare_at_price > u_variant.price
+    assign u_compare = u_variant.compare_at_price
+  endif
+  assign u_offer = u_variant.price | minus: u_price | round
+  assign u_price_cents = u_price | round
+  assign u_save = 0
+  assign u_save_pct = 0
+  if u_variant.compare_at_price > u_variant.price
+    assign u_save = u_variant.compare_at_price | minus: u_variant.price
+    assign u_save_pct = u_save | times: 100.0 | divided_by: u_variant.compare_at_price | round
+  endif
+
+  assign u_plan = ''
+  if product.requires_selling_plan and u_variant.selling_plan_allocations.size > 0
+    assign u_plan = u_variant.selling_plan_allocations.first.selling_plan.id
+  endif
+
+  # Image and icon. main.js copies the image's src without a check, so a card has its image in every render or in
+  # none; the variant image only replaces an existing product image.
+  assign u_show_image = true
+  if v2 != true and opts.show_images != true
+    assign u_show_image = false
+  endif
+  assign u_icon = icon | strip
+  if u_icon != blank and v2 != true
+    assign u_show_image = false
+  endif
+  assign u_image = image
+  if u_image == blank
+    assign u_image = product.featured_image
+    if u_image != blank and u_variant.id != product.first_available_variant.id and u_variant.featured_image != blank
+      assign u_image = u_variant.featured_image
+    endif
+  endif
+  if u_image == blank
+    assign u_show_image = false
+  endif
+  assign u_image_h = 500
+  if u_image.aspect_ratio > 0
+    assign u_image_h = 500 | divided_by: u_image.aspect_ratio | round
+  endif
+
+  # Looks: v1 takes them from the block, V2 from the V2 block's tokens
+  assign u_style = style
+  assign u_price_position = 'next_to_title'
+  assign u_btn_position = 'right'
+  assign u_rating = show_rating
+  assign u_savings = show_savings
+  assign u_title_link = false
+  assign u_picker = true
+  assign u_add_classes = add_classes
+  if v2
+    assign u_rating = true
+    assign u_savings = true
+    assign u_add_classes = '[[ups:add_class]]'
+    if product.variants.size > 100 or band_variant != blank or bands != blank
+      assign u_picker = false
+    endif
+  else
+    assign u_price_position = price_position | default: opts.price_position
+    assign u_btn_position = opts.btn_position
+    if u_btn_position == 'under' and style != 'add_button'
+      assign u_btn_position = 'right'
+    endif
+    assign u_title_link = opts.title_link
+    assign u_picker = opts.show_variant_picker
+  endif
+  if kind == 'upgrade'
+    assign u_style = 'add_button'
+  endif
+  assign u_labelledby = 'UpsellTitle-' | append: uid
+  if u_price_position != 'hidden'
+    assign u_labelledby = u_labelledby | append: ' UpsellPrice-' | append: uid
+  endif
+  assign u_soldout = false
+  if soldout_visible
+    assign u_soldout = true
+  endif
+  assign u_whole_card = false
+  if v2 != true and u_engine and opts.toggle_element == 'container' and style != 'add_button' and u_soldout == false
+    assign u_whole_card = true
+  endif
+  assign u_toggle_btn = false
+  if v2 or opts.toggle_element == 'button' or u_engine == false
+    unless u_soldout
+      assign u_toggle_btn = true
+    endunless
+  endif
+  assign u_save_money = u_save | money
+  assign u_save_pct_text = u_save_pct | append: '%'
+  assign u_rating_value = product.metafields.reviews.rating.value
+
+  # Upgrade: the line it replaces, and the line of the chosen variant that the swap adds to (Shopify updates the first
+  # line of a variant, so an existing line is raised, never cut)
+  assign u_target_key = ''
+  assign u_target_qty = upgrade_quantity | default: 1
+  if kind == 'upgrade'
+    for item in cart.items
+      if item.variant_id == u_variant.id
+        assign u_target_key = item.key
+        assign u_target_qty = item.quantity | plus: u_target_qty
+        break
+      endif
+    endfor
+  endif
+
+  # V2 chunk state: soldout, hidden (Shown with products) or skip (theme toggles: empty cart, or per item with nothing to
+  # wrap). Upsells and upgrades the shopper can't take are dropped by the V2 block.
+  assign u_state = 'ok'
+  if u_available == false
+    assign u_state = 'soldout'
+  endif
+  # v1 theme add-on in an empty cart (it would fill it on its own) or matched with nothing to match yet: hidden until a
+  # cart render brings products (V2: state skip). Selected by default still adds it with the first product.
+  assign u_wait = false
+  if v2 != true and kind == 'toggle' and u_engine == false
+    if cart.item_count == 0 or per_item and per_item_target == 0 and u_in_cart == false
+      assign u_wait = true
+    endif
+  endif
+  if hidden and u_in_cart == false and kind == 'toggle'
+    assign u_state = 'hidden'
+  endif
+  if kind == 'toggle' and u_engine == false
+    if cart.item_count == 0
+      assign u_state = 'skip'
+    elsif per_item and per_item_target == 0 and u_in_cart == false
+      assign u_state = 'skip'
+    endif
+  endif
+-%}
+{%- if v2 -%}
+  <!--ups2:card|{{ uid }}|{{ kind }}|{{ product.handle }}|{{ u_state }}|{% if u_engine %}1{% else %}0{% endif %}|{% if u_in_cart %}1{% else %}0{% endif %}|{{ u_sel_shown }}|{{ u_in_cart }}|{{ u_choice }}|{{ u_price_cents }}|{% if u_save > 0 %}{{ u_save_pct }}|{{ u_save_money | strip_html }}{% endif %}-->
+{%- endif -%}
+{%- if u_markers -%}<!--cart-engine-->{%- endif -%}
+{%- if slide %}
+  <li class="splide__slide">
+    <div class="splide__slide__container">
+{%- endif -%}
+{%- if placeholder_wrap != blank -%}
+  <div class="cart-upsells__placeholder" hidden data-ups-placeholder="{{ placeholder_wrap }}">
+{%- endif -%}
+{%- if kind == 'toggle' %}
+  <style data-ups-hide-lines{% if v2 %} media="[[ups:media]]"{% elsif u_style_off %} media="not all"{% endif %}>
+    {% if context == 'page' %}cart-page{% else %}.cart-drawer{% endif %} .cart-item--product-{{ product.handle }} {
+      display: none;
+    }
+  </style>
+{%- endif %}
+<{% if u_engine %}cart-drawer-upsell{% else %}cart-upsell-item{% endif %}
+  class='upsell{% if v2 %} cart-upsell cart-upsell--v2{% else %} upsell--{{ style }}{% if u_engine %} {{ u_type }}-upsell-{{ section_id }}{% endif %} upsell--btn-{{ u_btn_position }}{% if scheme != blank %} color-{{ scheme }}{% endif %} accent-color-{{ opts.accent_color }}{% unless cart_styling %}{% if opts.show_custom_bg %} upsell--custom-bg{% endif %}{% if opts.show_box_shadow %} upsell--box-shadow{% endif %}{% if opts.show_border %} upsell--border{% endif %}{% endunless %} cart-upsell{% if inherit %} cart-upsell--inherit-scheme{% endif %}{% endif %}{% if u_icon != blank %} cart-upsell--has-icon{% endif %}{% if u_soldout %} cart-upsell--soldout{% endif %}'
+  {%- unless v2 %}
+    data-style="{{ u_style }}"
+  {%- endunless %}
+  data-selected="{% if v2 and kind == 'toggle' %}[[ups:selected]]{% else %}{{ u_selected }}{% endif %}"
+  data-handle="{{ product.handle }}"
+  {%- if u_engine %}
+    data-toggle="{% if kind == 'toggle' %}true{% else %}false{% endif %}"
+  {%- endif %}
+  data-id="{{ u_variant.id }}"
+  data-product-id="{{ product.id }}"
+  {%- if u_engine %}
+    data-skip-non-existent='true'
+    data-skip-unavailable="{% if v2 %}true{% else %}{{ opts.skip_unavailable }}{% endif %}"
+  {%- else %}
+    data-skip-unavailable="true"
+    data-ups-surface="{{ context }}"
+  {%- endif %}
+  {%- if u_engine and v2 != true and opts.update_prices %}
+    data-update-prices='true'
+    data-price="{{ u_price }}"
+    data-compare-price="{% if u_compare > u_price %}{{ u_price }}{% else %}{{ u_compare }}{% endif %}"
+    data-percentage-left="{{ u_pct_left }}"
+    data-fixed-discount="{{ u_fixed }}"
+    data-money-format="{{ shop.money_format }}"
+  {%- endif %}
+  data-ups-uid="{{ uid }}"
+  data-ups-kind="{{ kind }}"
+  {%- if kind == 'toggle' %} data-ups-preselected="{{ u_pre }}"{% endif %}
+  {%- if u_in_cart %} data-ups-in-cart="true" data-ups-line-key="{{ u_line_key }}" data-ups-line-variant="{{ u_line_variant }}" data-ups-line-quantity="{{ u_line_quantity }}"{% endif %}
+  {%- if kind != 'toggle' or u_offer > 0 %} data-ups-price="{{ u_price_cents }}"{% endif %}
+  {%- if u_offer > 0 %} data-ups-offer-cents="{{ u_offer }}"{% if v2 or u_engine == false %} data-ups-offer="{{ u_pct_left }}:{{ u_fixed }}"{% endif %}{% endif %}
+  {%- if u_plan != blank %} data-ups-selling-plan="{{ u_plan }}"{% endif %}
+  {%- if v2 %} data-ups-initial-id="{{ u_variant.id }}" data-ups-sel-shown="{{ u_sel_shown }}"{% elsif pending %} data-ups-sel-shown="{{ u_sel_shown }}"{% endif %}
+  {%- if per_item %} data-ups-per-item="true" data-ups-target="{{ per_item_target | default: 0 }}"{% endif %}
+  {%- if u_qty_mode != '' %} data-ups-qty-mode="{{ u_qty_mode }}"{% if u_qty_mode == 'product' %} data-ups-match-products="{{ match_ids }}"{% endif %}{% endif %}
+  {%- if u_wait %} hidden{% endif %}
+  {%- if bands != blank %} data-ups-bands="{{ bands }}" data-ups-band-variants="{{ band_variants }}" data-ups-band-base="{{ band_base }}" data-band-id="{{ u_variant.id }}" data-fresh-variant{% endif %}
+  {%- if attribute != blank %} data-ups-attribute="{{ attribute | escape }}" data-ups-attribute-value="{{ cart.attributes[attribute] | escape }}"{% endif %}
+  {%- if kind == 'upgrade' %} data-ups-upgrade-key="{{ upgrade_line.key }}" data-ups-upgrade-variant="{{ upgrade_line.variant_id }}" data-ups-upgrade-product="{{ upgrade_line.product_id }}" data-ups-quantity="{{ upgrade_quantity | default: 1 }}" data-ups-target-key="{{ u_target_key }}" data-ups-target-quantity="{{ u_target_qty }}"{% endif %}
+  {%- if design_tag and kind == 'toggle' %} data-ups-tagged="{% if product.tags contains 'cart-hidden' %}true{% else %}false{% endif %}"{% endif %}
+  {%- if shopify_attributes != blank %} {{ shopify_attributes }}{% endif %}
+>
+  {%- if title_inside %}
+    <h3 class='cart-drawer-gift__progress center custom-font-size{{ title_classes }}' style='--mobile-text-size: {{ opts.container_title_mobile_text_size | divided_by: 10.0 }}rem;--desktop-text-size: {{ opts.container_title_desktop_text_size | divided_by: 10.0 }}rem;'>
+      {{ opts.container_title }}
+    </h3>
+  {%- endif %}
+  <div class='upsell__container{% if u_whole_card %} upsell-toggle-btn{% endif %}'>
+    {%- if u_icon != blank %}
+      <span class="cart-upsell__icon-tile" aria-hidden="true">{% render 'material-icon', icon: u_icon %}</span>
+    {%- endif %}
+    {%- if u_show_image %}
+      <div class='upsell__image'>
+        <img
+          src="{{ u_image | image_url: width: 500 }}"
+          alt="{{ u_image.alt | escape }}"
+          class="upsell__image__img"
+          loading="lazy"
+          width="500"
+          height="{{ u_image_h }}"
+        >
+      </div>
+    {%- endif %}
+    <div class='upsell__content{% if v2 != true and opts.hide_compare_price %} hide-compare-price{% endif %}'>
+      <div class='upsell__title'>
+        <h3 id="UpsellTitle-{{ uid }}">
+          {% if u_title_link %}<a href='{{ product.url }}'>{% endif %}
+            {{ product.title }}
+          {% if u_title_link %}</a>{% endif %}
+        </h3>
+        {%- if u_price_position == 'next_to_title' %}
+          <div class='upsell__price' id="UpsellPrice-{{ uid }}">
+            {%- if u_soldout %}
+              <span class='regular-price'>{{ 'products.product.sold_out' | t }}</span>
+            {%- else %}
+              <span class='regular-price'>{{ u_price | money }}</span>
+              <span class='compare-price{% unless u_compare > u_price %} hidden{% endunless %}'>{{ u_compare | money }}</span>
+              {%- if per_item %}<span class="cart-upsell__per-item">{{ 'sections.cart.upsells_per_item' | t }}</span>{% endif %}
+            {%- endif %}
+          </div>
+        {%- endif %}
+      </div>
+      {%- if u_rating and u_rating_value != blank -%}
+        {%- liquid
+          assign u_decimal = 0
+          assign u_rest = u_rating_value.rating | modulo: 1
+          if u_rest >= 0.3 and u_rest <= 0.7
+            assign u_decimal = 0.5
+          elsif u_rest > 0.7
+            assign u_decimal = 1
+          endif
+        -%}
+        <div class="cart-upsell__rating">
+          <span class="rating" role="img" aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: u_rating_value, rating_max: u_rating_value.scale_max }}">
+            <span aria-hidden="true" class="rating-star color-icon-{{ settings.accent_icons }}" style="--rating: {{ u_rating_value.rating | floor }}; --rating-max: {{ u_rating_value.scale_max }}; --rating-decimal: {{ u_decimal }};"></span>
+          </span>
+          {%- if product.metafields.reviews.rating_count != blank %}
+            <span class="rating-count caption"><span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span><span class="visually-hidden">{{ product.metafields.reviews.rating_count }} {{ 'accessibility.total_reviews' | t }}</span></span>
+          {%- endif %}
+        </div>
+      {%- endif -%}
+      {%- unless description == blank -%}
+        <p class="upsell__desc">
+          {{ description }}
+        </p>
+      {%- endunless -%}
+      {%- unless product.has_only_default_variant -%}
+        {% if u_picker %}
+          {%- liquid
+            assign variants_available_arr = product.variants | map: 'available'
+            assign variants_option1_arr = product.variants | map: 'option1'
+            assign variants_option2_arr = product.variants | map: 'option2'
+            assign variants_option3_arr = product.variants | map: 'option3'
+          -%}
+          {%- if v2 %}<!--ups2:picker-->{% endif %}
+          <div class='upsell__variant-picker'>
+            {%- for option in product.options_with_values -%}
+              {%- liquid
+                case option.position
+                  when 1
+                    assign u_option_value = u_variant.option1
+                  when 2
+                    assign u_option_value = u_variant.option2
+                  else
+                    assign u_option_value = u_variant.option3
+                endcase
+              -%}
+              <div class="upsell__select select select--small no-background color-{{ settings.pickers_color_scheme }} accent-color-{{ settings.pickers_overlay_color }} accent-2-color-{{ settings.pickers_text_color }}">
+                <select class="select__select variant-dropdown"{% if v2 %} aria-label="{{ option.name | escape }}"{% else %} name="options[{{ option.name | escape }}]"{% endif %}>
+                  {% for value in option.values %}
+                    {%- liquid
+                      assign option_class = ''
+                      assign option_disabled = true
+                      assign option_exists = false
+
+                      for option1_name in variants_option1_arr
+                        case option.position
+                          when 1
+                            if variants_option1_arr[forloop.index0] == value
+                              assign option_exists = true
+                              if variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                              endif
+                            endif
+                          when 2
+                            if option1_name == u_variant.option1 and variants_option2_arr[forloop.index0] == value
+                              assign option_exists = true
+                              if variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                              endif
+                            endif
+                          when 3
+                            if option1_name == u_variant.option1 and variants_option2_arr[forloop.index0] == u_variant.option2 and variants_option3_arr[forloop.index0] == value
+                              assign option_exists = true
+                              if variants_available_arr[forloop.index0]
+                                assign option_disabled = false
+                              endif
+                            endif
+                        endcase
+                      endfor
+
+                      assign hidden_option = false
+                      if option_exists == false
+                        assign option_class = 'non-existent'
+                        assign hidden_option = true
+                      elsif option_disabled == true
+                        assign option_class = 'unavailable'
+                        if v2 or opts.skip_unavailable
+                          assign hidden_option = true
+                        endif
+                      endif
+                    -%}
+                    <option
+                      value="{{ value | escape }}"
+                      class="{{ option_class }}"
+                      {% if hidden_option %}
+                        disabled hidden
+                      {% endif %}
+                      {%- if value == u_option_value %} selected{% endif %}
+                    >
+                      {% if option_disabled -%}
+                        {{- 'products.product.value_unavailable' | t: option_value: value -}}
+                      {%- else -%}
+                        {{- value -}}
+                      {%- endif %}
+                    </option>
+                  {% endfor %}
+                </select>
+                {% render 'icon-caret' %}
+              </div>
+            {%- endfor -%}
+            {%- if v2 -%}
+              <script type="application/json" data-ups-variants>[
+                {%- for v in product.variants -%}
+                  {"id":{{ v.id }},"title":{{ v.title | json }},"options":{{ v.options | json }},"option1":{{ v.option1 | json }},"option2":{{ v.option2 | json }},"option3":{{ v.option3 | json }},"available":{{ v.available | json }},"price":{{ v.price | json }},"compare_at_price":{{ v.compare_at_price | json }},"featured_image":{% if v.featured_image %}{"src":{{ v.featured_image | image_url: width: 500 | json }}}{% else %}null{% endif %}}{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              ]</script>
+            {%- else %}
+              <script type="application/json">
+                {{ product.variants | json }}
+              </script>
+            {%- endif %}
+          </div>
+          {%- if v2 %}<!--/ups2:picker-->{% endif %}
+        {% endif %}
+      {% endunless %}
+      {%- if u_price_position == 'separate' %}
+        <div class='upsell__price upsell__price--separate' id="UpsellPrice-{{ uid }}">
+          {%- if u_soldout %}
+            <span class='regular-price'>{{ 'products.product.sold_out' | t }}</span>
+          {%- else %}
+            <span class='regular-price'>{{ u_price | money }}</span>
+            <span class='compare-price{% unless u_compare > u_price %} hidden{% endunless %}'>{{ u_compare | money }}</span>
+            {%- if per_item %}<span class="cart-upsell__per-item">{{ 'sections.cart.upsells_per_item' | t }}</span>{% endif %}
+          {%- endif %}
+        </div>
+      {%- endif %}
+      {%- if u_savings and u_save > 0 %}
+        <span class="cart-upsell__savings">
+          {%- if v2 -%}
+            [[ups:savings]]
+          {%- else -%}
+            {{- opts.savings_text | escape | replace: '[amount]', u_save_money | replace: '[percentage]', u_save_pct_text -}}
+          {%- endif -%}
+        </span>
+      {%- endif %}
+      {%- if u_qty_mode == 'selector' %}
+        {%- liquid
+          assign u_qty_value = 1
+          if u_in_cart
+            assign u_qty_value = u_line_quantity
+          endif
+        -%}
+        <div class="cart-upsell__quantity" data-ups-part="quantity">
+          <button type="button" class="cart-upsell__quantity-button" data-ups-action="less" aria-label="{{ 'products.product.quantity.decrease' | t: product: product.title | escape }}"{% if u_qty_value <= 1 %} disabled{% endif %}>
+            {%- render 'icon-minus' -%}
+          </button>
+          <input class="cart-upsell__quantity-input" type="number" inputmode="numeric" min="1" max="999" value="{{ u_qty_value }}" data-ups-quantity aria-label="{{ 'products.product.quantity.input_label' | t: product: product.title | escape }}">
+          <button type="button" class="cart-upsell__quantity-button" data-ups-action="more" aria-label="{{ 'products.product.quantity.increase' | t: product: product.title | escape }}">
+            {%- render 'icon-plus' -%}
+          </button>
+        </div>
+      {%- endif %}
+      <span class="cart-upsell__error" role="alert" data-ups-error-slot hidden></span>
+    </div>
+    {%- if kind == 'toggle' and v2 %}
+      <button
+        type="button"
+        class="[[ups:toggle_class]] upsell-toggle-btn"
+        role="[[ups:toggle_role]]"
+        aria-checked="[[ups:selected]]"
+        aria-labelledby="{{ u_labelledby }}"
+        data-ups-part="control"
+        {%- unless u_engine %} data-ups-action="toggle"{% endunless %}
+      >
+        [[ups:toggle_inner]]
+      </button>
+    {%- elsif kind == 'toggle' and style == 'toggle_switch' %}
+      <button
+        type="button"
+        class='upsell__toggle-switch toggle-switch{% if u_toggle_btn %} upsell-toggle-btn{% endif %}'
+        role="switch"
+        aria-checked="{{ u_selected }}"
+        aria-labelledby="{{ u_labelledby }}"
+        data-ups-part="control"
+        {%- unless u_engine %} data-ups-action="toggle"{% endunless %}
+        {%- if u_soldout %} disabled aria-disabled="true"{% endif %}
+      >
+        <span class='toggle-switch__slider'>&nbsp</span>
+      </button>
+    {%- elsif kind == 'toggle' and style == 'checkbox_1' %}
+      <button
+        type="button"
+        class='upsell__checkbox flex-center{% if u_toggle_btn %} upsell-toggle-btn{% endif %}'
+        role="checkbox"
+        aria-checked="{{ u_selected }}"
+        aria-labelledby="{{ u_labelledby }}"
+        data-ups-part="control"
+        {%- unless u_engine %} data-ups-action="toggle"{% endunless %}
+        {%- if u_soldout %} disabled aria-disabled="true"{% endif %}
+      >
+        {% render 'checkbox-icons' %}
+      </button>
+    {%- elsif kind == 'toggle' and style == 'checkbox_2' %}
+      <button
+        type="button"
+        class='upsell__checkbox flex-center{% if u_toggle_btn %} upsell-toggle-btn{% endif %}'
+        role="checkbox"
+        aria-checked="{{ u_selected }}"
+        aria-labelledby="{{ u_labelledby }}"
+        data-ups-part="control"
+        {%- unless u_engine %} data-ups-action="toggle"{% endunless %}
+        {%- if u_soldout %} disabled aria-disabled="true"{% endif %}
+      >
+        {% render 'material-icon', icon: 'add_circle', class: ' checkmark-unchecked' %}
+        {% render 'material-icon', icon: 'check_circle', filled: true, class: ' checkmark-checked' %}
+      </button>
+    {%- elsif kind == 'toggle' and style == 'plus_button' %}
+      <button
+        type="button"
+        class='upsell__plus-btn{% if u_toggle_btn %} upsell-toggle-btn{% endif %}'
+        role="checkbox"
+        aria-checked="{{ u_selected }}"
+        aria-labelledby="{{ u_labelledby }}"
+        data-ups-part="control"
+        {%- unless u_engine %} data-ups-action="toggle"{% endunless %}
+        {%- if u_soldout %} disabled aria-disabled="true"{% endif %}
+      >
+        {% render 'material-icon', icon: 'add', class: ' checkmark-unchecked' %}
+        {% render 'material-icon', icon: 'check', filled: true, class: ' checkmark-checked' %}
+      </button>
+    {%- else %}
+      {%- if u_choice > 0 %}<!--ups2:add-->{% endif %}
+      <button
+        {%- if u_engine %}
+          type="submit"
+          name="add"
+        {%- else %}
+          type="button"
+        {%- endif %}
+        class="upsell__add-btn button button--has-spinner{{ u_add_classes }}"
+        {%- if u_engine %}
+          form="{{ form_id }}"
+          id="DisplayedSubmitBtn-{{ section_key }}"
+        {%- else %}
+          data-ups-action="{% if kind == 'upgrade' %}upgrade{% else %}add{% endif %}"
+        {%- endif %}
+        {% if u_available == false %}
+          disabled
+        {% endif %}
+        aria-describedby="UpsellTitle-{{ uid }}"
+        data-ups-part="control"
+      >
+        {%- if v2 or u_add_classes contains 'cart-add--pill' -%}
+          <svg class="cart-add__plus" aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        {%- endif %}
+        <span>
+          {%- if u_available == false -%}
+            {{ 'products.product.sold_out' | t }}
+          {%- elsif kind == 'upgrade' -%}
+            {{ button_label | escape }}
+          {%- elsif v2 -%}
+            [[ups:add_label]]
+          {%- else -%}
+            {{ opts.add_btn_label }}
+          {%- endif -%}
+        </span>
+        <div class="loading-overlay__spinner">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </button>
+      {%- if u_choice > 0 -%}
+        <!--/ups2:add--><!--ups2:choose--><a class="upsell__add-btn button{{ u_add_classes }} cart-upsell__choose" href="{{ product.url }}" aria-describedby="UpsellTitle-{{ uid }}" data-ups-part="control">{{ 'products.product.choose_options' | t }}</a><!--/ups2:choose-->
+      {%- endif -%}
+    {%- endif %}
+    {%- if u_engine %}
+      <product-form data-is-cart-upsell='true' data-section="{{ section_key }}">
+        {%- form 'product',
+          product,
+          id: form_id,
+          class: 'form',
+          novalidate: 'novalidate',
+          data-type: 'add-to-cart-form'
+        -%}
+          <input type="hidden" name="id" value="{{ u_variant.id }}">
+          <button type='submit' class='hidden'>+</button>
+          {%- if u_plan != blank -%}
+            <input
+              type="hidden"
+              name="selling_plan"
+              value="{{ u_plan }}"
+            >
+          {%- endif -%}
+        {%- endform -%}
+      </product-form>
+    {%- endif %}
+  </div>
+</{% if u_engine %}cart-drawer-upsell{% else %}cart-upsell-item{% endif %}>
+{%- if placeholder_wrap != blank %}
+  </div>
+{%- endif -%}
+{%- if slide %}
+    </div>
+  </li>
+{%- endif -%}
+{%- if u_markers -%}<!--/cart-engine-->{%- endif -%}
+{%- if v2 -%}<!--/ups2:card-->{%- endif -%}

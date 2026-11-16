@@ -1,0 +1,45 @@
+{%- comment -%}
+  Quantity breaks V2: swatch data of one option value, as attributes for its <option>.
+  Order: Shopify swatch image, Shopify swatch color, the theme's color list
+  (Theme settings > Color swatches), the variant image. Values without any print nothing,
+  and the script shows them as pills.
+
+  Accepts:
+  - value: {Object} product_option_value
+  - colors: {Array} optional, the theme's color list already split into lines (saves splitting it per value)
+  - variant_images: {Boolean} optional, false skips the variant image (an option whose values all show
+    the same image, such as sizes, would get identical swatches)
+
+  Usage:
+  {%- capture swatch_attributes -%}{%- render 'qb-v2-swatch', value: value -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign qb_attr = ''
+  if value.swatch.image
+    assign qb_src = value.swatch.image | image_url: width: 120
+    assign qb_attr = ' data-swatch-image="' | append: qb_src | append: '"'
+  elsif value.swatch.color
+    assign qb_attr = ' data-swatch-color="rgb(' | append: value.swatch.color.rgb | append: ')"'
+  elsif settings.swatches_predefined_colors_list contains value.name
+    assign qb_lines = colors
+    if qb_lines == blank
+      assign qb_lines = settings.swatches_predefined_colors_list | split: '</p><p>'
+    endif
+    for qb_line in qb_lines
+      assign qb_pair = qb_line | remove: '<p>' | remove: '</p>' | split: '='
+      assign qb_name = qb_pair[0] | strip
+      if qb_name == value.name
+        assign qb_color = qb_pair[1] | strip | escape
+        if qb_color != blank
+          assign qb_attr = ' data-swatch-color="' | append: qb_color | append: '"'
+        endif
+        break
+      endif
+    endfor
+  endif
+  if qb_attr == blank and variant_images != false and value.variant.featured_image
+    assign qb_src = value.variant.featured_image | image_url: width: 120
+    assign qb_attr = ' data-swatch-image="' | append: qb_src | append: '"'
+  endif
+  echo qb_attr
+-%}

@@ -1,0 +1,2309 @@
+/* Quantity breaks V2 (blocks/product_quantity-breaks-v2.liquid and its child blocks), linked by that block only.
+   <quantity-breaks-v2 class="qb-v2 qb-v2--<setting>-<value>"> holds the heading, the slots, main.js's <quantity-breaks>
+   with one .qb-v2-option per option, the savings line, the plain quantity field and the shared dropdown list.
+   main.js needs base.css's .quantity-break* classes here: rules that must beat base.css start with .qb-v2 and have one
+   class more, so they win in the raw and the minified base.css alike. */
+
+/* ---------- Wrapper ---------- */
+.qb-v2 {
+  --qb-v2-accent: var(--color-base-accent-1);
+  --qb-v2-on-accent: var(--color-base-solid-button-labels);
+  --qb-v2-gap: 12px;
+  --qb-v2-radius: 10px;
+  --qb-v2-border: 1px;
+  --qb-v2-image-size: 64px;
+  --qb-v2-title-size: 16px;
+  --qb-v2-text-size: 13px;
+  --qb-v2-price-size: 17px;
+  --qb-v2-columns: 2;
+  --qb-v2-tab-height: 24px;
+  display: block;
+  position: relative;
+}
+
+/* element + class: base.css gives scheme classes rgba(…, 0.9) text at the specificity of one class */
+quantity-breaks-v2.qb-v2 {
+  color: rgb(var(--color-foreground));
+}
+
+/* Card colors: --qb-v2-ink for text-colored lines and tints, --qb-v2-mark (--qb-v2-on-mark on top) for checks, dots
+   and labels. A selected Filled card swaps them, so they stay visible on the accent. */
+.qb-v2,
+.qb-v2-option {
+  --qb-v2-ink: var(--color-foreground);
+  --qb-v2-mark: var(--qb-v2-accent);
+  --qb-v2-on-mark: var(--qb-v2-on-accent);
+}
+
+/* Accent "Text" is the text color of the widget's scheme */
+.qb-v2.qb-v2--accent-text {
+  --qb-v2-accent: var(--color-foreground) !important;
+  --qb-v2-on-accent: var(--color-background);
+}
+
+/* On Accent and Inverse schemes the accents match or nearly match the background, so the widget takes the scheme's
+   button color, like the theme's buttons. A custom accent is kept. */
+:is(.color-accent-1, .color-accent-2, .color-inverse) .qb-v2:not(.qb-v2--accent-custom, .qb-v2--scheme),
+.qb-v2:is(.color-accent-1, .color-accent-2, .color-inverse):not(.qb-v2--accent-custom) {
+  --qb-v2-accent: var(--color-button) !important;
+  --qb-v2-on-accent: var(--color-button-text);
+}
+
+.qb-v2 [hidden] {
+  display: none !important;
+}
+
+.qb-v2--scheme {
+  padding: 12px;
+  border-radius: var(--qb-v2-radius);
+  background: rgb(var(--color-background));
+  background: var(--gradient-background, rgb(var(--color-background)));
+}
+
+.qb-v2__heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: calc(var(--qb-v2-text-size) + 1px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.qb-v2--heading-lines .qb-v2__heading::before,
+.qb-v2--heading-lines .qb-v2__heading::after {
+  content: '';
+  flex: 1 1 0;
+  min-width: 16px;
+  height: 2px;
+  background: rgb(var(--qb-v2-accent));
+}
+
+/* Slots: the other child blocks (timer, upsells for every option, apps), before or after the options */
+.qb-v2__slot {
+  display: grid;
+  gap: var(--qb-v2-gap);
+}
+
+.qb-v2__slot--before {
+  margin-bottom: var(--qb-v2-gap);
+}
+
+.qb-v2__slot--after {
+  margin-top: var(--qb-v2-gap);
+}
+
+.qb-v2__slot:not(:has(> :not([hidden], script, style, template))) {
+  display: none;
+}
+
+.qb-v2__savings {
+  margin: 10px 0 0;
+  font-size: var(--qb-v2-text-size);
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.qb-v2__savings:not(:has(> .qb-v2-text:not([hidden]))) {
+  margin: 0;
+}
+
+/* Turned off, or outside the Schedule's dates: only the plain quantity field, the Custom product fields and the
+   Subscription widget show (a required field would otherwise block Add to cart unseen, and a hidden widget would still
+   sell its subscription) */
+.qb-v2.qb-v2--off > :not(.qb-v2-fallback-qty),
+.qb-v2.qb-v2--scheduled:not([data-qb-schedule='on']) > :not(.qb-v2-fallback-qty),
+.qb-v2.qb-v2--off > .qb-v2__slot > :not(custom-product-field, shrine-subscription-widget),
+.qb-v2.qb-v2--scheduled:not([data-qb-schedule='on']) > .qb-v2__slot > :not(custom-product-field, shrine-subscription-widget) {
+  display: none !important;
+}
+
+.qb-v2.qb-v2--off > .qb-v2__slot:has(> custom-product-field, > shrine-subscription-widget),
+.qb-v2.qb-v2--scheduled:not([data-qb-schedule='on']) > .qb-v2__slot:has(> custom-product-field, > shrine-subscription-widget) {
+  display: grid !important;
+}
+
+.qb-v2.qb-v2--scheme:is(.qb-v2--off, .qb-v2--scheduled:not([data-qb-schedule='on'])) {
+  padding: 0;
+  background: none;
+}
+
+.qb-v2-fallback-qty:not([hidden]) {
+  display: block;
+}
+
+/* ---------- Theme editor only ---------- */
+.qb-v2--inactive > :not(.qb-v2-setup, .qb-v2-fallback-qty, script) {
+  opacity: 0.5;
+}
+
+.qb-v2--inactive[data-qb-inactive-label]::before {
+  content: attr(data-qb-inactive-label);
+  display: block;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(var(--color-foreground), 0.07);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.qb-v2-placeholder,
+.qb-v2.qb-v2--placeholder {
+  padding: 10px 12px;
+  border: 1px dashed rgba(var(--color-foreground), 0.35);
+  border-radius: 8px;
+  color: rgba(var(--color-foreground), 0.75);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.qb-v2-option--needs-update > :not(.qb-v2-option__input) {
+  opacity: 0.5;
+}
+
+/* the whole card, so its border doesn't show through the badge */
+.qb-v2 .qb-v2-option.qb-v2-option--hidden-preview {
+  opacity: 0.5;
+}
+
+.qb-v2 .qb-v2-option.qb-v2-option--needs-update::after {
+  content: 'Needs a Shrine update';
+  display: block;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.qb-v2-option.is-previewed {
+  outline: 2px dashed rgb(var(--qb-v2-accent));
+  outline-offset: 3px;
+}
+
+/* ---------- Options ---------- */
+.qb-v2__options {
+  display: grid;
+  gap: var(--qb-v2-gap);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* The border is an inset shadow, so the thicker selected ring never moves anything */
+.qb-v2-option {
+  --qb-v2-ring: var(--qb-v2-border);
+  --qb-v2-border-color: rgba(var(--color-foreground), 0.18);
+  --qb-v2-card-background: transparent;
+  --qb-v2-selected-ring: rgb(var(--qb-v2-accent));
+  --qb-v2-selected-background: rgba(var(--qb-v2-accent), 0.08);
+  position: relative;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--qb-v2-radius);
+  background: var(--qb-v2-card-background);
+  box-shadow: inset 0 0 0 var(--qb-v2-ring) var(--qb-v2-border-color);
+  color: rgb(var(--color-foreground));
+  line-height: 1.35;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qb-v2--cards-filled .qb-v2-option {
+  --qb-v2-card-background: rgba(var(--color-foreground), 0.04);
+}
+
+.qb-v2--cards-minimal .qb-v2-option {
+  --qb-v2-ring: 0px;
+  padding-inline: 4px;
+}
+
+.qb-v2--selected-border .qb-v2-option {
+  --qb-v2-selected-background: transparent;
+}
+
+.qb-v2--selected-filled .qb-v2-option {
+  --qb-v2-selected-background: rgb(var(--qb-v2-accent));
+}
+
+/* Option card style (overrides the wrapper's) */
+.qb-v2 .qb-v2-option.qb-v2-option--card-tint {
+  --qb-v2-card-background: rgba(var(--qb-v2-accent), 0.08);
+}
+
+/* an inverse card's dark background would swallow the accent, so its dots, checks and labels use the card's text color */
+.qb-v2 .qb-v2-option.qb-v2-option--card-inverse {
+  --qb-v2-card-bg: var(--color-base-text);
+  --qb-v2-card-text: var(--color-base-background-1);
+  --qb-v2-mark: var(--qb-v2-card-text);
+  --qb-v2-on-mark: var(--qb-v2-card-bg);
+}
+
+.qb-v2 .qb-v2-option:is(.qb-v2-option--card-inverse, .qb-v2-option--card-custom) {
+  --color-foreground: var(--qb-v2-card-text, var(--color-base-text));
+  --color-background: var(--qb-v2-card-bg, var(--color-base-background-1));
+  --qb-v2-card-background: rgb(var(--color-background));
+  --qb-v2-border-color: rgba(var(--color-foreground), 0.25);
+}
+
+/* Native pickers on those cards follow the card's colors instead of the theme's picker colors */
+.qb-v2 .qb-v2-option:is(.qb-v2-option--card-inverse, .qb-v2-option--card-custom) .select {
+  --accent-color: var(--color-foreground);
+  --accent-2-color: var(--color-foreground);
+}
+
+.qb-v2 .qb-v2-option:is(.qb-v2-option--card-inverse, .qb-v2-option--card-custom) .select::after {
+  --color-foreground: var(--qb-v2-card-text, var(--color-base-text));
+}
+
+/* Selected: before the script runs the checked radio decides, afterwards .is-selected */
+.qb-v2 .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) {
+  --qb-v2-ring: calc(var(--qb-v2-border) + 1px);
+  --qb-v2-border-color: var(--qb-v2-selected-ring);
+  background: linear-gradient(var(--qb-v2-selected-background), var(--qb-v2-selected-background)) var(--qb-v2-card-background);
+  cursor: auto;
+}
+
+/* Minimal cards have almost no side padding, so their selected ring goes around the outside */
+.qb-v2.qb-v2--cards-minimal .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) {
+  box-shadow: 0 0 0 var(--qb-v2-ring) var(--qb-v2-border-color);
+}
+
+.qb-v2.qb-v2--selected-filled .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) {
+  --qb-v2-ink: var(--qb-v2-on-accent);
+  --qb-v2-mark: var(--qb-v2-on-accent);
+  --qb-v2-on-mark: var(--qb-v2-accent);
+  color: rgb(var(--qb-v2-on-accent));
+}
+
+@media (hover: hover) {
+  .qb-v2 .qb-v2-option:not(.is-selected, [data-qb-available='false']):not(:has(> .qb-v2-option__input:checked)):hover {
+    --qb-v2-border-color: rgba(var(--color-foreground), 0.4);
+  }
+}
+
+.qb-v2 .qb-v2-option:has(> .qb-v2-option__input:focus-visible) {
+  outline: 2px solid rgb(var(--color-foreground));
+  outline-offset: 3px;
+}
+
+.qb-v2-option[data-qb-available='false'] {
+  opacity: 0.55;
+}
+
+.qb-v2-option[data-qb-available='false'],
+.qb-v2 .qb-v2-option[data-qb-available='false'] .qb-v2-card {
+  cursor: not-allowed;
+}
+
+.qb-v2-option[data-qb-hidden='true']:not(.qb-v2-option--hidden-preview) {
+  display: none;
+}
+
+.qb-v2-option[data-qb-dormant] {
+  pointer-events: none;
+}
+
+/* Prices the script must work out (counted carried gift, other currency, pack variant) keep their space until then */
+.qb-v2-pending :is(.qb-v2-card__price, .qb-v2-card__compare, .qb-v2-card__savings, .qb-v2-card__each, .qb-v2-card__subtitle, .qb-v2-card__label, .qb-v2-badge),
+.qb-v2__savings.qb-v2-pending {
+  visibility: hidden;
+}
+
+/* ---------- Card (the option's label) ---------- */
+/* Indicator, image, texts, prices; status, stepper and pickers below. Margins, not column-gap, so a missing indicator
+   or image takes no room. Static: badges sit on the option. */
+.qb-v2 .qb-v2-option .qb-v2-card {
+  position: static;
+  z-index: auto;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-card__indicator {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-inline-end: 12px;
+  border-radius: 50%;
+  /* 0.5 keeps the empty circle at 3:1 or more on filled cards and Background 2 */
+  box-shadow: inset 0 0 0 2px rgba(var(--qb-v2-ink), 0.5);
+}
+
+.qb-v2 .qb-v2-card__media {
+  grid-area: 1 / 2;
+  display: block;
+  width: var(--qb-v2-image-size);
+  aspect-ratio: 1;
+  margin-inline-end: 12px;
+}
+
+.qb-v2 .qb-v2-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  object-fit: contain;
+}
+
+.qb-v2 .qb-v2-card__main {
+  grid-area: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qb-v2 .qb-v2-card__prices {
+  grid-area: 1 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-inline-start: 12px;
+  text-align: end;
+}
+
+.qb-v2 .qb-v2-card__status {
+  grid-column: 3 / -1;
+  justify-self: start;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--qb-v2-ink), 0.08);
+  font-size: calc(var(--qb-v2-text-size) - 2px);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.qb-v2 .qb-v2-card > .qb-v2-units {
+  grid-column: 1 / -1;
+}
+
+/* the stepper sits under the texts it changes ("5+") */
+.qb-v2 .qb-v2-card > .qb-v2-stepper {
+  grid-column: 3 / -1;
+}
+
+/* Radio indicator; Checkmark is a rounded square that fills */
+.qb-v2 .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator {
+  box-shadow: inset 0 0 0 2px rgb(var(--qb-v2-mark));
+  background: radial-gradient(circle, rgb(var(--qb-v2-mark)) 0 4px, transparent 4.5px);
+}
+
+.qb-v2.qb-v2--indicator-check .qb-v2-card__indicator {
+  border-radius: 5px;
+}
+
+.qb-v2.qb-v2--indicator-check .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator,
+.qb-v2.qb-v2--indicator-none .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator {
+  background: rgb(var(--qb-v2-mark));
+  box-shadow: none;
+}
+
+.qb-v2.qb-v2--indicator-check .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator::after,
+.qb-v2.qb-v2--indicator-none .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: rgb(var(--qb-v2-on-mark));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* None: no indicator, a check badge on the selected card's corner instead (on the other corner when a badge sits on
+   that one) */
+.qb-v2.qb-v2--indicator-none .qb-v2-card__indicator {
+  display: none;
+}
+
+.qb-v2.qb-v2--indicator-none .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator {
+  position: absolute;
+  top: -7px;
+  inset-inline-end: -7px;
+  z-index: 3;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 50%;
+  background: rgb(var(--qb-v2-accent));
+  box-shadow: 0 0 0 2px rgb(var(--color-background));
+}
+
+.qb-v2.qb-v2--indicator-none .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator::after {
+  background: rgb(var(--qb-v2-on-accent));
+}
+
+.qb-v2.qb-v2--indicator-none .qb-v2-option:has(> .qb-v2-card > :is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker, .qb-v2-badge--image, .qb-v2-badge--right:not(.qb-v2-badge--inline))) .qb-v2-card__indicator {
+  inset-inline: -7px auto;
+}
+
+/* Texts */
+.qb-v2 .qb-v2-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.qb-v2 .qb-v2-card__title {
+  font-size: var(--qb-v2-title-size);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.qb-v2--title-font-heading .qb-v2-card__title {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+}
+
+/* A text whose saving is zero is hidden, and its pill with it - only visually: a hidden element in the radio's
+   description would still be read out. */
+.qb-v2 .qb-v2-card__label:not(:has(> .qb-v2-text:not([hidden]))) {
+  padding: 0;
+  background: none;
+}
+
+.qb-v2 .qb-v2-card__label {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(var(--qb-v2-mark), 0.12);
+  color: rgb(var(--qb-v2-mark));
+  font-size: calc(var(--qb-v2-text-size) - 2px);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* a custom accent can be too light for text: filled, with the text color picked for it */
+.qb-v2.qb-v2--accent-custom .qb-v2-card__label {
+  background: rgb(var(--qb-v2-mark));
+  color: rgb(var(--qb-v2-on-mark));
+}
+
+.qb-v2 :is(.qb-v2-card__subtitle, .qb-v2-card__plan) {
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.qb-v2 .qb-v2-card__highlights {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.4;
+}
+
+.qb-v2 .qb-v2-card__highlights :is(p, ul, ol) {
+  margin: 0;
+  padding: 0;
+}
+
+.qb-v2 .qb-v2-card__highlights ul {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+}
+
+.qb-v2 .qb-v2-card__highlights ul > li {
+  position: relative;
+  padding-inline-start: 1.5em;
+}
+
+.qb-v2 .qb-v2-card__highlights ul > li::before {
+  content: '';
+  position: absolute;
+  top: 0.15em;
+  inset-inline-start: 0;
+  width: 1.1em;
+  height: 1.1em;
+  background: rgb(var(--qb-v2-mark));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Prices */
+.qb-v2 .qb-v2-card__price {
+  font-size: var(--qb-v2-price-size);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* "From" of an option still missing picks (the theme's own words): text size and weight, the price keeps its look */
+.qb-v2 .qb-v2-card__price .qb-v2-from {
+  font-size: var(--qb-v2-text-size);
+  font-weight: var(--font-body-weight, 400);
+}
+
+.qb-v2 .qb-v2-card__compare {
+  color: var(--qb-v2-compare-color, rgb(var(--qb-v2-ink)));
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.3;
+}
+
+/* the merchant's text may already strike it through with <s> */
+.qb-v2 .qb-v2-card__compare:not(:has(s)) {
+  text-decoration: line-through;
+}
+
+.qb-v2 .qb-v2-card__each {
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  line-height: 1.3;
+  opacity: 0.75;
+}
+
+.qb-v2--no-each .qb-v2-card__each {
+  display: none;
+}
+
+/* Savings line (the option's Savings text), part of the radio's name: only its text hides when nothing is saved, and
+   the empty line leaves the flow, so it adds no gap */
+.qb-v2 .qb-v2-card__savings {
+  color: var(--qb-v2-savings-color, rgb(var(--qb-v2-mark)));
+  font-size: calc(var(--qb-v2-text-size) - 2px);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.qb-v2 .qb-v2-card__savings:not(:has(> .qb-v2-text:not([hidden]))) {
+  position: absolute;
+}
+
+/* Money with and without the zero decimals; the wrapper's class picks one */
+.qb-v2-m__t {
+  display: none;
+}
+
+.qb-v2--trim-zeros .qb-v2-m__f {
+  display: none;
+}
+
+.qb-v2--trim-zeros .qb-v2-m__t {
+  display: inline;
+}
+
+/* Right, compare price beside */
+.qb-v2.qb-v2--prices-right_beside .qb-v2-card__prices {
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
+.qb-v2.qb-v2--prices-right_beside :is(.qb-v2-card__each, .qb-v2-card__savings),
+.qb-v2.qb-v2--prices-below_title .qb-v2-card__savings {
+  flex-basis: 100%;
+}
+
+/* Below title: the prices join the texts' column, the fourth column collapses */
+.qb-v2.qb-v2--prices-below_title .qb-v2-card__prices {
+  grid-area: auto / 3 / auto / -1;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: baseline;
+  column-gap: 8px;
+  margin: 4px 0 0;
+  text-align: start;
+}
+
+.qb-v2.qb-v2--prices-below_title :is(.qb-v2-card__indicator, .qb-v2-card__media) {
+  grid-row: 1 / span 2;
+}
+
+/* ---------- Layouts ---------- */
+.qb-v2--layout-grid .qb-v2__options {
+  grid-template-columns: repeat(var(--qb-v2-columns), minmax(0, 1fr));
+}
+
+.qb-v2--layout-columns .qb-v2__options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.qb-v2--layout-columns.qb-v2--count-1 .qb-v2__options {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.qb-v2--layout-columns.qb-v2--count-2 .qb-v2__options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.qb-v2--layout-columns.qb-v2--count-3 .qb-v2__options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Grid and Columns: each card stacks its content, centered (Columns also centers it vertically) */
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option {
+  display: flex;
+  flex-direction: column;
+}
+
+.qb-v2.qb-v2--layout-columns .qb-v2-option {
+  justify-content: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option .qb-v2-card {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option :is(.qb-v2-card__indicator, .qb-v2-card__media, .qb-v2-card__main, .qb-v2-card__prices, .qb-v2-card__status) {
+  grid-area: auto / 1;
+  margin: 0;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option :is(.qb-v2-card__indicator, .qb-v2-card__media) {
+  margin-bottom: 10px;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option .qb-v2-card__main {
+  align-items: center;
+  width: 100%;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option .qb-v2-card__head {
+  justify-content: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option .qb-v2-card__prices {
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: 8px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option :is(.qb-v2-card__each, .qb-v2-card__savings) {
+  flex-basis: 100%;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option :is(.qb-v2-card__status, .qb-v2-stepper) {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-option .qb-v2-card__status {
+  margin-top: 8px;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-card__highlights ul > li {
+  justify-self: center;
+}
+
+/* Per-item pickers in a narrow card: one picker per line at full width, the number above */
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-card > .qb-v2-units {
+  justify-self: stretch;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) :is(.qb-v2-units__head, .qb-v2-units .qb-v2-sw) {
+  justify-content: center;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-units .qb-v2-unit {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-unit__number {
+  text-align: center;
+}
+
+/* Table: one row per option in shared columns (indicator, texts, price per item, total over compare price), passed
+   down by subgrid so every row lines up. Margins, so an unused price-per-item column takes no room. */
+.qb-v2.qb-v2--layout-table .qb-v2__options {
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  column-gap: 0;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option,
+.qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option > :not(.qb-v2-card),
+.qb-v2.qb-v2--layout-table .qb-v2-option::after {
+  grid-column: 1 / -1;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card__indicator {
+  grid-area: 1 / 1;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-card__media {
+  display: none;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card__main {
+  grid-area: 1 / 2;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card__prices {
+  grid-area: 1 / 3 / auto / span 2;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+  row-gap: 2px;
+  margin: 0;
+  text-align: end;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-card__prices > * {
+  grid-column: 2;
+  margin-inline-start: 12px;
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-card__prices > .qb-v2-card__each {
+  grid-area: 1 / 1 / span 2;
+  font-size: var(--qb-v2-text-size);
+}
+
+.qb-v2.qb-v2--layout-table .qb-v2-option :is(.qb-v2-card__status, .qb-v2-stepper) {
+  grid-column: 2 / -1;
+}
+
+/* Browsers without subgrid: fixed widths for the two price columns */
+@supports not (grid-template-columns: subgrid) {
+  .qb-v2.qb-v2--layout-table .qb-v2-option,
+  .qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card {
+    grid-template-columns: auto minmax(0, 1fr) 6em 7em;
+  }
+
+  .qb-v2.qb-v2--layout-table .qb-v2-option .qb-v2-card__prices {
+    grid-template-columns: 6em 7em;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .qb-v2--layout-grid .qb-v2__options,
+  .qb-v2--layout-columns .qb-v2__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qb-v2--layout-columns.qb-v2--count-1 .qb-v2__options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qb-v2--layout-columns.qb-v2--count-3 .qb-v2__options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* a third column is too narrow for a number and two pickers */
+  .qb-v2.qb-v2--layout-columns.qb-v2--has-units.qb-v2--count-3 .qb-v2__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Narrow cards center their content, so a corner sticker or ribbon would cover the radio and title: on phones both
+     sit on the top edge like a pill */
+  .qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) :is(.qb-v2-badge--sticker, .qb-v2-badge--ribbon),
+  body[data-rtl='true'] .qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-badge--sticker {
+    top: 0;
+    inset-inline: auto;
+    left: 50%;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: calc(100% + 8px);
+    padding: 2px 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    rotate: none;
+    translate: -50% -50%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    letter-spacing: 0;
+    font-size: calc(var(--qb-v2-text-size) - 2px);
+    font-weight: 700;
+    line-height: 1.4;
+    background: var(--qb-v2-badge-fill);
+    color: var(--qb-v2-badge-ink);
+    box-shadow: 0 0 0 2px rgb(var(--color-background));
+  }
+
+  .qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-badge--ribbon > .qb-v2-text,
+  body[data-rtl='true'] .qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2-badge--ribbon > .qb-v2-text {
+    position: static;
+    rotate: none;
+    width: auto;
+    padding: 0;
+    background: none;
+  }
+
+  /* three columns: room for the content, and badges centered so they stay on their own card */
+  .qb-v2.qb-v2--layout-columns.qb-v2--count-3 .qb-v2-option {
+    padding-inline: 8px;
+  }
+
+  .qb-v2.qb-v2--layout-columns.qb-v2--count-3 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border) {
+    inset-inline: auto;
+    left: 50%;
+    max-width: calc(100% + 8px);
+    padding-inline: 6px;
+    overflow: hidden;
+    letter-spacing: 0;
+    text-overflow: ellipsis;
+    translate: -50% -50%;
+  }
+
+  /* a tab belongs to its card's top edge: never wider than the card */
+  .qb-v2.qb-v2--layout-columns.qb-v2--count-3 .qb-v2-badge.qb-v2-badge--tab {
+    inset-inline: auto;
+    left: 50%;
+    display: block;
+    max-width: 100%;
+    padding-inline: 6px;
+    overflow: hidden;
+    letter-spacing: 0;
+    line-height: var(--qb-v2-tab-height);
+    text-overflow: ellipsis;
+    translate: -50% 0;
+  }
+
+  .qb-v2.qb-v2--layout-columns.qb-v2--count-3 .qb-v2-card__label {
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Badges ---------- */
+/* Inside the label, positioned against the option (the label is static). translate / rotate, never transform. */
+.qb-v2 .qb-v2-badge {
+  --qb-v2-badge-fill: rgb(var(--qb-v2-accent));
+  --qb-v2-badge-ink: rgb(var(--qb-v2-on-accent));
+  box-sizing: border-box;
+  font-size: calc(var(--qb-v2-text-size) - 2px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.qb-v2 .qb-v2-badge--color-inverse {
+  --qb-v2-badge-fill: rgb(var(--color-base-text));
+  --qb-v2-badge-ink: rgb(var(--color-base-background-1));
+}
+
+.qb-v2 .qb-v2-badge--color-custom {
+  --qb-v2-badge-fill: var(--qb-v2-badge-bg, rgb(var(--color-base-text)));
+  --qb-v2-badge-ink: var(--qb-v2-badge-text, rgb(var(--color-base-background-1)));
+}
+
+/* a text badge whose saving keyword has nothing to show hides with its text (visually only, as the label above) */
+.qb-v2 .qb-v2-badge:not(.qb-v2-badge--image):not(:has(.qb-v2-text:not([hidden]))) {
+  padding: 0;
+  clip-path: inset(50%);
+}
+
+.qb-v2 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border, .qb-v2-badge--tab, .qb-v2-badge--sticker, .qb-v2-badge--inline) {
+  background: var(--qb-v2-badge-fill);
+  color: var(--qb-v2-badge-ink);
+}
+
+/* Pill on the border (also the text of Animated border) */
+.qb-v2 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border) {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  padding: 2px 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgb(var(--color-background));
+  translate: 0 -50%;
+}
+
+/* Tab on the top edge; the option moves down by its height */
+.qb-v2 .qb-v2-badge--tab {
+  position: absolute;
+  bottom: 100%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: var(--qb-v2-tab-height);
+  padding: 0 12px;
+  border-radius: 6px 6px 0 0;
+}
+
+.qb-v2 .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--tab .qb-v2-text:not([hidden])) {
+  margin-top: var(--qb-v2-tab-height);
+}
+
+/* cards side by side keep their tops aligned */
+.qb-v2:is(.qb-v2--layout-grid, .qb-v2--layout-columns) .qb-v2__options:has(.qb-v2-badge--tab .qb-v2-text:not([hidden])) > .qb-v2-option {
+  margin-top: var(--qb-v2-tab-height);
+}
+
+.qb-v2 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border, .qb-v2-badge--tab).qb-v2-badge--left {
+  inset-inline-start: 14px;
+}
+
+.qb-v2 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border, .qb-v2-badge--tab).qb-v2-badge--right {
+  inset-inline-end: 14px;
+}
+
+.qb-v2 .qb-v2-badge:is(.qb-v2-badge--pill, .qb-v2-badge--border).qb-v2-badge--center {
+  left: 50%;
+  translate: -50% -50%;
+}
+
+.qb-v2 .qb-v2-badge--tab.qb-v2-badge--center {
+  left: 50%;
+  translate: -50% 0;
+}
+
+/* Corner ribbon: a clipped square on the top inline-end corner holding a 45° band; the band's middle is the part
+   that shows, so the text keeps to it (and ends with "…" when it is longer) */
+.qb-v2 .qb-v2-badge--ribbon {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  z-index: 2;
+  width: 96px;
+  height: min(96px, 100%);
+  overflow: hidden;
+  border-start-end-radius: var(--qb-v2-radius);
+  font-size: calc(var(--qb-v2-text-size) - 4px);
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.qb-v2 .qb-v2-badge--ribbon > .qb-v2-text {
+  position: absolute;
+  top: 19px;
+  inset-inline-end: -35px;
+  width: 132px;
+  padding: 3px 12px;
+  overflow: hidden;
+  background: var(--qb-v2-badge-fill);
+  color: var(--qb-v2-badge-ink);
+  text-align: center;
+  text-overflow: ellipsis;
+  rotate: 45deg;
+}
+
+body[data-rtl='true'] .qb-v2 .qb-v2-badge--ribbon > .qb-v2-text {
+  rotate: -45deg;
+}
+
+/* Sticker: a tilted round stamp over the top inline-end corner */
+.qb-v2 .qb-v2-badge--sticker {
+  position: absolute;
+  top: -12px;
+  inset-inline-end: -8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  padding: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgb(var(--color-background));
+  font-size: calc(var(--qb-v2-text-size) - 3px);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  white-space: normal;
+  rotate: -8deg;
+}
+
+body[data-rtl='true'] .qb-v2 .qb-v2-badge--sticker {
+  rotate: 8deg;
+}
+
+/* Image badge */
+.qb-v2 .qb-v2-badge--image {
+  position: absolute;
+  top: -14px;
+  inset-inline-end: -8px;
+  z-index: 2;
+  width: clamp(48px, 18%, 96px);
+  pointer-events: none;
+}
+
+.qb-v2 .qb-v2-badge__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Row cards keep the ribbon, sticker or image corner free of prices; in a table every row keeps the widest one */
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--ribbon),
+.qb-v2--layout-table .qb-v2__options:has(.qb-v2-badge--ribbon) {
+  --qb-v2-corner: 62px;
+}
+
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--sticker),
+.qb-v2--layout-table .qb-v2__options:has(.qb-v2-badge--sticker) {
+  --qb-v2-corner: 68px;
+}
+
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--image),
+.qb-v2--layout-table .qb-v2__options:has(.qb-v2-badge--image) {
+  --qb-v2-corner-image: clamp(48px, 18%, 96px);
+}
+
+/* A ribbon or sticker only reaches the card's first lines: the card keeps that side clear for the title and prices,
+   while its per-item pickers and the option's products below use the full width */
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > :is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)),
+.qb-v2--layout-table .qb-v2__options:has(:is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)) > .qb-v2-option {
+  padding-inline-end: 16px;
+}
+
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > :is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)) > .qb-v2-card,
+.qb-v2--layout-table .qb-v2__options:has(:is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)) > .qb-v2-option > .qb-v2-card {
+  padding-inline-end: calc(var(--qb-v2-corner) - 16px);
+}
+
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > :is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)) > .qb-v2-card > .qb-v2-units,
+.qb-v2--layout-table .qb-v2__options:has(:is(.qb-v2-badge--ribbon, .qb-v2-badge--sticker)) > .qb-v2-option > .qb-v2-card > .qb-v2-units {
+  margin-inline-end: calc(16px - var(--qb-v2-corner));
+}
+
+/* An image badge can be any height: its option keeps the whole side clear */
+.qb-v2--layout-stack .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--image),
+.qb-v2--layout-table .qb-v2__options:has(.qb-v2-badge--image) > .qb-v2-option {
+  padding-inline-end: var(--qb-v2-corner-image);
+}
+
+/* Next to title */
+.qb-v2 .qb-v2-badge--inline {
+  --qb-v2-badge-fill: rgb(var(--qb-v2-mark));
+  --qb-v2-badge-ink: rgb(var(--qb-v2-on-mark));
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.qb-v2 .qb-v2-badge--inline.qb-v2-badge--color-inverse {
+  --qb-v2-badge-fill: rgb(var(--color-base-text));
+  --qb-v2-badge-ink: rgb(var(--color-base-background-1));
+}
+
+.qb-v2 .qb-v2-badge--inline.qb-v2-badge--color-custom {
+  --qb-v2-badge-fill: var(--qb-v2-badge-bg, rgb(var(--color-base-text)));
+  --qb-v2-badge-ink: var(--qb-v2-badge-text, rgb(var(--color-base-background-1)));
+}
+
+/* Animated border: one turn on load, one more on each selection (a second, identical animation; deselecting removes it
+   without a restart). Never endless: motion over 5 s needs a pause control (WCAG 2.2.2). */
+@property --qb-v2-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes qb-v2-spin {
+  to {
+    --qb-v2-angle: 360deg;
+  }
+}
+
+@keyframes qb-v2-spin-sel {
+  to {
+    --qb-v2-angle: 360deg;
+  }
+}
+
+.qb-v2 .qb-v2-option:has(> .qb-v2-card > .qb-v2-badge--border)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: calc(var(--qb-v2-border) + 1px);
+  border-radius: inherit;
+  background: conic-gradient(from var(--qb-v2-angle), rgb(var(--qb-v2-accent)), rgba(var(--qb-v2-accent), 0.1) 40%, rgb(var(--qb-v2-accent)));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: qb-v2-spin 3s linear 1;
+  pointer-events: none;
+}
+
+.qb-v2 .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)):has(> .qb-v2-card > .qb-v2-badge--border)::before {
+  animation-name: qb-v2-spin, qb-v2-spin-sel;
+}
+
+.qb-v2 .qb-v2-badge__ring {
+  display: none;
+}
+
+/* ---------- Per-item pickers ---------- */
+/* Only in the selected option (display: none, not base.css's height: 0, so hidden pickers leave the tab order) */
+.qb-v2 .qb-v2-units.quantity-break__variants {
+  display: grid;
+  gap: 8px;
+  height: auto;
+  overflow: visible;
+  padding-top: 10px;
+}
+
+.qb-v2-option:not(.is-selected):not(:has(> .qb-v2-option__input:checked)) .qb-v2-units {
+  display: none;
+}
+
+.qb-v2 .qb-v2-units__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  line-height: 1.3;
+}
+
+.qb-v2 .qb-v2-units__names {
+  opacity: 0.75;
+}
+
+/* in-card links (theme .link) take the card's text color: the link color would vanish on a filled or inverse card */
+.qb-v2 :is(.qb-v2-units__toggle, .qb-v2-gift__change) {
+  color: rgb(var(--qb-v2-ink));
+}
+
+.qb-v2 .qb-v2-units__toggle {
+  display: none;
+  align-items: center;
+  min-height: 24px;
+  margin-inline-start: auto;
+  padding: 0;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+}
+
+.qb-v2:is(.qb-v2--labels-numbers, .qb-v2--labels-none) :is(.qb-v2-units__head, .qb-v2-units__names),
+.qb-v2:is(.qb-v2--labels-names, .qb-v2--labels-none) .qb-v2-unit__number {
+  display: none;
+}
+
+/* One picker for all items: until the per-item link is used, only the first unit shows, without its number (the
+   script copies it to the others) */
+.qb-v2.qb-v2--units-same_for_all .qb-v2-units:not(.is-expanded) :is(.qb-v2-unit ~ .qb-v2-unit, .qb-v2-unit__number) {
+  display: none;
+}
+
+.qb-v2.qb-v2--units-same_for_all .qb-v2-units:not(.is-expanded):has(.qb-v2-unit ~ .qb-v2-unit) .qb-v2-units__head {
+  display: flex;
+}
+
+.qb-v2.qb-v2--units-same_for_all .qb-v2-units:not(.is-expanded):has(.qb-v2-unit ~ .qb-v2-unit) .qb-v2-units__toggle {
+  display: inline-flex;
+}
+
+.qb-v2 .qb-v2-units .qb-v2-unit {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.qb-v2 .qb-v2-unit__number {
+  flex: none;
+  min-width: 22px;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  font-weight: 600;
+  line-height: 1.3;
+  opacity: 0.75;
+}
+
+.qb-v2 .qb-v2-unit > .qb-v2-picker {
+  flex: 1 1 0;
+}
+
+/* ---------- Pickers (per-item pickers and extra products) ---------- */
+/* The native select always exists and stays the source of truth; the wrapper's picker style decides what shows */
+.qb-v2 .qb-v2-picker {
+  display: block;
+  min-width: 0;
+  text-align: start;
+}
+
+.qb-v2 .qb-v2-dd,
+.qb-v2 .qb-v2-sw {
+  display: none;
+}
+
+.qb-v2.qb-v2--pickers-image_dropdown .qb-v2-picker .qb-v2-dd,
+.qb-v2.qb-v2--pickers-mixed .qb-v2-picker[data-qb-mode='dropdown'] .qb-v2-dd {
+  display: inline-flex;
+}
+
+.qb-v2.qb-v2--pickers-buttons .qb-v2-picker .qb-v2-sw,
+.qb-v2.qb-v2--pickers-mixed .qb-v2-picker[data-qb-mode='swatches'] .qb-v2-sw {
+  display: flex;
+}
+
+.qb-v2:is(.qb-v2--pickers-image_dropdown, .qb-v2--pickers-buttons) .qb-v2-picker .qb-v2-native,
+.qb-v2.qb-v2--pickers-mixed .qb-v2-picker[data-qb-mode] .qb-v2-native {
+  display: none;
+}
+
+/* In a popup only the native select works (the shared list outside a modal dialog is inert) */
+.qb-v2 .qb-v2-dialog .qb-v2-picker[data-qb-picker][data-option-position] .qb-v2-native.select {
+  display: flex;
+}
+
+.qb-v2 .qb-v2-dialog .qb-v2-picker[data-qb-picker][data-option-position] :is(.qb-v2-dd, .qb-v2-sw) {
+  display: none;
+}
+
+/* Native select: the theme's small select, taller and with a readable size; 16px on phones so iOS doesn't zoom */
+.qb-v2 .qb-v2-picker .select {
+  width: 100%;
+}
+
+/* 40px with the theme's margin around the select, like the trigger and the swatch row, so switching never shifts */
+.qb-v2 .qb-v2-picker .select__select {
+  height: auto;
+  min-height: calc(40px - 2 * var(--inputs-border-width));
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.3;
+}
+
+/* Image dropdown trigger */
+.qb-v2 .qb-v2-dd {
+  box-sizing: border-box;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+  padding-block: 4px;
+  padding-inline: 6px 10px;
+  border: 1px solid rgba(var(--color-foreground), 0.2);
+  border-radius: 8px;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.3;
+  text-align: start;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-dd[aria-expanded='true'] {
+  border-color: rgb(var(--qb-v2-accent));
+}
+
+.qb-v2 .qb-v2-dd:focus-visible {
+  outline: 2px solid rgb(var(--color-foreground));
+  outline-offset: 2px;
+}
+
+.qb-v2 .qb-v2-dd__image {
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+.qb-v2 .qb-v2-dd__image:empty {
+  display: none;
+}
+
+.qb-v2 .qb-v2-dd:has(> .qb-v2-dd__image:empty) {
+  padding-inline-start: 10px;
+}
+
+.qb-v2 .qb-v2-dd__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.qb-v2 .qb-v2-dd__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qb-v2 .qb-v2-dd .icon-caret {
+  flex: none;
+  width: 10px;
+  height: 6px;
+  transition: rotate 0.15s ease;
+}
+
+.qb-v2 .qb-v2-dd[aria-expanded='true'] .icon-caret {
+  rotate: 180deg;
+}
+
+/* Shared list of the image dropdowns. Grid rows, never flex (WebKit bug 151657: VoiceOver ignores
+   aria-activedescendant then). */
+.qb-v2__listbox {
+  position: absolute;
+  z-index: 20;
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: min(360px, calc(100vw - 32px));
+  max-height: 320px;
+  margin: 0;
+  padding: 4px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(var(--color-foreground), 0.15);
+  border-radius: 10px;
+  background: rgb(var(--color-background));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  color: rgb(var(--color-foreground));
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.3;
+  text-align: start;
+}
+
+.qb-v2__listbox [role='option'] {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  min-height: 44px;
+  padding-block: 4px;
+  padding-inline: 8px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.qb-v2__listbox:has([role='option'] > :is(img, .qb-v2-swatch)) [role='option'] {
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+
+.qb-v2__listbox [role='option'] > :is(img, .qb-v2-swatch) {
+  grid-column: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.qb-v2__listbox [role='option'] > :not(img, .qb-v2-swatch) {
+  grid-column: -2;
+}
+
+.qb-v2__listbox [role='option'].is-active {
+  background: rgba(var(--color-foreground), 0.07);
+}
+
+.qb-v2__listbox [role='option'][aria-selected='true'] {
+  font-weight: 600;
+}
+
+.qb-v2__listbox [role='option'][aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 10px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background: rgb(var(--qb-v2-accent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.55 18.2 3.65 12.3l1.6-1.6 4.3 4.3 9.2-9.2 1.6 1.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* sold out but selectable (Show sold-out values); values that can't be chosen fade more */
+.qb-v2__listbox [role='option'].is-unavailable {
+  opacity: 0.6;
+}
+
+.qb-v2__listbox [role='option'][aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Swatches and pills in the theme's swatch look (Theme settings > Color swatches), built by the script; the row keeps
+   their line from the first paint */
+.qb-v2 .qb-v2-sw {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.qb-v2.qb-v2--pickers-mixed .qb-v2-sw {
+  min-height: 40px;
+}
+
+.qb-v2 .qb-v2-swatch {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--swatches-radius, 50%);
+  background: var(--qb-v2-swatch, rgba(var(--color-foreground), 0.08));
+  /* the theme's border, plus a faint hairline so a white swatch stays visible when that border is off */
+  box-shadow: 0 0 0 1px rgba(var(--color-foreground), var(--swatches-border-opacity, 0)), inset 0 0 0 1px rgba(var(--color-foreground), 0.12);
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+/* 44px touch target */
+.qb-v2 .qb-v2-swatch::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.qb-v2 .qb-v2-swatch img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.qb-v2 .qb-v2-swatch[aria-checked='true'] {
+  box-shadow: 0 0 0 2px rgb(var(--color-background)), 0 0 0 3px rgba(var(--color-foreground), var(--swatches-selected-border-opacity, 0.5)), 0 0 0 5px rgb(var(--qb-v2-mark));
+}
+
+.qb-v2 .qb-v2-swatch:is(.is-unavailable, .is-nonexistent) {
+  opacity: 0.5;
+}
+
+.qb-v2 .qb-v2-swatch:is(.is-unavailable, .is-nonexistent):not(.qb-v2-swatch--pill)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(to top right, transparent calc(50% - 1.5px), rgb(var(--color-background)) calc(50% - 1.5px), rgb(var(--color-background)) calc(50% - 0.5px), rgb(var(--color-foreground)) calc(50% - 0.5px), rgb(var(--color-foreground)) calc(50% + 0.5px), rgb(var(--color-background)) calc(50% + 0.5px), rgb(var(--color-background)) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+}
+
+.qb-v2 .qb-v2-swatch:focus-visible {
+  outline: 2px solid rgb(var(--color-foreground));
+  outline-offset: 6px;
+}
+
+/* outlined; the selected pill is filled, so the two never look alike, whatever the card's background */
+.qb-v2 .qb-v2-swatch.qb-v2-swatch--pill {
+  width: auto;
+  min-width: 36px;
+  height: auto;
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid rgba(var(--qb-v2-ink), 0.35);
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+}
+
+.qb-v2 .qb-v2-swatch--pill[aria-checked='true'] {
+  border-color: rgb(var(--qb-v2-mark));
+  background: rgb(var(--qb-v2-mark));
+  color: rgb(var(--qb-v2-on-mark));
+  font-weight: 600;
+}
+
+.qb-v2 .qb-v2-swatch--pill:is(.is-unavailable, .is-nonexistent) {
+  text-decoration: line-through;
+}
+
+@media screen and (max-width: 749px) {
+  .qb-v2 .qb-v2-picker .select__select,
+  .qb-v2 .qb-v2-dd {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Option body: bundle products, gifts, upsells ---------- */
+/* Not position: relative - a scratch card covers the whole option */
+.qb-v2 .qb-v2-option__body {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  cursor: auto;
+}
+
+/* empty (div:empty is hidden by the theme, but this display rule outranks it) or holding only hidden things */
+.qb-v2 .qb-v2-option__body:empty,
+.qb-v2 .qb-v2-option__body:not(:has(> :not([hidden], script, style, template))),
+.qb-v2-option:not(.is-selected):not(:has(> .qb-v2-option__input:checked)) > .qb-v2-option__body:not(:has(> :not([hidden], script, style, template, .qb-v2-bundle--when-selected, .qb-v2-upsell--when-selected, .qb-v2-field))) {
+  display: none;
+}
+
+/* Show divider (wrapper): a line above the rows, in the card's own text color, only while the body shows rows (a scratch
+   cover alone is no row). Decorative: a border, nothing to read */
+.qb-v2.qb-v2--divider .qb-v2-option__body:has(> :not([hidden], script, style, template, .qb-v2-scratch)) {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(var(--qb-v2-ink), 0.12);
+}
+
+/* a Plain gift row has 8px of its own above its image */
+.qb-v2.qb-v2--divider .qb-v2-option__body:has(> .qb-v2-gift--plain:first-child) {
+  padding-top: 6px;
+}
+
+/* Personalisation only in the selected option, like the pickers (elsewhere nobody could type in it) */
+.qb-v2-option:not(.is-selected):not(:has(> .qb-v2-option__input:checked)) :is(.qb-v2-bundle--when-selected, .qb-v2-upsell--when-selected, .qb-v2-field) {
+  display: none;
+}
+
+/* the theme's small input, as in Custom product field */
+.qb-v2 .qb-v2-field__label {
+  margin-bottom: 6px;
+  font-size: var(--qb-v2-text-size);
+  font-weight: 600;
+}
+
+/* Extra product (tile or row) */
+.qb-v2 .qb-v2-item {
+  min-width: 0;
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+}
+
+.qb-v2 .qb-v2-item__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  background: rgba(var(--qb-v2-ink), 0.05);
+}
+
+.qb-v2 .qb-v2-item__media :is(img, svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qb-v2 .qb-v2-item__img--placeholder {
+  fill: rgba(var(--qb-v2-ink), 0.4);
+}
+
+.qb-v2 .qb-v2-item__info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.qb-v2 .qb-v2-item__title {
+  overflow-wrap: break-word;
+}
+
+.qb-v2 .qb-v2-item__qty {
+  font-weight: 700;
+}
+
+.qb-v2 .qb-v2-item__prices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+
+.qb-v2 .qb-v2-item__price {
+  font-weight: 700;
+}
+
+.qb-v2 .qb-v2-item__compare {
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  opacity: 0.7;
+}
+
+.qb-v2 .qb-v2-item__picker {
+  display: grid;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.qb-v2 .qb-v2-item__status {
+  justify-self: start;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  font-weight: 600;
+}
+
+.qb-v2 .qb-v2-item--tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  text-align: center;
+}
+
+.qb-v2 .qb-v2-item--tile .qb-v2-item__media {
+  align-self: center;
+  width: min(100%, 88px);
+  aspect-ratio: 1;
+}
+
+.qb-v2 .qb-v2-item--tile .qb-v2-item__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.qb-v2 .qb-v2-item--tile .qb-v2-item__prices {
+  justify-content: center;
+}
+
+/* a tile can be 80px wide on a phone: a tighter dropdown keeps room for the value */
+.qb-v2 .qb-v2-item--tile .qb-v2-dd {
+  gap: 4px;
+  padding-inline: 4px 6px;
+}
+
+.qb-v2 .qb-v2-item--tile .qb-v2-dd__image {
+  width: 22px;
+  height: 22px;
+}
+
+.qb-v2 .qb-v2-item--tile .qb-v2-item__status {
+  justify-self: center;
+}
+
+.qb-v2 .qb-v2-item--row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: start;
+}
+
+.qb-v2 .qb-v2-item--row .qb-v2-item__media {
+  grid-column: 1;
+  aspect-ratio: 1;
+}
+
+.qb-v2 .qb-v2-item--row .qb-v2-item__info {
+  grid-column: 2;
+}
+
+/* Bundle products */
+.qb-v2 .qb-v2-bundle {
+  display: grid;
+  gap: 8px;
+}
+
+.qb-v2 .qb-v2-bundle__heading {
+  font-size: var(--qb-v2-text-size);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.qb-v2 .qb-v2-bundle__items {
+  display: flex;
+  gap: 8px;
+}
+
+.qb-v2 .qb-v2-bundle__plus {
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(var(--qb-v2-mark));
+  color: rgb(var(--qb-v2-on-mark));
+}
+
+.qb-v2 .qb-v2-bundle__plus svg {
+  width: 12px;
+  height: 12px;
+}
+
+.qb-v2 .qb-v2-bundle--no-plus .qb-v2-bundle__plus {
+  display: none;
+}
+
+/* Tiles in a row, images aligned at the top; the plus sits level with the middle of the (88px) images */
+.qb-v2 :is(.qb-v2-bundle--grid, .qb-v2-bundle--auto-grid) .qb-v2-bundle__items {
+  justify-content: center;
+}
+
+.qb-v2 :is(.qb-v2-bundle--grid, .qb-v2-bundle--auto-grid) .qb-v2-item {
+  flex: 1 1 0;
+  max-width: 160px;
+}
+
+.qb-v2 .qb-v2-bundle__items > .qb-v2-bundle__plus {
+  align-self: flex-start;
+  margin-top: 32px;
+}
+
+.qb-v2 :is(.qb-v2-bundle--list, .qb-v2-bundle--auto-list) .qb-v2-bundle__items {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+/* the plus links the images, centered under the 56px image column */
+.qb-v2 :is(.qb-v2-bundle--list, .qb-v2-bundle--auto-list) .qb-v2-bundle__items > .qb-v2-bundle__plus {
+  margin-block: 0;
+  margin-inline-start: 16px;
+}
+
+/* in a list the tiles become rows */
+.qb-v2 :is(.qb-v2-bundle--list, .qb-v2-bundle--auto-list) .qb-v2-item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: start;
+}
+
+.qb-v2 :is(.qb-v2-bundle--list, .qb-v2-bundle--auto-list) .qb-v2-item__info {
+  grid-column: 2;
+}
+
+.qb-v2 :is(.qb-v2-bundle--list, .qb-v2-bundle--auto-list) :is(.qb-v2-item__prices, .qb-v2-item__status) {
+  justify-content: flex-start;
+  justify-self: start;
+}
+
+/* four or more tiles side by side would be about 50px wide on a phone: Grid falls back to the list there */
+@media screen and (max-width: 749px) {
+  .qb-v2 .qb-v2-bundle--grid:has(.qb-v2-item:nth-of-type(4)) .qb-v2-bundle__items {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .qb-v2 .qb-v2-bundle--grid:has(.qb-v2-item:nth-of-type(4)) .qb-v2-bundle__items > .qb-v2-bundle__plus {
+    margin-block: 0;
+    margin-inline-start: 16px;
+  }
+
+  .qb-v2 .qb-v2-bundle--grid:has(.qb-v2-item:nth-of-type(4)) .qb-v2-item {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    max-width: none;
+    text-align: start;
+  }
+
+  .qb-v2 .qb-v2-bundle--grid:has(.qb-v2-item:nth-of-type(4)) .qb-v2-item__info {
+    grid-column: 2;
+  }
+
+  .qb-v2 .qb-v2-bundle--grid:has(.qb-v2-item:nth-of-type(4)) :is(.qb-v2-item__prices, .qb-v2-item__status) {
+    justify-content: flex-start;
+    justify-self: start;
+  }
+}
+
+/* only the first Bundle products block of an option shows this product */
+.qb-v2 .qb-v2-bundle--with-main ~ .qb-v2-bundle--with-main :is(.qb-v2-item--main, .qb-v2-item--main + .qb-v2-bundle__plus) {
+  display: none;
+}
+
+/* Free gift: thumbnail, text and crossed-out value in one row; picker, status and Change button under the text */
+.qb-v2 .qb-v2-gift {
+  display: grid;
+  gap: 6px;
+}
+
+.qb-v2 .qb-v2-gift__row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  padding: 8px 10px;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+}
+
+.qb-v2 .qb-v2-gift--tint .qb-v2-gift__row {
+  background: rgba(var(--qb-v2-mark), 0.1);
+}
+
+.qb-v2 .qb-v2-gift--outline .qb-v2-gift__row {
+  border: 1px dashed rgb(var(--qb-v2-mark));
+}
+
+.qb-v2 .qb-v2-gift--plain .qb-v2-gift__row {
+  padding-inline: 0;
+}
+
+.qb-v2 .qb-v2-gift__row > .qb-v2-item,
+.qb-v2 .qb-v2-gift__row > .qb-v2-item > .qb-v2-item__info {
+  display: contents;
+}
+
+.qb-v2 .qb-v2-gift__row .qb-v2-item__media {
+  grid-area: 1 / 1;
+  width: 40px;
+  aspect-ratio: 1;
+}
+
+/* Image shape: Square, or Circle with the whole image inset on the light background */
+.qb-v2 .qb-v2-gift--image-square .qb-v2-item__media {
+  border-radius: 0;
+}
+
+.qb-v2 .qb-v2-gift--image-circle .qb-v2-item__media {
+  border-radius: 50%;
+}
+
+.qb-v2 .qb-v2-gift--image-circle .qb-v2-item__media :is(img, svg) {
+  box-sizing: border-box;
+  padding: 15%;
+  object-fit: contain;
+}
+
+.qb-v2 .qb-v2-gift__row :is(.qb-v2-gift__text, .qb-v2-item__title) {
+  grid-area: 1 / 2;
+  font-weight: 600;
+}
+
+/* the text names the gift, so the product title only shows when the text is empty */
+.qb-v2 .qb-v2-gift__row:has(> .qb-v2-gift__text > .qb-v2-text:not([hidden])) .qb-v2-item__title {
+  display: none;
+}
+
+/* 0.85 keeps 13px text at 4.5:1 on the tinted row of every color scheme */
+.qb-v2 .qb-v2-gift__value {
+  grid-area: 1 / 3;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.qb-v2 .qb-v2-gift__row .qb-v2-item__picker {
+  grid-column: 2;
+  margin-top: 6px;
+}
+
+.qb-v2 .qb-v2-gift__row .qb-v2-item__status {
+  grid-column: 2 / -1;
+  margin-top: 6px;
+}
+
+.qb-v2 .qb-v2-gift__change {
+  grid-area: 2 / 3;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-top: 4px;
+  padding: 0;
+  font-size: var(--qb-v2-text-size);
+}
+
+.qb-v2 .qb-v2-gift__row:has(.qb-v2-item[data-available='false']) {
+  opacity: 0.55;
+}
+
+/* Free shipping and text rows: the icon takes the thumbnail's place */
+.qb-v2 .qb-v2-gift__row--note .qb-v2-gift__icon {
+  grid-area: 1 / 1;
+  justify-self: center;
+  font-size: 22px;
+}
+
+.qb-v2 .qb-v2-gift__row--note .qb-v2-gift__text {
+  grid-column: 2 / -1;
+}
+
+/* Checkbox upsell: checkbox, image, texts, prices; the real checkbox is hidden but focusable */
+.qb-v2 .qb-v2-upsell {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  background: rgba(var(--qb-v2-ink), 0.04);
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+}
+
+/* for every option: looks like an option card */
+.qb-v2 .qb-v2__slot .qb-v2-upsell {
+  padding: 12px 16px;
+  border-radius: var(--qb-v2-radius);
+  background: var(--qb-v2-card-background, transparent);
+  box-shadow: inset 0 0 0 var(--qb-v2-border) rgba(var(--color-foreground), 0.18);
+}
+
+.qb-v2.qb-v2--cards-filled .qb-v2__slot .qb-v2-upsell {
+  background: rgba(var(--color-foreground), 0.04);
+}
+
+/* Ticked; before the script ticks them, pre-selected add-ons that can be bought (the option's first price has them) */
+.qb-v2 .qb-v2__slot .qb-v2-upsell:has(> .qb-v2-upsell__input:checked),
+.qb-v2:not(.qb-v2--js) .qb-v2__slot .qb-v2-upsell[data-qb-default-checked='true'][data-available='true'] {
+  box-shadow: inset 0 0 0 calc(var(--qb-v2-border) + 1px) rgb(var(--qb-v2-accent));
+}
+
+.qb-v2 .qb-v2-upsell__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.qb-v2 .qb-v2-upsell__label {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-upsell__input:focus-visible + .qb-v2-upsell__label {
+  outline: 2px solid rgb(var(--color-foreground));
+  outline-offset: 2px;
+}
+
+.qb-v2 .qb-v2-upsell__input:disabled + .qb-v2-upsell__label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.qb-v2 .qb-v2-upsell__box {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-inline-end: 10px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 2px rgba(var(--qb-v2-ink), 0.5);
+  color: rgb(var(--qb-v2-on-mark));
+}
+
+.qb-v2 .qb-v2-upsell__box svg {
+  width: 12px;
+  height: 9px;
+  visibility: hidden;
+}
+
+.qb-v2 .qb-v2-upsell__input:checked + .qb-v2-upsell__label .qb-v2-upsell__box,
+.qb-v2:not(.qb-v2--js) .qb-v2-upsell[data-qb-default-checked='true'][data-available='true'] .qb-v2-upsell__box {
+  background: rgb(var(--qb-v2-mark));
+  box-shadow: none;
+}
+
+.qb-v2 .qb-v2-upsell__input:checked + .qb-v2-upsell__label .qb-v2-upsell__box svg,
+.qb-v2:not(.qb-v2--js) .qb-v2-upsell[data-qb-default-checked='true'][data-available='true'] .qb-v2-upsell__box svg {
+  visibility: visible;
+}
+
+.qb-v2 .qb-v2-upsell__media {
+  grid-area: 1 / 2;
+  width: 48px;
+  aspect-ratio: 1;
+  margin-inline-end: 10px;
+  overflow: hidden;
+  border-radius: calc(var(--qb-v2-radius) * 0.5);
+}
+
+.qb-v2 .qb-v2-upsell__media:empty {
+  display: none;
+}
+
+.qb-v2 .qb-v2-upsell__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qb-v2 .qb-v2-upsell__info {
+  grid-area: 1 / 3;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qb-v2 .qb-v2-upsell__text {
+  font-weight: 600;
+}
+
+.qb-v2 .qb-v2-upsell__sub {
+  opacity: 0.8;
+}
+
+.qb-v2 .qb-v2-upsell__prices {
+  grid-area: 1 / 4;
+  margin-inline-start: 10px;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.qb-v2 .qb-v2-upsell__prices [data-qb-item-price] {
+  font-weight: 700;
+}
+
+.qb-v2 .qb-v2-upsell__prices s {
+  display: block;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  opacity: 0.7;
+}
+
+.qb-v2 .qb-v2-upsell__badge {
+  grid-column: 3;
+  justify-self: start;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(var(--qb-v2-mark));
+  color: rgb(var(--qb-v2-on-mark));
+  font-size: calc(var(--qb-v2-text-size) - 2px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.qb-v2 .qb-v2-upsell__picker {
+  display: grid;
+  gap: 6px;
+  margin-inline-start: 30px;
+}
+
+/* Quantity stepper (5+): only in the selected option - the title carries the offer in the others */
+.qb-v2 .qb-v2-stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(var(--qb-v2-ink), 0.25);
+}
+
+.qb-v2-option:not(.is-selected):not(:has(> .qb-v2-option__input:checked)) .qb-v2-stepper {
+  display: none;
+}
+
+.qb-v2 .qb-v2-stepper__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-stepper__btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+/* at the option's quantity or the maximum */
+.qb-v2 .qb-v2-stepper__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.qb-v2 .qb-v2-stepper__btn svg {
+  width: 10px;
+  height: 10px;
+}
+
+.qb-v2 .qb-v2-stepper__input {
+  width: 3.5ch;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--qb-v2-text-size);
+  font-weight: 600;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.qb-v2 .qb-v2-stepper__input::-webkit-inner-spin-button,
+.qb-v2 .qb-v2-stepper__input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.qb-v2 .qb-v2-stepper :focus-visible {
+  outline: 2px solid rgb(var(--color-foreground));
+  outline-offset: 2px;
+}
+
+@media screen and (max-width: 749px) {
+  .qb-v2 .qb-v2-stepper__input {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Outside the widget ---------- */
+.qb-v2-hide-bin .shopify-payment-button {
+  display: none !important;
+}
+
+.qb-v2-hidden-qty,
+.qb-v2-hidden-picker,
+.qb-v2-hidden-option {
+  display: none !important;
+}
+
+/* First paint, before the script disables them: other quantity fields of the same product */
+[id^='ProductInfo-']:has(quantity-breaks-v2:not(.qb-v2--off, .qb-v2--inactive, .qb-v2--scheduled)) .product-form__quantity:not(.qb-v2-fallback-qty),
+[id^='ProductInfo-']:has(quantity-breaks-v2.qb-v2--scheduled[data-qb-schedule='on']:not(.qb-v2--off, .qb-v2--inactive)) .product-form__quantity:not(.qb-v2-fallback-qty) {
+  display: none;
+}
+
+/* First paint, until the script has set qb-v2-hide-bin: Buy it now starts hidden when the selected option adds items */
+[id^='ProductInfo-']:has(quantity-breaks-v2:not(.qb-v2--js, .qb-v2--off, .qb-v2--inactive):not(.qb-v2--scheduled:not([data-qb-schedule='on'])) :is(.qb-v2-option__input:checked ~ .qb-v2-option__body > :is([data-qb-child='bundle'], [data-qb-child='choice'], [data-qb-child='builder'], .qb-v2-gift--product, [data-qb-default-checked='true'], [data-qb-must-choose='true']), .qb-v2__slot > [data-qb-default-checked='true'], .qb-v2-option[data-qb-method='code'] > .qb-v2-option__input:checked)) .shopify-payment-button {
+  display: none;
+}
+
+/* ---------- Motion, forced colors ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .qb-v2 .qb-v2-option,
+  .qb-v2 .qb-v2-dd .icon-caret {
+    transition: none;
+  }
+
+  .qb-v2 .qb-v2-option::before {
+    animation: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .qb-v2 :is(.qb-v2-option, .qb-v2__slot .qb-v2-upsell, .qb-v2-stepper) {
+    border: 1px solid CanvasText;
+  }
+
+  .qb-v2 :is(.qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)), .qb-v2__slot .qb-v2-upsell:has(> .qb-v2-upsell__input:checked)) {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  /* the selected outline is on the option, so focus goes around its content */
+  .qb-v2 .qb-v2-option:has(> .qb-v2-option__input:focus-visible) > .qb-v2-card {
+    outline: 2px solid CanvasText;
+    outline-offset: 4px;
+  }
+
+  /* color swatches keep their colors; pills and text take the system colors */
+  .qb-v2 :is(.qb-v2-card__indicator, .qb-v2-upsell__box, .qb-v2-swatch:not(.qb-v2-swatch--pill), .qb-v2-bundle__plus, .qb-v2-card__highlights li) {
+    forced-color-adjust: none;
+  }
+
+  .qb-v2 .qb-v2-card__highlights ul > li {
+    color: CanvasText;
+  }
+
+  .qb-v2 .qb-v2-card__highlights ul > li::before {
+    background: CanvasText;
+  }
+
+  .qb-v2 .qb-v2-swatch:not(.qb-v2-swatch--pill) {
+    outline: 1px solid CanvasText;
+    outline-offset: 1px;
+  }
+
+  .qb-v2 .qb-v2-card__indicator,
+  .qb-v2 .qb-v2-upsell__box {
+    background: Canvas;
+    box-shadow: inset 0 0 0 2px CanvasText;
+    color: HighlightText;
+  }
+
+  .qb-v2 .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator {
+    background: radial-gradient(circle, Highlight 0 4px, Canvas 4.5px);
+    box-shadow: inset 0 0 0 2px Highlight;
+  }
+
+  .qb-v2:is(.qb-v2--indicator-check, .qb-v2--indicator-none) .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) .qb-v2-card__indicator,
+  .qb-v2 .qb-v2-upsell__input:checked + .qb-v2-upsell__label .qb-v2-upsell__box,
+  .qb-v2:not(.qb-v2--js) .qb-v2-upsell[data-qb-default-checked='true'][data-available='true'] .qb-v2-upsell__box {
+    background: Highlight;
+    box-shadow: none;
+  }
+
+  .qb-v2 .qb-v2-card__indicator::after {
+    background: HighlightText !important;
+  }
+
+  .qb-v2 .qb-v2-badge,
+  .qb-v2 .qb-v2-badge--ribbon > .qb-v2-text,
+  .qb-v2 .qb-v2-card__label,
+  .qb-v2 .qb-v2-card__status,
+  .qb-v2 .qb-v2-upsell__badge {
+    border: 1px solid CanvasText;
+  }
+
+  .qb-v2 .qb-v2-badge--ribbon,
+  .qb-v2 .qb-v2-badge--image {
+    border: 0;
+  }
+
+  .qb-v2 .qb-v2-swatch[aria-checked='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: 3px;
+  }
+
+  .qb-v2 .qb-v2-swatch--pill[aria-checked='true'] {
+    border-color: Highlight;
+    outline-offset: 1px;
+  }
+
+  .qb-v2 .qb-v2-swatch:focus-visible {
+    outline: 2px dashed CanvasText;
+    outline-offset: 6px;
+  }
+
+  .qb-v2 .qb-v2-swatch:is(.is-unavailable, .is-nonexistent):not(.qb-v2-swatch--pill)::before {
+    background: linear-gradient(to top right, transparent calc(50% - 1px), CanvasText calc(50% - 1px), CanvasText calc(50% + 1px), transparent calc(50% + 1px));
+  }
+
+  .qb-v2 .qb-v2-bundle__plus {
+    background: Canvas;
+    box-shadow: inset 0 0 0 1px CanvasText;
+    color: CanvasText;
+  }
+
+  .qb-v2__listbox [role='option'].is-active {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .qb-v2__listbox [role='option'][aria-selected='true']::after {
+    background: CanvasText;
+  }
+}

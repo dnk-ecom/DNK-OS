@@ -1,0 +1,271 @@
+/* Shrine PRO 2.0.0 - cart pages: Empty cart (blocks/cart-drawer_empty.liquid), Saved products
+   (blocks/cart_saved-products.liquid) and Cart page V2 (sections/main-cart-v2.liquid). Loaded from
+   data-cart-feature="page" and linked by Cart page V2. The Empty cart's drawer layout rules are inline in the block.
+   Every override wins by specificity, never by file order; logical properties only (RTL). */
+
+/* ---------- Empty cart */
+.cart-empty__text {
+  margin: -1rem 0 2rem;
+  color: rgba(var(--color-foreground), 0.75);
+}
+
+.cart-empty--page .cart-empty__blocks {
+  margin-block-start: 4rem;
+  text-align: start;
+}
+
+.cart-empty--page .cart-empty__text {
+  margin: -1.5rem 0 3rem;
+}
+
+/* the page empty state shows whenever it is printed, even if a script removed is-empty from its root */
+.cart-empty--page .cart__warnings,
+.cart-empty--page .cart__empty-text {
+  display: block;
+}
+
+/* ---------- Saved products */
+cart-saved-products:not([hidden]) {
+  display: block;
+}
+
+.cart-saved__title {
+  margin: 0 0 1.2rem;
+}
+
+.cart-saved__title--heading {
+  font-size: 1.6rem;
+}
+
+.cart-saved__list {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.cart-saved--tile .cart-saved__list {
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
+}
+
+.cart-saved__item {
+  display: grid;
+  grid-template-columns: 6.4rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.cart-saved--tile .cart-saved__item {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.cart-saved__media {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--cart-radius-small, 0.4rem);
+  background: rgba(var(--color-foreground), 0.04);
+  overflow: hidden;
+}
+
+.cart-saved__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cart-saved__name {
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.4rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cart-saved__variant {
+  margin: 0.2rem 0 0;
+  font-size: 1.2rem;
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.cart-saved__price {
+  margin: 0.4rem 0 0;
+  font-size: 1.3rem;
+}
+
+.cart-saved__price-compare {
+  margin-inline-start: 0.6rem;
+  color: rgba(var(--color-foreground), 0.6);
+}
+
+.cart-saved .cart-saved__add {
+  min-height: 3.6rem;
+  min-width: 4.4rem;
+}
+
+.cart-saved .cart-saved__add:not(.cart-add--pill) {
+  --buttons-padding-x: 1.4rem;
+}
+
+.cart-saved__choose,
+.cart-saved__sold-out {
+  font-size: 1.3rem;
+}
+
+/* standalone text links: 24 px targets (WCAG 2.5.8) */
+.cart-saved__choose,
+.cart-saved__view-all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+}
+
+.cart-saved__view-all {
+  margin-block-start: 1.2rem;
+  font-size: 1.3rem;
+}
+
+.cart-style--cards .cart-saved__item,
+.cart-style--soft .cart-saved__item {
+  padding: 0.8rem;
+  border-radius: var(--cart-radius-small, 0.8rem);
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-style--clean .cart-saved--row .cart-saved__item + .cart-saved__item {
+  padding-block-start: 1.2rem;
+  border-block-start: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.08));
+}
+
+.cart-saved__name:focus-visible {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.2rem;
+}
+
+/* ---------- Cart page V2 */
+cart-page {
+  display: block;
+}
+
+.cart-page__header {
+  margin-block-end: 3rem;
+}
+
+.cart-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cart-gap, 3rem);
+}
+
+.cart-page__blocks {
+  margin-block-start: var(--cart-gap, 3rem);
+}
+
+.cart-page__summary-inner--panel,
+.cart-style--clean .cart-page__summary-inner,
+.cart-style--cards .cart-page__summary-inner,
+.cart-style--soft .cart-page__summary-inner,
+.cart-style--bold .cart-page__summary-inner {
+  padding: var(--cart-pad, 2rem);
+  border-radius: var(--cart-radius, 0);
+}
+
+.cart-style--clean .cart-page__summary-inner:not(.cart-page__summary-inner--panel) {
+  border: 0.1rem solid var(--cart-hairline, rgba(var(--color-foreground), 0.1));
+}
+
+.cart-style--cards .cart-page__summary-inner:not(.cart-page__summary-inner--panel) {
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-style--cards .cart-page__main {
+  padding: var(--cart-pad, 1.6rem);
+  border-radius: var(--cart-radius, 1.2rem);
+  background: var(--cart-tint, rgba(var(--color-foreground), 0.04));
+}
+
+.cart-style--soft .cart-page__summary-inner:not(.cart-page__summary-inner--panel) {
+  background: rgba(var(--color-button), 0.06);
+}
+
+.cart-style--bold .cart-page__summary-inner:not(.cart-page__summary-inner--panel) {
+  border: 0.2rem solid rgb(var(--color-foreground));
+}
+
+@media screen and (min-width: 990px) {
+  cart-page .cart-page__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(28rem, var(--cart-page-summary-width, 38rem));
+    column-gap: 5rem;
+    align-items: start;
+  }
+
+  .cart-page--summary-start .cart-page__grid {
+    grid-template-columns: minmax(28rem, var(--cart-page-summary-width, 38rem)) minmax(0, 1fr);
+  }
+
+  .cart-page--summary-start .cart-page__summary {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .cart-page--summary-start .cart-page__main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .cart-page--sticky .cart-page__summary {
+    position: sticky;
+    top: calc(var(--sticky-group-height, 0px) + 2.4rem);
+  }
+}
+
+.cart-page__bar {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-inline: -1.5rem;
+  padding: 1.2rem 1.5rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+  background: rgb(var(--color-background));
+  box-shadow: 0 -0.1rem 0 rgba(var(--color-foreground), 0.08);
+  opacity: 0;
+  translate: 0 100%;
+  pointer-events: none;
+  transition: opacity 0.2s ease, translate 0.2s ease;
+}
+
+.cart-page__bar.is-visible {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+.cart-page__bar-total {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.cart-page__bar-checkout {
+  flex: 1 1 auto;
+  max-width: 24rem;
+  min-height: 4.4rem;
+}
+
+/* (0,1,1): wins over the bar's own display: flex in any file order */
+@media screen and (min-width: 990px) {
+  cart-page .cart-page__bar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  cart-page .cart-page__bar {
+    transition: none;
+  }
+}

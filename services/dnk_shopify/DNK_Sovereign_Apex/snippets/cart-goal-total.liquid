@@ -1,0 +1,71 @@
+{%- comment -%}
+  Counted cart total: what counts toward cart goals (rewards, free shipping, the Free gift).
+  Outputs "{total}|{items}|{has_plan}" with no whitespace: the counted total in presentment cents, the number of
+  counted units, and true when any line has a selling plan.
+  total = cart.total_price minus the final line prices of the skipped lines, at least 0 (after all discounts).
+
+  Always skipped: lines with a _reward_gift property (a reward gift never counts toward a goal).
+  Accepts (pass false explicitly to turn a default-on rule off):
+  - skip_hidden {Boolean} default true: products tagged cart-hidden (protection, gift wrap)
+  - skip_gifts {Boolean} default true: lines with a _qb_gift property, and free lines (final line price 0)
+  - skip_gift_cards {Boolean} default true: gift cards
+  - skip_unshipped {Boolean} default false: lines that don't need shipping; every free shipping answer passes true
+  - skip_handles {String} ",handle-a,handle-b,": lines of these products
+
+  Usage:
+  {%- capture counted -%}{%- render 'cart-goal-total' -%}{%- endcapture -%}
+  {%- capture counted -%}{%- render 'cart-goal-total', skip_unshipped: true -%}{%- endcapture -%}
+  JS twin: ShrineCartGoals.countedTotal(cart, { skipUnshipped: true }).
+{%- endcomment -%}
+{%- liquid
+  assign cgt_hidden = true
+  if skip_hidden == false
+    assign cgt_hidden = false
+  endif
+  assign cgt_gifts = true
+  if skip_gifts == false
+    assign cgt_gifts = false
+  endif
+  assign cgt_cards = true
+  if skip_gift_cards == false
+    assign cgt_cards = false
+  endif
+  assign cgt_unshipped = false
+  if skip_unshipped == true
+    assign cgt_unshipped = true
+  endif
+  assign cgt_skipped = 0
+  assign cgt_items = 0
+  assign cgt_plan = false
+  for cgt_item in cart.items
+    if cgt_item.selling_plan_allocation
+      assign cgt_plan = true
+    endif
+    assign cgt_skip = false
+    if cgt_item.properties['_reward_gift'] != blank
+      assign cgt_skip = true
+    elsif cgt_hidden and cgt_item.product.tags contains 'cart-hidden'
+      assign cgt_skip = true
+    elsif cgt_gifts and cgt_item.properties['_qb_gift'] != blank
+      assign cgt_skip = true
+    elsif cgt_gifts and cgt_item.final_line_price == 0
+      assign cgt_skip = true
+    elsif cgt_cards and cgt_item.gift_card
+      assign cgt_skip = true
+    elsif cgt_unshipped and cgt_item.requires_shipping == false
+      assign cgt_skip = true
+    elsif skip_handles != blank
+      assign cgt_key = ',' | append: cgt_item.product.handle | append: ','
+      if skip_handles contains cgt_key
+        assign cgt_skip = true
+      endif
+    endif
+    if cgt_skip
+      assign cgt_skipped = cgt_skipped | plus: cgt_item.final_line_price
+    else
+      assign cgt_items = cgt_items | plus: cgt_item.quantity
+    endif
+  endfor
+  assign cgt_total = cart.total_price | minus: cgt_skipped | at_least: 0
+-%}
+{{- cgt_total -}}|{{- cgt_items -}}|{{- cgt_plan -}}

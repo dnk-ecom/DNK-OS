@@ -1,0 +1,404 @@
+{%- liquid
+  assign qb_main = closest.product
+
+  assign qb_currency_ok = true
+  if cart.currency.iso_code != shop.currency
+    assign qb_currency_ok = false
+  endif
+
+  # Discount values as the widget reads them: percentage as an integer, amounts in shop-currency cents
+  assign qb_amount_cents = block.settings.discount_amount | times: 100 | round | at_least: 0
+  assign qb_discount_value = 0
+  if block.settings.discount_type == 'percentage'
+    assign qb_discount_value = block.settings.discount_percentage
+  elsif block.settings.discount_type == 'amount_each'
+    assign qb_discount_value = qb_amount_cents
+  endif
+
+  assign qb_p = nil
+  if block.settings.source == 'product'
+    assign qb_p = block.settings.product
+  elsif recommendations.performed and recommendations.products_count > 0
+    # The section rendered for Search & Discovery's complementary products (the URL in data-qb-reco-url): the row is
+    # the first recommendation that can be added as an extra
+    for qb_reco in recommendations.products
+      unless qb_reco.requires_selling_plan or qb_reco.id == qb_main.id
+        assign qb_p = qb_reco
+        break
+      endunless
+    endfor
+  endif
+  assign qb_usable = false
+  if qb_p != blank
+    assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+    unless qb_p.requires_selling_plan
+      assign qb_usable = true
+    endunless
+  endif
+
+  if qb_usable
+    assign qb_v = qb_p.selected_or_first_available_variant
+
+    # Price of one unit (contract 5.4); "Same as option quantity" multiplies it by the option's quantity
+    assign qb_x = qb_v.price
+    assign qb_unit_cat = qb_x
+    if qb_v.compare_at_price > qb_x
+      assign qb_unit_cat = qb_v.compare_at_price
+    endif
+    assign qb_disc = 0
+    case block.settings.discount_type
+      when 'percentage'
+        assign qb_disc = qb_x | times: qb_discount_value | divided_by: 100.0 | round
+      when 'amount_each'
+        if qb_currency_ok
+          assign qb_disc = qb_discount_value | at_most: qb_x
+        endif
+    endcase
+    assign qb_total = qb_x | minus: qb_disc | at_least: 0
+    assign qb_saving = qb_unit_cat | minus: qb_total | at_least: 0
+    assign qb_percent = 0
+    if qb_unit_cat > 0
+      assign qb_percent = qb_saving | times: 100.0 | divided_by: qb_unit_cat | plus: 0.05 | floor
+    endif
+
+    # Only a pre-ticked upsell that can be bought is part of its option's first-paint price
+    assign qb_contributes = false
+    if block.settings.selected_by_default and qb_v.available
+      assign qb_contributes = true
+    endif
+    assign qb_pending = false
+    if qb_contributes and block.settings.discount_type == 'amount_each' and qb_currency_ok == false
+      assign qb_pending = true
+    endif
+
+    assign qb_img = block.settings.image
+    assign qb_img_mode = 'fixed'
+    if qb_img == blank
+      assign qb_img = qb_v.featured_image | default: qb_p.featured_image
+      assign qb_img_mode = ''
+    endif
+    assign qb_img_ratio = qb_img.aspect_ratio | default: 1
+    assign qb_prefix = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id
+  endif
+-%}
+{%- capture qb_setup_json -%}
+  {%- if request.design_mode -%}
+    {%- liquid
+      # Complementary products are only known in the recommendations render: the editor checks the chosen product
+      assign qb_products_json = ''
+      assign qb_listed = false
+      if qb_p != blank and block.settings.source == 'product'
+        assign qb_listed = true
+        assign qb_pv = qb_p.selected_or_first_available_variant
+        assign qb_is_main = false
+        if qb_p.id == qb_main.id
+          assign qb_is_main = true
+        endif
+        assign qb_requires_plan = false
+        if qb_p.requires_selling_plan
+          assign qb_requires_plan = true
+        endif
+      endif
+    -%}
+    {%- if qb_listed -%}
+      {%- capture qb_products_json -%}
+        {"id":{{ qb_p.id }},"handle":{{ qb_p.handle | json }},"title":{{ qb_p.title | json }},"available":{{ qb_p.available }},"requires_selling_plan":{{ qb_requires_plan }},"variants_count":{{ qb_variants_count | plus: 0 }},"price":{{ qb_pv.price | plus: 0 }},"compare_at_price":{{ qb_pv.compare_at_price | json }},"is_main":{{ qb_is_main }}}
+      {%- endcapture -%}
+    {%- endif -%}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"upsell","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"source":{{ block.settings.source | json }},"selected_by_default":{{ block.settings.selected_by_default }},"quantity_mode":{{ block.settings.quantity_mode | json }},"discount_type":{{ block.settings.discount_type | json }},"discount_percentage":{{ block.settings.discount_percentage | json }},"discount_amount_cents":{{ qb_amount_cents }}},"products":[{{ qb_products_json }}]}
+    </script>
+  {%- endif -%}
+{%- endcapture -%}
+{%- capture qb_root_attributes -%}
+  class="qb-v2-upsell{% if block.settings.show_only_when_selected %} qb-v2-upsell--when-selected{% endif %}"
+  data-qb-child="upsell"
+  data-qb-block="{{ block.id }}"
+  data-qb-source="{{ block.settings.source }}"
+  data-qb-quantity-mode="{{ block.settings.quantity_mode }}"
+  data-qb-discount-type="{{ block.settings.discount_type }}"
+  data-qb-discount-value="{{ qb_discount_value }}"
+  data-qb-default-checked="{{ block.settings.selected_by_default }}"
+{%- endcapture -%}
+{%- comment -%}The row of one add-on product: the selected product, or the complementary product in the recommendations render{%- endcomment -%}
+{%- capture qb_row -%}
+  {%- if qb_usable -%}
+    {%- comment -%}No name and no checked attribute: the widget ticks pre-selected upsells and adds the line itself{%- endcomment -%}
+    <input
+      type="checkbox"
+      class="qb-v2-upsell__input"
+      id="{{ qb_prefix }}-cb"
+      autocomplete="off"
+      {%- unless qb_v.available %} disabled{% endunless %}
+    >
+    <label class="qb-v2-upsell__label" for="{{ qb_prefix }}-cb">
+      <span class="qb-v2-upsell__box" aria-hidden="true">{%- render 'icon-checkmark' -%}</span>
+      {%- comment -%}Without an image the span stays empty and the media column collapses (add-ons such as gift wrap){%- endcomment -%}
+      <span class="qb-v2-upsell__media">
+        {%- if qb_img != blank -%}
+          {%- comment -%}One source, so a variant change only swaps src{%- endcomment -%}
+          <img
+            src="{{ qb_img | image_url: width: 160 }}"
+            alt=""
+            width="96"
+            height="{{ 96 | divided_by: qb_img_ratio | round }}"
+            loading="lazy"
+            class="qb-v2-upsell__img"
+            data-qb-item-img="{{ qb_img_mode }}"
+          >
+        {%- endif -%}
+      </span>
+      <span class="qb-v2-upsell__info">
+        <span class="qb-v2-upsell__text">
+          {%- render 'qb-v2-text',
+            text: block.settings.upsell_text,
+            ctx: 'upsell',
+            title: qb_p.title,
+            quantity: 1,
+            T: qb_total,
+            C: qb_unit_cat,
+            S: qb_saving,
+            P: qb_percent
+          -%}
+        </span>
+        {%- if block.settings.subtitle != blank -%}
+          <span class="qb-v2-upsell__sub">
+            {%- render 'qb-v2-text',
+              text: block.settings.subtitle,
+              ctx: 'upsell',
+              title: qb_p.title,
+              quantity: 1,
+              T: qb_total,
+              C: qb_unit_cat,
+              S: qb_saving,
+              P: qb_percent
+            -%}
+          </span>
+        {%- endif -%}
+        <span class="qb-v2-upsell__status qb-v2-item__status"{% if qb_v.available %} hidden{% endif %}>
+          {{- 'products.product.sold_out' | t -}}
+        </span>
+      </span>
+      <span class="qb-v2-upsell__prices">
+        <span class="qb-v2-upsell__price" data-qb-item-price>{%- render 'qb-v2-money', cents: qb_total -%}</span>
+        <s class="qb-v2-upsell__compare{% if qb_unit_cat <= qb_total %} hidden{% endif %}" data-qb-item-compare>
+          {%- render 'qb-v2-money', cents: qb_unit_cat -%}
+        </s>
+      </span>
+      {%- if block.settings.badge_text != blank -%}
+        <span class="qb-v2-upsell__badge">{{ block.settings.badge_text }}</span>
+      {%- endif -%}
+    </label>
+    {%- if block.settings.show_variant_picker and qb_p.has_only_default_variant == false -%}
+      {%- if qb_variants_count <= 100 -%}
+        <div class="qb-v2-upsell__picker">
+          {%- render 'qb-v2-picker', product: qb_p, role: 'extra', id_prefix: qb_prefix -%}
+        </div>
+      {%- elsif request.design_mode -%}
+        <div class="qb-v2-placeholder">
+          {{- qb_p.title | escape }} has over 100 variants, so customers can't choose one here.
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+    {%- render 'qb-v2-product-json', product: qb_p, mode: 'extra' -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- if block.settings.source == 'complementary' -%}
+  {%- comment -%}
+    Filled from the product recommendations of Search & Discovery once the page has loaded; hidden until then. The
+    section rendered at data-qb-reco-url prints the row in [data-qbv2-reco], which the core script copies in here.
+  {%- endcomment -%}
+  <div
+    {{ qb_root_attributes }}
+    data-qb-reco-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ qb_main.id }}&limit=4&intent=complementary"
+    hidden
+    {{ block.shopify_attributes }}
+  >
+    {%- if qb_usable -%}
+      <div data-qbv2-reco="{{ block.id }}" data-product-id="{{ qb_p.id }}" data-variant-id="{{ qb_v.id }}" data-available="{{ qb_v.available }}">
+        {{- qb_row -}}
+      </div>
+    {%- endif -%}
+    {{- qb_setup_json -}}
+  </div>
+{%- elsif qb_usable -%}
+  <div
+    {{ qb_root_attributes }}
+    data-product-id="{{ qb_p.id }}"
+    data-variant-id="{{ qb_v.id }}"
+    data-available="{{ qb_v.available }}"
+    {%- if qb_contributes -%}
+      {%- if block.settings.quantity_mode == 'match' %}
+        data-qb-sum-total-per-q="{{ qb_total }}"
+        data-qb-sum-cat-per-q="{{ qb_unit_cat }}"
+        data-qb-sum-creg-per-q="{{ qb_x }}"
+      {%- else %}
+        data-qb-sum-total="{{ qb_total }}"
+        data-qb-sum-cat="{{ qb_unit_cat }}"
+        data-qb-sum-creg="{{ qb_x }}"
+      {%- endif -%}
+    {%- endif -%}
+    {%- if qb_pending %} data-qb-pending="true"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {{- qb_row -}}
+    {{- qb_setup_json -}}
+  </div>
+{%- elsif request.design_mode -%}
+  <div {{ qb_root_attributes }} {{ block.shopify_attributes }}>
+    {%- if qb_p == blank -%}
+      <div class="qb-v2-placeholder">Choose a product in Checkbox upsell.</div>
+    {%- else -%}
+      <div class="qb-v2-placeholder">{{ qb_p.title | escape }} can only be sold with a subscription.</div>
+    {%- endif -%}
+    {{- qb_setup_json -}}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Checkbox upsell",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Product source",
+      "options": [
+        {
+          "value": "product",
+          "label": "Selected product"
+        },
+        {
+          "value": "complementary",
+          "label": "Complementary products"
+        }
+      ],
+      "default": "product"
+    },
+    {
+      "type": "paragraph",
+      "content": "Uses the first complementary product set in the Search & Discovery app.",
+      "visible_if": "{{ block.settings.source == 'complementary' }}"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "info": "Used when Product source is Selected product."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "upsell_text",
+      "label": "Text",
+      "default": "Add [title]",
+      "info": "Use [title], [quantity], [price] and [compare_price]."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "checkbox",
+      "id": "selected_by_default",
+      "label": "Selected by default",
+      "default": false,
+      "info": "EU law doesn't allow paid extras to be pre-selected."
+    },
+    {
+      "type": "select",
+      "id": "quantity_mode",
+      "label": "Quantity",
+      "options": [
+        {
+          "value": "one",
+          "label": "1"
+        },
+        {
+          "value": "match",
+          "label": "Same as option quantity"
+        }
+      ],
+      "default": "one"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_picker",
+      "label": "Show variant picker",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_only_when_selected",
+      "label": "Show only when selected",
+      "default": false,
+      "info": "Inside an option, hides the upsell while another option is selected."
+    },
+    {
+      "type": "header",
+      "content": "Discount"
+    },
+    {
+      "type": "select",
+      "id": "discount_type",
+      "label": "Discount type",
+      "options": [
+        {
+          "value": "none",
+          "label": "No discount"
+        },
+        {
+          "value": "percentage",
+          "label": "Percentage off"
+        },
+        {
+          "value": "amount_each",
+          "label": "Amount off each item"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Percentage",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 10,
+      "visible_if": "{{ block.settings.discount_type == 'percentage' }}"
+    },
+    {
+      "type": "number",
+      "id": "discount_amount",
+      "label": "Amount",
+      "default": 5,
+      "info": "In your shop's currency, without the currency symbol. Example: 4.99",
+      "visible_if": "{{ block.settings.discount_type == 'amount_each' }}"
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "badge_text",
+      "label": "Badge text",
+      "info": "Leave empty to hide the badge."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "If empty, the product image."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Checkbox upsell"
+    }
+  ]
+}
+{% endschema %}

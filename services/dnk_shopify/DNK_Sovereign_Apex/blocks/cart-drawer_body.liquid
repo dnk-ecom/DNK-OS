@@ -1,0 +1,108 @@
+<div class="cart-drawer__body" {{ block.shopify_attributes }}>
+  {%- if block.blocks.size == 0 -%}
+    {% render 'cart-editor-notice', code: 'core-body-empty', level: 'info', title: 'Cart body', text: 'no blocks yet. Add Cart items and the other blocks you want in the cart.' %}
+  {%- endif -%}
+  {% content_for 'blocks' %}
+  {%- comment -%} Beside the cart with Desktop layout Two columns; otherwise (and on phones) its blocks follow the others {%- endcomment -%}
+  {% content_for 'block', type: 'cart-drawer_side-panel', id: 'SidePanel' %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart body",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "cart-drawer_items"
+    },
+    {
+      "type": "cart_progress-bar"
+    },
+    {
+      "type": "cart_quantity-breaks-nudge"
+    },
+    {
+      "type": "cart_checkpoints-bar"
+    },
+    {
+      "type": "cart_countdown-timer"
+    },
+        {
+      "type": "cart_gift"
+    },
+    {
+      "type": "text-with-icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "icon-with-text"
+    },
+    {
+      "type": "payment-badges"
+    },
+    {
+      "type": "custom-liquid"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "rating-stars"
+    },
+    {
+      "type": "trustpilot-stars"
+    },
+    {
+      "type": "review-avatars"
+    },
+    {
+      "type": "icon-with-content"
+    },
+    {
+      "type": "reviews"
+    },
+    {
+      "type": "cart_subscription-upgrade"
+    },
+    {
+      "type": "cart_rewards-bar"
+    },
+    {
+      "type": "cart_product-upsells-v2"
+    },
+    {
+      "type": "cart_field"
+    },
+    {
+      "type": "cart_saved-products"
+    },
+    {
+      "type": "cart_announcement"
+    },
+    {
+      "type": "product_estimated-shipping"
+    },
+    {
+      "type": "product_shipping-information"
+    },
+    {
+      "type": "product_shipping-checkpoints"
+    },
+    {
+      "type": "cart_shipping-estimator"
+    },
+    {
+      "type": "container--cart"
+    }
+  ],
+  "settings": []
+}
+{% endschema %}

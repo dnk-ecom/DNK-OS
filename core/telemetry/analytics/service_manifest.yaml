@@ -1,0 +1,79 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_analytics/service_manifest.yaml"
+# purpose: "SaaP ServicePluginCard specification v1alpha2 for dnk_analytics"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.2.0"
+# updated_at: "2026-09-14"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+apiVersion: dnk.os/v1alpha2
+kind: ServicePluginCard
+metadata:
+  service_id: dnk_analytics
+  name: DNK Analytics - Telemetry & Drift Monitoring Engine
+  version: 1.0.0
+  domain: analytics
+  author: DNK-e.com Maksym & Gerych Prime
+  description: System telemetry exporter and metric drift detector tracking swarm
+    performance, token budgets, model drift, and self-healing events.
+  tags:
+  - analytics
+  - analytics
+spec:
+  lifecycle: Active
+  domain: analytics
+  entrypoint: services.dnk_analytics.telemetry_exporter:GeminiTelemetryExporter
+  transport:
+    protocol: fastmcp
+    mode: stdio
+    command: python3
+    args:
+    - -m
+    - services.dnk_analytics.main
+    env_passthrough:
+    - PYTHONPATH
+    - DNK_ENV
+  fastmcp_tools:
+  - name: analytics_export_metrics
+    description: Exports Prometheus-compatible metrics text payload for monitoring
+    input_schema:
+      type: object
+      properties: {}
+  - name: analytics_check_drift
+    description: Performs statistical check on model reasoning drift and alarms
+    input_schema:
+      type: object
+      properties: {}
+  - name: analytics_get_telemetry_snapshot
+    description: Returns JSON telemetry snapshot for Visual Shell dashboards
+    input_schema:
+      type: object
+      properties: {}
+  canvas_widgets:
+  - node_type: AnalyticsNode
+    display_name: Analytics Studio Node
+    category: analytics
+    icon: Layers
+    component_path: components/canvas/nodes/AnalyticsNode.tsx
+    inputs:
+    - socket_id: trigger_in
+      label: Trigger In
+      data_type: JSON
+    outputs:
+    - socket_id: result_out
+      label: Result Out
+      data_type: JSON
+  governance:
+    spend_guard:
+      max_cost_per_invocation_usd: 0.05
+      monthly_budget_usd: 50.0
+      max_tokens_per_task: 16000
+    circuit_breaker:
+      failure_threshold: 3
+      timeout_seconds: 30
+    health:
+      health_check_endpoint: /health

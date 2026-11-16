@@ -1,0 +1,189 @@
+{%- comment -%}
+  Unlockable gift, a child of Quantity breaks V2 (outside the options): a free product that the selected option
+  unlocks once it has enough items. It shows locked (striped, with the locked text) until then;
+  component-quantity-breaks-v2.js switches the state, adds the gift line and, with "Add value to savings", counts its
+  value in the savings line.
+{%- endcomment -%}
+{%- liquid
+  assign qb_main = closest.product
+  assign qb_p = block.settings.product
+  assign qb_usable = false
+  if qb_p != blank
+    unless qb_p.requires_selling_plan
+      assign qb_usable = true
+    endunless
+  endif
+  assign qb_qty = block.settings.quantity | plus: 0 | at_least: 1
+  assign qb_at = block.settings.unlock_quantity | plus: 0 | at_least: 1
+  assign qb_value = 0
+  if qb_usable
+    assign qb_v = qb_p.selected_or_first_available_variant
+    assign qb_value = qb_v.price | times: qb_qty
+  endif
+  # Outside the options there is no option number: the wrapper turns __QB_N__ into 0
+  assign qb_prefix = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id
+-%}
+{%- if qb_usable or request.design_mode -%}
+  <div
+    class="qb-v2-unlock is-locked"
+    data-qb-child="unlock"
+    data-qb-ext="true"
+    data-qb-block="{{ block.id }}"
+    data-qb-unlock-quantity="{{ qb_at }}"
+    data-qb-quantity="{{ qb_qty }}"
+    data-qb-counts-value="{{ block.settings.include_value_in_savings }}"
+    data-qb-show-when-locked="{{ block.settings.show_when_locked }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- if qb_usable -%}
+      <div class="qb-v2-unlock__row">
+        {%- render 'qb-v2-extra-item',
+          product: qb_p,
+          variant: qb_v,
+          quantity: qb_qty,
+          role: 'unlock',
+          discount_type: 'free',
+          show_price: false,
+          show_picker: block.settings.show_variant_picker,
+          image: block.settings.image,
+          id_prefix: qb_prefix,
+          layout: 'row'
+        -%}
+        <span class="qb-v2-unlock__lock" aria-hidden="true">{%- render 'icon-padlock' -%}</span>
+        <span class="qb-v2-unlock__text qb-v2-unlock__text--open">
+          {%- render 'qb-v2-text',
+            text: block.settings.gift_text,
+            ctx: 'unlock',
+            title: qb_p.title,
+            quantity: qb_qty,
+            value: qb_value,
+            unlock_quantity: qb_at
+          -%}
+        </span>
+        <span class="qb-v2-unlock__text qb-v2-unlock__text--locked">
+          {%- render 'qb-v2-text',
+            text: block.settings.locked_text,
+            ctx: 'unlock',
+            title: qb_p.title,
+            quantity: qb_qty,
+            value: qb_value,
+            unlock_quantity: qb_at
+          -%}
+        </span>
+        {%- if block.settings.show_value -%}
+          <s class="qb-v2-unlock__value">{%- render 'qb-v2-money', cents: qb_value -%}</s>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- if request.design_mode -%}
+      {%- liquid
+        assign qb_products_json = ''
+        if qb_p != blank
+          assign qb_pv = qb_p.selected_or_first_available_variant
+          assign qb_is_main = false
+          if qb_p.id == qb_main.id
+            assign qb_is_main = true
+          endif
+          assign qb_requires_plan = false
+          if qb_p.requires_selling_plan
+            assign qb_requires_plan = true
+          endif
+          assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+        endif
+      -%}
+      {%- if qb_p == blank -%}
+        <div class="qb-v2-placeholder">Choose a product in Unlockable gift.</div>
+      {%- else -%}
+        {%- if qb_requires_plan -%}
+          <div class="qb-v2-placeholder">{{ qb_p.title | escape }} can only be sold with a subscription.</div>
+        {%- endif -%}
+        {%- capture qb_products_json -%}
+          {"id":{{ qb_p.id }},"handle":{{ qb_p.handle | json }},"title":{{ qb_p.title | json }},"available":{{ qb_p.available }},"requires_selling_plan":{{ qb_requires_plan }},"variants_count":{{ qb_variants_count | plus: 0 }},"price":{{ qb_pv.price | plus: 0 }},"compare_at_price":{{ qb_pv.compare_at_price | json }},"is_main":{{ qb_is_main }}}
+        {%- endcapture -%}
+      {%- endif -%}
+      <script type="application/json" data-qbv2-setup="child">
+        {"type":"unlock","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"unlock_quantity":{{ qb_at }},"quantity":{{ qb_qty }},"include_value_in_savings":{{ block.settings.include_value_in_savings }}},"products":[{{ qb_products_json }}]}
+      </script>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Unlockable gift",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "range",
+      "id": "unlock_quantity",
+      "label": "Unlock quantity",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "quantity",
+      "label": "Quantity",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "inline_richtext",
+      "id": "gift_text",
+      "label": "Text",
+      "default": "+ FREE [title]",
+      "info": "Use [title], [quantity], [value] and [unlock_quantity]."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "locked_text",
+      "label": "Locked text",
+      "default": "Unlocks at [unlock_quantity] items"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_when_locked",
+      "label": "Show when locked",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_value",
+      "label": "Show value",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "include_value_in_savings",
+      "label": "Add value to savings",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_picker",
+      "label": "Show variant picker",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "If empty, the product image."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Unlockable gift"
+    }
+  ]
+}
+{% endschema %}

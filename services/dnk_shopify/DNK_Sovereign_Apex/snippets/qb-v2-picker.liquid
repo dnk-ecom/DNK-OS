@@ -1,0 +1,95 @@
+{%- comment -%}
+  Quantity breaks V2: the variant picker of one item (a unit of the page product, or an extra product).
+  One .qb-v2-picker per product option: the native select (always present, the source of truth), the
+  image dropdown trigger and an empty swatch group the script fills. The wrapper's picker style decides
+  with CSS which one shows. Unit selects carry quantity-break__variant-select, which main.js reads.
+  Products with only the default variant print nothing.
+
+  Accepts:
+  - product: {Object}
+  - role: {String} unit | extra
+  - id_prefix: {String} unique id prefix that contains section.id
+  - options_html_1, options_html_2, options_html_3: {String} optional <option> lists captured once with
+    qb-v2-option-values and reused for every unit; extras leave them out
+  - index: {Number} optional, the unit number
+  - native_only: {Boolean} optional, only the native select and plain <option>s, for pickers that are never
+    shown outside a dialog (Bundle builder candidates), where pickers are always native selects
+
+  Usage:
+  {% render 'qb-v2-picker', product: product, role: 'extra', id_prefix: item_prefix %}
+{%- endcomment -%}
+{%- unless product.has_only_default_variant -%}
+  {%- for qb_option in product.options_with_values -%}
+    {%- liquid
+      assign qb_options_html = ''
+      case qb_option.position
+        when 1
+          assign qb_options_html = options_html_1
+        when 2
+          assign qb_options_html = options_html_2
+        when 3
+          assign qb_options_html = options_html_3
+      endcase
+      if qb_options_html == blank
+        capture qb_options_html
+          render 'qb-v2-option-values', product: product, option: qb_option, plain: native_only
+        endcapture
+      endif
+
+      # The trigger shows the selected value's image, the same one the script shows after a change (data-image)
+      assign qb_image = ''
+      unless native_only
+        if qb_options_html contains 'selected="selected"'
+          assign qb_selected_tag = qb_options_html | split: 'selected="selected"' | last | split: '>' | first
+          if qb_selected_tag contains 'data-image="'
+            assign qb_image = qb_selected_tag | split: 'data-image="' | last | split: '"' | first
+          endif
+        endif
+      endunless
+
+      assign qb_select_id = id_prefix | append: '-o' | append: qb_option.position
+      assign qb_name = qb_option.name | escape
+
+      # A unit's pickers start their names with the item number ("#2 Color"), so each row can be told apart
+      assign qb_number_ref = ''
+      if role == 'unit'
+        assign qb_number_ref = id_prefix | append: '-n '
+      endif
+    -%}
+    <span class="qb-v2-picker" data-qb-picker data-option-position="{{ qb_option.position }}">
+      <span class="select select--small no-background color-{{ settings.pickers_color_scheme }} accent-color-{{ settings.pickers_overlay_color }} accent-2-color-{{ settings.pickers_text_color }} qb-v2-native">
+        <select
+          class="select__select {% if role == 'unit' %}quantity-break__variant-select{% else %}qb-v2-xselect{% endif %}"
+          id="{{ qb_select_id }}"
+          {%- if qb_number_ref != blank %} aria-labelledby="{{ qb_number_ref }}{{ qb_select_id }}-dd-name"{% else %} aria-label="{{ qb_name }}"{% endif %}
+          autocomplete="off"
+        >
+          {{- qb_options_html -}}
+        </select>
+        {%- render 'icon-caret' -%}
+      </span>
+      {%- unless native_only -%}
+        <button
+          type="button"
+          class="qb-v2-dd"
+          id="{{ qb_select_id }}-dd"
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="qbv2-{{ section.id }}-__QB_WRAPPER_ID__-listbox"
+          aria-labelledby="{{ qb_number_ref }}{{ qb_select_id }}-dd-name {{ qb_select_id }}-dd-value"
+        >
+          <span class="visually-hidden" id="{{ qb_select_id }}-dd-name">{{ qb_name }}</span>
+          <span class="qb-v2-dd__image" aria-hidden="true">
+            {%- if qb_image != blank -%}
+              <img src="{{ qb_image }}" alt="" width="40" height="40" loading="lazy">
+            {%- endif -%}
+          </span>
+          <span class="qb-v2-dd__value" id="{{ qb_select_id }}-dd-value">{{ qb_option.selected_value | escape }}</span>
+          {%- render 'icon-caret' -%}
+        </button>
+        <span class="qb-v2-sw" role="radiogroup"{% if qb_number_ref != blank %} aria-labelledby="{{ qb_number_ref }}{{ qb_select_id }}-dd-name"{% else %} aria-label="{{ qb_name }}"{% endif %}></span>
+      {%- endunless -%}
+    </span>
+  {%- endfor -%}
+{%- endunless -%}

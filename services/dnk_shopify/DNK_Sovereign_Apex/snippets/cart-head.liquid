@@ -1,0 +1,19 @@
+{%- comment -%}
+  Rendered in <head> directly above content_for_header, so this configure call runs before any app code (only the
+  first configure call on an action takes effect). Shopify's updateCart action then writes the cart itself and the
+  theme re-renders its cart through assets/component-cart.js. Printed only where the cart core is on the page.
+{%- endcomment -%}
+{%- if settings.cart_type == 'drawer' or request.page_type == 'cart' -%}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var a = window.Shopify && window.Shopify.actions;
+      var u = a && a.updateCart;
+      var c = window.ShrineCart;
+      if (!u || typeof u.configure !== 'function' || !c || !c.actions) return;
+      u.configure({
+        eventTarget: function (meta) { return c.actions.eventTarget(meta); },
+        handler: function (defaultHandler, payload, options) { return c.actions.handleUpdate(defaultHandler, payload, options); }
+      });
+    });
+  </script>
+{%- endif -%}

@@ -1,0 +1,25 @@
+{
+  "source_repository": "alpha-omega-security/scrutineer",
+  "activated_at_slice": 1,
+  "domain": "security_audit_probes",
+  "rules": [
+    {
+      "rule_id": "SEC-001-AUTHZ-SCOPE",
+      "title": "Strict Tenant Authorization Boundary Enforcement",
+      "directive": "All MCP tool invocations and state mutations must validate workspace tenant isolation.",
+      "source": "audit-authz.md"
+    },
+    {
+      "rule_id": "SEC-002-EXFIL-DATA-LEAK",
+      "title": "Exfiltration & Secret Leak Detection Gate",
+      "directive": "Pre-commit tool guard scans all tool outputs for credentials, API tokens, and user paths.",
+      "source": "audit-exfil.md"
+    },
+    {
+      "rule_id": "SEC-003-INJECTION-GUARD",
+      "title": "Prompt Injection & Tool Poisoning Shield",
+      "directive": "Sanitize out-of-band untrusted inputs and tool execution strings before dispatch.",
+      "source": "audit-injection.md"
+    }
+  ]
+}

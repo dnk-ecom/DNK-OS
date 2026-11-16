@@ -1,0 +1,22 @@
+{%- comment -%}
+  Floating cart button (Theme settings > Cart > Floating cart button), rendered by snippets/cart-layout.liquid on every
+  page except the cart page. assets/component-cart-extras.js defines the element (data-cart-feature="extras"); until it
+  runs, the link is a plain link to the cart page.
+{%- endcomment -%}
+{%- capture fcb_count -%}{%- render 'cart-count' -%}{%- endcapture -%}
+{%- assign fcb_count = fcb_count | strip | plus: 0 -%}
+<cart-floating-button
+  class="cart-floating-button cart-floating-button--{{ settings.floating_cart_position | default: 'bottom_right' }} floating-btn {{ settings.floating_cart_visibility | default: 'always-display' }}{% if settings.floating_cart_after_scroll %} is-hidden{% endif %}"
+  data-after-scroll="{{ settings.floating_cart_after_scroll }}"
+  data-cart-type="{{ settings.cart_type }}"
+  data-cart-feature="extras"
+>
+  <a href="{{ routes.cart_url }}" class="cart-floating-button__link color-{{ settings.floating_cart_color_scheme | default: 'inverse' }} focus-inset"{% if settings.cart_type == 'drawer' %} role="button" aria-haspopup="dialog" aria-controls="CartDrawer-Dialog" aria-expanded="false"{% endif %}>
+    <span class="cart-floating-button__icon" aria-hidden="true">{% render 'icon-cart' %}</span>
+    <span class="visually-hidden">{{ 'sections.cart.core_open_cart' | t }}</span>
+    <span class="cart-floating-button__count"{% if fcb_count == 0 %} hidden{% endif %}>
+      <span aria-hidden="true">{% if fcb_count < 100 %}{{ fcb_count }}{% endif %}</span>
+      <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: fcb_count }}</span>
+    </span>
+  </a>
+</cart-floating-button>

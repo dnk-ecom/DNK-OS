@@ -1,0 +1,530 @@
+{%- comment -%}
+  Free gift card and its gift element (cart-drawer-gift, read by main.js).
+  Accepts:
+  - block: the Free gift block
+  - items_count: the cart's item count without cart-hidden products (kept for older callers; the unlock counts on its own)
+  - shown {Boolean} the block's cart-based display condition (default true). When false the gift is switched off, so
+    main.js removes it from the cart, but the element still renders: the list of gift elements keeps its length.
+  - display_sync {String} 'lt:{cents}' / 'gt:{cents}': a subtotal display condition in store currency, converted for
+    other currencies by the inline sync below
+  - in_drawer {Boolean} rendered inside the cart drawer section
+  - cart_style {String} the cart's style (classic, clean, cards, soft, bold) for Card styling "Same as cart"
+  - cart_scheme {String} the cart's colour scheme setting (for Color scheme "Same as cart")
+{%- endcomment -%}
+{%- liquid
+  assign main_product_handle = product.handle
+  assign product = block.settings.product
+  assign fg_shown = true
+  if shown == false
+    assign fg_shown = false
+  endif
+  assign fg_in_drawer = false
+  if in_drawer
+    assign fg_in_drawer = true
+  endif
+
+  # Card styling: Custom = the block's own settings (today); Same as cart = the cart style's values (§5.4)
+  assign fg_cs = cart_style | default: 'classic'
+  assign fg_card = block.settings.card_styling | default: 'custom'
+  assign fg_img_size = block.settings.image_size
+  assign fg_img_radius = block.settings.image_corner_radius | divided_by: 10.0 | append: 'rem'
+  assign fg_title_size = block.settings.title_size
+  assign fg_desc_size = block.settings.desc_size
+  assign fg_price_size = block.settings.price_size
+  assign fg_radius = block.settings.corner_radius | divided_by: 10.0 | append: 'rem'
+  assign fg_border_regular = block.settings.regular_border_color
+  assign fg_border_selected = block.settings.selected_border_color
+  assign fg_border_width = block.settings.border_width | append: 'rem'
+  assign fg_bg_regular = block.settings.regular_bg_color
+  assign fg_bg_selected = block.settings.selected_bg_color
+  assign fg_show_border = block.settings.show_border
+  assign fg_show_bg = block.settings.show_custom_bg
+  assign fg_show_shadow = block.settings.show_box_shadow
+  if fg_card == 'cart'
+    assign fg_img_size = '5'
+    assign fg_title_size = '1.4'
+    assign fg_desc_size = '1.2'
+    assign fg_price_size = '1.4'
+    assign fg_img_radius = 'var(--cart-radius-small, .2rem)'
+    assign fg_border_regular = '#d7d7d7'
+    assign fg_border_selected = '#d7d7d7'
+    assign fg_border_width = '.1rem'
+    assign fg_bg_regular = '#f2f2f2'
+    assign fg_bg_selected = '#f2f2f2'
+    assign fg_show_border = true
+    assign fg_show_bg = false
+    assign fg_show_shadow = false
+    case fg_cs
+      when 'clean'
+        assign fg_radius = 'var(--cart-radius, .6rem)'
+        assign fg_border_regular = 'rgba(var(--color-foreground), .1)'
+        assign fg_border_selected = 'rgba(var(--color-foreground), .1)'
+      when 'cards'
+        assign fg_radius = 'var(--cart-radius, 1.2rem)'
+        assign fg_show_border = false
+        assign fg_show_bg = true
+        assign fg_bg_regular = 'rgb(var(--color-background))'
+        assign fg_bg_selected = 'rgb(var(--color-background))'
+      when 'soft'
+        assign fg_radius = 'var(--cart-radius, 1.6rem)'
+        assign fg_show_border = false
+        assign fg_show_bg = true
+        assign fg_bg_regular = 'var(--cart-tint, rgba(var(--color-foreground), .05))'
+        assign fg_bg_selected = 'var(--cart-tint, rgba(var(--color-foreground), .05))'
+      when 'bold'
+        assign fg_img_radius = '0'
+        assign fg_radius = '0'
+        assign fg_border_regular = 'rgb(var(--color-foreground))'
+        assign fg_border_selected = 'rgb(var(--accent-color))'
+        assign fg_border_width = '.2rem'
+      else
+        assign fg_img_radius = '.2rem'
+        assign fg_radius = '.6rem'
+    endcase
+  endif
+-%}
+{%- capture fg_scheme -%}{%- render 'cart-color-scheme', value: block.settings.color_scheme, default: 'background-2', cart_scheme: cart_scheme -%}{%- endcapture -%}
+{%- liquid
+  assign fg_scheme = fg_scheme | strip
+  # theme editor only: the block overrides the cart's style or colour scheme (skeleton §3e)
+  assign fg_override = ''
+  if request.design_mode
+    assign fg_cart_set = false
+    if fg_cs != 'classic'
+      assign fg_cart_set = true
+    elsif cart_scheme != blank and cart_scheme != 'default'
+      assign fg_cart_set = true
+    endif
+    if fg_cart_set
+      if fg_card == 'custom'
+        assign fg_override = 'Card styling'
+      endif
+      if block.settings.color_scheme != 'cart' and block.settings.color_scheme != 'background-2'
+        if fg_override != blank
+          assign fg_override = fg_override | append: ', '
+        endif
+        assign fg_override = fg_override | append: 'Color scheme'
+      endif
+      if fg_override != blank
+        assign fg_override = 'Free gift|' | append: fg_override
+      endif
+    endif
+  endif
+-%}
+{%- capture fg_style -%}
+    --image-size: {{ fg_img_size }}rem;
+    --image-size-number: {{ fg_img_size }};
+    --image-border-radius: {{ fg_img_radius }};
+    --title-font-size: {{ fg_title_size }}rem;
+    --desc-font-size: {{ fg_desc_size }}rem;
+    --price-font-size: {{ fg_price_size }}rem;
+    --border-radius: {{ fg_radius }};
+    --regular-border-color: {{ fg_border_regular }};
+    --selected-border-color: {{ fg_border_selected }};
+    --border-width: {{ fg_border_width }};
+    --regular-bg-color: {{ fg_bg_regular }};
+    --selected-bg-color: {{ fg_bg_selected }};
+{%- endcapture -%}
+{%- capture fg_margins -%}
+    margin-top: {{ block.settings.margin_top | divided_by: 10.0 }}rem;
+    margin-bottom: {{ block.settings.margin_bottom | divided_by: 10.0 }}rem;
+{%- endcapture -%}
+{%- if product == blank -%}
+  {%- if request.design_mode -%}
+    <div class='cart-drawer-gift-container' style="{{ fg_style }}{{ fg_margins }}" {{ block.shopify_attributes }}>
+      {% render 'cart-editor-notice', code: 'rewards-free-gift-no-product', level: 'info', title: 'Free gift', text: "choose a gift product in Product to show this block to customers." %}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign is_quantity = false
+    if block.settings.goal_type == 'quantity'
+      assign is_quantity = true
+    endif
+
+    if is_quantity
+      assign goal_multiplier = 1.0
+    else
+      assign goal_multiplier = 100.00
+    endif
+
+    # T4: the unlock requirement is read as a number: "$80" is 80, "1,000" is 1000, "80,5" is 80.5, empty is 0
+    assign fg_req_text = block.settings.requirement | append: ''
+    assign fg_req_chars = fg_req_text | split: ''
+    assign fg_req = ''
+    assign fg_req_other = false
+    for fg_char in fg_req_chars
+      if '0123456789.,' contains fg_char
+        assign fg_req = fg_req | append: fg_char
+      elsif fg_char != ' '
+        assign fg_req_other = true
+      endif
+    endfor
+    if fg_req contains ',' and fg_req contains '.'
+      assign fg_req = fg_req | remove: ','
+    elsif fg_req contains ','
+      assign fg_req_parts = fg_req | split: ','
+      assign fg_req_last = fg_req_parts | last
+      if fg_req_last.size == 3
+        assign fg_req = fg_req | remove: ','
+      else
+        assign fg_req = fg_req | replace: ',', '.'
+      endif
+    endif
+    if fg_req == blank
+      assign fg_req = '0'
+    endif
+    assign requirement = fg_req | times: goal_multiplier
+
+    # T4: the gift's own lines never count toward its requirement, and it never unlocks in a cart with nothing else
+    assign gift_key = ',' | append: product.handle | append: ','
+    if is_quantity
+      capture fg_count
+        render 'cart-goal-total', skip_gifts: false, skip_gift_cards: false, skip_handles: gift_key
+      endcapture
+    else
+      capture fg_count
+        render 'cart-goal-total', skip_hidden: false, skip_gifts: false, skip_gift_cards: false, skip_handles: gift_key
+      endcapture
+    endif
+    assign fg_counted = fg_count | strip | split: '|'
+    assign fg_items = fg_counted[1] | plus: 0
+    if is_quantity
+      assign fg_ref = fg_items
+    else
+      assign fg_ref = fg_counted[0] | plus: 0
+    endif
+
+    if fg_items > 0 and fg_ref >= requirement
+      assign unlocked = true
+      assign progress_message = block.settings.unlocked_progress_text
+    else
+      assign unlocked = false
+      assign progress_message = block.settings.locked_progress_text
+    endif
+
+    assign fg_v = product.selected_or_first_available_variant
+    assign fg_available = false
+    if fg_v.available
+      assign fg_available = true
+    endif
+    # §5.3 #12: the variant in the cart wins (Cart page V2's own renders, and the drawer's first paint after a reload)
+    assign fg_cart_v = nil
+    for item in cart.items
+      if item.product_id == product.id
+        assign fg_cart_v = item.variant
+        break
+      endif
+    endfor
+    assign fg_in_cart_v = false
+    if fg_cart_v and fg_cart_v.id != fg_v.id
+      assign fg_v = fg_cart_v
+      assign fg_in_cart_v = true
+    endif
+    assign fg_price_v = product.first_available_variant
+    assign fg_base_v = product.selected_or_first_available_variant
+    if fg_in_cart_v
+      assign fg_price_v = fg_v
+      assign fg_base_v = fg_v
+    endif
+    assign visible = false
+    if fg_shown and fg_available
+      assign visible = true
+    endif
+    assign selected = false
+    if visible and unlocked
+      assign selected = true
+    endif
+
+    # A7: the gift element lives where main.js manages gifts: the cart drawer, or the cart page of a store without one
+    assign fg_engine = false
+    if fg_in_drawer or settings.cart_type != 'drawer'
+      assign fg_engine = true
+    endif
+    # Stores without a cart drawer: the gift on the cart page works only with the latest main.js, so it stays hidden
+    # until cart-rewards-gate sees it
+    assign fg_gate = false
+    if fg_in_drawer == false and settings.cart_type != 'drawer'
+      assign fg_gate = true
+    endif
+
+    # Other currencies: goals and subtotal conditions are in store currency, so the inline sync converts them on
+    # first paint and inside every re-render, before main.js reads the gift
+    assign fg_sync = false
+    if cart.currency.iso_code != shop.currency
+      if is_quantity == false or display_sync != blank
+        assign fg_sync = true
+      endif
+    endif
+    # what the sync may switch on: an available gift whose display condition holds (a subtotal condition is
+    # decided by the sync itself)
+    assign fg_sync_eligible = fg_available
+    if display_sync == blank and fg_shown == false
+      assign fg_sync_eligible = false
+    endif
+    assign fg_page_assets = false
+    if fg_in_drawer == false
+      if fg_gate or fg_sync
+        assign fg_page_assets = true
+      endif
+    endif
+    if fg_engine
+      assign fg_tag = 'cart-drawer-gift'
+    else
+      assign fg_tag = 'div'
+    endif
+  -%}
+  {% capture requirement_difference_money %}
+    {% if is_quantity %}
+      {{ requirement | minus: fg_ref | round }}
+    {% else %}
+      <span>{{ requirement | minus: fg_ref | money_without_trailing_zeros }}</span>
+    {% endif %}
+  {% endcapture %}
+  <div
+    class='cart-drawer-gift-container'
+    style="{{ fg_style }}"
+    data-card-styling="{{ fg_card }}"
+    {%- if fg_gate %} hidden data-rw-engine-wait data-cart-feature="rewards"{% elsif fg_sync and fg_in_drawer %} data-cart-feature="rewards"{% endif %}
+    {%- if request.design_mode %} data-country="{{ localization.country.iso_code }}"{% if fg_override != blank %} data-cart-override="{{ fg_override | escape }}"{% endif %}{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {%- if fg_gate -%}<cart-rewards-gate></cart-rewards-gate>{%- endif -%}
+    {%- if fg_page_assets -%}
+      {{ 'component-cart-rewards.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'component-cart-rewards.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    {%- if request.design_mode -%}
+      {%- if fg_req_other -%}
+        {%- capture fg_req_note -%}the unlock requirement is read as {{ fg_req | plus: 0 }}. Enter a number only.{%- endcapture -%}
+        {% render 'cart-editor-notice', code: 'rewards-free-gift-requirement', level: 'info', title: 'Free gift', text: fg_req_note %}
+      {%- endif -%}
+      {%- if fg_engine == false -%}
+        {% render 'cart-editor-notice', code: 'rewards-free-gift-page', level: 'info', title: 'Free gift', text: "on the cart page this block shows the gift's state only. The gift is added by the Free gift block in the cart drawer." %}
+      {%- endif -%}
+    {%- endif -%}
+    {%- if fg_engine -%}<!--cart-engine-->{%- endif -%}
+    {%- if fg_sync -%}<cart-rewards-sync></cart-rewards-sync>{%- endif -%}
+    <style>
+      .cart-drawer .cart-item--product-{{ product.handle }} {
+        display: none;
+      }
+      {%- unless fg_in_drawer %}
+      cart-page .cart-item--product-{{ product.handle }} {
+        display: none;
+      }
+      {%- endunless %}
+      {%- if fg_sync %}
+      .cart-drawer-gift__image__locked[hidden] {
+        display: none;
+      }
+      {%- endif %}
+    </style>
+    {%- comment -%} The margins sit on the wrapper, so a gift that is switched off takes no room {%- endcomment -%}
+    <div class="cart-drawer-gift-wrap" style="{{ fg_margins | strip }}" data-sync-wrapper{% unless visible %} hidden{% endunless %}>
+      <{{ fg_tag }}
+        class='cart-drawer-gift upsell gift--product-{{ product.handle }}{% if fg_scheme != blank %} color-{{ fg_scheme }}{% endif %} accent-color-{{ block.settings.accent_color }}{% if fg_show_bg %} upsell--custom-bg{% endif %}{% if fg_show_shadow %} upsell--box-shadow{% endif %}{% if fg_show_border %} upsell--border{% endif %}{% if block.settings.toggle_element == 'container' %} upsell--container-btn{% endif %}'
+        data-selected="{{ selected }}"
+        data-handle="{{ product.handle }}"
+        data-id="{{ fg_v.id }}"
+        data-type="{% if is_quantity %}product_quantity{% else %}cart_subtotal{% endif %}"
+        data-requirement="{{ requirement }}"
+        {% if block.settings.display == 'specific_products' %}
+          data-main-product="{{ main_product_handle }}"
+          data-save-local-storage="true"
+        {% endif %}
+        {%- if fg_sync %}
+          data-sync
+          {%- unless is_quantity %} data-sync-goal="{{ requirement }}"{% endunless %}
+          data-sync-total="{{ fg_ref }}"
+          data-sync-items="{{ fg_items }}"
+          data-sync-unlocked="{{ unlocked }}"
+          data-sync-eligible="{{ fg_sync_eligible }}"
+          {%- if display_sync != blank %} data-sync-display="{{ display_sync }}" data-sync-cart-total="{{ cart.total_price }}"{% endif %}
+        {%- endif %}
+      >
+        {% if progress_message != blank or fg_sync %}
+          <h3 class='cart-drawer-gift__progress center custom-font-size' style='--mobile-text-size: {{ block.settings.progress_mobile_text_size | divided_by: 10.0 }}rem;--desktop-text-size: {{ block.settings.progress_desktop_text_size | divided_by: 10.0 }}rem;'{% if progress_message == blank %} hidden{% endif %}>
+            {%- if fg_sync -%}
+              <cart-gift-status
+                data-goal-cents="{{ requirement }}"
+                data-total-cents="{{ fg_ref }}"
+                data-items="{{ fg_items }}"
+                data-quantity="{{ is_quantity }}"
+                data-shop-currency="{{ shop.currency }}"
+                data-locked-text="{{ block.settings.locked_progress_text | escape }}"
+                data-unlocked-text="{{ block.settings.unlocked_progress_text | escape }}"
+              >
+                {{- progress_message | replace: '[amount]', requirement_difference_money -}}
+              </cart-gift-status>
+            {%- else %}
+            {{ progress_message | replace: '[amount]', requirement_difference_money }}
+            {%- endif %}
+          </h3>
+        {% endif %}
+        <div class='upsell__container'>
+          {% if block.settings.show_image %}
+            {% liquid
+              if block.settings.product_image != blank
+                assign product_image = block.settings.product_image
+              else
+                assign product_image = product.featured_image
+              endif
+              if fg_in_cart_v and fg_v.featured_image != blank
+                assign product_image = fg_v.featured_image
+              endif
+            %}
+            {% if product_image != blank %}
+              <div class='upsell__image'>
+                <img
+                  src="{{ product_image | image_url: width: 500 }}"
+                  alt="{{ product_image.alt | escape }}"
+                  class="upsell__image__img"
+                  loading="lazy"
+                  width="{{ product_image.width | default: 'auto' }}"
+                  height="{{ product_image.height | default: 'auto' }}"
+                >
+                {% if block.settings.show_image_locked_overlay %}
+                  {% if fg_sync %}
+                    <div class='cart-drawer-gift__image__locked'{% if unlocked %} hidden{% endif %}>
+                      <span class="lock"></span>
+                    </div>
+                  {% elsif unlocked == false %}
+                    <div class='cart-drawer-gift__image__locked'>
+                      <span class="lock"></span>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endif %}
+          <div class='upsell__content{% if block.settings.hide_compare_price %} hide-compare-price{% endif %}'>
+            <div class='upsell__title'>
+              <h3>
+                {{ product.title }}
+              </h3>
+              {% if block.settings.price_position == 'next_to_title' %}
+                <div class='upsell__price'>
+                  {% if fg_price_v.compare_at_price > fg_price_v.price %}
+                    <span class='compare-price'>{{ fg_price_v.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class='regular-price'>
+                    {% if block.settings.displayed_price == 'text' %}
+                      {{ block.settings.displayed_price_text }}
+                    {% else %}
+                      {{ fg_price_v.price | money }}
+                    {% endif %}
+                  </span>
+                </div>
+              {% endif %}
+            </div>
+            {%- if block.settings.product_desc != blank -%}
+              <p class="upsell__desc">
+                {{ block.settings.product_desc }}
+              </p>
+            {%- endif -%}
+            {%- unless product.has_only_default_variant -%}
+              {% if block.settings.show_variant_picker %}
+                <div class='upsell__variant-picker'>
+                  {%- for option in product.options_with_values -%}
+                    <div class="upsell__select select select--small no-background color-{{ settings.pickers_color_scheme }} accent-color-{{ settings.pickers_overlay_color }} accent-2-color-{{ settings.pickers_text_color }}">
+                      <select class="select__select variant-dropdown" name="options[{{ option.name | escape }}]">
+                        {%- liquid
+                          assign variants_available_arr = product.variants | map: 'available'
+                          assign variants_option1_arr = product.variants | map: 'option1'
+                          assign variants_option2_arr = product.variants | map: 'option2'
+                          assign variants_option3_arr = product.variants | map: 'option3'
+                        -%}
+                        {% for value in option.values %}
+                          {%- liquid
+                            assign option_disabled = true
+
+                            for option1_name in variants_option1_arr
+                              case option.position
+                                when 1
+                                  if variants_option1_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                    assign option_disabled = false
+                                  endif
+                                when 2
+                                  if option1_name == fg_base_v.option1 and variants_option2_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                    assign option_disabled = false
+                                  endif
+                                when 3
+                                  if option1_name == fg_base_v.option1 and variants_option2_arr[forloop.index0] == fg_base_v.option2 and variants_option3_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+                                    assign option_disabled = false
+                                  endif
+                              endcase
+                            endfor
+                            assign fg_option_index = option.position | minus: 1
+                          -%}
+                          <option
+                            value="{{ value | escape }}"
+                            {%- if fg_in_cart_v and fg_v.options[fg_option_index] == value %} selected{% endif %}
+                          >
+                            {% if option_disabled -%}
+                              {{- 'products.product.value_unavailable' | t: option_value: value -}}
+                            {%- else -%}
+                              {{- value -}}
+                            {%- endif %}
+                          </option>
+                        {% endfor %}
+                      </select>
+                      {% render 'icon-caret' %}
+                    </div>
+                  {%- endfor -%}
+
+                  <script type="application/json">
+                    {{ product.variants | json }}
+                  </script>
+                </div>
+              {% endif %}
+            {% endunless %}
+            {% if block.settings.price_position == 'separate' %}
+              <div class='upsell__price upsell__price--separate'>
+                {% if fg_price_v.compare_at_price > fg_price_v.price %}
+                  <span class='compare-price'>{{ fg_price_v.compare_at_price | money }}</span>
+                {% endif %}
+                <span class='regular-price'>
+                  {% if block.settings.displayed_price == 'text' %}
+                    {{ block.settings.displayed_price_text }}
+                  {% else %}
+                    {{ fg_price_v.price | money }}
+                  {% endif %}
+                </span>
+              </div>
+            {% endif %}
+          </div>
+          {%- if fg_engine -%}
+            {% assign product_form_id = 'cart-drawer-gift-' | append: block.id %}
+            <product-form data-is-cart-upsell='true'>
+              {%- form 'product',
+                product,
+                id: product_form_id,
+                class: 'form',
+                novalidate: 'novalidate',
+                data-type: 'add-to-cart-form'
+              -%}
+                <input type="hidden" name="id" value="{{ fg_v.id }}">
+                <button
+                  id="{{ product_form_id }}-submit"
+                  type="submit"
+                  name="add"
+                  class="cart-primary-upsell__btn hidden"
+                  {% if fg_available == false %}
+                    disabled
+                  {% endif %}
+                >
+                  {{ 'products.product.add_to_cart' | t }}
+                </button>
+              {%- endform -%}
+            </product-form>
+          {%- endif -%}
+        </div>
+      </{{ fg_tag }}>
+    </div>
+    {%- if fg_sync -%}
+      {%- render 'cart-rewards-sync' -%}
+    {%- endif -%}
+    {%- if fg_engine -%}<!--/cart-engine-->{%- endif -%}
+  </div>
+{%- endif -%}

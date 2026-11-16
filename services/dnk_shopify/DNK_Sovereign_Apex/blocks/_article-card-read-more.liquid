@@ -1,0 +1,74 @@
+<div
+  class="article-card-read-more-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <span class="btn btn-wide {{ block.settings.button_size }} {{ block.settings.button_style }}">
+    {{ 'blogs.read_more' | t }}
+  </span>
+</div>
+
+{% schema %}
+{
+  "name": "Read more",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        { "value": "btn-accent-solid", "label": "Accent solid" },
+        { "value": "btn-accent-outline", "label": "Accent outline" },
+        { "value": "btn-text-solid", "label": "Text solid" },
+        { "value": "btn-text-outline", "label": "Text outline" }
+      ],
+      "default": "btn-text-outline"
+    },
+    {
+      "type": "select",
+      "id": "button_size",
+      "label": "Button size",
+      "options": [
+        { "value": "btn-sm", "label": "Small" },
+        { "value": "btn-md", "label": "Medium" },
+        { "value": "btn-lg", "label": "Large" }
+      ],
+      "default": "btn-sm"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Read more",
+      "category": "Blog"
+    }
+  ]
+}
+{% endschema %}

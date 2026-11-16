@@ -1,0 +1,166 @@
+{% liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign active_filter_count = 0
+
+  for filter in collection.filters
+    case filter.type
+      when 'boolean'
+        if filter.true_value != nil and filter.true_value.active
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+        if filter.false_value != nil and filter.false_value.active
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+      when 'list'
+        assign active_filter_count = active_filter_count | plus: filter.active_values.size
+      when 'price_range'
+        if filter.min_value.value != nil or filter.max_value.value != nil
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+    endcase
+  endfor
+
+  assign encoded_sort_by = sort_by | url_encode
+  assign filters_clear_url = collection.url | append: '?sort_by=' | append: encoded_sort_by
+%}
+
+<s-view-event
+  view-event-trigger="connect"
+  view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
+>
+  <faceted-results
+    class="main-collection"
+    data-section-id="{{ section.id }}"
+    data-collection-id="{{ collection.id }}"
+    data-collection-handle="{{ collection.handle | escape }}"
+    data-collection-products-count="{{ collection.all_products_count }}"
+    style="
+      --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+      --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+      --color-accent: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+    "
+  >
+    <p class="visually-hidden" role="status" aria-live="polite" data-faceted-results-status></p>
+
+    {% content_for 'block', type: '_collection-header', id: 'collection-header' %}
+
+    <div
+      class="faceted-results-grid"
+      data-faceted-results-grid
+      data-result-count="{{ collection.products_count }}"
+      data-result-count-text="{{ 'collections.products_count' | t: count: collection.products_count | escape }}"
+      tabindex="-1"
+    >
+      {% content_for 'block', type: '_collection-toolbar', id: 'collection-toolbar' %}
+      {% content_for 'block', type: '_collection-product-grid', id: 'collection-product-grid' %}
+    </div>
+
+    {% if collection.filters.size > 0 %}
+      {% render 'facets-dialog',
+        context: 'collection',
+        filters: collection.filters,
+        form_action: collection.url,
+        sort_by: sort_by,
+        clear_url: filters_clear_url,
+        active_filter_count: active_filter_count,
+        result_count: collection.products_count,
+        section_id: section.id
+      %}
+    {% endif %}
+  </faceted-results>
+</s-view-event>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "_collection-header"
+    },
+    {
+      "type": "_collection-toolbar"
+    },
+    {
+      "type": "_collection-product-grid"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "presets": [
+    {
+      "name": "Collection",
+      "category": "Collection",
+      "blocks": [
+        {
+          "type": "_collection-header",
+          "id": "collection-header",
+          "static": true
+        },
+        {
+          "type": "_collection-toolbar",
+          "id": "collection-toolbar",
+          "static": true
+        },
+        {
+          "type": "_collection-product-grid",
+          "id": "collection-product-grid",
+          "static": true,
+          "blocks": [
+            {
+              "type": "product-card",
+              "id": "product-card",
+              "static": true,
+              "blocks": [
+                {
+                  "type": "_product-card-image"
+                },
+                {
+                  "type": "_product-card-title"
+                },
+                {
+                  "type": "_product-card-rating"
+                },
+                {
+                  "type": "_product-card-price"
+                },
+                {
+                  "type": "_product-card-swatches"
+                },
+                {
+                  "type": "_product-card-form"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

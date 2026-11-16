@@ -1,0 +1,75 @@
+{%- comment -%}
+  Scratch card, a child of a Quantity option: a cover over the whole option that the customer scratches away (or
+  reveals with the button, by keyboard) before the option can be chosen. The option's radio stays disabled until then;
+  component-quantity-breaks-v2-extras.js draws the cover, remembers the reveal in this browser and unlocks the option.
+{%- endcomment -%}
+{%- liquid
+  # The button is the keyboard and screen reader way in: never without a name
+  assign qb_reveal_label = block.settings.reveal_label | strip
+  if qb_reveal_label == blank
+    assign qb_reveal_label = block.settings.cover_text | strip_html | strip
+  endif
+-%}
+<div
+  class="qb-v2-scratch qb-v2-scratch--{{ block.settings.cover_style }}"
+  data-qb-child="scratch"
+  data-qb-ext="true"
+  data-qb-block="{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  <canvas class="qb-v2-scratch__canvas" aria-hidden="true"></canvas>
+  <span class="qb-v2-scratch__text" aria-hidden="true">{{ block.settings.cover_text }}</span>
+  <button type="button" class="qb-v2-scratch__reveal" data-qb-action="scratch-reveal">{{ qb_reveal_label | escape }}</button>
+  {%- if request.design_mode -%}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"scratch","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{},"products":[]}
+    </script>
+  {%- endif -%}
+</div>
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Scratch card",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "cover_text",
+      "label": "Text",
+      "default": "Scratch to reveal your deal"
+    },
+    {
+      "type": "select",
+      "id": "cover_style",
+      "label": "Cover style",
+      "options": [
+        {
+          "value": "gold",
+          "label": "Gold"
+        },
+        {
+          "value": "silver",
+          "label": "Silver"
+        },
+        {
+          "value": "accent",
+          "label": "Accent"
+        }
+      ],
+      "default": "gold"
+    },
+    {
+      "type": "text",
+      "id": "reveal_label",
+      "label": "Reveal button label",
+      "default": "Reveal offer",
+      "info": "Read by screen readers and used with the keyboard."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scratch card"
+    }
+  ]
+}
+{% endschema %}

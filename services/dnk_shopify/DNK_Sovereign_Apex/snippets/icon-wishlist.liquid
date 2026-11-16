@@ -1,0 +1,30 @@
+{%- comment -%}
+  Wishlist icon (Theme settings > Wishlist > Icon): one outlined path; the saved state fills it (component-wishlist.css).
+  Accepts:
+  - icon {String} heart | bookmark | star (optional, default: the theme setting)
+  - stroke_width {Number} line width in viewBox units (optional, default 1.6)
+{%- endcomment -%}
+{%- liquid
+  assign wishlist_icon = icon | default: settings.wishlist_icon | default: 'heart'
+  assign wishlist_stroke = stroke_width | default: 1.6
+-%}
+<svg
+  class="icon icon-wishlist icon-wishlist--{{ wishlist_icon }}"
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  focusable="false"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="{{ wishlist_stroke }}"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  {%- case wishlist_icon -%}
+    {%- when 'bookmark' -%}
+      <path d="M6.75 3.75h10.5c.55 0 1 .45 1 1v15.5l-6.25-4-6.25 4V4.75c0-.55.45-1 1-1z"/>
+    {%- when 'star' -%}
+      <path d="M12 3.6l2.55 5.2 5.7.83-4.13 4.03.98 5.69L12 16.66l-5.1 2.69.98-5.69-4.13-4.03 5.7-.83z"/>
+    {%- else -%}
+      <path d="M12 20.25c-.27 0-.54-.09-.76-.27C6.33 15.95 2.75 12.9 2.75 9.06c0-2.72 2.11-4.81 4.75-4.81 1.66 0 3.24.82 4.5 2.4 1.26-1.58 2.84-2.4 4.5-2.4 2.64 0 4.75 2.09 4.75 4.81 0 3.84-3.58 6.89-8.49 10.92-.22.18-.49.27-.76.27z"/>
+  {%- endcase -%}
+</svg>

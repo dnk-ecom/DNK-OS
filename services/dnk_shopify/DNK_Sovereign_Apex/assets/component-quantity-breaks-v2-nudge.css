@@ -1,0 +1,59 @@
+/* Quantity breaks V2 - "Quantity breaks nudge" in the cart (blocks/cart_quantity-breaks-nudge.liquid), filled in by
+   component-quantity-breaks-v2-nudge.js: <qb-v2-cart-nudge> with a text and an optional button. It stays hidden until
+   the script writes a text, so carts without a deal to offer show nothing. */
+.qb-v2-cart-nudge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgb(var(--color-foreground));
+  font-size: 1.3rem;
+  line-height: 1.4;
+  text-align: start;
+}
+
+.qb-v2-cart-nudge:not(:has(.qb-v2-cart-nudge__text:not(:empty))) {
+  display: none;
+}
+
+.qb-v2-cart-nudge--tint {
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+.qb-v2-cart-nudge--outline {
+  border: 1px dashed rgba(var(--color-foreground), 0.35);
+}
+
+.qb-v2-cart-nudge--plain {
+  padding-inline: 0;
+}
+
+/* the theme's .button display would beat the hidden attribute */
+.qb-v2-cart-nudge [hidden] {
+  display: none !important;
+}
+
+.qb-v2-cart-nudge__text {
+  flex: 1 1 160px;
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+/* the theme's secondary button, sized for a cart line (its own size variables, so every hover effect still fits) */
+.qb-v2-cart-nudge .qb-v2-cart-nudge__button.button {
+  --buttons-height: 34px;
+  --buttons-padding-x: 14px;
+  --buttons-text-size: 1.3rem;
+  flex: none;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .qb-v2-cart-nudge--tint {
+    border: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,136 @@
+{%- comment -%}
+  Shipping state of the cart totals: the Subtotals shipping row and the classic cart page's Subtotal block.
+  Outputs "state|rate_cents|goal_kind|goal_cents|goal_currency|counted_total|counted_items|unreadable" with no
+  whitespace:
+  - state: none (nothing in the cart ships), free, rate (a flat rate applies), calculated (cost unknown) or pending
+    (a store-currency goal shown in another currency: cart-totals-goal converts it in JS)
+  - rate_cents: the flat rate for this market in presentment cents, or empty
+  - goal_kind / goal_cents / goal_currency: the free shipping goal (snippets/cart-free-shipping-goal.liquid)
+  - counted_total / counted_items: what counts toward the goal (snippets/cart-goal-total.liquid with skip_unshipped:
+    lines that don't ship, gift cards, cart-hidden add-ons, free and _qb_gift lines and reward gifts don't count)
+  - unreadable: the first flat-rate entry that can't be read, escaped (editor notice)
+  Free = at least one counted item and a counted total that reaches the goal; a goal of 0 is free from the first
+  counted item. The same rule decides the Rewards bar's shipping reward, so the two always agree.
+  Accepts:
+  - rates {String} flat rates: "5.99, GB:3.95, EUR:6.50". A plain number applies in the store currency only; 2-letter
+    codes are countries, 3-letter codes currencies. Rates are never converted.
+  Usage:
+  {%- capture ship -%}{%- render 'cart-totals-shipping', rates: block.settings.shipping_rates -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign cts_state = 'none'
+  assign cts_rate = ''
+  assign cts_kind = 'none'
+  assign cts_goal = 0
+  assign cts_goal_currency = ''
+  assign cts_total = 0
+  assign cts_items = 0
+  assign cts_unreadable = ''
+  assign cts_country = localization.country.iso_code | upcase
+  assign cts_currency = cart.currency.iso_code | upcase
+
+  # flat rates: read even when nothing ships, so the editor can point at an entry it can't read.
+  # Entries are comma-separated, so a decimal comma ("5,99", "GB:3,95") would read as two rates (5 and 99): one or two
+  # digits right after a comma, with no space, that follow a whole number are glued back on and reported unreadable.
+  assign cts_list = ''
+  assign cts_prev_whole = false
+  assign cts_parts = rates | split: ','
+  for cts_part in cts_parts
+    assign cts_trim = cts_part | strip
+    assign cts_lead = cts_part | slice: 0
+    assign cts_nondigits = cts_trim | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+    if cts_prev_whole and cts_lead != ' ' and cts_trim.size < 3 and cts_trim != '' and cts_nondigits == ''
+      assign cts_list = cts_list | append: ',' | append: cts_trim
+      assign cts_prev_whole = false
+    else
+      assign cts_list = cts_list | append: '|~|' | append: cts_trim
+      assign cts_tail = cts_trim | split: ':' | last | strip
+      assign cts_tail_rest = cts_tail | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+      assign cts_prev_whole = false
+      if cts_tail != '' and cts_tail_rest == ''
+        assign cts_prev_whole = true
+      endif
+    endif
+  endfor
+  assign cts_rate_country = ''
+  assign cts_rate_currency = ''
+  assign cts_rate_shop = ''
+  assign cts_entries = cts_list | split: '|~|'
+  for cts_entry in cts_entries
+    assign cts_e = cts_entry | strip
+    if cts_e == blank
+      continue
+    endif
+    assign cts_code = ''
+    assign cts_value = cts_e
+    if cts_e contains ':'
+      assign cts_code = cts_e | split: ':' | first | strip | upcase
+      assign cts_value = cts_e | split: ':' | last | strip
+    endif
+    assign cts_rest = cts_value | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9' | remove_first: '.'
+    if cts_value == blank or cts_rest != ''
+      if cts_unreadable == ''
+        assign cts_unreadable = cts_e
+      endif
+      continue
+    endif
+    assign cts_first = cts_value | slice: 0
+    if cts_first == '.'
+      assign cts_value = '0' | append: cts_value
+    endif
+    assign cts_cents = cts_value | times: 100 | round
+    if cts_code == ''
+      assign cts_rate_shop = cts_cents
+    elsif cts_code == cts_country
+      assign cts_rate_country = cts_cents
+    elsif cts_code == cts_currency
+      assign cts_rate_currency = cts_cents
+    endif
+  endfor
+  assign cts_rate = cts_rate_country
+  if cts_rate == ''
+    assign cts_rate = cts_rate_currency
+  endif
+  if cts_rate == '' and cts_currency == shop.currency
+    assign cts_rate = cts_rate_shop
+  endif
+
+  if cart.requires_shipping
+    capture cts_counted
+      render 'cart-goal-total', skip_unshipped: true
+    endcapture
+    assign cts_counted_parts = cts_counted | strip | split: '|'
+    assign cts_total = cts_counted_parts[0] | plus: 0
+    assign cts_items = cts_counted_parts[1] | plus: 0
+
+    capture cts_goal_raw
+      render 'cart-free-shipping-goal'
+    endcapture
+    assign cts_goal_parts = cts_goal_raw | strip | split: '|'
+    assign cts_kind = cts_goal_parts[0] | default: 'none'
+    assign cts_goal = cts_goal_parts[1] | plus: 0
+    assign cts_goal_currency = cts_goal_parts[2] | upcase
+
+    assign cts_fallback = 'calculated'
+    if cts_rate != ''
+      assign cts_fallback = 'rate'
+    endif
+    if cts_kind == 'local' or cts_kind == 'shop'
+      if cts_items == 0
+        # only add-ons, gifts or lines that don't ship: never Free
+        assign cts_state = cts_fallback
+      elsif cts_goal == 0
+        assign cts_state = 'free'
+      elsif cts_kind == 'shop' and cts_goal_currency != cts_currency
+        assign cts_state = 'pending'
+      elsif cts_total >= cts_goal
+        assign cts_state = 'free'
+      else
+        assign cts_state = cts_fallback
+      endif
+    else
+      assign cts_state = cts_fallback
+    endif
+  endif
+-%}
+{{- cts_state }}|{{ cts_rate }}|{{ cts_kind }}|{{ cts_goal }}|{{ cts_goal_currency }}|{{ cts_total }}|{{ cts_items }}|{{ cts_unreadable | replace: '|', ' ' | escape -}}

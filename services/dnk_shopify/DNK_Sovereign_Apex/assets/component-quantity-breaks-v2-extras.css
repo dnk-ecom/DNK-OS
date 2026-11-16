@@ -1,0 +1,702 @@
+/* Quantity breaks V2 extras, linked by the widget when a block has data-qb-ext="true". The popup (built by the extras
+   script inside the widget): .qb-v2-dialog > __header (__title, __close), __body (cards), __footer (__tray, __count,
+   __done). Script states: html.qb-v2-dialog-open, .is-picked, .is-revealed, .is-locked, --qb-v2-progress. */
+
+/* ---------- Popup: centered, a bottom sheet on phones; only the body scrolls ---------- */
+.qb-v2-dialog {
+  box-sizing: border-box;
+  width: min(640px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: min(80vh, 760px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 14px;
+  background: rgb(var(--color-background));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.2);
+  color: rgb(var(--color-foreground));
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+  text-align: start;
+}
+
+.qb-v2-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  animation: qb-v2-dialog-in 0.2s ease-out;
+}
+
+.qb-v2-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.qb-v2-dialog[open]::backdrop {
+  animation: qb-v2-fade-in 0.2s ease-out;
+}
+
+@keyframes qb-v2-dialog-in {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+@keyframes qb-v2-sheet-in {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes qb-v2-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+html.qb-v2-dialog-open {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.qb-v2-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding-block: 8px;
+  padding-inline: 20px 8px;
+  border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+}
+
+.qb-v2-dialog .qb-v2-dialog__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: calc(var(--qb-v2-title-size) + 2px);
+  line-height: 1.3;
+}
+
+.qb-v2-dialog .qb-v2-dialog__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: rgba(var(--color-foreground), 0.75);
+  cursor: pointer;
+}
+
+.qb-v2-dialog__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (hover: hover) {
+  .qb-v2-dialog .qb-v2-dialog__close:hover {
+    background: rgba(var(--color-foreground), 0.06);
+    color: rgb(var(--color-foreground));
+  }
+}
+
+.qb-v2-dialog__body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, calc(50% - 6px)), 1fr));
+  align-content: start;
+  gap: 12px;
+  min-height: 0;
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.qb-v2-dialog__body > :not(.qb-v2-cand) {
+  grid-column: 1 / -1;
+}
+
+.qb-v2-dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 20px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(var(--color-foreground), 0.08);
+}
+
+.qb-v2 .qb-v2-dialog__tray .qb-v2-builder__slot {
+  width: 32px;
+  height: 32px;
+}
+
+/* "2 / 4" keeps its order in right-to-left stores */
+.qb-v2-dialog__count {
+  flex: none;
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.qb-v2-dialog .qb-v2-dialog__done.button {
+  --buttons-height: 42px;
+  --buttons-padding-x: 24px;
+  flex: none;
+  margin-inline-start: auto;
+}
+
+@media screen and (max-width: 749px) {
+  .qb-v2-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    max-height: 85dvh;
+    margin: auto 0 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .qb-v2-dialog[open] {
+    animation-name: qb-v2-sheet-in;
+  }
+
+  .qb-v2-dialog__header {
+    padding-inline-start: 16px;
+  }
+
+  .qb-v2-dialog__body,
+  .qb-v2-dialog__footer {
+    padding-inline: 16px;
+  }
+
+  .qb-v2-dialog .qb-v2-dialog__done.button {
+    flex: 1 0 100%;
+  }
+}
+
+.qb-v2 .qb-v2-cand {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  border-radius: var(--qb-v2-radius);
+  box-shadow: inset 0 0 0 1px rgba(var(--color-foreground), 0.14);
+}
+
+.qb-v2 .qb-v2-cand.is-picked {
+  box-shadow: inset 0 0 0 2px rgb(var(--qb-v2-accent));
+}
+
+.qb-v2 .qb-v2-cand__media {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+.qb-v2 .qb-v2-cand__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qb-v2 .qb-v2-cand[data-available='false'] .qb-v2-cand__media {
+  opacity: 0.55;
+}
+
+.qb-v2 .qb-v2-cand__title {
+  display: -webkit-box;
+  min-height: 2.7em;
+  overflow: hidden;
+  font-weight: 600;
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.qb-v2 .qb-v2-cand__prices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+}
+
+.qb-v2 .qb-v2-cand__prices [data-qb-item-price] {
+  font-weight: 700;
+}
+
+.qb-v2 .qb-v2-cand__prices s {
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  opacity: 0.7;
+}
+
+.qb-v2 .qb-v2-cand__picker {
+  display: grid;
+  gap: 6px;
+}
+
+.qb-v2 .qb-v2-cand__choose,
+.qb-v2 .qb-v2-cand__count {
+  margin-top: auto;
+}
+
+.qb-v2 .qb-v2-cand__count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(var(--color-foreground), 0.25);
+  font-weight: 700;
+}
+
+.qb-v2 .qb-v2-cand__count > button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-cand__count > button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.qb-v2 .qb-v2-cand__count svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* theme buttons sized for a card through their own variables, so every hover effect still fits */
+.qb-v2 :is(.qb-v2-choice__button, .qb-v2-builder__button, .qb-v2-cand__choose).button {
+  --buttons-height: 38px;
+  --buttons-padding-x: 16px;
+  --buttons-text-size: calc(var(--qb-v2-text-size) + 1px);
+}
+
+.qb-v2 .qb-v2-cand__choose.button {
+  --buttons-padding-x: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ---------- Product choice, Bundle builder ---------- */
+/* panels like the upsells; under 280px the button gets its own line */
+.qb-v2 :is(.qb-v2-choice, .qb-v2-builder, .qb-v2-choice__slot) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.qb-v2 :is(.qb-v2-choice, .qb-v2-builder) {
+  padding: 8px 10px;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  background: rgba(var(--qb-v2-ink), 0.04);
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+}
+
+.qb-v2 :is(.qb-v2-choice, .qb-v2-builder) > :not(.qb-v2-builder__tray, .qb-v2-builder__button) {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.qb-v2 :is(.qb-v2-choice__title, .qb-v2-builder__title) {
+  font-weight: 600;
+}
+
+.qb-v2 .qb-v2-choice__slot > .qb-v2-item {
+  flex: 1 1 180px;
+}
+
+.qb-v2 .qb-v2-choice__slot > .qb-v2-item--empty {
+  flex-basis: 56px;
+}
+
+.qb-v2 :is(.qb-v2-choice__button, .qb-v2-builder__button) {
+  flex: none;
+  max-width: 100%;
+  margin-inline-start: auto;
+}
+
+.qb-v2 :is(.qb-v2-choice__button, .qb-v2-builder__button).button {
+  min-width: min(100%, (280px - 100%) * 999);
+}
+
+/* outline buttons on selected Filled, Inverse and Custom cards: the card's colors */
+.qb-v2 .qb-v2-option:is(.qb-v2-option--card-inverse, .qb-v2-option--card-custom) :is(.qb-v2-choice__button, .qb-v2-builder__button),
+.qb-v2.qb-v2--selected-filled .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) :is(.qb-v2-choice__button, .qb-v2-builder__button) {
+  --color-button-text: var(--qb-v2-ink);
+}
+
+.qb-v2.qb-v2--selected-filled .qb-v2-option:is(.is-selected, :has(> .qb-v2-option__input:checked)) :is(.qb-v2-choice__button, .qb-v2-builder__button) {
+  --color-button: var(--qb-v2-accent);
+  --button-gradient: none;
+}
+
+.qb-v2 .qb-v2-item__placeholder {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 56px;
+  aspect-ratio: 1;
+  border: 1px dashed rgba(var(--qb-v2-ink), 0.45);
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+/* the empty title repeats the button label: screen readers only */
+.qb-v2 .qb-v2-item--empty .qb-v2-item__title {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.qb-v2 :is(.qb-v2-builder__tray, .qb-v2-dialog__tray) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.qb-v2 .qb-v2-builder__slot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px dashed rgba(var(--qb-v2-ink), 0.45);
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.qb-v2 .qb-v2-builder__slot:has(img) {
+  border: 0;
+  opacity: 1;
+}
+
+.qb-v2 .qb-v2-builder__slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Scratch card ---------- */
+/* Over the whole option, under the next option's badges. The gradient is the first paint; a sized canvas carries it
+   (from, to, from at 135deg) to be scratched, the text on top. pan-y: vertical swipes still scroll the page. */
+.qb-v2 .qb-v2-scratch {
+  --qb-v2-scratch-from: #d4af37;
+  --qb-v2-scratch-to: #f4e3a1;
+  --qb-v2-scratch-ink: #3b2c00;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 12px;
+  overflow: hidden;
+  border-radius: var(--qb-v2-radius);
+  background: linear-gradient(135deg, var(--qb-v2-scratch-from), var(--qb-v2-scratch-to) 50%, var(--qb-v2-scratch-from));
+  color: var(--qb-v2-scratch-ink);
+  cursor: grab;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.qb-v2 .qb-v2-scratch--silver {
+  --qb-v2-scratch-from: #a7acb2;
+  --qb-v2-scratch-to: #eef0f2;
+  --qb-v2-scratch-ink: #2c3034;
+}
+
+.qb-v2 .qb-v2-scratch--accent {
+  --qb-v2-scratch-from: rgb(var(--qb-v2-accent));
+  --qb-v2-scratch-to: rgb(var(--qb-v2-accent));
+  --qb-v2-scratch-ink: rgb(var(--qb-v2-on-accent));
+}
+
+.qb-v2 .qb-v2-scratch:has(> .qb-v2-scratch__canvas[width]) {
+  background: none;
+}
+
+.qb-v2 .qb-v2-scratch__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.qb-v2 .qb-v2-scratch__text {
+  position: relative;
+  max-width: 100%;
+  font-size: calc(var(--qb-v2-title-size) - 1px);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: break-word;
+  pointer-events: none;
+}
+
+/* a way in without dragging (a click, the keyboard, switch and voice control): a link under the text */
+.qb-v2 .qb-v2-scratch__reveal {
+  position: relative;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--qb-v2-scratch-ink);
+  font: inherit;
+  font-size: calc(var(--qb-v2-text-size) - 1px);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-scratch__reveal:focus-visible {
+  position: relative;
+  width: auto;
+  height: auto;
+  min-height: 36px;
+  margin: 0;
+  padding: 6px 16px;
+  clip: auto;
+  border-radius: 999px;
+  background: var(--qb-v2-scratch-ink);
+  color: var(--qb-v2-scratch-from);
+  font: inherit;
+  font-size: var(--qb-v2-text-size);
+  font-weight: 700;
+  outline: 2px solid var(--qb-v2-scratch-ink);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+
+.qb-v2 .qb-v2-option.is-revealed .qb-v2-scratch {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+/* badges outside the option's box would give the deal away */
+.qb-v2 .qb-v2-option[data-qb-scratch='true']:not(.is-revealed) .qb-v2-badge {
+  visibility: hidden;
+}
+
+/* a body with only the cover adds no space */
+.qb-v2 .qb-v2-option__body:has(> .qb-v2-scratch):not(:has(> :not(.qb-v2-scratch, [hidden], script, style, template))) {
+  margin-top: 0;
+}
+
+/* ---------- Unlockable gift: a free gift row; locked = stripes, a lock on the image, the locked text ---------- */
+.qb-v2 .qb-v2-unlock__row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  padding: 8px 10px;
+  border-radius: calc(var(--qb-v2-radius) * 0.6);
+  background: rgba(var(--qb-v2-mark), 0.1);
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.35;
+  transition: background-color 0.3s ease;
+}
+
+.qb-v2 .qb-v2-unlock.is-locked .qb-v2-unlock__row {
+  background: repeating-linear-gradient(45deg, rgba(var(--color-foreground), 0.05) 0 8px, transparent 8px 16px);
+  box-shadow: inset 0 0 0 1px rgba(var(--color-foreground), 0.12);
+}
+
+.qb-v2 .qb-v2-unlock__row > .qb-v2-item,
+.qb-v2 .qb-v2-unlock__row > .qb-v2-item > .qb-v2-item__info {
+  display: contents;
+}
+
+.qb-v2 .qb-v2-unlock__row .qb-v2-item__media {
+  grid-area: 1 / 1;
+  width: 40px;
+  aspect-ratio: 1;
+  transition: opacity 0.3s ease;
+}
+
+.qb-v2 .qb-v2-unlock.is-locked .qb-v2-item__media {
+  opacity: 0.6;
+}
+
+.qb-v2 .qb-v2-unlock__row :is(.qb-v2-unlock__text, .qb-v2-item__title) {
+  grid-area: 1 / 2;
+  font-weight: 600;
+}
+
+/* the product title only shows while the current text is empty */
+.qb-v2 .qb-v2-unlock.is-locked .qb-v2-unlock__row:has(> .qb-v2-unlock__text--locked > .qb-v2-text:not([hidden])) .qb-v2-item__title,
+.qb-v2 .qb-v2-unlock:not(.is-locked) .qb-v2-unlock__row:has(> .qb-v2-unlock__text--open > .qb-v2-text:not([hidden])) .qb-v2-item__title,
+.qb-v2 .qb-v2-unlock.is-locked .qb-v2-unlock__text--open,
+.qb-v2 .qb-v2-unlock:not(.is-locked) :is(.qb-v2-unlock__text--locked, .qb-v2-unlock__lock) {
+  display: none;
+}
+
+.qb-v2 .qb-v2-unlock__value {
+  grid-area: 1 / 3;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.qb-v2 .qb-v2-unlock__row :is(.qb-v2-item__picker, .qb-v2-item__status) {
+  grid-column: 2 / -1;
+  margin-top: 6px;
+}
+
+/* centered like the image, then moved onto its corner, so a wrapping text can't shift it */
+.qb-v2 .qb-v2-unlock__lock {
+  display: grid;
+  place-items: center;
+  grid-area: 1 / 1;
+  place-self: center;
+  width: 20px;
+  height: 20px;
+  margin-block-start: 30px;
+  margin-inline-start: 30px;
+  border-radius: 50%;
+  background: rgb(var(--color-background));
+  box-shadow: 0 0 0 1px rgba(var(--color-foreground), 0.2);
+  color: rgb(var(--color-foreground));
+}
+
+.qb-v2 .qb-v2-unlock__lock svg {
+  width: 10px;
+  height: 10px;
+}
+
+.qb-v2 .qb-v2-unlock.is-locked[data-qb-show-when-locked='false'] {
+  display: none;
+}
+
+.qb-v2 .qb-v2__slot:not(:has(> :not([hidden], script, style, template, .qb-v2-unlock.is-locked[data-qb-show-when-locked='false']))) {
+  display: none;
+}
+
+/* ---------- Next-tier nudge ---------- */
+.qb-v2 .qb-v2-nudge {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: var(--qb-v2-text-size);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.qb-v2 .qb-v2-nudge__text {
+  margin: 0;
+  padding: 0;
+  color: rgb(var(--qb-v2-ink));
+  font: inherit;
+  font-weight: 600;
+}
+
+.qb-v2 button.qb-v2-nudge__text {
+  min-height: 24px;
+  text-underline-offset: 3px;
+}
+
+.qb-v2 button.qb-v2-nudge__text:disabled {
+  text-decoration: none;
+  cursor: default;
+}
+
+.qb-v2 .qb-v2-nudge__bar {
+  display: block;
+  justify-self: stretch;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--color-foreground), 0.1);
+}
+
+.qb-v2 .qb-v2-nudge__fill {
+  display: block;
+  width: calc(var(--qb-v2-progress, 0) * 100%);
+  height: 100%;
+  border-radius: inherit;
+  background: rgb(var(--qb-v2-accent));
+  transition: width 0.3s ease;
+}
+
+/* ---------- Motion, forced colors ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .qb-v2-dialog[open],
+  .qb-v2-dialog[open]::backdrop {
+    animation: none;
+  }
+
+  .qb-v2 :is(.qb-v2-option.is-revealed .qb-v2-scratch, .qb-v2-unlock__row, .qb-v2-unlock__row .qb-v2-item__media, .qb-v2-nudge__fill) {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .qb-v2-dialog {
+    border: 1px solid CanvasText;
+  }
+
+  .qb-v2 .qb-v2-cand,
+  .qb-v2 .qb-v2-cand__count,
+  .qb-v2 .qb-v2-unlock__row {
+    border: 1px solid CanvasText;
+  }
+
+  .qb-v2 .qb-v2-cand.is-picked {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .qb-v2 .qb-v2-unlock.is-locked .qb-v2-unlock__row {
+    border-style: dashed;
+  }
+
+  /* the cover keeps its colors, so the deal stays hidden */
+  .qb-v2 .qb-v2-scratch {
+    forced-color-adjust: none;
+  }
+
+  .qb-v2 .qb-v2-nudge__bar {
+    border: 1px solid CanvasText;
+  }
+
+  .qb-v2 .qb-v2-nudge__fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+}

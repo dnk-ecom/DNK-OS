@@ -1,0 +1,104 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-article",
+      "blocks": {
+        "article-featured-image": {
+          "type": "_article-featured-image",
+          "settings": {
+            "image_ratio": "landscape",
+            "pt": 0,
+            "pb": 30
+          },
+          "blocks": {}
+        },
+        "article-breadcrumb": {
+          "type": "_article-breadcrumb",
+          "settings": {
+            "pt": 0,
+            "pb": 10
+          },
+          "blocks": {}
+        },
+        "article-heading": {
+          "type": "_article-heading",
+          "settings": {
+            "heading_size": "h1",
+            "pt": 0,
+            "pb": 0
+          },
+          "blocks": {}
+        },
+        "article-meta": {
+          "type": "_article-meta",
+          "settings": {
+            "show_date": true,
+            "show_author": true,
+            "text_size": "fs-md",
+            "pt": 10,
+            "pb": 6
+          },
+          "blocks": {}
+        },
+        "article-content": {
+          "type": "_article-content",
+          "settings": {
+            "pt": 16,
+            "pb": 30
+          },
+          "blocks": {}
+        },
+        "article-tags": {
+          "type": "_article-tags",
+          "settings": {
+            "text_size": "fs-md",
+            "pt": 24,
+            "pb": 0
+          },
+          "blocks": {}
+        },
+        "article-share": {
+          "type": "_article-share",
+          "settings": {
+            "button_style": "btn-text-outline",
+            "button_size": "btn-sm",
+            "pt": 24,
+            "pb": 0
+          },
+          "blocks": {}
+        },
+        "article-navigation": {
+          "type": "_article-navigation",
+          "settings": {
+            "pt": 24,
+            "pb": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "article-featured-image",
+        "article-breadcrumb",
+        "article-heading",
+        "article-meta",
+        "article-content",
+        "article-tags",
+        "article-share",
+        "article-navigation"
+      ],
+      "settings": {
+        "background_color": "{{ settings.colors.background }}",
+        "text_color": "{{ settings.colors.text }}",
+        "accent_color": "{{ settings.colors.accent }}",
+        "content_width": "narrow",
+        "mobile_text_alignment": "left",
+        "desktop_text_alignment": "left",
+        "pt": 40,
+        "pb": 60
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

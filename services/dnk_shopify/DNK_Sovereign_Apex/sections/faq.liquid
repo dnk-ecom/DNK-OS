@@ -1,0 +1,201 @@
+{% if section.index <= 3 or request.design_mode %}
+  <link href="{{ 'faq.css' | asset_url }}" rel="stylesheet" fetchpriority="high">
+{% endif %}
+
+<div
+  class="faq section-spacing"
+  style="
+    --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --color-accent: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+    --pt: {{ section.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ section.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  data-section-css="{{ 'faq.css' | asset_url }}"
+  {% if section.settings.enable_faq_structured_data %}
+    itemscope
+    itemtype="https://schema.org/FAQPage"
+  {% endif %}
+>
+  <div class="container container-content">
+    {% content_for 'block', type: 'group', id: 'header' %}
+
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    },
+    {
+      "type": "header",
+      "content": "Search engines"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_faq_structured_data",
+      "label": "Enable FAQ structured data",
+      "info": "Helps search engines understand the questions and answers in this section.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    { "type": "collapse" }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "presets": [
+    {
+      "name": "FAQ",
+      "category": "Text",
+      "blocks": [
+        {
+          "type": "group",
+          "id": "header",
+          "static": true,
+          "name": "Header",
+          "settings": {
+            "mobile_content_direction": "column",
+            "mobile_gap": 0,
+            "mobile_alignment": "inherit",
+            "desktop_content_direction": "column",
+            "desktop_gap": 0,
+            "desktop_alignment": "inherit",
+            "pt": 0,
+            "pb": 28,
+            "pl": 0,
+            "pr": 0
+          },
+          "blocks": [
+            {
+              "type": "heading",
+              "settings": {
+                "heading": "FAQs",
+                "heading_tag": "2",
+                "heading_size": "h2",
+                "pt": 0,
+                "pb": 0
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>Find quick answers to common questions about ordering, delivery, and returns.</p>",
+                "text_size": "fs-md",
+                "pt": 6,
+                "pb": 0
+              }
+            }
+          ]
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "How long does shipping take?",
+            "text": "<p>Orders are usually processed within 1–2 business days. Delivery times depend on your location and the shipping method selected at checkout.</p>",
+            "open_by_default": true
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "Can I return or exchange an item?",
+            "text": "<p>Eligible items can be returned or exchanged within the return period shown in our policy. Items must be unused and returned in their original condition.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "How can I contact your team?",
+            "text": "<p>Send us a message through our contact page. Our customer support team will respond as soon as possible during regular business hours.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "How can I track my order?",
+            "text": "<p>Once your order ships, you will receive a confirmation email containing a tracking link. You can use that link to follow your delivery.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "Can I change or cancel my order?",
+            "text": "<p>Contact us as soon as possible after placing your order. We will do our best to help before the order has been processed or shipped.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "What payment methods do you accept?",
+            "text": "<p>Available payment methods are displayed securely at checkout and may include major credit cards, accelerated checkout options, and local payment methods.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "Do you ship internationally?",
+            "text": "<p>International shipping availability and rates are calculated at checkout based on your delivery address. Additional duties or taxes may apply.</p>"
+          }
+        },
+        {
+          "type": "collapse",
+          "settings": {
+            "heading": "Will sold-out products be restocked?",
+            "text": "<p>Some popular products are restocked. Check the product page regularly or sign up for restock notifications when that option is available.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

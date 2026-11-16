@@ -1,0 +1,183 @@
+{%- comment -%}
+  Quantity breaks V2: the products a customer can pick in a popup (Product choice, Bundle builder, and Free gift
+  with "One product of their choice"), rendered into an inert <template> that the extras script clones when the
+  popup opens. Everything comes from Liquid, so prices stay in the customer's currency and nothing is fetched.
+  Subscription-only products are left out: an extra line never gets a selling plan.
+
+  Every card prints its product JSON, and a picker for products with up to 100 variants. Builder cards only ever
+  show inside the popup, where pickers are native selects, so they get the native select alone; choice and gift
+  cards keep the full picker, which the core script copies into the slot or the gift row.
+
+  Page weight: the main-product section is rendered again on every variant change, so cards stop once the template
+  passes about 190 KB (products with many variants show fewer; the first 4 always show). The <template> reports
+  what it printed: data-qb-count (cards), data-qb-available (cards of available products) and data-qb-taken (how
+  many entries of `products` it went through), so the caller's checks match what customers can pick. With low_prices,
+  also data-qb-low-prices: per card of an available product, in card order, the lowest price among the available
+  variants a customer can pick there (every variant when the card has a picker, else the card's own variant), which
+  the "From" price of an empty choice or builder starts from.
+
+  Accepts:
+  - products: {Array} product list, or a collection's products
+  - limit: {Number} most products to list (optional, default: 24)
+  - kind: {String} choice | gift | builder
+  - block: {Object} the child block the popup belongs to
+  - heading: {String} popup heading; tags are removed
+  - choose_label: {String} label of each card's Choose button (choice, gift)
+  - done_label: {String} label of the popup's Done button (builder)
+  - quantity: {Number} units one pick adds; card prices are for this many (optional, default: 1)
+  - discount_type: {String} none | percentage | amount_each | free (optional, default: none)
+  - discount_value: {Number} percentage as an integer, or shop-currency cents for amount_each (optional)
+  - show_price: {Boolean} prints the card prices (optional, default: true)
+  - show_picker: {Boolean} prints a variant picker for products with up to 100 variants (optional, default: true)
+  - low_prices: {Boolean} reports each card's lowest available price (optional, default: false)
+
+  Usage:
+  {% render 'qb-v2-candidates', products: block.settings.products, limit: 12, kind: 'choice', block: block, heading: heading, choose_label: block.settings.empty_label %}
+{%- endcomment -%}
+{%- liquid
+  assign qb_limit = limit | default: 24 | plus: 0 | at_least: 1
+  assign qb_k = quantity | default: 1 | plus: 0 | at_least: 1
+  assign qb_value = discount_value | default: 0 | plus: 0 | at_least: 0
+  assign qb_show_price = true
+  if show_price == false
+    assign qb_show_price = false
+  endif
+  assign qb_show_picker = true
+  if show_picker == false
+    assign qb_show_picker = false
+  endif
+  assign qb_native = false
+  if kind == 'builder'
+    assign qb_native = true
+  endif
+  assign qb_currency_ok = true
+  if cart.currency.iso_code != shop.currency
+    assign qb_currency_ok = false
+  endif
+
+  # Plain text for the popup heading: tags removed and the entities rich text stores decoded, so it is escaped once
+  assign qb_heading = heading | strip_html | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&quot;', '"' | replace: '&#39;', "'" | replace: '&#x27;', "'" | replace: '&nbsp;', ' ' | replace: '&amp;', '&' | strip
+
+  # Card ids carry the option number, so the copies of a gift in bigger options stay unique too
+  assign qb_prefix_base = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-c'
+
+  # Page weight (see above): characters of card markup printed so far, cards printed, cards of available products
+  assign qb_budget = 190000
+  assign qb_bytes = 0
+  assign qb_count = 0
+  assign qb_count_available = 0
+  assign qb_taken = 0
+  assign qb_low_prices = ''
+-%}
+{%- comment -%}The theme's minus and plus icons, once per popup instead of once per card (builder counters){%- endcomment -%}
+{%- capture qb_icon_minus -%}<svg aria-hidden="true" focusable="false" class="icon icon-minus" viewBox="0 0 10 2"><path d="M.5 1C.5.7.7.5 1 .5h8a.5.5 0 110 1H1A.5.5 0 01.5 1z" fill="currentColor"/></svg>{%- endcapture -%}
+{%- capture qb_icon_plus -%}<svg aria-hidden="true" focusable="false" class="icon icon-plus" viewBox="0 0 10 10"><path d="M1 4.51a.5.5 0 000 1h3.5l.01 3.5a.5.5 0 001-.01V5.5l3.5-.01a.5.5 0 00-.01-1H5.5L5.49.99a.5.5 0 00-1 .01v3.5l-3.5.01H1z" fill="currentColor"/></svg>{%- endcapture -%}
+{%- capture qb_cards -%}
+  {%- for qb_p in products limit: qb_limit -%}
+    {%- unless qb_p.requires_selling_plan -%}
+      {%- liquid
+        assign qb_v = qb_p.selected_or_first_available_variant
+        assign qb_prefix = qb_prefix_base | append: forloop.index
+        assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+
+        # Card price (contract 5.4): the units one pick adds, minus the block's discount; compare-at as the compare base
+        assign qb_x = qb_v.price | default: 0
+        assign qb_kx = qb_x | times: qb_k
+        assign qb_disc = 0
+        case discount_type
+          when 'percentage'
+            assign qb_disc = qb_kx | times: qb_value | divided_by: 100.0 | round
+          when 'amount_each'
+            # Amounts are typed in the shop's currency; another currency needs the exchange rate, which only JS knows
+            if qb_currency_ok
+              assign qb_disc = qb_value | at_most: qb_x | times: qb_k
+            endif
+          when 'free'
+            assign qb_disc = qb_kx
+        endcase
+        assign qb_total = qb_kx | minus: qb_disc | at_least: 0
+        # A gift's value is its price, as in the gift row
+        assign qb_unit_compare = qb_x
+        if qb_v.compare_at_price > qb_x and kind != 'gift'
+          assign qb_unit_compare = qb_v.compare_at_price
+        endif
+        assign qb_compare = qb_unit_compare | times: qb_k
+
+        assign qb_img = qb_v.featured_image | default: qb_p.featured_image
+        assign qb_ratio = qb_img.aspect_ratio | default: 1
+      -%}
+      {%- capture qb_card -%}
+      <div class="qb-v2-cand" data-qb-candidate data-product-id="{{ qb_p.id }}" data-variant-id="{{ qb_v.id }}" data-available="{{ qb_v.available }}" data-quantity="{{ qb_k }}">
+        {%- comment -%}One source: the popup's cards are about 170px wide; without an image the box stays empty (CSS keeps its size){%- endcomment -%}
+        <div class="qb-v2-cand__media">
+          {%- if qb_img != blank -%}
+            <img src="{{ qb_img | image_url: width: 360 }}" alt="" width="360" height="{{ 360 | divided_by: qb_ratio | round }}" loading="lazy" class="qb-v2-cand__img">
+          {%- endif -%}
+        </div>
+        <div class="qb-v2-cand__title" id="{{ qb_prefix }}-title">
+          {%- if qb_k > 1 -%}<span class="qb-v2-cand__qty">{{ qb_k }}×</span> {% endif -%}
+          {{- qb_p.title | escape -}}
+        </div>
+        {%- if qb_show_price -%}
+          {%- comment -%}A gift card shows only its struck value, as the gift row does (no "0.00" price tag){%- endcomment -%}
+          <div class="qb-v2-cand__prices"><span class="qb-v2-cand__price{% if kind == 'gift' %} hidden{% endif %}" data-qb-item-price>{%- render 'qb-v2-money', cents: qb_total -%}</span> <s class="qb-v2-cand__compare{% if qb_compare <= qb_total %} hidden{% endif %}" data-qb-item-compare>{%- render 'qb-v2-money', cents: qb_compare -%}</s></div>
+        {%- endif -%}
+        {%- if qb_show_picker and qb_p.has_only_default_variant == false and qb_variants_count <= 100 -%}
+          <div class="qb-v2-cand__picker">
+            {%- render 'qb-v2-picker', product: qb_p, role: 'extra', id_prefix: qb_prefix, native_only: qb_native -%}
+          </div>
+        {%- endif -%}
+        {%- if kind == 'builder' -%}
+          <div class="qb-v2-cand__count">
+            <button type="button" class="qb-v2-cand__step" data-qb-cand-step="-1" aria-label="{{ 'products.product.quantity.decrease' | t: product: qb_p.title | escape }}" disabled>
+              {{- qb_icon_minus -}}
+            </button>
+            <span class="qb-v2-cand__count-value" data-qb-cand-count aria-live="polite">0</span>
+            <button type="button" class="qb-v2-cand__step" data-qb-cand-step="1" aria-label="{{ 'products.product.quantity.increase' | t: product: qb_p.title | escape }}"{% unless qb_v.available %} disabled{% endunless %}>
+              {{- qb_icon_plus -}}
+            </button>
+          </div>
+        {%- else -%}
+          <button type="button" class="button qb-v2-cand__choose" data-qb-cand-action="choose" aria-describedby="{{ qb_prefix }}-title"{% unless qb_v.available %} disabled{% endunless %}>
+            {{- choose_label | escape -}}
+          </button>
+        {%- endif -%}
+        {%- render 'qb-v2-product-json', product: qb_p, mode: 'extra' -%}
+      </div>
+      {%- endcapture -%}
+      {%- assign qb_next = qb_bytes | plus: qb_card.size -%}
+      {%- if qb_count >= 4 and qb_next > qb_budget -%}{%- break -%}{%- endif -%}
+      {{- qb_card -}}
+      {%- liquid
+        assign qb_bytes = qb_next
+        assign qb_count = qb_count | plus: 1
+        if qb_p.available
+          assign qb_count_available = qb_count_available | plus: 1
+        endif
+        # Lowest price a customer can pick on this card: any available variant when the card has a picker (up to 100
+        # variants), else only the card's own variant (Show variant picker off, or over 100 variants)
+        if low_prices
+          assign qb_low = nil
+          if qb_show_picker and qb_variants_count <= 100
+            for qb_variant in qb_p.variants
+              if qb_variant.available
+                if qb_low == nil or qb_variant.price < qb_low
+                  assign qb_low = qb_variant.price
+                endif
+              endif
+            endfor
+          elsif qb_v.available
+            assign qb_low = qb_v.price
+          endif
+          if qb_low != nil
+            assign qb_low_prices = qb_low_prices | append: ',' | append: qb_low
+          endif
+        endif
+      -%}
+    {%- endunless -%}
+    {%- assign qb_taken = forloop.index -%}
+  {%- endfor -%}
+{%- endcapture -%}
+<template data-qb-candidates="{{ kind }}" data-qb-block="{{ block.id }}" data-qb-heading="{{ qb_heading | escape }}" data-qb-choose-label="{{ choose_label | escape }}" data-qb-done-label="{{ done_label | escape }}" data-qb-close-label="{{ 'accessibility.close' | t | escape }}" data-qb-count="{{ qb_count }}" data-qb-available="{{ qb_count_available }}" data-qb-taken="{{ qb_taken }}"{% if low_prices %} data-qb-low-prices="{{ qb_low_prices | remove_first: ',' }}"{% endif %}>
+  {{- qb_cards -}}
+</template>

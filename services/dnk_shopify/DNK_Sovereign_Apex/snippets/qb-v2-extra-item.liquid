@@ -1,0 +1,128 @@
+{% comment %}
+  Renders one extra product of Quantity breaks V2 (bundle item, gift, product choice, builder pick, unlockable gift):
+  image, title with quantity, line price, variant picker, sold-out status and the product JSON the widget reads.
+
+  Accepts:
+  - product: {Object} Product Liquid object
+  - variant: {Object} Variant shown first (optional, default: product.selected_or_first_available_variant)
+  - quantity: {Number} Units this item adds to the cart (optional, default: 1)
+  - role: {String} bundle | gift | upsell | choice | builder | unlock
+  - discount_type: {String} none | percentage | amount_each | free (optional, default: none)
+  - discount_value: {Number} Percentage as an integer, or shop-currency cents for amount_each (optional)
+  - line_total: {Number} Line total in cents, when the caller already computed it (optional)
+  - line_compare: {Number} Line compare price in cents, when the caller already computed it (optional)
+  - show_price: {Boolean} Renders the line price and compare price (optional)
+  - show_picker: {Boolean} Renders the variant picker for products with up to 100 variants (optional)
+  - image: {Object} Image that replaces the product image (optional)
+  - id_prefix: {String} Unique id prefix that contains section.id
+  - layout: {String} tile | row
+
+  Usage:
+  {% render 'qb-v2-extra-item', product: product, quantity: 2, role: 'bundle', discount_type: 'percentage', discount_value: 15, show_price: true, show_picker: true, id_prefix: item_prefix, layout: 'tile' %}
+{% endcomment %}
+{%- liquid
+  assign qb_item_variant = variant | default: product.selected_or_first_available_variant
+  assign qb_item_qty = quantity | default: 1 | plus: 0 | at_least: 1
+  assign qb_item_variants_count = product.variants_count | default: product.variants.size
+
+  # Price model of an extra line (contract 5.4): k units at price x, own discount, compare-at as the compare base
+  assign qb_item_price = qb_item_variant.price | default: 0
+  assign qb_item_kx = qb_item_price | times: qb_item_qty
+  if line_total == nil
+    assign qb_item_disc = 0
+    case discount_type
+      when 'percentage'
+        assign qb_item_disc = qb_item_kx | times: discount_value | divided_by: 100.0 | round
+      when 'amount_each'
+        # Amounts are typed in the shop's currency; another currency needs the exchange rate, which only JS knows
+        if cart.currency.iso_code == shop.currency
+          assign qb_item_disc = discount_value | default: 0 | at_least: 0 | at_most: qb_item_price | times: qb_item_qty
+        endif
+      when 'free'
+        assign qb_item_disc = qb_item_kx
+    endcase
+    assign qb_item_total = qb_item_kx | minus: qb_item_disc | at_least: 0
+  else
+    assign qb_item_total = line_total
+  endif
+  if line_compare == nil
+    assign qb_item_unit_compare = qb_item_price
+    if qb_item_variant.compare_at_price > qb_item_price
+      assign qb_item_unit_compare = qb_item_variant.compare_at_price
+    endif
+    assign qb_item_compare = qb_item_unit_compare | times: qb_item_qty
+  else
+    assign qb_item_compare = line_compare
+  endif
+
+  # A replacement image stays when the shopper changes the variant ("fixed"); the product image follows the variant
+  assign qb_item_img = image
+  assign qb_item_img_mode = 'fixed'
+  if qb_item_img == blank
+    assign qb_item_img = qb_item_variant.featured_image | default: product.featured_image
+    assign qb_item_img_mode = ''
+  endif
+  assign qb_item_ratio = qb_item_img.aspect_ratio | default: 1
+-%}
+{%- if product == blank -%}
+{%- elsif product.requires_selling_plan -%}
+  {%- if request.design_mode -%}
+    <div class="qb-v2-placeholder">{{ product.title | escape }} can only be sold with a subscription.</div>
+  {%- endif -%}
+{%- else -%}
+  <div
+    class="qb-v2-item qb-v2-item--{{ layout | default: 'row' }}"
+    data-qb-item
+    data-role="{{ role }}"
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ qb_item_variant.id }}"
+    data-quantity="{{ qb_item_qty }}"
+    data-available="{{ qb_item_variant.available }}"
+  >
+    <div class="qb-v2-item__media">
+      {%- if qb_item_img != blank -%}
+        {%- comment -%}One 160px source (the size of the product JSON's variant images), so a variant change only swaps src{%- endcomment -%}
+        <img
+          src="{{ qb_item_img | image_url: width: 160 }}"
+          alt=""
+          width="160"
+          height="{{ 160 | divided_by: qb_item_ratio | round }}"
+          loading="lazy"
+          class="qb-v2-item__img"
+          data-qb-item-img="{{ qb_item_img_mode }}"
+        >
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'qb-v2-item__img qb-v2-item__img--placeholder' }}
+      {%- endif -%}
+    </div>
+    <div class="qb-v2-item__info">
+      <span class="qb-v2-item__title" id="{{ id_prefix }}-title">
+        {%- if qb_item_qty > 1 -%}<span class="qb-v2-item__qty">{{ qb_item_qty }}×</span> {% endif -%}
+        {{- product.title | escape -}}
+      </span>
+      {%- if show_price -%}
+        <span class="qb-v2-item__prices">
+          <span class="qb-v2-item__price" data-qb-item-price>{%- render 'qb-v2-money', cents: qb_item_total -%}</span>
+          <s class="qb-v2-item__compare{% if qb_item_compare <= qb_item_total %} hidden{% endif %}" data-qb-item-compare>
+            {%- render 'qb-v2-money', cents: qb_item_compare -%}
+          </s>
+        </span>
+      {%- endif -%}
+      {%- if show_picker and product.has_only_default_variant == false -%}
+        {%- if qb_item_variants_count <= 100 -%}
+          <div class="qb-v2-item__picker">
+            {%- render 'qb-v2-picker', product: product, role: 'extra', id_prefix: id_prefix -%}
+          </div>
+        {%- elsif request.design_mode -%}
+          <div class="qb-v2-placeholder">
+            {{- product.title | escape }} has over 100 variants, so customers can't choose one here.
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+      <span class="qb-v2-item__status"{% if qb_item_variant.available %} hidden{% endif %}>
+        {{- 'products.product.sold_out' | t -}}
+      </span>
+    </div>
+    {%- render 'qb-v2-product-json', product: product, mode: 'extra' -%}
+  </div>
+{%- endif -%}

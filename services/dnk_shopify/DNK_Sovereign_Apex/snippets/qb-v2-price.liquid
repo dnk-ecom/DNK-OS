@@ -1,0 +1,130 @@
+{%- comment -%}
+  Quantity breaks V2: prices of one option in its first paint, in integer cents of the
+  customer's currency. The core script runs the same model, so both print the same numbers.
+  Prints "M,Cm,T,C,S,P,E,CE,pending": main total, main compare total, option total, option
+  compare total, saving, percent saved, price per item, compare price per item, and 1 when an
+  amount discount still needs a currency conversion (the script prices the option then).
+
+  Accepts:
+  - variant: {Object} the variant every unit uses in the first paint
+  - units: {Number} units added to the cart
+  - q: {Number} quantity shown for the option
+  - discount_type: {String} none | percentage | amount_each | amount_total | set_price | free_items
+  - discount_percentage: {Number}
+  - discount_amount_cents, total_price_cents: {Number} shop-currency cents, 0 or more
+  - free_quantity: {Number}
+  - compare_source: {String} compare_price | price
+  - plan_type, plan_value: price adjustment of the option's selling plan (blank without a plan)
+  - pack_variant, unit_variant: {Object} the pack variant and the single-unit variant it replaces
+  - extra_total, extra_compare: {Number} cents the option's bundle items, gifts and add-ons add
+  - has_extras, currency_ok: {Boolean}
+
+  Usage:
+  {%- capture csv -%}{%- render 'qb-v2-price', variant: v, units: 2, q: 2, discount_type: 'percentage', discount_percentage: 10, compare_source: 'compare_price', currency_ok: true -%}{%- endcapture -%}
+  {%- assign prices = csv | strip | split: ',' -%}
+{%- endcomment -%}
+{%- liquid
+  assign qb_units = units | plus: 0 | at_least: 1
+  assign qb_q = q | plus: 0 | at_least: 1
+  assign qb_is_pack = false
+  assign qb_line = variant
+  if pack_variant != blank
+    assign qb_is_pack = true
+    assign qb_line = pack_variant
+    assign qb_units = 1
+  endif
+
+  # 1. Price per unit after the selling plan; regular prices stay the compare base
+  assign qb_p = qb_line.price | plus: 0
+  assign qb_pp = qb_p
+  assign qb_has_plan = false
+  if plan_type != blank and plan_value != blank
+    assign qb_has_plan = true
+    case plan_type
+      when 'percentage'
+        assign qb_keep = 100 | minus: plan_value
+        assign qb_pp = qb_p | times: qb_keep | plus: 50 | divided_by: 100 | floor
+      when 'fixed_amount'
+        assign qb_pp = qb_p | minus: plan_value | at_least: 0 | round
+      when 'price'
+        assign qb_pp = plan_value | plus: 0 | at_least: 0 | round
+      else
+        assign qb_has_plan = false
+    endcase
+  endif
+
+  # 2.-3. Units total and the option's own discount (a pack variant's price is its discount)
+  assign qb_b = qb_pp | times: qb_units
+  assign qb_d = 0
+  assign qb_pending = 0
+  unless qb_is_pack
+    case discount_type
+      when 'percentage'
+        assign qb_pct = discount_percentage | plus: 0 | at_least: 0 | at_most: 100
+        assign qb_d = qb_b | times: qb_pct | plus: 50 | divided_by: 100 | floor
+      when 'amount_each'
+        if currency_ok
+          assign qb_a = discount_amount_cents | plus: 0 | at_least: 0
+          assign qb_d = qb_pp | at_most: qb_a | times: qb_units
+        else
+          assign qb_pending = 1
+        endif
+      when 'amount_total'
+        if currency_ok
+          assign qb_d = discount_amount_cents | plus: 0 | at_least: 0 | at_most: qb_b
+        else
+          assign qb_pending = 1
+        endif
+      when 'set_price'
+        if currency_ok
+          assign qb_set = total_price_cents | plus: 0 | at_least: 0
+          assign qb_d = qb_b | minus: qb_set | at_least: 0
+        else
+          assign qb_pending = 1
+        endif
+      when 'free_items'
+        assign qb_free_max = qb_units | minus: 1
+        assign qb_free = free_quantity | plus: 0 | at_most: qb_free_max | at_least: 0
+        assign qb_d = qb_pp | times: qb_free
+    endcase
+  endunless
+
+  # 4. Main total and main compare total (a pack compares with its units bought singly)
+  assign qb_m = qb_b | minus: qb_d
+  assign qb_base_variant = variant
+  assign qb_base_units = qb_units
+  if qb_is_pack
+    assign qb_base_units = qb_q
+    if unit_variant != blank
+      assign qb_base_variant = unit_variant
+    endif
+  endif
+  assign qb_bp = qb_base_variant.price | plus: 0
+  assign qb_bc = qb_base_variant.compare_at_price | plus: 0
+  assign qb_base = qb_bp
+  if compare_source == 'compare_price' and qb_bc > qb_bp
+    assign qb_base = qb_bc
+  endif
+  assign qb_cm = qb_base | times: qb_base_units
+
+  # 5.-6. Extras, totals, saving
+  assign qb_t = qb_m | plus: extra_total
+  assign qb_c = qb_cm | plus: extra_compare
+  assign qb_s = qb_c | minus: qb_t | at_least: 0
+
+  # 7. Percent saved: the configured percentage when nothing else changes the comparison
+  assign qb_regular = qb_p | times: qb_units
+  assign qb_percent = 0
+  if discount_type == 'percentage' and qb_is_pack == false and qb_has_plan == false and has_extras != true and qb_cm == qb_regular
+    assign qb_percent = discount_percentage | plus: 0
+  elsif qb_c > 0
+    assign qb_percent = qb_s | times: 100.0 | divided_by: qb_c | plus: 0.05 | floor
+  endif
+
+  # 8. Per item, rounded half up
+  assign qb_q2 = qb_q | times: 2
+  assign qb_e = qb_t | times: 2 | plus: qb_q | divided_by: qb_q2 | floor
+  assign qb_ce = qb_c | times: 2 | plus: qb_q | divided_by: qb_q2 | floor
+
+  echo qb_m | append: ',' | append: qb_cm | append: ',' | append: qb_t | append: ',' | append: qb_c | append: ',' | append: qb_s | append: ',' | append: qb_percent | append: ',' | append: qb_e | append: ',' | append: qb_ce | append: ',' | append: qb_pending
+-%}

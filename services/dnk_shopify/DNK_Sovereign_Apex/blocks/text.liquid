@@ -1,0 +1,70 @@
+<div
+  class="text-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="rte {{ block.settings.text_size }}">
+    {{ block.settings.text }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Share information about your brand with your customers.</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "options": [
+        { "value": "fs-xs", "label": "Extra small" },
+        { "value": "fs-sm", "label": "Small" },
+        { "value": "fs-md", "label": "Medium" },
+        { "value": "fs-lg", "label": "Large" },
+        { "value": "fs-xl", "label": "Extra large" }
+      ],
+      "default": "fs-md"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Text",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

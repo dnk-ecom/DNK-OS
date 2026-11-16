@@ -1,0 +1,148 @@
+{% liquid
+  assign heading_size_scale = settings.heading_size_scale | divided_by: 100.0
+  assign body_size_scale = settings.body_size_scale | divided_by: 100.0
+
+  if settings.heading_size_scale >= 125
+    assign heading_line_height = 1.05
+  elsif settings.heading_size_scale >= 100
+    assign heading_line_height = 1.15
+  else
+    assign heading_line_height = 1.25
+  endif
+%}
+
+{% style %}
+  /*
+    Typography
+  */
+  {{ settings.type_heading_font | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_modify: 'weight', '500' | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+
+  :root {
+    /* Colors */
+    --color-site-background: {{ settings.color_background.red }} {{ settings.color_background.green }} {{ settings.color_background.blue }};
+    --color-background: {{ settings.color_background.red }} {{ settings.color_background.green }} {{ settings.color_background.blue }};
+    --color-text: {{ settings.color_text.red }} {{ settings.color_text.green }} {{ settings.color_text.blue }};
+    --color-surface: {{ settings.color_surface.red }} {{ settings.color_surface.green }} {{ settings.color_surface.blue }};
+    --color-accent: {{ settings.color_accent.red }} {{ settings.color_accent.green }} {{ settings.color_accent.blue }};
+
+    /* Alerts */
+    --alert-error-color: 158 8 18;
+    --alert-warning-color: 102 77 3;
+    --alert-success-color: 15 81 50;
+
+    /* Borders */
+    --border-opacity: {{ settings.border_opacity }}%;
+    --border-radius: {{ settings.border_radius }}px;
+
+    /* Fonts */
+    --font-heading-family: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }};
+    --font-heading-style: {{ settings.type_heading_font.style }};
+    --font-heading-weight: {{ settings.type_heading_font.weight }};
+    --heading-size-scale: {{ heading_size_scale }};
+    --heading-line-height: {{ heading_line_height }};
+    --font-body-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    --font-body-style: {{ settings.type_body_font.style }};
+    --font-body-weight: {{ settings.type_body_font.weight }};
+    --body-size-scale: {{ body_size_scale }};
+
+    /* Font sizes */
+    --fs-xs: 0.75em;
+    --fs-sm: 0.875em;
+    --fs-md: 1em;
+    --fs-lg: 1.125em;
+    --fs-xl: 1.25em;
+    --fs-2xl: 1.5em;
+    --fs-3xl: 2em;
+    --fs-4xl: 2.5em;
+    --fs-5xl: 3em;
+    --fs-6xl: 3.75em;
+
+    /* Letter spacing */
+    --ls-tight: -0.03em;
+    --ls-normal: 0;
+    --ls-loose: 0.05em;
+  }
+{% endstyle %}
+
+{{ 'dnk-tokens.css' | asset_url | stylesheet_tag: preload: true }}
+{{ 'base.css' | asset_url | stylesheet_tag: preload: true }}
+{{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+
+<link
+  id="lazy-styles"
+  rel="stylesheet"
+  href="{{ 'lazy-styles.css' | asset_url }}"
+  media="print"
+  onload="this.media='all'">
+
+<link
+  rel="stylesheet"
+  href="{{ 'quick-add.css' | asset_url }}"
+  media="print"
+  onload="this.media='all'"
+>
+
+{% if request.page_type == 'product' %}
+  {{ 'product-variant-picker.css' | asset_url | stylesheet_tag: preload: true }}
+{% else %}
+  <link
+    rel="stylesheet"
+    href="{{ 'product-variant-picker.css' | asset_url }}"
+    media="print"
+    onload="this.media='all'"
+  >
+{% endif %}
+
+{% if request.page_type == 'product' %}
+  {{ 'main-product.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'product-gallery.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'collection' %}
+  {{ 'main-collection.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'facets.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'product-card.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'list-collections' %}
+  {{ 'main-list-collections.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'collection-card.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'blog' %}
+  {{ 'main-blog.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'article-card.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'article' %}
+  {{ 'main-article.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'password' %}
+  {{ 'password.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif request.page_type == 'search' %}
+  {{ 'main-search.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'facets.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'product-card.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'article-card.css' | asset_url | stylesheet_tag: preload: true }}
+{% endif %}
+
+{% if request.page_type == 'cart' %}
+  {{ 'cart.css' | asset_url | stylesheet_tag: preload: true }}
+{% elsif settings.cart_type == 'drawer' %}
+  <link
+    rel="stylesheet"
+    href="{{ 'cart.css' | asset_url }}"
+    media="print"
+    onload="this.media='all'"
+  >
+{% endif %}
+
+<script src="{{ 'base.js' | asset_url }}" type="module"></script>
+<script src="{{ 'components.js' | asset_url }}" type="module"></script>
+<script src="{{ 'product-form.js' | asset_url }}" type="module"></script>
+<script src="{{ 'product-card.js' | asset_url }}" type="module"></script>
+<script src="{{ 'cart.js' | asset_url }}" type="module"></script>
+<script src="{{ 'quick-add.js' | asset_url }}" type="module"></script>
+<script src="{{ 'product-variant-picker.js' | asset_url }}" type="module"></script>
+
+{% if request.page_type == 'product' %}
+  <script src="{{ 'product-gallery.js' | asset_url }}" type="module"></script>
+{% endif %}
+
+{% if request.page_type == 'collection' or request.page_type == 'search' %}
+  <script src="{{ 'faceted-results.js' | asset_url }}" type="module"></script>
+{% endif %}

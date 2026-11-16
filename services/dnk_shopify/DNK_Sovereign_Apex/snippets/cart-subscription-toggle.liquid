@@ -1,0 +1,169 @@
+{%- comment -%}
+  Per-line Subscribe & save control (Cart items, the classic cart page, Cart page V2's items).
+  Prints nothing unless the line is upgrade or subscribed, or required with more than one plan, or a design-mode sample.
+  Accepts:
+  - item, index (1-based line number)
+  - opts: the host's settings (subscribe_style, subscribe_label, subscribe_caption, subscribe_one_time_label,
+    subscribe_accent_color, subscribe_show_policy)
+  - cart_style: the section's cart style ("Same as cart")
+  - surface: drawer, page or page-v2
+  - eligibility: the line's cart-subscription-eligibility output
+  - scope: block or section id (element ids)
+  - sample: true on the line that shows the editor sample
+  Every control renders disabled; component-cart-lines.js enables it. Controls have no name and stop change events.
+  Usage:
+  {% render 'cart-subscription-toggle', item: item, index: line, opts: block.settings, cart_style: section.settings.cart_style, surface: 'drawer', eligibility: sub, scope: block.id, sample: false %}
+{%- endcomment -%}
+{%- liquid
+  assign parts = eligibility | split: '|'
+  assign status = parts[0]
+  assign plan_id = parts[1] | append: ''
+  assign saving = parts[2] | plus: 0
+  assign plan_count = parts[3] | plus: 0
+  assign percent = parts[4] | plus: 0
+  assign plan_ids = parts[5]
+  if sample and request.design_mode
+    assign status = 'sample'
+  endif
+  assign show = false
+  if status == 'upgrade' or status == 'subscribed' or status == 'sample'
+    assign show = true
+  elsif status == 'required' and plan_count > 1
+    assign show = true
+  endif
+-%}
+{%- if show -%}
+  {%- liquid
+    capture style_value
+      render 'cart-style-value', option: 'subscribe_style', value: opts.subscribe_style, cart_style: cart_style
+    endcapture
+    assign look = style_value | strip
+    if status == 'required'
+      assign look = 'dropdown'
+    endif
+    assign uid = 'CartSub-' | append: scope | append: '-' | append: index
+    assign title = item.product.title
+    assign current_id = item.selling_plan_allocation.selling_plan.id | append: ''
+    assign is_on = false
+    if status == 'subscribed' or status == 'required'
+      assign is_on = true
+    endif
+    assign show_freq = false
+    if is_on and plan_count > 1
+      assign show_freq = true
+    endif
+    for alloc in item.variant.selling_plan_allocations
+      assign alloc_id = alloc.selling_plan.id | append: ''
+      if alloc_id == plan_id
+        assign target = alloc
+      endif
+    endfor
+    if status == 'sample'
+      assign saving = item.final_line_price | divided_by: 10
+      assign percent = 10
+      assign plan_name = 'Delivery every month'
+      assign price_cents = item.final_line_price | minus: saving
+    else
+      assign plan_name = target.selling_plan.name | escape
+      assign price_cents = target.price | times: item.quantity
+    endif
+    capture pct_text
+      echo percent | append: '%'
+    endcapture
+    capture amount_text
+      echo saving | money_without_trailing_zeros
+    endcapture
+    capture price_text
+      echo price_cents | money_without_trailing_zeros
+    endcapture
+    assign label_source = opts.subscribe_label
+    if saving == 0
+      assign label_source = 'sections.cart.lines_subscribe' | t
+    endif
+    capture label_html
+      render 'cart-text', text: label_source, percentage_saved: pct_text, amount_saved: amount_text, plan_name: plan_name, price: price_text
+    endcapture
+    capture caption_html
+      render 'cart-text', text: opts.subscribe_caption, percentage_saved: pct_text, amount_saved: amount_text, plan_name: plan_name, price: price_text
+    endcapture
+
+    # the line's plan name hides only while this control shows the current plan name itself
+    assign shows_plan = false
+    if is_on
+      if look == 'dropdown' or show_freq
+        assign shows_plan = true
+      elsif opts.subscribe_caption contains '[plan_name]' or label_source contains '[plan_name]'
+        assign shows_plan = true
+      endif
+    endif
+  -%}
+  <cart-subscription-toggle
+    class="cart-sub cart-sub--{{ look }} accent-color-{{ opts.subscribe_accent_color }}"
+    data-sub-control
+    data-cart-feature="lines"
+    data-status="{{ status }}"
+    data-line-key="{{ item.key }}"
+    data-variant-id="{{ item.variant_id }}"
+    data-product-id="{{ item.product_id }}"
+    data-handle="{{ item.product.handle }}"
+    data-plan-id="{{ plan_id }}"
+    data-current-plan="{{ current_id }}"
+    data-saving="{% if status == 'upgrade' %}{{ saving }}{% else %}0{% endif %}"
+    data-surface="{{ surface }}"
+    data-quantity="{{ item.quantity }}"
+    data-title="{{ title | escape }}"
+    data-properties="{{ item.properties | json | escape }}"
+    {% if shows_plan %}data-shows-plan{% endif %}
+    {% if status == 'sample' %}data-sub-sample{% endif %}
+  >
+    {%- if look == 'dropdown' -%}
+      {%- unless status == 'required' -%}<span class="cart-sub__label" id="{{ uid }}-label">{{ label_html }}</span>{%- endunless -%}
+      <div class="cart-sub__select select select--small no-background color-{{ settings.pickers_color_scheme }} accent-color-{{ settings.pickers_overlay_color }} accent-2-color-{{ settings.pickers_text_color }}">
+        <select class="select__select" data-sub-select data-sub-focus id="{{ uid }}-select" aria-label="{{ 'sections.cart.lines_purchase_option_label' | t: product: title | escape }}" disabled>
+          {%- unless status == 'required' -%}<option value=""{% unless is_on %} selected{% endunless %}>{{ opts.subscribe_one_time_label | escape }}</option>{%- endunless -%}
+          {%- for alloc in item.variant.selling_plan_allocations -%}
+            {%- assign alloc_token = ',' | append: alloc.selling_plan.id | append: ',' -%}
+            {%- if plan_ids contains alloc_token -%}
+              <option value="{{ alloc.selling_plan.id }}"{% if is_on and alloc.selling_plan.id == item.selling_plan_allocation.selling_plan.id %} selected{% endif %}>{{ alloc.selling_plan.name | escape }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if status == 'sample' -%}<option value="0">{{ plan_name }}</option>{%- endif -%}
+        </select>
+        {%- render 'icon-caret' -%}
+      </div>
+    {%- else -%}
+      <button type="button" class="cart-sub__toggle" data-sub-toggle data-sub-focus
+        {% if look == 'pill' %}aria-pressed="{{ is_on }}"{% elsif look == 'checkbox' %}role="checkbox" aria-checked="{{ is_on }}"{% else %}role="switch" aria-checked="{{ is_on }}"{% endif %}
+        {% unless show_freq %}aria-describedby="{{ uid }}-caption"{% endunless %}
+        disabled>
+        {%- if look == 'checkbox' -%}
+          <span class="cart-sub__box" aria-hidden="true"><svg class="cart-sub__check" viewBox="0 0 12 12" focusable="false"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        {%- elsif look == 'pill' -%}
+          <span class="cart-sub__pill-icon" aria-hidden="true"><svg class="cart-sub__plus" viewBox="0 0 12 12" focusable="false"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><svg class="cart-sub__check" viewBox="0 0 12 12" focusable="false"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        {%- endif -%}
+        <span class="cart-sub__text"><span class="cart-sub__label">{{ label_html }}</span><span class="visually-hidden"> {{ 'sections.cart.lines_for_product' | t: product: title | escape }}</span></span>
+        {%- if look == 'switch' -%}<span class="cart-sub__switch" aria-hidden="true"><span class="cart-sub__knob"></span></span>{%- endif -%}
+      </button>
+      {%- unless show_freq -%}<span class="cart-sub__caption" id="{{ uid }}-caption">{{ caption_html }}</span>{%- endunless -%}
+      {%- if show_freq -%}
+        <div class="cart-sub__frequency select select--small no-background color-{{ settings.pickers_color_scheme }} accent-color-{{ settings.pickers_overlay_color }} accent-2-color-{{ settings.pickers_text_color }}">
+          <select class="select__select" data-sub-plan id="{{ uid }}-plan" aria-label="{{ 'sections.cart.lines_frequency_label' | t: product: title | escape }}" disabled>
+            {%- for alloc in item.variant.selling_plan_allocations -%}
+              {%- assign alloc_token = ',' | append: alloc.selling_plan.id | append: ',' -%}
+              {%- if plan_ids contains alloc_token -%}
+                <option value="{{ alloc.selling_plan.id }}"{% if alloc.selling_plan.id == item.selling_plan_allocation.selling_plan.id %} selected{% endif %}>{{ alloc.selling_plan.name | escape }}</option>
+              {%- endif -%}
+            {%- endfor -%}
+          </select>
+          {%- render 'icon-caret' -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+    {%- comment -%} The subscription policy, once per control, after its caption or frequency select; never in samples {%- endcomment -%}
+    {%- if opts.subscribe_show_policy and status != 'sample' and shop.subscription_policy != blank -%}
+      <a class="cart-sub__policy link" href="{{ shop.subscription_policy.url }}">{{ shop.subscription_policy.title | escape }}</a>
+    {%- endif -%}
+    {%- if status == 'sample' -%}<span class="cart-sub__sample">Preview</span>{%- endif -%}
+    <span class="cart-sub__relock" data-sub-relock hidden></span>
+  </cart-subscription-toggle>
+{%- endif -%}

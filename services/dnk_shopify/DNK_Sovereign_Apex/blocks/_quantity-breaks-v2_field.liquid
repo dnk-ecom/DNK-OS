@@ -1,0 +1,101 @@
+{%- comment -%}
+  Personalisation, a child of a Quantity option: one text field whose text goes with the product's line in the cart
+  and the order while its option is selected. The input has no name: component-quantity-breaks-v2.js copies the
+  trimmed text into a hidden properties[<name>] input in the product form only while this option is selected, and
+  holds Add to cart back while a required field is empty.
+{%- endcomment -%}
+{%- liquid
+  # Brackets would break the property name the script builds (properties[<name>])
+  assign qb_name = block.settings.field_name | remove: '[' | remove: ']' | strip
+  assign qb_label = block.settings.label | strip
+  if qb_label == blank
+    assign qb_label = qb_name
+  endif
+  assign qb_id = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-field'
+-%}
+{%- if qb_name != blank or request.design_mode -%}
+  <div
+    class="qb-v2-field"
+    data-qb-child="field"
+    data-qb-block="{{ block.id }}"
+    data-qb-field-name="{{ qb_name | escape }}"
+    data-qb-required="{{ block.settings.required }}"
+    {%- if block.settings.required and qb_name != blank %} data-qb-must-choose="true" data-qb-required-message="{{ block.settings.required_message | escape }}"{% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {%- if qb_name != blank -%}
+      {%- comment -%}The theme's small input, as in the Custom product field block{%- endcomment -%}
+      <label class="qb-v2-field__label form__label" for="{{ qb_id }}">{{ qb_label | escape }}</label>
+      <input
+        type="text"
+        class="qb-v2-field__input input--small"
+        id="{{ qb_id }}"
+        maxlength="{{ block.settings.max_characters }}"
+        {%- if block.settings.placeholder != blank %} placeholder="{{ block.settings.placeholder | escape }}"{% endif %}
+        autocomplete="off"
+        {%- if block.settings.required %} aria-required="true"{% endif %}
+      >
+    {%- else -%}
+      <div class="qb-v2-placeholder">Enter a name in Personalisation.</div>
+    {%- endif -%}
+    {%- if request.design_mode -%}
+      <script type="application/json" data-qbv2-setup="child">
+        {"type":"field","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"field_name":{{ qb_name | json }},"required":{{ block.settings.required }},"max_characters":{{ block.settings.max_characters | json }}},"products":[]}
+      </script>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Personalisation",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "field_name",
+      "label": "Name",
+      "default": "Personalisation",
+      "info": "Shown with the item in the cart and the order."
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Add your text"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder"
+    },
+    {
+      "type": "range",
+      "id": "max_characters",
+      "label": "Maximum characters",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "required",
+      "label": "Required",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "required_message",
+      "label": "Error message",
+      "default": "Enter your text first",
+      "visible_if": "{{ block.settings.required }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Personalisation"
+    }
+  ]
+}
+{% endschema %}

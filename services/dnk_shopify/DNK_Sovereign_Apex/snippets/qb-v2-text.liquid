@@ -1,0 +1,152 @@
+{%- comment -%}
+  Quantity breaks V2: a merchant text with its keywords replaced, printed as one live element.
+  Every occurrence is replaced. A text with a saving keyword ([amount_saved], [amount_saved_rounded],
+  [percentage_saved] and the aliases [amount], [percentage]) is hidden while nothing is saved.
+  The core script re-renders the element from data-qb-text when its values change.
+
+  Accepts:
+  - text: {String} the merchant's text (inline rich text); nothing is printed when it is blank
+  - ctx: {String} option | savings | gift | upsell | unlock | builder | nudge
+  - id, class: {String} optional
+  - T, C, S, P: {Number} total, compare total and saving in cents, percent saved
+  - quantity, title, price_each, compare_price_each, free_quantity, paid_quantity, plan_name, value,
+    unlock_quantity, picks, chosen, missing_quantity, next_title, next_saving: the other keywords' values
+  - from: {Boolean} the option still misses picks: [price] and [price_each] read "From <price>" (the theme's
+    products.product.price.from_price_html, its words in .qb-v2-from spans), and data-qb-v ends in |f
+  - saving: {Boolean} optional: a saving text whatever its keywords (the option's savings line), hidden the same way
+
+  Usage:
+  {% render 'qb-v2-text', text: block.settings.title, ctx: 'option', T: 2205, C: 2594, S: 389, P: 15, quantity: 2, title: product.title %}
+{%- endcomment -%}
+{%- if text != blank -%}
+  {%- liquid
+    assign qb_s = S | plus: 0
+    assign qb_out = text | replace: '[amount]', '[amount_saved]' | replace: '[percentage]', '[percentage_saved]'
+    assign qb_is_saving = false
+    if saving or qb_out contains '[amount_saved' or qb_out contains '[percentage_saved]'
+      assign qb_is_saving = true
+    endif
+
+    # "From <price>" for an option that still misses picks: the words around the price as spans, so the price keeps
+    # its own look (the translation may put them on either side)
+    assign qb_from_before = ''
+    assign qb_from_after = ''
+    if from
+      assign qb_from_parts = 'products.product.price.from_price_html' | t: price: '[price]' | split: '[price]'
+      if qb_from_parts[0] != blank
+        assign qb_from_before = '<span class="qb-v2-from">' | append: qb_from_parts[0] | append: '</span>'
+      endif
+      if qb_from_parts[1] != blank
+        assign qb_from_after = '<span class="qb-v2-from">' | append: qb_from_parts[1] | append: '</span>'
+      endif
+    endif
+
+    # [price_per_serving] needs the wrapper's Servings per item, which only the core script can read: an empty spot
+    # until it fills the text in
+    if qb_out contains '[price_per_serving]'
+      assign qb_out = qb_out | replace: '[price_per_serving]', '<span class="qb-v2-serving"></span>'
+    endif
+
+    # Inserted values never contain "[" or "\" as plain characters: a product title can't turn
+    # into another keyword, and no replacement reads a backslash as a reference
+    if qb_out contains '[price]'
+      capture qb_value
+        render 'qb-v2-money', cents: T
+      endcapture
+      assign qb_value = qb_from_before | append: qb_value | append: qb_from_after | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[price]', qb_value
+    endif
+    if qb_out contains '[compare_price]'
+      capture qb_value
+        render 'qb-v2-money', cents: C
+      endcapture
+      assign qb_value = qb_value | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[compare_price]', qb_value
+    endif
+    if qb_out contains '[price_each]'
+      capture qb_value
+        render 'qb-v2-money', cents: price_each
+      endcapture
+      assign qb_value = qb_from_before | append: qb_value | append: qb_from_after | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[price_each]', qb_value
+    endif
+    if qb_out contains '[compare_price_each]'
+      capture qb_value
+        render 'qb-v2-money', cents: compare_price_each
+      endcapture
+      assign qb_value = qb_value | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[compare_price_each]', qb_value
+    endif
+    if qb_out contains '[amount_saved]'
+      capture qb_value
+        render 'qb-v2-money', cents: qb_s
+      endcapture
+      assign qb_value = qb_value | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[amount_saved]', qb_value
+    endif
+    if qb_out contains '[amount_saved_rounded]'
+      assign qb_rounded = qb_s | plus: 50 | divided_by: 100 | floor | times: 100
+      capture qb_value
+        render 'qb-v2-money', cents: qb_rounded
+      endcapture
+      assign qb_value = qb_value | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[amount_saved_rounded]', qb_value
+    endif
+    if qb_out contains '[value]'
+      capture qb_value
+        render 'qb-v2-money', cents: value
+      endcapture
+      assign qb_value = qb_value | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[value]', qb_value
+    endif
+    if qb_out contains '[percentage_saved]'
+      assign qb_value = P | plus: 0 | append: '%'
+      assign qb_out = qb_out | replace: '[percentage_saved]', qb_value
+    endif
+    if qb_out contains '[quantity]'
+      assign qb_value = quantity | plus: 0
+      assign qb_out = qb_out | replace: '[quantity]', qb_value
+    endif
+    if qb_out contains '[free_quantity]'
+      assign qb_value = free_quantity | plus: 0
+      assign qb_out = qb_out | replace: '[free_quantity]', qb_value
+    endif
+    if qb_out contains '[paid_quantity]'
+      assign qb_value = paid_quantity | plus: 0
+      assign qb_out = qb_out | replace: '[paid_quantity]', qb_value
+    endif
+    if qb_out contains '[unlock_quantity]'
+      assign qb_value = unlock_quantity | plus: 0
+      assign qb_out = qb_out | replace: '[unlock_quantity]', qb_value
+    endif
+    if qb_out contains '[picks]'
+      assign qb_value = picks | plus: 0
+      assign qb_out = qb_out | replace: '[picks]', qb_value
+    endif
+    if qb_out contains '[chosen]'
+      assign qb_value = chosen | plus: 0
+      assign qb_out = qb_out | replace: '[chosen]', qb_value
+    endif
+    if qb_out contains '[missing_quantity]'
+      assign qb_value = missing_quantity | plus: 0
+      assign qb_out = qb_out | replace: '[missing_quantity]', qb_value
+    endif
+    if qb_out contains '[next_saving]'
+      assign qb_value = next_saving | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[next_saving]', qb_value
+    endif
+    if qb_out contains '[plan_name]'
+      assign qb_value = plan_name | escape | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[plan_name]', qb_value
+    endif
+    if qb_out contains '[next_title]'
+      assign qb_value = next_title | escape | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[next_title]', qb_value
+    endif
+    if qb_out contains '[title]'
+      assign qb_value = title | escape | replace: '[', '&#91;' | replace: '\', '&#92;'
+      assign qb_out = qb_out | replace: '[title]', qb_value
+    endif
+  -%}
+  <span class="qb-v2-text{% if qb_is_saving %} qb-v2-text--saving{% endif %}{% if class != blank %} {{ class }}{% endif %}"{% if id != blank %} id="{{ id }}"{% endif %} data-qb-text="{{ text | escape }}" data-qb-ctx="{{ ctx }}" data-qb-v="{{ T }}|{{ C }}|{{ S }}|{{ P }}{% if from %}|f{% endif %}"{% if qb_is_saving and qb_s <= 0 %} hidden{% endif %}>{{ qb_out }}</span>
+{%- endif -%}

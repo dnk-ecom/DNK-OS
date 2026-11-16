@@ -1,0 +1,100 @@
+{%- comment -%}
+  Goal resolver: the free shipping goal (or a reward's goal) that applies to this market.
+  Outputs "{kind}|{cents}|{currency}" with no whitespace:
+  - none|0|        no goal applies here (blank everywhere, or a matched local goal of 0)
+  - local|4500|EUR a local goal matched by country or currency, in the cart's (presentment) currency
+  - shop|5000|USD  a goal in store currency (exact when the cart is in the store currency; JS converts it otherwise)
+  - items|3|       a number of items (unit: 'items')
+  A goal of 0 (shop|0|...) means reached with the first counted item; only a matched local 0 gives none.
+
+  Order: the local_goals parameter (country, then currency), the goal parameter, Theme settings > Cart > Local goals
+  (country, then currency), Theme settings > Cart > Free shipping goal. The theme settings are skipped with
+  use_theme: false or unit: 'items'. Local goals are comma-separated CODE:VALUE pairs ("US:50, EUR:45, CA:0"):
+  2-letter codes are countries, 3-letter codes are currencies; entries that don't parse are ignored.
+
+  Accepts (all optional):
+  - goal {Number} a goal in store currency, or a number of items
+  - local_goals {String} local goals of a reward
+  - use_theme {Boolean} false: don't fall back to Theme settings > Cart (rewards other than free shipping)
+  - unit {String} 'items' for quantity goals (values are counts, not money)
+
+  Usage:
+  {%- capture goal -%}{%- render 'cart-free-shipping-goal' -%}{%- endcapture -%}
+  {%- capture goal -%}{%- render 'cart-free-shipping-goal', goal: g, local_goals: lg, use_theme: false -%}{%- endcapture -%}
+  Elements that show a goal print data-goal-kind, data-goal-cents and data-goal-currency (JS: ShrineCartGoals.parse).
+{%- endcomment -%}
+{%- liquid
+  assign fsg_country = localization.country.iso_code | upcase
+  assign fsg_currency = cart.currency.iso_code | upcase
+  assign fsg_unit = 100
+  if unit == 'items'
+    assign fsg_unit = 1
+  endif
+  assign fsg_theme = true
+  if use_theme == false or unit == 'items'
+    assign fsg_theme = false
+  endif
+  assign fsg_kind = ''
+  assign fsg_cents = 0
+  for fsg_pass in (1..2)
+    if fsg_kind == blank
+      assign fsg_run = true
+      if fsg_pass == 1
+        assign fsg_list = local_goals
+        assign fsg_single = goal
+      elsif fsg_theme
+        assign fsg_list = settings.free_shipping_local_goals
+        assign fsg_single = settings.free_shipping_goal
+      else
+        assign fsg_run = false
+      endif
+      if fsg_run
+        assign fsg_hit_country = ''
+        assign fsg_hit_currency = ''
+        if fsg_list != blank
+          assign fsg_entries = fsg_list | split: ','
+          for fsg_entry in fsg_entries
+            assign fsg_pair = fsg_entry | split: ':'
+            if fsg_pair.size == 2
+              assign fsg_code = fsg_pair[0] | strip | upcase
+              assign fsg_value = fsg_pair[1] | strip
+              assign fsg_num = fsg_value | times: fsg_unit | round
+              assign fsg_valid = false
+              if fsg_num > 0 or fsg_value == '0' or fsg_value == '0.0' or fsg_value == '0.00'
+                assign fsg_valid = true
+              endif
+              if fsg_valid
+                if fsg_code.size == 2 and fsg_code == fsg_country and fsg_hit_country == blank
+                  assign fsg_hit_country = fsg_num | append: ''
+                elsif fsg_code.size == 3 and fsg_code == fsg_currency and fsg_hit_currency == blank
+                  assign fsg_hit_currency = fsg_num | append: ''
+                endif
+              endif
+            endif
+          endfor
+        endif
+        if fsg_hit_country != blank
+          assign fsg_cents = fsg_hit_country | plus: 0
+          assign fsg_kind = 'local'
+        elsif fsg_hit_currency != blank
+          assign fsg_cents = fsg_hit_currency | plus: 0
+          assign fsg_kind = 'local'
+        elsif fsg_single != blank
+          assign fsg_cents = fsg_single | times: fsg_unit | round
+          assign fsg_kind = 'shop'
+        endif
+      endif
+    endif
+  endfor
+  if fsg_kind == 'local' and fsg_cents == 0
+    assign fsg_kind = 'none'
+  endif
+  if fsg_kind == blank or fsg_kind == 'none'
+    assign fsg_kind = 'none'
+    assign fsg_cents = 0
+  endif
+  if unit == 'items' and fsg_kind != 'none'
+    assign fsg_kind = 'items'
+  endif
+-%}
+{{- fsg_kind -}}|{{- fsg_cents -}}|{%- if fsg_kind == 'local' -%}{{- fsg_currency -}}{%- elsif fsg_kind == 'shop' -%}{{- shop.currency -}}{%- endif -%}

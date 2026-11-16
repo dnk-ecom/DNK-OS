@@ -1,0 +1,104 @@
+<div
+  class="main-blog"
+  style="
+    --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --color-accent: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+  "
+>
+  {% content_for 'block', type: '_blog-header', id: 'blog-header' %}
+  {% content_for 'block', type: '_blog-toolbar', id: 'blog-toolbar' %}
+  {% content_for 'block', type: '_blog-article-grid', id: 'blog-article-grid' %}
+</div>
+
+{% schema %}
+{
+  "name": "Blog",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "_blog-header"
+    },
+    {
+      "type": "_blog-toolbar"
+    },
+    {
+      "type": "_blog-article-grid"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["blog"]
+  },
+  "presets": [
+    {
+      "name": "Blog",
+      "category": "Blog",
+      "blocks": [
+        {
+          "type": "_blog-header",
+          "id": "blog-header",
+          "static": true
+        },
+        {
+          "type": "_blog-toolbar",
+          "id": "blog-toolbar",
+          "static": true
+        },
+        {
+          "type": "_blog-article-grid",
+          "id": "blog-article-grid",
+          "static": true,
+          "blocks": [
+            {
+              "type": "article-card",
+              "id": "article-card",
+              "static": true,
+              "blocks": [
+                {
+                  "type": "_article-card-image"
+                },
+                {
+                  "type": "_article-card-heading"
+                },
+                {
+                  "type": "_article-card-meta"
+                },
+                {
+                  "type": "_article-card-excerpt"
+                },
+                {
+                  "type": "_article-card-read-more"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

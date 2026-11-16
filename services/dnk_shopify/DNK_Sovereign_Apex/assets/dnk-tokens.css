@@ -1,0 +1,32 @@
+/* --- DNK-MRH-HEADER ---
+mrh_id: "assets/dnk-tokens.css"
+purpose: "Fluid Typography, Motion Variables and Design System Tokens for DNK Sovereign Theme"
+canonical_source: true
+--- END DNK-MRH-HEADER --- */
+
+:root {
+  /* Fluid Typography Scale (LCP & Zero-CLS Optimized) */
+  --dnk-font-size-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.8125rem);
+  --dnk-font-size-sm: clamp(0.8125rem, 0.76rem + 0.25vw, 0.875rem);
+  --dnk-font-size-base: clamp(0.9375rem, 0.88rem + 0.3vw, 1rem);
+  --dnk-font-size-lg: clamp(1.125rem, 1.02rem + 0.5vw, 1.25rem);
+  --dnk-font-size-xl: clamp(1.375rem, 1.22rem + 0.75vw, 1.625rem);
+  --dnk-font-size-2xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.25rem);
+  --dnk-font-size-display: clamp(2.25rem, 1.8rem + 2.25vw, 3.5rem);
+
+  /* Fluid Spacing & Gutters */
+  --dnk-gutter: clamp(1rem, 0.8rem + 1vw, 2.5rem);
+  --dnk-grid-gap: clamp(1rem, 0.9rem + 0.5vw, 2rem);
+
+  /* Elevation Shadows */
+  --dnk-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --dnk-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --dnk-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --dnk-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* GPU-Accelerated Transitions & Animations */
+  --dnk-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dnk-dur-fast: 150ms;
+  --dnk-dur-base: 250ms;
+  --dnk-dur-slow: 400ms;
+}

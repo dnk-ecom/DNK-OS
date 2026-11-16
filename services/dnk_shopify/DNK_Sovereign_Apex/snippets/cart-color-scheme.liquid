@@ -1,0 +1,38 @@
+{%- comment -%}
+  Colour-scheme resolver for cart blocks.
+  Accepts:
+  - value: the block's color_scheme setting ('cart' = Same as cart)
+  - default: that setting's schema default
+  - cart_scheme: section.settings.color_scheme (blank = default)
+  - band: true for full-width band blocks whose default is a contrasting scheme (e.g. the Countdown timer)
+  Outputs a theme scheme id (print color-{{ scheme }}), or nothing (print no class: the block inherits the panel's colours).
+  Usage:
+  {%- capture scheme -%}{%- render 'cart-color-scheme', value: block.settings.color_scheme, default: 'background-1', cart_scheme: section.settings.color_scheme, band: false -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign ccs_value = value | default: default
+  assign ccs_cart = cart_scheme | default: 'default'
+  if ccs_value == 'cart'
+    if ccs_cart != 'default' and ccs_cart != 'custom'
+      echo ccs_cart
+    endif
+  elsif ccs_value == default
+    if ccs_cart == 'default'
+      echo ccs_value
+    elsif band
+      if ccs_value != ccs_cart
+        echo ccs_value
+      elsif ccs_value == 'accent-1'
+        echo 'inverse'
+      else
+        echo 'accent-1'
+      endif
+    elsif ccs_cart == 'custom'
+      echo ''
+    else
+      echo ccs_cart
+    endif
+  else
+    echo ccs_value
+  endif
+-%}

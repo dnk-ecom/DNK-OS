@@ -1,0 +1,14 @@
+{%- comment -%}
+  Number of items in the cart without products tagged cart-hidden (the header's and the drawer's rule).
+  Usage:
+  {%- capture count -%}{%- render 'cart-count' -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign cc_count = cart.item_count
+  for cc_item in cart.items
+    if cc_item.product.tags contains 'cart-hidden'
+      assign cc_count = cc_count | minus: cc_item.quantity
+    endif
+  endfor
+  echo cc_count
+-%}

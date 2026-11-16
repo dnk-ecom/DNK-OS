@@ -1,0 +1,108 @@
+/*
+  Collection card stylesheet
+
+  This file owns the reusable layout and presentation of collection cards and their inner content blocks.
+*/
+
+.collection-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  padding-top: calc(var(--card-pt) * var(--spacing-scale));
+  padding-right: calc(var(--card-pr) * var(--spacing-scale));
+  padding-bottom: calc(var(--card-pb) * var(--spacing-scale));
+  padding-left: calc(var(--card-pl) * var(--spacing-scale));
+  color: rgb(var(--color-text));
+  text-align: left;
+  border-radius: var(--border-radius);
+}
+
+.collection-card:not([data-border-opacity="0"]) {
+  border: 1px solid rgb(var(--color-text) / var(--card-border-opacity));
+}
+
+.collection-card[data-custom-colors="true"] {
+  background-color: rgb(var(--color-background));
+}
+
+.collection-card[data-box-shadow="true"] {
+  box-shadow: 0 0.25rem 0.75rem rgb(var(--color-text) / 0.1);
+}
+
+.collection-card[data-text-alignment="center"] {
+  text-align: center;
+}
+
+.collection-card[data-text-alignment="right"] {
+  text-align: right;
+}
+
+.collection-card-image-block {
+  position: relative;
+}
+
+.collection-card-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  transition: opacity 200ms ease-out;
+}
+
+.collection-card-title {
+  margin: 0;
+  font-size: var(--mobile-heading-size);
+}
+
+.collection-card-title[data-font-family="body"] {
+  font-family: var(--font-body-family);
+  font-style: var(--font-body-style);
+  font-weight: var(--font-body-weight);
+}
+
+.collection-card-title-link {
+  text-decoration: none;
+}
+
+.collection-card-title-link::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border-radius: var(--border-radius);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.theme-carousel .collection-card-title-link::after {
+  outline-offset: -2px;
+}
+
+.collection-card-title-link:focus-visible {
+  outline-color: transparent;
+}
+
+.collection-card-title-link:focus-visible::after {
+  outline-color: currentcolor;
+}
+
+@media (hover: hover) {
+  .collection-card:has(.collection-card-title-link:hover) .collection-card-image {
+    opacity: 0.85;
+  }
+}
+
+.collection-card:has(.collection-card-title-link:active) .collection-card-image {
+  opacity: 0.7;
+}
+
+@media (min-width: 1200px) {
+  .collection-card-title {
+    font-size: var(--desktop-heading-size);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-card-image {
+    transition: none;
+  }
+}

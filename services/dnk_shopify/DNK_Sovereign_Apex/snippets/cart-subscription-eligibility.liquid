@@ -1,0 +1,115 @@
+{%- comment -%}
+  Subscribe & save eligibility of one cart line: the only rule both Subscribe & save features use.
+  Accepts:
+  - item: the line item
+  - hidden_handles: ',a,b,' or blank (every caller passes blank; products tagged cart-subscribe-hidden are left out)
+  - default_plan: 'first' or 'biggest_saving'
+  - parent_keys: '|key|key|' of the lines that have nested children (computed here when blank)
+  Outputs status|plan_id|saving_cents|plan_count|percent|plan_ids with no whitespace:
+  - upgrade: a one-time line that can switch; plan_id is the target plan, saving is what the line total drops
+  - subscribed: the line has a plan and one-time is allowed; required: the variant requires a plan
+  - none: anything else
+  Only recurring pay-per-delivery plans count. Never gift cards, bundles, Quantity breaks lines, reward gifts,
+  nested lines, lines with nested children, $0 lines, products tagged cart-hidden or cart-subscribe-hidden,
+  or a plan that costs more than the line does now.
+  Usage:
+  {%- capture sub -%}{%- render 'cart-subscription-eligibility', item: item, hidden_handles: '', default_plan: 'first', parent_keys: parent_keys -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign status = 'none'
+  assign target_id = ''
+  assign saving = 0
+  assign count = 0
+  assign percent = 0
+  assign ids = ','
+  assign skip = false
+
+  if item == blank
+    assign skip = true
+  elsif item.final_line_price == 0 or item.gift_card or item.item_components.size > 0 or item.parent_relationship
+    assign skip = true
+  elsif item.properties['_qb_gift'] != blank or item.properties['_qb_upsell'] != blank or item.properties['_qb_bundle'] != blank or item.properties['_reward_gift'] != blank
+    assign skip = true
+  elsif item.product.tags contains 'cart-hidden' or item.product.tags contains 'cart-subscribe-hidden'
+    assign skip = true
+  endif
+
+  if skip == false and hidden_handles != blank
+    assign handle_token = ',' | append: item.product.handle | append: ','
+    if hidden_handles contains handle_token
+      assign skip = true
+    endif
+  endif
+
+  # no control on a line that has nested children until a store test shows the children stay attached
+  if skip == false
+    assign keys = parent_keys
+    if keys == blank
+      assign keys = '|'
+      for cart_line in cart.items
+        if cart_line.parent_relationship
+          assign keys = keys | append: cart_line.parent_relationship.parent.key | append: '|'
+        endif
+      endfor
+    endif
+    assign key_token = '|' | append: item.key | append: '|'
+    if keys contains key_token
+      assign skip = true
+    endif
+  endif
+
+  if skip == false
+    assign current = item.selling_plan_allocation
+    assign current_ok = false
+    assign best = -1
+    for alloc in item.variant.selling_plan_allocations
+      # recurring pay-per-delivery subscriptions only (no prepaid, pre-order or try-before-you-buy)
+      if alloc.selling_plan.recurring_deliveries and alloc.per_delivery_price == alloc.price
+        if current
+          assign count = count | plus: 1
+          assign ids = ids | append: alloc.selling_plan.id | append: ','
+          if alloc.selling_plan.id == current.selling_plan.id
+            assign current_ok = true
+          endif
+        elsif alloc.price <= item.final_price
+          # a one-time-only discount can already beat the plan: never offer a price rise
+          assign count = count | plus: 1
+          assign ids = ids | append: alloc.selling_plan.id | append: ','
+          assign alloc_saving = item.final_price | minus: alloc.price | times: item.quantity
+          if target_id == ''
+            assign target_id = alloc.selling_plan.id
+            assign best = alloc_saving
+          elsif default_plan == 'biggest_saving' and alloc_saving > best
+            assign target_id = alloc.selling_plan.id
+            assign best = alloc_saving
+          endif
+        endif
+      endif
+    endfor
+
+    if current
+      if current_ok
+        assign status = 'subscribed'
+        if item.variant.requires_selling_plan
+          assign status = 'required'
+        endif
+        assign target_id = current.selling_plan.id
+        assign full = current.compare_at_price | times: item.quantity
+        assign saving = current.compare_at_price | minus: current.price | times: item.quantity
+        if full > 0 and saving > 0
+          assign percent = saving | times: 100 | divided_by: full
+        endif
+      else
+        assign count = 0
+        assign ids = ','
+      endif
+    elsif count > 0
+      assign status = 'upgrade'
+      assign saving = best
+      if saving > 0
+        assign percent = saving | times: 100 | divided_by: item.final_line_price
+      endif
+    endif
+  endif
+-%}
+{{- status }}|{{ target_id }}|{{ saving }}|{{ count }}|{{ percent }}|{{ ids -}}

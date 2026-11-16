@@ -1,0 +1,993 @@
+{% liquid
+  assign close_btn_offset = section.settings.close_btn_offset | divided_by: 10.0
+  assign close_btn_size = section.settings.close_btn_size | divided_by: 10.0
+  assign x_icon_scale = section.settings.close_btn_x_size | divided_by: 100.0
+  assign x_icon_thickness = section.settings.close_btn_x_thickness
+  assign heading_size = section.settings.heading_size | divided_by: 10.0
+  assign bubble_size = section.settings.count_bubble_size | divided_by: 10.0
+  assign bubble_radius = section.settings.count_bubble_radius | divided_by: 2.0
+  assign number_size = section.settings.count_number_size | divided_by: 100.0
+  assign cart_style = section.settings.cart_style | default: 'classic'
+  assign cart_scheme = section.settings.color_scheme | default: 'default'
+%}
+{%- capture cart_corners -%}{%- render 'cart-style-value', option: 'corner_style', value: section.settings.corner_style, cart_style: cart_style -%}{%- endcapture -%}
+{%- capture cart_spacing -%}{%- render 'cart-style-value', option: 'spacing', value: section.settings.spacing, cart_style: cart_style -%}{%- endcapture -%}
+{%- capture cart_count -%}{%- render 'cart-count' -%}{%- endcapture -%}
+{%- liquid
+  assign cart_count = cart_count | strip | plus: 0
+  assign show_empty = false
+  if cart == empty
+    assign show_empty = true
+  elsif request.design_mode and section.settings.test_mode and section.settings.test_mode_state == 'empty'
+    assign show_empty = true
+  endif
+  assign drawer_open = false
+  if request.design_mode and section.settings.test_mode
+    assign drawer_open = true
+  endif
+  assign announce_money = cart.total_price | money | strip_html
+  assign cd_after_add = settings.cart_after_add | default: 'open'
+  assign cd_icon_animation = settings.cart_icon_animation | default: 'none'
+  assign cd_features = ''
+  if request.design_mode
+    assign cd_features = 'editor'
+  endif
+  if section.settings.mobile_position == 'bottom' or cd_after_add == 'message' or cd_icon_animation != 'none'
+    assign cd_features = cd_features | append: ' extras' | strip
+  endif
+  assign follow_scheme = false
+  if cart_scheme != 'default'
+    assign follow_scheme = true
+  endif
+  assign close_bg = section.settings.close_btn_bg_color | append: '' | downcase
+  assign close_x = section.settings.close_btn_x_color | append: '' | downcase
+  assign bubble_bg = section.settings.count_bubble_bg_color | append: '' | downcase
+  assign bubble_text = section.settings.count_number_color | append: '' | downcase
+-%}
+{%- capture root_style -%}
+  {%- if section.settings.desktop_width == 'custom' -%}--cart-width: {{ section.settings.custom_desktop_width | divided_by: 10.0 }}rem;{%- endif -%}
+  {%- if section.settings.desktop_layout == 'two_columns' -%}--cart-side-width: {{ section.settings.side_panel_width | divided_by: 10.0 }}rem;{%- endif -%}
+  {%- if section.settings.overlay_opacity != 50 -%}--cart-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};{%- endif -%}
+{%- endcapture -%}
+{%- capture cart_announce -%}
+  {%- if show_empty -%}{{ 'sections.cart.empty' | t }}{%- else -%}{{ 'sections.cart.core_announce_updated' | t: subtotal: announce_money }}{%- endif -%}
+{%- endcapture -%}
+{%- capture count_html -%}<span class="cart-header__count">{{ cart_count }}</span>{%- endcapture -%}
+{%- capture items_html -%}<span class="cart-header__count">{{ 'sections.header.cart_count' | t: count: cart_count }}</span>{%- endcapture -%}
+{%- capture heading_html -%}{%- render 'cart-text', text: section.settings.heading_text, count: count_html, items: items_html -%}{%- endcapture -%}
+{%- if section.settings.logo != blank -%}
+  {%- assign logo_px = section.settings.logo_width | times: 2 -%}
+  {%- capture logo_img -%}{{ section.settings.logo | image_url: width: logo_px | image_tag: loading: 'lazy', alt: '', class: 'cart-header__logo-img', width: section.settings.logo_width }}{%- endcapture -%}
+{%- endif -%}
+{%- capture heading_inner -%}
+  {%- if section.settings.logo != blank and section.settings.logo_position == 'instead' -%}
+    <span class="visually-hidden">{{ heading_html | strip_html | strip }}</span><span class="cart-header__logo" style="--cart-logo-width: {{ section.settings.logo_width }}px">{{ logo_img }}</span>
+  {%- else -%}
+    {{ heading_html }}
+  {%- endif -%}
+{%- endcapture -%}
+{%- capture heading_block -%}
+  {%- if section.settings.display_count_bubble -%}
+    <div class="drawer__heading-wrapper">
+      <h2 class="drawer__heading" id="CartDrawer-Heading">{{ heading_inner }}</h2>
+      <div class="cart-drawer__count-bubble">
+        <span class="cart-drawer__count-bubble__number font-{{ section.settings.count_number_font }}">{{ cart_count }}</span>
+      </div>
+    </div>
+  {%- else -%}
+    <h2 class="drawer__heading" id="CartDrawer-Heading">{{ heading_inner }}</h2>
+  {%- endif -%}
+{%- endcapture -%}
+<style>
+  {%- if cart_scheme == 'custom' -%}
+    .cart-drawer .drawer__inner.color-custom {
+      --color-background: {{ section.settings.custom_colors_background.red }}, {{ section.settings.custom_colors_background.green }}, {{ section.settings.custom_colors_background.blue }};
+      --gradient-background: {{ section.settings.custom_colors_background }};
+      --color-foreground: {{ section.settings.custom_colors_text.red }}, {{ section.settings.custom_colors_text.green }}, {{ section.settings.custom_colors_text.blue }};
+    }
+  {%- endif -%}
+  .drawer {
+    visibility: hidden;
+  }
+  {% if section.settings.header_bg_type == 'color' %}
+    .cart-drawer .drawer__header {
+      background: {{ section.settings.header_bg_color }};
+    }
+  {% elsif section.settings.header_bg_type == 'gradient' %}
+    .cart-drawer .drawer__header {
+      background: {{ section.settings.header_bg_gradient }};
+    }
+  {% endif %}
+  {% if section.settings.body_bg_type == 'color' %}
+    .cart-drawer__body, .cart-drawer-item {
+      background: {{ section.settings.body_bg_color }};
+    }
+  {% elsif section.settings.body_bg_type == 'gradient' %}
+    .cart-drawer__body, .cart-drawer-item {
+      background: {{ section.settings.body_bg_gradient }};
+    }
+  {% endif %}
+  {% if section.settings.footer_bg_type == 'color' %}
+    .cart-drawer .drawer__footer {
+      background: {{ section.settings.footer_bg_color }};
+    }
+  {% elsif section.settings.footer_bg_type == 'gradient' %}
+    .cart-drawer .drawer__footer {
+      background: {{ section.settings.footer_bg_gradient }};
+    }
+  {% endif %}
+  .cart-drawer .drawer__close, .cart-drawer .drawer__header {
+    --btn-size: {{ close_btn_size }}rem;
+    --btn-offset: {{ close_btn_offset }}rem;
+    --x-scale: {{ x_icon_scale }};
+    --x-stroke: {{ x_icon_thickness }}px;
+  }
+  .cart-drawer .drawer__heading {
+    font-size: {{ heading_size }}rem;
+  }
+  {% if section.settings.display_count_bubble %}
+    .cart-drawer .drawer__heading-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      {% if section.settings.count_bubble_position == 'before' %}
+        flex-direction: row-reverse;
+      {% endif %}
+    }
+    .cart-drawer .cart-drawer__count-bubble {
+      width: {{ bubble_size }}rem;
+      height: {{ bubble_size }}rem;
+      background: {% if follow_scheme and bubble_bg == '#2e2a39' %}rgb(var(--color-foreground)){% else %}{{ section.settings.count_bubble_bg_color }}{% endif %};
+      border-radius: {{ bubble_radius }}%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cart-drawer .cart-drawer__count-bubble__number {
+      font-size: calc({{ bubble_size }}rem * {{ number_size }});
+      color: {% if follow_scheme and bubble_text == '#ffffff' %}rgb(var(--color-background)){% else %}{{ section.settings.count_number_color }}{% endif %};
+      line-height: 1;
+    }
+  {% endif %}
+  .cart-drawer .drawer__close {
+    background: {% if follow_scheme and close_bg == '#ebebeb' %}rgba(var(--color-foreground), .08){% else %}{{ section.settings.close_btn_bg_color }}{% endif %};
+    color: {% if follow_scheme and close_x == '#2e2a39' %}rgb(var(--color-foreground)){% else %}{{ section.settings.close_btn_x_color }}{% endif %};
+  }
+</style>
+<link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'component-cart.css' | asset_url | stylesheet_tag }}</noscript>
+{%- if cart_style != 'classic' -%}
+  <link rel="stylesheet" href="{{ 'component-cart-styles.css' | asset_url }}" media="print" onload="this.media='all'">
+  <noscript>{{ 'component-cart-styles.css' | asset_url | stylesheet_tag }}</noscript>
+{%- endif %}
+
+<cart-drawer
+  id="CartDrawer-Dialog"
+  class="drawer cart-root cart-style--{{ cart_style }} cart-corners--{{ cart_corners }} cart-spacing--{{ cart_spacing }}{% if show_empty %} is-empty{% endif %}{% if drawer_open %} active{% endif %} cart-drawer--desktop-width-{{ section.settings.desktop_width }} cart-drawer--mobile-width-{{ section.settings.mobile_width }}{% if section.settings.drawer_position == 'left' %} cart-drawer--position-left{% endif %}{% if section.settings.mobile_position == 'bottom' %} cart-drawer--mobile-bottom{% endif %}{% if section.settings.enable_floating %} cart-drawer--floating{% endif %}{% if section.settings.desktop_layout == 'two_columns' %} cart-drawer--two-columns{% endif %}{% if section.settings.close_position == 'start' %} cart-drawer--close-start{% endif %}{% unless section.settings.show_header_divider %} cart-drawer--no-header-divider{% endunless %}{% if section.settings.overlay_opacity != 50 %} cart-drawer--overlay-custom{% endif %}{% if section.settings.enable_overlay_blur %} cart-drawer--overlay-blur{% endif %}{% if section.settings.header_bg_type != 'none' %} cart-drawer--header-bg{% endif %}{% if section.settings.body_bg_type != 'none' %} cart-drawer--body-bg{% endif %}{% if section.settings.footer_bg_type != 'none' %} cart-drawer--footer-bg{% endif %}"
+  data-type='modal'
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ 'sections.cart.title' | t }}"
+  data-cart-surface="drawer"
+  data-cart-queue
+  {%- if cd_after_add == 'message' %} data-after-add="stay"{% endif %}
+  {%- if section.settings.keep_checkout_visible %} data-keep-checkout{% endif %}
+  {%- if cd_features != blank %} data-cart-feature="{{ cd_features }}"{% endif %}
+  {%- if request.design_mode %} data-test-mode="{{ section.settings.test_mode }}"{% endif %}
+  {%- if root_style != blank %} style="{{ root_style }}"{% endif %}
+>
+  <div id="CartDrawer" class="cart-drawer">
+    <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
+    <div
+      class="drawer__inner{% if cart_scheme != 'default' %} color-{{ cart_scheme }}{% endif %}"
+      tabindex="-1"
+      role="group"
+      aria-labelledby="CartDrawer-Heading"
+    >
+      <span hidden data-cart-announce="{{ cart_announce | strip | escape }}"></span>
+      {%- if section.settings.mobile_position == 'bottom' -%}
+        <span class="cart-sheet__handle" aria-hidden="true"></span>
+      {%- endif -%}
+      {%- if show_empty -%}
+        <div class="drawer__inner-empty">
+          {% content_for 'block', type: 'cart-drawer_empty', id: 'Empty', empty_context: 'drawer' %}
+        </div>
+      {%- endif -%}
+      <div class="drawer__header{% if section.settings.logo != blank %} cart-header--logo-{{ section.settings.logo_position }}{% endif %}" style='--alignment:{{ section.settings.heading_alignment }}'>
+        {%- if section.settings.logo != blank and section.settings.logo_position == 'above' -%}
+          <div class="cart-header__brand">
+            <span class="cart-header__logo" style="--cart-logo-width: {{ section.settings.logo_width }}px">{{ logo_img }}</span>
+            {{ heading_block }}
+          </div>
+        {%- else -%}
+          {{ heading_block }}
+        {%- endif -%}
+        <button
+          class="drawer__close header__icon header__icon--menu header__icon--summary link focus-inset flex-center"
+          type="button"
+          onclick="this.closest('cart-drawer').close()"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          <svg class="x-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      {% content_for 'block', type: 'cart-drawer_body', id: 'Body' %}
+      {% content_for 'block', type: 'cart-drawer_footer', id: 'Footer' %}
+      {%- if section.settings.keep_checkout_visible and cart != empty -%}
+        <cart-compact-bar class="cart-compact-bar" hidden>
+          <span class="cart-compact-bar__total">
+            <span class="cart-compact-bar__label">{{ 'sections.cart.subtotal' | t }}</span>
+            <span class="cart-compact-bar__amount">{{ cart.total_price | money }}</span>
+          </span>
+          <button type="submit" name="checkout" form="CartDrawer-Form" class="button cart-compact-bar__checkout" data-checkout-button>
+            <span class="button__label">{{ 'sections.cart.checkout' | t }}</span>
+            <span class="loading-overlay__spinner hidden"><svg aria-hidden="true" focusable="false" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle></svg></span>
+          </button>
+        </cart-compact-bar>
+      {%- endif -%}
+      <s-view-event class="cart-view-event" view-event-trigger="manual" view-event-payload='{{ cart | standard_event_data: "view", context: "dialog" | escape }}'></s-view-event>
+    </div>
+  </div>
+  <span class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-cart-announcer="drawer"></span>
+  <div class="cart-toast-region" data-cart-toast-region="drawer"></div>
+  {%- if request.design_mode -%}
+    <div class="cart-editor-notices" data-cart-notices></div>
+  {%- endif -%}
+</cart-drawer>
+<script src="{{ 'component-cart.js' | asset_url }}" defer="defer"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function isIE() {
+      const ua = window.navigator.userAgent;
+      const msie = ua.indexOf('MSIE ');
+      const trident = ua.indexOf('Trident/');
+
+      return msie > 0 || trident > 0;
+    }
+
+    if (!isIE()) return;
+    const cartSubmitInput = document.createElement('input');
+    cartSubmitInput.setAttribute('name', 'checkout');
+    cartSubmitInput.setAttribute('type', 'hidden');
+    document.querySelector('#cart').appendChild(cartSubmitInput);
+    document.querySelector('#checkout').addEventListener('click', function (event) {
+      document.querySelector('#cart').submit();
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "limit": 1,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Test mode"
+    },
+    {
+      "type": "paragraph",
+      "content": "Keeps the drawer open while you customize it in the theme editor. Customers never see it open."
+    },
+    {
+      "type": "checkbox",
+      "id": "test_mode",
+      "label": "Enable test mode",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "test_mode_state",
+      "label": "Preview",
+      "options": [
+        {
+          "value": "cart",
+          "label": "Current cart"
+        },
+        {
+          "value": "empty",
+          "label": "Empty cart"
+        }
+      ],
+      "default": "cart",
+      "info": "Empty cart shows the empty state even when the cart has items.",
+      "visible_if": "{{ section.settings.test_mode }}"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "select",
+      "id": "cart_style",
+      "label": "Cart style",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Classic"
+        },
+        {
+          "value": "clean",
+          "label": "Clean"
+        },
+        {
+          "value": "cards",
+          "label": "Cards"
+        },
+        {
+          "value": "soft",
+          "label": "Soft"
+        },
+        {
+          "value": "bold",
+          "label": "Bold"
+        }
+      ],
+      "default": "classic",
+      "info": "Block looks set to Same as cart follow this style."
+    },
+    {
+      "type": "paragraph",
+      "content": "Classic: the original Shrine cart.",
+      "visible_if": "{{ section.settings.cart_style == 'classic' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Clean: thin lines between items, image tiles, a muted item count, a collapsed discount field and a large checkout button.",
+      "visible_if": "{{ section.settings.cart_style == 'clean' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Cards: each item on its own card over a tinted background, with product tiles and + Add buttons.",
+      "visible_if": "{{ section.settings.cart_style == 'cards' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Soft: light accent tints, pill corners and roomier spacing.",
+      "visible_if": "{{ section.settings.cart_style == 'soft' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Bold: an accent header band, step progress bars, square corners, a large checkout button and a footer shadow.",
+      "visible_if": "{{ section.settings.cart_style == 'bold' }}"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "Theme default"
+        },
+        {
+          "value": "accent-1",
+          "label": "Accent 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Accent 2"
+        },
+        {
+          "value": "background-1",
+          "label": "Background 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Background 2"
+        },
+        {
+          "value": "inverse",
+          "label": "Inverse"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "default",
+      "info": "Blocks left at their default colors follow it. Pick a scheme in a block to keep it different."
+    },
+    {
+      "type": "color",
+      "id": "custom_colors_background",
+      "label": "Background color",
+      "default": "#FFFFFF",
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "custom_colors_text",
+      "label": "Text color",
+      "default": "#121212",
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "corner_style",
+      "label": "Corner style",
+      "options": [
+        {
+          "value": "cart",
+          "label": "Same as cart style"
+        },
+        {
+          "value": "theme",
+          "label": "Theme settings"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "rounded",
+          "label": "Rounded"
+        },
+        {
+          "value": "pill",
+          "label": "Pill"
+        }
+      ],
+      "default": "cart"
+    },
+    {
+      "type": "select",
+      "id": "spacing",
+      "label": "Spacing",
+      "options": [
+        {
+          "value": "cart",
+          "label": "Same as cart style"
+        },
+        {
+          "value": "compact",
+          "label": "Compact"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "relaxed",
+          "label": "Relaxed"
+        }
+      ],
+      "default": "cart"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Text",
+      "default": "Cart • [count] items",
+      "info": "Use [count] to display the number of items, or [items] for \"1 item\" or \"3 items\"."
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 16,
+      "max": 36,
+      "step": 1,
+      "label": "Size",
+      "default": 26,
+      "unit": "px"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 40,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 90,
+      "visible_if": "{{ section.settings.logo != blank }}"
+    },
+    {
+      "type": "select",
+      "id": "logo_position",
+      "label": "Logo position",
+      "options": [
+        {
+          "value": "above",
+          "label": "Above heading"
+        },
+        {
+          "value": "instead",
+          "label": "Instead of heading"
+        }
+      ],
+      "default": "above",
+      "visible_if": "{{ section.settings.logo != blank }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_header_divider",
+      "label": "Show header divider",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Items count"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_count_bubble",
+      "label": "Show item count bubble",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "count_bubble_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "before",
+          "label": "Before heading"
+        },
+        {
+          "value": "after",
+          "label": "After heading"
+        }
+      ],
+      "default": "after",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "range",
+      "id": "count_bubble_size",
+      "min": 16,
+      "max": 50,
+      "step": 2,
+      "label": "Size",
+      "default": 24,
+      "unit": "px",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "color",
+      "id": "count_bubble_bg_color",
+      "label": "Background color",
+      "default": "#2E2A39",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "range",
+      "id": "count_bubble_radius",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "label": "Corner radius",
+      "default": 100,
+      "unit": "%",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "range",
+      "id": "count_number_size",
+      "min": 30,
+      "max": 80,
+      "step": 5,
+      "label": "Number size",
+      "default": 60,
+      "unit": "%",
+      "info": "Relative to bubble size.",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "color",
+      "id": "count_number_color",
+      "label": "Number color",
+      "default": "#FFFFFF",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "select",
+      "id": "count_number_font",
+      "label": "Number font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "body-bold", "label": "Body - bold" },
+        { "value": "headings", "label": "Headings" }
+      ],
+      "default": "body-bold",
+      "visible_if": "{{ section.settings.display_count_bubble }}"
+    },
+    {
+      "type": "header",
+      "content": "Close button"
+    },
+    {
+      "type": "select",
+      "id": "close_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "end",
+          "label": "Right"
+        },
+        {
+          "value": "start",
+          "label": "Left"
+        }
+      ],
+      "default": "end",
+      "info": "Flipped for right-to-left languages, except Right in the Classic style."
+    },
+    {
+      "type": "range",
+      "id": "close_btn_offset",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "label": "Offset from the side",
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "close_btn_size",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "label": "Button size",
+      "default": 30,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "close_btn_bg_color",
+      "label": "Button background color",
+      "default": "#EBEBEB"
+    },
+    {
+      "type": "color",
+      "id": "close_btn_x_color",
+      "label": "X icon color",
+      "default": "#2E2A39"
+    },
+    {
+      "type": "range",
+      "id": "close_btn_x_size",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "label": "X icon size",
+      "default": 65,
+      "unit": "%",
+      "info": "Relative to the button size."
+    },
+    {
+      "type": "range",
+      "id": "close_btn_x_thickness",
+      "min": 0.3,
+      "max": 3,
+      "step": 0.3,
+      "label": "X icon thickness",
+      "default": 1.5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_width",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "normal",
+      "label": "Desktop width"
+    },
+    {
+      "type": "range",
+      "id": "custom_desktop_width",
+      "label": "Width",
+      "min": 360,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 440,
+      "visible_if": "{{ section.settings.desktop_width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "drawer_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "right",
+          "label": "From the right"
+        },
+        {
+          "value": "left",
+          "label": "From the left"
+        }
+      ],
+      "default": "right",
+      "info": "Flipped for right-to-left languages."
+    },
+    {
+      "type": "select",
+      "id": "mobile_position",
+      "label": "Mobile position",
+      "options": [
+        {
+          "value": "side",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "bottom",
+          "label": "From the bottom"
+        }
+      ],
+      "default": "side",
+      "info": "From the bottom opens a sheet that customers can swipe down to close."
+    },
+    {
+      "type": "select",
+      "id": "mobile_width",
+      "options": [
+        {
+          "value": "partial",
+          "label": "Partial screen width"
+        },
+        {
+          "value": "full",
+          "label": "Full screen width"
+        }
+      ],
+      "default": "partial",
+      "label": "Mobile width",
+      "visible_if": "{{ section.settings.mobile_position != 'bottom' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_floating",
+      "label": "Enable floating drawer",
+      "default": false,
+      "info": "Desktop only: rounded corners and space around the drawer."
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop layout",
+      "options": [
+        {
+          "value": "one_column",
+          "label": "One column"
+        },
+        {
+          "value": "two_columns",
+          "label": "Two columns"
+        }
+      ],
+      "default": "one_column",
+      "info": "Two columns shows the Side panel blocks beside the cart. With One column they show below the cart's other blocks."
+    },
+    {
+      "type": "range",
+      "id": "side_panel_width",
+      "label": "Side panel width",
+      "min": 260,
+      "max": 460,
+      "step": 10,
+      "unit": "px",
+      "default": 340,
+      "visible_if": "{{ section.settings.desktop_layout == 'two_columns' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add blocks in Cart body > Side panel. On mobile they show below the items.",
+      "visible_if": "{{ section.settings.desktop_layout == 'two_columns' }}"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacity",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay_blur",
+      "label": "Blur page behind",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "select",
+      "id": "header_bg_type",
+      "label": "Header background",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "color",
+          "label": "Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background color",
+      "default": "#F3F3F3",
+      "visible_if": "{{ section.settings.header_bg_type == 'color' }}"
+    },
+    {
+      "type": "color_background",
+      "id": "header_bg_gradient",
+      "label": "Header background gradient",
+      "default": "linear-gradient(#ffffff, #000000)",
+      "visible_if": "{{ section.settings.header_bg_type == 'gradient' }}"
+    },
+    {
+      "type": "select",
+      "id": "body_bg_type",
+      "label": "Body background",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "color",
+          "label": "Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "body_bg_color",
+      "label": "Body background color",
+      "default": "#F3F3F3",
+      "visible_if": "{{ section.settings.body_bg_type == 'color' }}"
+    },
+    {
+      "type": "color_background",
+      "id": "body_bg_gradient",
+      "label": "Body background gradient",
+      "default": "linear-gradient(#ffffff, #000000)",
+      "visible_if": "{{ section.settings.body_bg_type == 'gradient' }}"
+    },
+    {
+      "type": "select",
+      "id": "footer_bg_type",
+      "label": "Footer background",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "color",
+          "label": "Color"
+        },
+        {
+          "value": "gradient",
+          "label": "Gradient"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg_color",
+      "label": "Footer background color",
+      "default": "#F3F3F3",
+      "visible_if": "{{ section.settings.footer_bg_type == 'color' }}"
+    },
+    {
+      "type": "color_background",
+      "id": "footer_bg_gradient",
+      "label": "Footer background gradient",
+      "default": "linear-gradient(#ffffff, #000000)",
+      "visible_if": "{{ section.settings.footer_bg_type == 'gradient' }}"
+    },
+    {
+      "type": "select",
+      "id": "footer_shape",
+      "label": "Footer top edge",
+      "options": [
+        {
+          "value": "none",
+          "label": "Straight"
+        },
+        {
+          "value": "curved",
+          "label": "Curved"
+        },
+        {
+          "value": "wavy",
+          "label": "Wavy"
+        },
+        {
+          "value": "sharp",
+          "label": "Pointed"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ section.settings.footer_bg_type != 'none' or section.settings.body_bg_type != 'none' }}"
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "keep_checkout_visible",
+      "label": "Keep checkout visible",
+      "default": true,
+      "info": "On short screens a compact checkout bar stays in view."
+    }
+  ],
+  "blocks": []
+}
+{% endschema %}

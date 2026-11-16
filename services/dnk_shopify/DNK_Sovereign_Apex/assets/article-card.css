@@ -1,0 +1,149 @@
+/*
+  Article card stylesheet
+
+  This file owns the reusable layout and presentation styles for article cards and their inner content blocks.
+*/
+
+.article-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  padding-top: calc(var(--card-pt) * var(--spacing-scale));
+  padding-right: calc(var(--card-pr) * var(--spacing-scale));
+  padding-bottom: calc(var(--card-pb) * var(--spacing-scale));
+  padding-left: calc(var(--card-pl) * var(--spacing-scale));
+  color: rgb(var(--color-text));
+  text-align: left;
+  border-radius: var(--border-radius);
+}
+
+.article-card:not([data-border-opacity="0"]) {
+  border: 1px solid rgb(var(--color-text) / var(--card-border-opacity));
+}
+
+.article-card[data-custom-colors="true"] {
+  background-color: rgb(var(--color-background));
+}
+
+.article-card[data-box-shadow="true"] {
+  box-shadow: 0 0.25rem 0.75rem rgb(var(--color-text) / 0.1);
+}
+
+.article-card[data-text-alignment="center"] {
+  text-align: center;
+}
+
+.article-card[data-text-alignment="right"] {
+  text-align: right;
+}
+
+.article-card-image-block {
+  position: relative;
+}
+
+.article-card-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+  transition: opacity 200ms ease-out;
+}
+
+.article-card-tags {
+  position: absolute;
+  top: 0.75em;
+  right: 0.75em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: calc(100% - 1.5em);
+  gap: 0.35em;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.article-card-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-card-heading {
+  margin: 0;
+}
+
+.article-card-heading[data-font-family="body"] {
+  font-family: var(--font-body-family);
+  font-style: var(--font-body-style);
+  font-weight: var(--font-body-weight);
+}
+
+.article-card-heading-link {
+  text-decoration: none;
+}
+
+.article-card-heading-link::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border-radius: var(--border-radius);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.theme-carousel .article-card-heading-link::after {
+  outline-offset: -2px;
+}
+
+.article-card-heading-link:focus-visible {
+  outline-color: transparent;
+}
+
+.article-card-heading-link:focus-visible::after {
+  outline-color: currentcolor;
+}
+
+.article-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.35em;
+  margin: 0;
+  color: rgb(var(--color-text) / 0.65);
+}
+
+.article-card[data-text-alignment="center"] .article-card-meta {
+  justify-content: center;
+}
+
+.article-card[data-text-alignment="right"] .article-card-meta {
+  justify-content: flex-end;
+}
+
+.article-card-excerpt {
+  margin: 0;
+  line-height: normal;
+}
+
+.article-card-read-more-block {
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .article-card:has(.article-card-heading-link:hover) .article-card-image {
+    opacity: 0.85;
+  }
+}
+
+.article-card:has(.article-card-heading-link:active) .article-card-image {
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-card-image {
+    transition: none;
+  }
+}

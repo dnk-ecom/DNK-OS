@@ -1,0 +1,38 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_shopify/brick.manifest.yaml"
+# purpose: "Sovereign Brick Manifest for dnk_shopify (Workhorse #1: Theme Blocks 2.0 & Molecular Vault)"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-16"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+id: "dnk_shopify"
+name: "Shopify Theme Blocks 2.0 & Molecular Engine"
+version: "1.0.0"
+mrh_id: "services/dnk_shopify/brick.manifest.yaml"
+category: "ecommerce_engine"
+description: "Sovereign Workhorse #1: Pure Python & Node Theme Blocks 2.0 operations, DNK Sovereign 1.0.0 Apex flagship core (https://github.com/DNKShopify/DNK-e.com), 7-Gate Anti-Regression Theme Integrity, and CartMutationQueue."
+
+paths:
+  - "services/dnk_shopify/contracts/**"
+  - "services/dnk_shopify/src/**"
+  - "services/dnk_shopify/cli.py"
+  - "services/dnk_shopify/mcp_server.py"
+  - "services/dnk_shopify/tests/**"
+  - "services/dnk_shopify/DNK_Sovereign_Apex/**"
+
+entrypoints:
+  in_ram_facade: "services.dnk_shopify.src.service"
+  standalone_cli: "services.dnk_shopify.cli"
+  mcp_server: "services.dnk_shopify.mcp_server"
+
+contracts:
+  schemas: "services.dnk_shopify.contracts.schemas"
+
+quality_gate:
+  test_command: "uv run pytest services/dnk_shopify/tests -v"
+  min_coverage: 85

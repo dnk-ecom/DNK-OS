@@ -1,0 +1,342 @@
+{%- liquid
+  assign qb_main = closest.product
+
+  assign qb_currency_ok = true
+  if cart.currency.iso_code != shop.currency
+    assign qb_currency_ok = false
+  endif
+
+  # Discount values as the widget reads them: percentage as an integer, amounts in shop-currency cents
+  assign qb_amount_cents = block.settings.discount_amount | times: 100 | round | at_least: 0
+  assign qb_discount_value = 0
+  if block.settings.discount_type == 'percentage'
+    assign qb_discount_value = block.settings.discount_percentage
+  elsif block.settings.discount_type == 'amount_each'
+    assign qb_discount_value = qb_amount_cents
+  endif
+  assign qb_pending = false
+  if block.settings.discount_type == 'amount_each' and qb_currency_ok == false
+    assign qb_pending = true
+  endif
+
+  assign qb_quantities = block.settings.quantities | split: ','
+  assign qb_rendered = 0
+  assign qb_blocks_option = false
+  assign qb_sum_total = 0
+  assign qb_sum_cat = 0
+  assign qb_sum_creg = 0
+  assign qb_notes = ''
+  assign qb_products_json = ''
+  assign qb_quantities_json = ''
+-%}
+{%- comment -%}The separator holds an SVG instead of being an empty element: div:empty is hidden theme-wide{%- endcomment -%}
+{%- capture qb_plus -%}
+  <span class="qb-v2-bundle__plus" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16" focusable="false"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span>
+{%- endcapture -%}
+{%- capture qb_items_html -%}
+  {%- for qb_p in block.settings.products -%}
+    {%- liquid
+      assign qb_v = qb_p.selected_or_first_available_variant
+      assign qb_k = qb_quantities[forloop.index0] | strip | plus: 0 | floor | at_least: 1 | at_most: 10
+    -%}
+    {%- if request.design_mode -%}
+      {%- liquid
+        assign qb_is_main = false
+        if qb_p.id == qb_main.id
+          assign qb_is_main = true
+        endif
+        assign qb_requires_plan = false
+        if qb_p.requires_selling_plan
+          assign qb_requires_plan = true
+        endif
+        assign qb_variants_count = qb_p.variants_count | default: qb_p.variants.size
+      -%}
+      {%- capture qb_entry -%}
+        {"id":{{ qb_p.id }},"handle":{{ qb_p.handle | json }},"title":{{ qb_p.title | json }},"available":{{ qb_p.available }},"requires_selling_plan":{{ qb_requires_plan }},"variants_count":{{ qb_variants_count | plus: 0 }},"price":{{ qb_v.price | plus: 0 }},"compare_at_price":{{ qb_v.compare_at_price | json }},"is_main":{{ qb_is_main }}}
+      {%- endcapture -%}
+      {%- liquid
+        if forloop.first
+          assign qb_products_json = qb_entry
+          assign qb_quantities_json = qb_k
+        else
+          assign qb_products_json = qb_products_json | append: ',' | append: qb_entry
+          assign qb_quantities_json = qb_quantities_json | append: ',' | append: qb_k
+        endif
+      -%}
+    {%- endif -%}
+    {%- if qb_p.requires_selling_plan -%}
+      {%- if request.design_mode -%}
+        {%- capture qb_note -%}
+          <div class="qb-v2-placeholder">{{ qb_p.title | escape }} can only be sold with a subscription.</div>
+        {%- endcapture -%}
+        {%- assign qb_notes = qb_notes | append: qb_note -%}
+      {%- endif -%}
+    {%- else -%}
+      {%- liquid
+        # Line price (contract 5.4): k units at price x minus this block's discount; compare with compare-at or regular price
+        assign qb_x = qb_v.price
+        assign qb_kx = qb_x | times: qb_k
+        assign qb_unit_cat = qb_x
+        if qb_v.compare_at_price > qb_x
+          assign qb_unit_cat = qb_v.compare_at_price
+        endif
+        assign qb_line_cat = qb_unit_cat | times: qb_k
+        assign qb_disc = 0
+        case block.settings.discount_type
+          when 'percentage'
+            assign qb_disc = qb_kx | times: qb_discount_value | divided_by: 100.0 | round
+          when 'amount_each'
+            if qb_currency_ok
+              assign qb_disc = qb_discount_value | at_most: qb_x | times: qb_k
+            endif
+          when 'free'
+            assign qb_disc = qb_kx
+        endcase
+        assign qb_line_total = qb_kx | minus: qb_disc | at_least: 0
+
+        assign qb_sum_total = qb_sum_total | plus: qb_line_total
+        assign qb_sum_cat = qb_sum_cat | plus: qb_line_cat
+        assign qb_sum_creg = qb_sum_creg | plus: qb_kx
+        if qb_v.available == false
+          assign qb_blocks_option = true
+        endif
+        assign qb_item_prefix = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-p' | append: forloop.index
+      -%}
+      {%- if qb_rendered > 0 or block.settings.show_main_product -%}{{ qb_plus }}{%- endif -%}
+      {%- render 'qb-v2-extra-item',
+        product: qb_p,
+        variant: qb_v,
+        quantity: qb_k,
+        role: 'bundle',
+        discount_type: block.settings.discount_type,
+        discount_value: qb_discount_value,
+        line_total: qb_line_total,
+        line_compare: qb_line_cat,
+        show_price: block.settings.show_prices,
+        show_picker: block.settings.show_variant_pickers,
+        id_prefix: qb_item_prefix,
+        layout: 'tile'
+      -%}
+      {%- assign qb_rendered = qb_rendered | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- liquid
+  # Without a product to add the option hides itself on the store (data-qb-require-missing); the editor keeps
+  # showing it, marked as hidden, with the placeholder below
+
+  # The page product's tile only shows next to at least one bundle product
+  assign qb_show_main = false
+  if block.settings.show_main_product and qb_rendered > 0
+    assign qb_show_main = true
+  endif
+  assign qb_tiles = qb_rendered
+  if qb_show_main
+    assign qb_tiles = qb_tiles | plus: 1
+  endif
+-%}
+<div
+  class="qb-v2-bundle qb-v2-bundle--{{ block.settings.layout }}{% if block.settings.layout == 'auto' %}{% if qb_tiles <= 3 %} qb-v2-bundle--auto-grid{% else %} qb-v2-bundle--auto-list{% endif %}{% endif %}{% if block.settings.show_only_when_selected %} qb-v2-bundle--when-selected{% endif %}{% if qb_show_main %} qb-v2-bundle--with-main{% endif %}{% unless block.settings.show_separators %} qb-v2-bundle--no-plus{% endunless %}"
+  data-qb-child="bundle"
+  data-qb-block="{{ block.id }}"
+  data-qb-discount-type="{{ block.settings.discount_type }}"
+  data-qb-discount-value="{{ qb_discount_value }}"
+  data-qb-sum-total="{{ qb_sum_total }}"
+  data-qb-sum-cat="{{ qb_sum_cat }}"
+  data-qb-sum-creg="{{ qb_sum_creg }}"
+  {%- if qb_blocks_option %} data-qb-blocks-option="true"{% endif %}
+  {%- if qb_rendered == 0 %} data-qb-require-missing="true"{% endif %}
+  {%- if qb_pending %} data-qb-pending="true"{% endif %}
+  style="--qb-v2-tiles: {{ qb_tiles }};"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.heading != blank -%}
+    <div class="qb-v2-bundle__heading">{{ block.settings.heading }}</div>
+  {%- endif -%}
+  <div class="qb-v2-bundle__items">
+    {%- if qb_show_main -%}
+      {%- comment -%}The page product; the option fills in its quantity and prices{%- endcomment -%}
+      <div class="qb-v2-item qb-v2-item--tile qb-v2-item--main" data-qb-item-main>
+        <div class="qb-v2-item__media">
+          {%- if qb_main.featured_image != blank -%}
+            {%- assign qb_main_ratio = qb_main.featured_image.aspect_ratio | default: 1 -%}
+            <img
+              src="{{ qb_main.featured_image | image_url: width: 160 }}"
+              alt=""
+              width="160"
+              height="{{ 160 | divided_by: qb_main_ratio | round }}"
+              loading="lazy"
+              class="qb-v2-item__img"
+            >
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'qb-v2-item__img qb-v2-item__img--placeholder' }}
+          {%- endif -%}
+        </div>
+        <div class="qb-v2-item__info">
+          <span class="qb-v2-item__title">
+            {%- comment -%}"2× " for options with more than one unit{%- endcomment -%}
+            <span class="qb-v2-item__qty">__QB_QX__</span>
+            {{- qb_main.title | escape -}}
+          </span>
+          {%- if block.settings.show_prices -%}
+            <span class="qb-v2-item__prices">
+              <span class="qb-v2-item__price">__QB_MAIN_PRICE__</span>
+              <s class="qb-v2-item__compare">__QB_MAIN_COMPARE__</s>
+            </span>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+    {{- qb_items_html -}}
+  </div>
+  {%- if request.design_mode -%}
+    {%- if block.settings.products == blank -%}
+      <div class="qb-v2-placeholder">Choose up to 4 products in Bundle products.</div>
+    {%- endif -%}
+    {{- qb_notes -}}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"bundle","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"discount_type":{{ block.settings.discount_type | json }},"discount_percentage":{{ block.settings.discount_percentage | json }},"discount_amount_cents":{{ qb_amount_cents }},"quantities":[{{ qb_quantities_json }}],"layout":{{ block.settings.layout | json }},"show_main_product":{{ block.settings.show_main_product }}},"products":[{{ qb_products_json }}]}
+    </script>
+  {%- endif -%}
+</div>
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Bundle products",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "Products",
+      "limit": 4,
+      "info": "Up to 4 products."
+    },
+    {
+      "type": "text",
+      "id": "quantities",
+      "label": "Quantities",
+      "info": "Comma-separated, in product order. Example: 1, 2. Empty means 1 each."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Shown above the products. Leave empty to hide it."
+    },
+    {
+      "type": "header",
+      "content": "Discount"
+    },
+    {
+      "type": "select",
+      "id": "discount_type",
+      "label": "Discount type",
+      "options": [
+        {
+          "value": "none",
+          "label": "No discount"
+        },
+        {
+          "value": "percentage",
+          "label": "Percentage off"
+        },
+        {
+          "value": "amount_each",
+          "label": "Amount off each item"
+        },
+        {
+          "value": "free",
+          "label": "Free"
+        }
+      ],
+      "default": "none",
+      "info": "Applies to every product in this block."
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Percentage",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15,
+      "visible_if": "{{ block.settings.discount_type == 'percentage' }}"
+    },
+    {
+      "type": "number",
+      "id": "discount_amount",
+      "label": "Amount",
+      "default": 5,
+      "info": "In your shop's currency, without the currency symbol. Example: 4.99",
+      "visible_if": "{{ block.settings.discount_type == 'amount_each' }}"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto"
+        },
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "list",
+          "label": "List"
+        }
+      ],
+      "default": "auto",
+      "info": "Auto shows a grid for up to 3 tiles and a list above that."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_main_product",
+      "label": "Show this product first",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separators",
+      "label": "Show + separators",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_only_when_selected",
+      "label": "Show only when selected",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_prices",
+      "label": "Show prices",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_pickers",
+      "label": "Show variant pickers",
+      "default": true,
+      "info": "Not shown for products with over 100 variants."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle products"
+    }
+  ]
+}
+{% endschema %}

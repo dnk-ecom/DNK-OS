@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "node_project_root",
+      "type": "text",
+      "text": "### 🚀 Project: Shopify Theme DNK-Ecom (L2 Project DNA)\n\n**Account**: `acct-dnk-maxim`\n**Project ID**: `proj-shopify-dnk-ecom`\n**Domain**: `shopify_theme`\n**Manifest**: `docs/projects/dnk_ecom/project.manifest.yaml`\n**Brand DNA**: `docs/projects/dnk_ecom/brand_dna.json`\n\n**Mission**:\nBuild an ultra-fast, modular, high-converting sovereign Shopify theme engine on Horizon Tinker 4.2.0 with Theme Blocks 2.0 and native CRO capabilities.",
+      "x": 600,
+      "y": 50,
+      "width": 420,
+      "height": 260,
+      "color": "5"
+    },
+    {
+      "id": "node_track_1_core_rnd",
+      "type": "text",
+      "text": "### 🛠️ Track 1: R&D & Theme Core Foundry\n\n**Track ID**: `track-theme-core`\n**Workhorse**: `dnk_shopify`\n**Repo Root**: `./services/dnk_shopify/DNK_Horizon_Tinker`\n**Mission**: Maintain immutable SemVer master theme on Tinker 4.2.0.\n\n**Agent**: `dnk_shopify`\n**Gate**: `shopify theme check`",
+      "x": 100,
+      "y": 400,
+      "width": 380,
+      "height": 220,
+      "color": "2"
+    },
+    {
+      "id": "node_track_2_marketing_sales",
+      "type": "text",
+      "text": "### 📈 Track 2: Marketing, Sales & Conversion Funnels\n\n**Track ID**: `track-marketing-sales`\n**Workhorse**: `dnk_distribution`\n**Mission**: Craft high-converting landing pages, PDP copy, and lead magnets.\n\n**Agent**: `strategist`\n**Gate**: `markdown_schema_gate.py`",
+      "x": 620,
+      "y": 400,
+      "width": 380,
+      "height": 220,
+      "color": "3"
+    },
+    {
+      "id": "node_track_3_donor_audit",
+      "type": "text",
+      "text": "### 🔍 Track 3: SOTA Competitor Audit & Benchmarks\n\n**Track ID**: `track-donor-audit`\n**Workhorse**: `dnk_shopify` / `gerych`\n**Repo Root**: `./docs/notes/sota_audits`\n**Mission**: Reverse-engineer top competitor themes (Sugar, Story, Ella, Shrine).\n\n**Agent**: `gerych`\n**Gate**: `verify_donor_audit`",
+      "x": 1140,
+      "y": 400,
+      "width": 380,
+      "height": 220,
+      "color": "6"
+    },
+    {
+      "id": "node_t1_dual_ready_blocks",
+      "type": "text",
+      "text": "### 🧱 T1.1: Dual-Ready Theme Blocks v2.0 Synthesis\n\n**Parent**: `node_track_1_core_rnd`\n**Target**: `services/dnk_shopify/DNK_Horizon_Tinker/blocks/`\n**Agent**: `dnk_shopify`\n\n**Tasks**:\n1. Construct atomic blocks with {% doc %} param typing.\n2. Ensure closest.product fallback.\n3. Validate under Tinker 4.2.0 runtime.",
+      "x": 100,
+      "y": 700,
+      "width": 380,
+      "height": 240,
+      "color": "1"
+    },
+    {
+      "id": "node_t2_pdp_copywriting",
+      "type": "text",
+      "text": "### ✍️ T2.1: PDP Direct Response Copywriting\n\n**Parent**: `node_track_2_marketing_sales`\n**Target**: `docs/projects/dnk_ecom/copy/`\n**Agent**: `strategist`\n\n**Tasks**:\n1. Extract pain points from L2 ICP profile.\n2. Formulate 3-angle value proposition.\n3. Eliminate AI-slop via humanizer gate.",
+      "x": 620,
+      "y": 700,
+      "width": 380,
+      "height": 240,
+      "color": "1"
+    },
+    {
+      "id": "node_t3_sugar_theme_audit",
+      "type": "text",
+      "text": "### 🔬 T3.1: Sugar Theme Reverse-Engineering Dossier\n\n**Parent**: `node_track_3_donor_audit`\n**Target**: `docs/notes/sota_audits/`\n**Agent**: `gerych`\n\n**Tasks**:\n1. Deconstruct Sugar theme cart drawer & sticky ATC.\n2. Extract Liquid AST interpolation patterns.\n3. Feed crystallized block specs into T1.1.",
+      "x": 1140,
+      "y": 700,
+      "width": 380,
+      "height": 240,
+      "color": "1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_root_to_t1",
+      "fromNode": "node_project_root",
+      "fromSide": "bottom",
+      "toNode": "node_track_1_core_rnd",
+      "toSide": "top",
+      "label": "Workstream 1"
+    },
+    {
+      "id": "edge_root_to_t2",
+      "fromNode": "node_project_root",
+      "fromSide": "bottom",
+      "toNode": "node_track_2_marketing_sales",
+      "toSide": "top",
+      "label": "Workstream 2"
+    },
+    {
+      "id": "edge_root_to_t3",
+      "fromNode": "node_project_root",
+      "fromSide": "bottom",
+      "toNode": "node_track_3_donor_audit",
+      "toSide": "top",
+      "label": "Workstream 3"
+    },
+    {
+      "id": "edge_t1_to_subtask",
+      "fromNode": "node_track_1_core_rnd",
+      "fromSide": "bottom",
+      "toNode": "node_t1_dual_ready_blocks",
+      "toSide": "top",
+      "label": "Subtask T1.1"
+    },
+    {
+      "id": "edge_t2_to_subtask",
+      "fromNode": "node_track_2_marketing_sales",
+      "fromSide": "bottom",
+      "toNode": "node_t2_pdp_copywriting",
+      "toSide": "top",
+      "label": "Subtask T2.1"
+    },
+    {
+      "id": "edge_t3_to_subtask",
+      "fromNode": "node_track_3_donor_audit",
+      "fromSide": "bottom",
+      "toNode": "node_t3_sugar_theme_audit",
+      "toSide": "top",
+      "label": "Subtask T3.1"
+    },
+    {
+      "id": "edge_t3_to_t1_feed",
+      "fromNode": "node_t3_sugar_theme_audit",
+      "fromSide": "left",
+      "toNode": "node_t1_dual_ready_blocks",
+      "toSide": "right",
+      "label": "Feed CRO Patterns"
+    },
+    {
+      "id": "edge_t1_to_t2_feed",
+      "fromNode": "node_t1_dual_ready_blocks",
+      "fromSide": "right",
+      "toNode": "node_t2_pdp_copywriting",
+      "toSide": "left",
+      "label": "Feed Block Specs"
+    }
+  ]
+}

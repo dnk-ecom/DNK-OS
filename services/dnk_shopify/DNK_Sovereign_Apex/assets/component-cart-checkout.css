@@ -1,0 +1,570 @@
+/* Cart checkout looks (footer area): Subtotals rows, Checkout button, Terms checkbox, express lock, Discount field,
+   Cart note, Cart field, Shipping estimator, the classic cart page's Subtotal extras, and the style-only parts of the
+   cart styles. Loaded by component-cart.js from data-cart-feature="checkout" / "checkout:css" markers; the cart page
+   sections link it. Every override wins by specificity (noted), never by file order; no corner variables here (the
+   cart root's corner classes set the theme's own radius variables). */
+
+/* Subtotals: Stacked texts layout (the base row isn't flex, only --spaced is; 0,2,0 beats the base row) */
+.cart-drawer__totals__row.cart-drawer__totals__row--stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: .2rem;
+}
+
+/* The blocks' "Text" colour options (the Subtotals rows) follow the panel they sit in: Cart page V2 with custom colours
+   (inline colours, no scheme class) and a Summary with its own scheme. The theme's .text-color-text is the base text
+   colour, invisible on a dark panel; component-cart.css (shell) covers a drawer or page with a scheme class. Cart page V2
+   links this file. (0,3,0) and (0,3,1) */
+cart-page.cart-root[style*='--color-foreground'] :is(.text-color-text, .color-foreground-text),
+.cart-root :is(.color-background-1, .color-background-2, .color-inverse, .color-accent-1, .color-accent-2) :is(.text-color-text, .color-foreground-text) {
+  --color-foreground: inherit;
+}
+
+cart-page.cart-root[style*='--color-foreground'] .text-color-text,
+.cart-root :is(.color-background-1, .color-background-2, .color-inverse, .color-accent-1, .color-accent-2) .text-color-text {
+  color: rgb(var(--color-foreground));
+}
+
+/* Subtotals: shipping row and estimated total (cart-totals-goal can be the host) */
+.cart-totals-shipping {
+  display: flex;
+  flex-direction: column;
+  row-gap: .8rem;
+  margin-top: 1rem;
+}
+
+.cart-totals-row__value {
+  text-align: end;
+}
+
+/* a long word (a translation, a currency) wraps instead of widening the drawer */
+.cart-totals-row__label,
+.cart-totals-row__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cart-totals-row--estimated [data-estimated-value] {
+  font-weight: bold;
+}
+
+/* 0,3,0: hidden beats the row's flex display (--spaced, --stacked, the classic .totals) */
+.cart-totals-shipping [data-estimated-row][hidden] {
+  display: none;
+}
+
+.cart-totals-note {
+  margin: .8rem 0 0;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-totals-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: .2rem;
+}
+
+.cart-totals-installments {
+  margin-top: .8rem;
+}
+
+/* Subtotals: discounts as a details list. 0,2,0 beats .drawer__footer summary (0,1,1) and summary .icon-caret */
+.cart-totals-discounts {
+  margin-top: .8rem;
+  font-size: 1.3rem;
+}
+
+.cart-totals-discounts > .cart-totals-discounts__summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .6rem;
+  min-height: 2.4rem;
+  padding: 0;
+  line-height: 1.2;
+  list-style: none;
+  cursor: pointer;
+}
+
+.cart-totals-discounts__total {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.cart-totals-discounts__total .icon-caret {
+  position: static;
+  width: 1rem;
+  height: .6rem;
+}
+
+.cart-totals-discounts__list {
+  display: grid;
+  gap: .4rem;
+  margin: .4rem 0 0;
+  padding: 0;
+}
+
+.cart-totals-discounts__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cart-totals-discounts__item .icon-discount {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-inline-end: .4rem;
+  vertical-align: -.1rem;
+}
+
+/* Checkout button: lock icon, Large size, caption, express heading, continue shopping */
+.cart-checkout__lock {
+  display: inline-flex;
+  vertical-align: -.12em;
+  margin-inline-end: .5em;
+}
+
+.cart-checkout__lock .icon-padlock {
+  width: .8em;
+  height: 1.05em;
+}
+
+/* in a narrow column (the Split footer recipe) the lock and the label keep one line: the side padding shrinks with
+   the column; in a full-width drawer button 8% is the theme's 3rem */
+.cart__checkout-button.cart-checkout__button--lock {
+  --buttons-padding-x: min(3rem, 8%);
+}
+
+.cart__checkout-button.cart-checkout__button--large {
+  min-height: calc(var(--buttons-height, 4.5rem) + 1.2rem + var(--buttons-border-width, 0rem) * 2);
+}
+
+.cart-checkout__caption {
+  font-size: 1.3rem;
+  line-height: 1.4;
+  text-align: center;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-checkout__caption,
+.cart-checkout__express-heading {
+  margin-bottom: 0;
+}
+
+.cart-checkout__express-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  letter-spacing: .06rem;
+  text-transform: uppercase;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-checkout__express-heading::before,
+.cart-checkout__express-heading::after {
+  content: '';
+  flex: 1 1 0;
+  height: .1rem;
+  background: var(--cart-hairline, rgba(var(--color-foreground), .15));
+}
+
+.cart-checkout__continue {
+  display: block;
+  width: 100%;
+  min-height: 2.4rem;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+button.cart-checkout__continue {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .3rem;
+}
+
+/* Terms checkbox: the native input is visually hidden inside the box; its focus ring goes on the visible box icon */
+.tnc-checkbox__input:focus-visible ~ svg {
+  outline: .2rem solid rgba(var(--color-foreground), .5);
+  outline-offset: .2rem;
+  border-radius: .2rem;
+}
+
+.tnc-chekcbox .tnc-checkbox__text {
+  cursor: pointer;
+}
+
+/* Express checkout locked by a Terms checkbox or a required Cart field */
+.cart-checkout__express--locked {
+  position: relative;
+}
+
+.cart-checkout__express--locked > :not(.cart-checkout__express-shield) {
+  opacity: .45;
+}
+
+.cart-checkout__express-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.cart-checkout__express-shield:focus-visible {
+  outline: .2rem solid rgba(var(--color-foreground), .5);
+  outline-offset: .3rem;
+}
+
+/* Discount field: applied codes and gift cards. Above the field, whose top margin is 0 in the drawer and on the
+   cart page: the gap goes below the chips */
+.cart-discount__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.cart-discount__pill.badge {
+  gap: .4rem;
+  min-height: 2.8rem;
+  padding-inline: .8rem .2rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  background: rgba(var(--color-foreground), .08);
+  border-radius: var(--cart-radius-small, var(--badge-corner-radius));
+}
+
+.cart-discount__pill .icon-discount {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.cart-discount__pill-icon {
+  display: inline-flex;
+}
+
+.cart-discount__pill-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.cart-discount__pill-remove .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cart-discount__pill-remove:hover {
+  background: rgba(var(--color-foreground), .08);
+}
+
+.cart-discount-form__note {
+  margin: .6rem 0 0;
+  font-size: 1.3rem;
+  color: rgba(var(--color-foreground), .75);
+}
+
+/* Discount field: Collapsed link. 0,2,0 beats .drawer__footer summary (0,1,1) */
+.cart-discount__toggle > .cart-discount__summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0;
+  line-height: 1.3;
+  font-size: 1.4rem;
+  list-style: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .3rem;
+}
+
+.cart-discount__toggle > .cart-discount__summary::-webkit-details-marker {
+  display: none;
+}
+
+.cart-discount--collapsed .cart-discount__toggle:not([open]) {
+  padding-bottom: 1.2rem;
+}
+
+.cart-discount--collapsed .cart-discount-form {
+  margin-top: .6rem;
+}
+
+/* Cart note: a placeholder of its own is shown (the theme hides floating-label placeholders) */
+.cart__note--placeholder .field__input::placeholder {
+  opacity: 1;
+  color: rgba(var(--color-foreground), .55);
+}
+
+/* Character counter of the Cart note and the Cart field */
+.cart-field__counter {
+  display: block;
+  margin-top: .4rem;
+  font-size: 1.2rem;
+  text-align: end;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-field__counter.cart-field__counter--limit {
+  color: rgb(var(--color-foreground));
+}
+
+/* Cart field */
+cart-field {
+  display: block;
+}
+
+.cart-field__label {
+  display: block;
+  margin-bottom: .6rem;
+  font-size: 1.4rem;
+}
+
+/* 0,3,0: an outside label, so no floating-label padding (.field__input:focus / :not(:placeholder-shown) are 0,2,0) */
+.cart-field .cart-field__input.field__input,
+.cart-estimator .cart-estimator__input.field__input {
+  padding: 1rem 1.5rem;
+}
+
+.cart-field .cart-field__input::placeholder {
+  opacity: 1;
+  color: rgba(var(--color-foreground), .55);
+}
+
+.cart-field .text-area.cart-field__input {
+  min-height: 8rem;
+}
+
+.cart-field__check {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  min-height: 2.4rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+/* 0,2,0 beats input[type=checkbox] (0,1,1) */
+.cart-field .cart-field__checkbox {
+  flex: none;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin: 0;
+  accent-color: rgb(var(--color-foreground));
+}
+
+.cart-field__check .cart-field__label {
+  display: inline;
+  margin: 0;
+}
+
+.cart-field__fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cart-field__fieldset > legend {
+  padding: 0;
+}
+
+.cart-field__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
+
+.cart-field__pill {
+  position: relative;
+}
+
+.cart-field__pill > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.6rem;
+  padding: 0 1.4rem;
+  border: .1rem solid rgba(var(--color-foreground), .3);
+  border-radius: var(--cart-radius-small, 4rem);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.cart-field__pill-input:checked + span {
+  color: rgb(var(--color-background));
+  background: rgb(var(--color-foreground));
+  border-color: rgb(var(--color-foreground));
+}
+
+.cart-field__pill-input:focus-visible + span {
+  outline: .2rem solid rgba(var(--color-foreground), .5);
+  outline-offset: .2rem;
+}
+
+.cart-field__error {
+  margin: .6rem 0 0;
+  font-size: 1.3rem;
+  color: rgb(var(--color-foreground));
+}
+
+.cart-field__error::before {
+  content: '! ';
+  font-weight: 700;
+}
+
+/* Shipping estimator. 0,2,0 beats .drawer__footer summary (0,1,1) and summary .icon-caret (0,1,1) */
+cart-shipping-estimator {
+  display: block;
+}
+
+.cart-estimator__details > .cart-estimator__summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-height: 4.4rem;
+  padding: 0;
+  line-height: 1.2;
+  font-size: 1.5rem;
+  list-style: none;
+  cursor: pointer;
+}
+
+.cart-estimator__summary .icon-caret {
+  position: static;
+  flex: none;
+  width: 1rem;
+  height: .6rem;
+}
+
+.cart-estimator__form {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.cart-estimator__label {
+  display: block;
+  margin-bottom: .4rem;
+  font-size: 1.3rem;
+}
+
+.cart-estimator__results {
+  font-size: 1.4rem;
+}
+
+.cart-estimator__results > :last-child {
+  margin-bottom: 1rem;
+}
+
+.cart-estimator__heading,
+.cart-estimator__error {
+  margin: 0 0 .6rem;
+}
+
+.cart-estimator__heading {
+  font-size: 1.3rem;
+  color: rgba(var(--color-foreground), .75);
+}
+
+.cart-estimator__rates {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-estimator__rate {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cart-estimator__rate-date {
+  display: block;
+  font-size: 1.2rem;
+  color: rgba(var(--color-foreground), .75);
+}
+
+/* Classic cart page: Subtotal extras */
+.cart-totals-shipping--page {
+  margin-top: 1.2rem;
+}
+
+.cart-totals-shipping--page .cart-totals-row__label,
+.cart-totals-shipping--page .cart-totals-row__value {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.cart-totals-goal {
+  display: block;
+  margin-top: 1.2rem;
+  text-align: end;
+}
+
+/* 0,2,0: hidden beats the display above */
+.cart-totals-goal[hidden] {
+  display: none;
+}
+
+.cart-totals-goal__text {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.cart-totals-goal__bar {
+  height: .6rem;
+  margin-top: .6rem;
+  border-radius: 1rem;
+  background: rgba(var(--color-foreground), .1);
+  overflow: hidden;
+}
+
+.cart-totals-goal__bar > span {
+  display: block;
+  height: 100%;
+  background: rgb(var(--color-base-accent-1));
+  transition: width .3s ease;
+}
+
+/* Style-only parts (Classic prints none of these classes) */
+.cart-style--cards .cart-timer,
+.cart-style--soft .cart-timer {
+  margin-inline: 0;
+  border-radius: var(--cart-radius-small, .8rem);
+}
+
+.cart-style--cards .cart-discount__pill.badge,
+.cart-style--soft .cart-discount__pill.badge {
+  background: var(--cart-tint, rgba(var(--color-foreground), .06));
+}
+
+/* Cart page V2: the countdown band's negative side margins belong to the drawer's Body and Footer padding (0,3,0) */
+.cart-root[data-cart-surface="page-v2"] .cart-timer {
+  margin-inline: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-totals-discounts__total .icon-caret,
+  .cart-estimator__summary .icon-caret,
+  .cart-totals-goal__bar > span {
+    transition: none;
+  }
+}

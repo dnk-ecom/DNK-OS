@@ -1,0 +1,68 @@
+{%- comment -%}
+  "Same as cart" resolver: the single source of truth for every cart look select.
+  Accepts:
+  - option: matrix key (corner_style, spacing, item_style, image_ratio, savings_style, free_item_style, subscribe_style,
+    upgrade_style, bar_style, card_layout, title_style, add_btn_style, field_style, button_size, qb_nudge_style)
+  - value: the select's value ('cart' = Same as cart)
+  - cart_style: section.settings.cart_style (blank or unknown = classic)
+  Outputs the resolved value with no whitespace; an unknown option with 'cart' outputs nothing.
+  Usage:
+  {%- capture item_style -%}{%- render 'cart-style-value', option: 'item_style', value: block.settings.item_style, cart_style: section.settings.cart_style -%}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign csv_value = value | default: 'cart'
+  if csv_value != 'cart'
+    echo csv_value
+  else
+    case cart_style
+      when 'clean'
+        assign csv_i = 1
+      when 'cards'
+        assign csv_i = 2
+      when 'soft'
+        assign csv_i = 3
+      when 'bold'
+        assign csv_i = 4
+      else
+        assign csv_i = 0
+    endcase
+    case option
+      when 'corner_style'
+        assign csv_row = 'theme,theme,rounded,pill,square'
+      when 'spacing'
+        assign csv_row = 'normal,relaxed,normal,relaxed,normal'
+      when 'item_style'
+        assign csv_row = 'classic,divided,cards,cards,divided'
+      when 'image_ratio'
+        assign csv_row = 'adapt,square,square,square,adapt'
+      when 'savings_style'
+        assign csv_row = 'text,text,pill,pill,pill'
+      when 'free_item_style'
+        assign csv_row = 'plain,highlight,highlight,highlight,highlight'
+      when 'subscribe_style'
+        assign csv_row = 'switch,switch,pill,pill,switch'
+      when 'upgrade_style'
+        assign csv_row = 'card,banner,card,card,banner'
+      when 'bar_style'
+        assign csv_row = 'line_icons,minimal,steps,steps,steps'
+      when 'card_layout'
+        assign csv_row = 'row,row,tile,tile,row'
+      when 'title_style'
+        assign csv_row = 'heading,label,label,label,heading'
+      when 'add_btn_style'
+        assign csv_row = 'solid,outline,pill,pill,solid'
+      when 'field_style'
+        assign csv_row = 'open,collapsed,collapsed,collapsed,open'
+      when 'button_size'
+        assign csv_row = 'theme,large,large,large,large'
+      when 'qb_nudge_style'
+        assign csv_row = 'tint,plain,outline,tint,tint'
+      else
+        assign csv_row = ''
+    endcase
+    if csv_row != ''
+      assign csv_cells = csv_row | split: ','
+      echo csv_cells[csv_i]
+    endif
+  endif
+-%}

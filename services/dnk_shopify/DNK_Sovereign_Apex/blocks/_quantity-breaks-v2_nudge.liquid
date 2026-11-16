@@ -1,0 +1,70 @@
+{%- comment -%}
+  Next-tier nudge, a child of Quantity breaks V2 (outside the options): one line that tells the customer what the
+  next bigger option saves, with an optional progress bar. component-quantity-breaks-v2-extras.js writes the text
+  from the options' live prices; the &nbsp; keeps the line's height until then, so nothing shifts.
+{%- endcomment -%}
+<div
+  class="qb-v2-nudge"
+  data-qb-child="nudge"
+  data-qb-ext="true"
+  data-qb-block="{{ block.id }}"
+  data-qb-text="{{ block.settings.nudge_text | escape }}"
+  data-qb-done-text="{{ block.settings.done_text | escape }}"
+  data-qb-select-on-click="{{ block.settings.select_on_click }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.select_on_click -%}
+    <button type="button" class="qb-v2-nudge__text link" data-qb-action="nudge">&nbsp;</button>
+  {%- else -%}
+    <p class="qb-v2-nudge__text">&nbsp;</p>
+  {%- endif -%}
+  {%- if block.settings.show_progress_bar -%}
+    <span class="qb-v2-nudge__bar" aria-hidden="true"><span class="qb-v2-nudge__fill"></span></span>
+  {%- endif -%}
+  {%- if request.design_mode -%}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"nudge","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{},"products":[]}
+    </script>
+  {%- endif -%}
+</div>
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Next-tier nudge",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "nudge_text",
+      "label": "Text",
+      "default": "Add [missing_quantity] more and save [next_saving]",
+      "info": "Use [missing_quantity], [next_title] and [next_saving]."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "done_text",
+      "label": "Best deal text",
+      "default": "You're getting the best deal",
+      "info": "Leave empty to hide the nudge at the top option."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show progress bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "select_on_click",
+      "label": "Select on click",
+      "default": true,
+      "info": "Clicking the nudge selects the next option."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Next-tier nudge"
+    }
+  ]
+}
+{% endschema %}

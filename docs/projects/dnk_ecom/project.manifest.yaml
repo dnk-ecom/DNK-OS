@@ -1,0 +1,47 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/projects/dnk_ecom/project.manifest.yaml"
+# purpose: "Canonical Project Manifest for Pilot Business Project 'Shopify Theme DNK-Ecom' with 3 Tracks & L2 DNA Binding."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-16"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+project_id: "proj-shopify-dnk-ecom"
+account_id: "acct-dnk-maxim"
+project_name: "Shopify Theme DNK-Ecom"
+domain_type: "shopify_theme"
+dna_version: "1.0.0"
+brand_dna_file: "./docs/projects/dnk_ecom/brand_dna.json"
+main_canvas: "./docs/canvas/projects/dnk_ecom/main.canvas"
+
+workstreams:
+  track_1_core_rnd:
+    track_id: "track-theme-core"
+    kind: "core_rnd"
+    title: "Track 1: R&D & Theme Core Foundry"
+    assigned_workhorse: "dnk_shopify"
+    repo_root: "./services/dnk_shopify/DNK_Sovereign_Apex"
+    canvas: "./docs/canvas/projects/dnk_ecom/track_theme_core.canvas"
+    definition_of_done: "100% 7-Gate Theme Integrity pass on DNK Sovereign 1.0.0 Apex, zero liquid syntax errors"
+
+  track_2_marketing_sales:
+    track_id: "track-marketing-sales"
+    kind: "marketing_sales"
+    title: "Track 2: Marketing, Sales & Conversion Funnels"
+    assigned_workhorse: "dnk_distribution"
+    repo_root: "./services/dnk_shopify"
+    canvas: "./docs/canvas/projects/dnk_ecom/track_marketing_sales.canvas"
+    definition_of_done: "PDP conversion blocks with direct response copy, zero AI-slop"
+
+  track_3_donor_audit:
+    track_id: "track-donor-audit"
+    kind: "donor_audit"
+    title: "Track 3: SOTA Competitor Audit & Reverse-Engineering"
+    assigned_workhorse: "dnk_shopify"
+    repo_root: "./docs/notes/sota_audits"
+    canvas: "./docs/canvas/projects/dnk_ecom/track_donor_audit.canvas"
+    definition_of_done: "Reverse engineering audits complete for Sugar, Story, Ella and integrated into atomic block backlog"

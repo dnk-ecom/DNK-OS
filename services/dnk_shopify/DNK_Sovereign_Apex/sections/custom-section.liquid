@@ -1,0 +1,204 @@
+{% liquid
+  assign container_class = 'custom-section-content'
+
+  if section.settings.container_width == 'site'
+    assign container_class = container_class | append: ' container ' | append: settings.container_width
+  elsif section.settings.container_width == 'narrow'
+    assign container_class = container_class | append: ' container container-content'
+  endif
+%}
+
+{% if section.index <= 3 or request.design_mode %}
+  <link href="{{ 'custom-section.css' | asset_url }}" rel="stylesheet" fetchpriority="high">
+{% endif %}
+
+<div
+  class="custom-section section-spacing"
+  data-mobile-text-alignment="{{ section.settings.mobile_text_alignment }}"
+  data-desktop-text-alignment="{{ section.settings.desktop_text_alignment }}"
+  style="
+    --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --color-accent: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+    --mobile-text-alignment: {{ section.settings.mobile_text_alignment }};
+    --desktop-text-alignment: {{ section.settings.desktop_text_alignment }};
+    --pt: {{ section.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ section.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  data-section-css="{{ 'custom-section.css' | asset_url }}"
+>
+  <div class="{{ container_class }}">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Custom section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "label": "Container",
+      "options": [
+        { "value": "full", "label": "Full width" },
+        { "value": "site", "label": "Site container" },
+        { "value": "narrow", "label": "Narrow container" }
+      ],
+      "default": "site"
+    },
+    {
+      "type": "text_alignment",
+      "id": "mobile_text_alignment",
+      "label": "Mobile text alignment",
+      "default": "left"
+    },
+    {
+      "type": "text_alignment",
+      "id": "desktop_text_alignment",
+      "label": "Desktop text alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "presets": [
+    {
+      "name": "Custom section",
+      "category": "Layout",
+      "settings": {
+        "container_width": "site",
+        "mobile_text_alignment": "center",
+        "desktop_text_alignment": "center"
+      },
+      "blocks": [
+        {
+          "type": "group",
+          "settings": {
+            "mobile_content_direction": "column",
+            "mobile_gap": 0,
+            "desktop_content_direction": "column",
+            "desktop_gap": 0,
+            "pb": 30
+          },
+          "blocks": [
+            {
+              "type": "subheading",
+              "settings": {
+                "subheading": "Build a flexible layout",
+                "pb": 12
+              }
+            },
+            {
+              "type": "heading",
+              "settings": {
+                "heading": "Custom section",
+                "pb": 0
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "<p>Add, remove, and rearrange reusable blocks to create a section tailored to your content and layout needs.</p>",
+                "pt": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "image",
+          "settings": {
+            "image_ratio": "adapt"
+          }
+        },
+        {
+          "type": "group",
+          "settings": {
+            "mobile_content_direction": "column",
+            "mobile_gap": 10,
+            "desktop_content_direction": "row",
+            "desktop_gap": 10,
+            "pt": 30
+          },
+          "blocks": [
+            {
+              "type": "button",
+              "settings": {
+                "label": "Primary action",
+                "style": "btn-accent-solid"
+              }
+            },
+            {
+              "type": "button",
+              "settings": {
+                "label": "Secondary action",
+                "style": "btn-text-solid"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,14 @@
+{%- comment -%}
+  Inline notice for the theme editor. Prints nothing outside the theme editor.
+  Accepts:
+  - code: kebab-case, prefixed by area (core-, lines-, checkout-, rewards-, upsells-, pages-)
+  - level: error, warning or info (default info)
+  - title: the block or section name
+  - text: "<what's wrong, lowercase first word>. <What to do>."
+  - attrs (optional): extra attributes, e.g. block.shopify_attributes, so a block that prints nothing else stays selectable
+  Usage:
+  {% render 'cart-editor-notice', code: 'gift-no-product', level: 'warning', title: 'Free gift', text: 'no gift product. Choose one in Gift products.' %}
+{%- endcomment -%}
+{%- if request.design_mode -%}
+  <p class="cart-editor-notice cart-editor-notice--{{ level | default: 'info' }}" data-cart-notice="{{ code }}" role="note"{% if attrs != blank %} {{ attrs }}{% endif %}><strong>{{ title }}:</strong> {{ text }} <small>Only visible in the theme editor.</small></p>
+{%- endif -%}

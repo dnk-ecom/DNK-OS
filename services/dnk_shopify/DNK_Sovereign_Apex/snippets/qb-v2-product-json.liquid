@@ -1,0 +1,104 @@
+{%- comment -%}
+  Quantity breaks V2: product data for the scripts, kept small because the main-product section
+  is rendered again on every variant change.
+
+  Accepts:
+  - product: {Object}
+  - mode: {String}
+    main: the variants array main.js reads, as the first JSON inside <quantity-breaks>
+    meta: the page product's facts for the V2 scripts
+    extra: an extra product (bundle item, gift, add-on, candidate); variants only for products with up
+           to 100 variants (no picker is shown above that), and one image per option value
+  - has_pickers: {Boolean} main mode, whether any option shows per-item pickers
+
+  Usage:
+  {% render 'qb-v2-product-json', product: product, mode: 'extra' %}
+{%- endcomment -%}
+{%- case mode -%}
+  {%- when 'main' -%}
+    <script type="application/json" data-has-variants="{% if has_pickers %}true{% else %}false{% endif %}">
+      [
+      {%- for qb_variant in product.variants limit: 250 -%}
+        {%- unless forloop.first -%},{%- endunless -%}
+        {"id":{{ qb_variant.id | json }},"title":{{ qb_variant.title | json }},"options":{{ qb_variant.options | json }},"option1":{{ qb_variant.option1 | json }},"option2":{{ qb_variant.option2 | json }},"option3":{{ qb_variant.option3 | json }},"available":{{ qb_variant.available | json }},"price":{{ qb_variant.price | json }},"compare_at_price":{{ qb_variant.compare_at_price | json }},"featured_image":
+        {%- if qb_variant.featured_image -%}
+          {"src":{{ qb_variant.featured_image | image_url: width: 600 | json }}}
+        {%- else -%}
+          null
+        {%- endif -%}
+        ,"featured_media":
+        {%- if qb_variant.featured_media -%}
+          {"id":{{ qb_variant.featured_media.id | json }}}
+        {%- else -%}
+          null
+        {%- endif -%}
+        }
+      {%- endfor -%}
+      ]
+    </script>
+  {%- when 'meta' -%}
+    {%- assign qb_variants_count = product.variants_count | default: product.variants.size -%}
+    <script type="application/json" data-qbv2-main>
+      {"id":{{ product.id | json }},"handle":{{ product.handle | json }},"title":{{ product.title | json }},"url":{{ product.url | json }},"options":{{ product.options | json }},"variants_count":{{ qb_variants_count | plus: 0 }},"has_only_default_variant":{{ product.has_only_default_variant | json }},"requires_selling_plan":{{ product.requires_selling_plan | json }},"selected_variant_id":{{ product.selected_or_first_available_variant.id | json }}}
+    </script>
+  {%- when 'extra' -%}
+    {%- liquid
+      assign qb_variants_count = product.variants_count | default: product.variants.size
+      assign qb_selected = product.selected_or_first_available_variant
+      assign qb_image = 'null'
+      if product.featured_image
+        assign qb_image = product.featured_image | image_url: width: 160 | json
+      endif
+    -%}
+    <!--qbv2:json--><script type="application/json" data-qbv2-product="{{ product.id }}">
+      {"id":{{ product.id | json }},"handle":{{ product.handle | json }},"title":{{ product.title | json }},"url":{{ product.url | json }},"image":{{ qb_image }},"available":{{ product.available | json }},"requires_selling_plan":{{ product.requires_selling_plan | json }},"options":{{ product.options | json }},"selected_variant_id":{{ qb_selected.id | json }},"images":{
+      {%- unless product.has_only_default_variant -%}
+        {%- assign qb_first = true -%}
+        {%- for qb_option in product.options_with_values -%}
+          {%- liquid
+            # A value's variant is the one with the other selected values: when every value of an option shows the
+            # same image (sizes, with the selected color's image), the option says nothing about the image and is left
+            # out, so the script finds the position that does (a size entry would otherwise win over every color)
+            assign qb_first_src = ''
+            assign qb_compared = false
+            assign qb_differs = false
+            for qb_val in qb_option.values
+              if qb_val.variant != nil
+                assign qb_src = ''
+                if qb_val.variant.featured_image
+                  assign qb_src = qb_val.variant.featured_image | image_url: width: 160
+                endif
+                if qb_compared == false
+                  assign qb_first_src = qb_src
+                  assign qb_compared = true
+                elsif qb_src != qb_first_src
+                  assign qb_differs = true
+                  break
+                endif
+              endif
+            endfor
+          -%}
+          {%- if qb_differs -%}
+            {%- for qb_val in qb_option.values -%}
+              {%- if qb_val.variant.featured_image -%}
+                {%- unless qb_first -%},{%- endunless -%}
+                {%- assign qb_key = qb_option.position | append: '|' | append: qb_val.name -%}
+                {{- qb_key | json }}:{{ qb_val.variant.featured_image | image_url: width: 160 | json -}}
+                {%- assign qb_first = false -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endunless -%}
+      },"variants":[
+      {%- if qb_variants_count <= 100 -%}
+        {%- for qb_variant in product.variants -%}
+          {%- unless forloop.first -%},{%- endunless -%}
+          {"id":{{ qb_variant.id | json }},"options":{{ qb_variant.options | json }},"available":{{ qb_variant.available | json }},"price":{{ qb_variant.price | json }},"compare_at_price":{{ qb_variant.compare_at_price | json }}}
+        {%- endfor -%}
+      {%- else -%}
+        {"id":{{ qb_selected.id | json }},"options":{{ qb_selected.options | json }},"available":{{ qb_selected.available | json }},"price":{{ qb_selected.price | json }},"compare_at_price":{{ qb_selected.compare_at_price | json }}}
+      {%- endif -%}
+      ]}
+    </script><!--/qbv2:json-->
+{%- endcase -%}

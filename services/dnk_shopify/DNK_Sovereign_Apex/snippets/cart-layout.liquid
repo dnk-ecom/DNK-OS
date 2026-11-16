@@ -1,0 +1,119 @@
+{%- comment -%}
+  Rendered once per page in layout/theme.liquid, directly after the cart drawer section.
+  Prints the cart config read by assets/component-cart.js, the body-level announcer and toast region (page surfaces),
+  and the recently-viewed writer used by the Saved products block.
+{%- endcomment -%}
+{%- liquid
+  assign cl_floating = false
+  if settings.show_floating_cart and request.page_type != 'cart'
+    assign cl_floating = true
+  endif
+-%}
+<script type="application/json" id="shrine-cart-config">
+  {
+    "version": 1,
+    "assets": {
+      "lines": { "js": {{ 'component-cart-lines.js' | asset_url | json }}, "css": {{ 'component-cart-lines.css' | asset_url | json }}
+        {%- if request.design_mode %}, "editor": {{ 'component-cart-lines-editor.js' | asset_url | json }}{% endif %} },
+      "checkout": { "js": {{ 'component-cart-checkout.js' | asset_url | json }}, "css": {{ 'component-cart-checkout.css' | asset_url | json }}
+        {%- if request.design_mode %}, "editor": {{ 'component-cart-checkout-editor.js' | asset_url | json }}{% endif %} },
+      "rewards": { "js": {{ 'component-cart-rewards.js' | asset_url | json }}, "css": {{ 'component-cart-rewards.css' | asset_url | json }}
+        {%- if request.design_mode %}, "editor": {{ 'component-cart-rewards-editor.js' | asset_url | json }}{% endif %} },
+      "upsells": { "js": {{ 'component-cart-upsells.js' | asset_url | json }}, "css": {{ 'component-cart-upsells.css' | asset_url | json }},
+        "cards": {{ 'component-cart-upsells-cards.js' | asset_url | json }}
+        {%- if request.design_mode %}, "editor": {{ 'component-cart-upsells-editor.js' | asset_url | json }}{% endif %} },
+      "page": { "js": {{ 'component-cart-page.js' | asset_url | json }}, "css": {{ 'component-cart-page.css' | asset_url | json }} },
+      "extras": { "js": {{ 'component-cart-extras.js' | asset_url | json }} }
+      {%- if request.design_mode -%},
+      "editor": { "js": {{ 'component-cart-editor.js' | asset_url | json }}, "css": {{ 'component-cart-editor.css' | asset_url | json }} }
+      {%- endif %}
+    },
+    "strings": {
+      "core_item_added": {{ 'general.cart.item_added' | t | json }},
+      "core_view_cart": {{ 'general.cart.view_empty_cart' | t | json }},
+      "core_close": {{ 'accessibility.close' | t | json }},
+      "core_cart_error": {{ 'sections.cart.cart_error' | t | json }},
+      "core_loading": {{ 'accessibility.loading' | t | json }},
+      "lines_one_time": {{ 'sections.cart.lines_one_time' | t: product: '[product]' | json }},
+      "lines_plan_changed": {{ 'sections.cart.lines_plan_changed' | t: product: '[product]' | json }},
+      "lines_plan_unavailable": {{ 'sections.cart.lines_plan_unavailable' | t | json }},
+      "lines_restored": {{ 'sections.cart.lines_restored' | t: product: '[product]' | json }},
+      "lines_saved_for_later": {{ 'sections.cart.lines_saved_for_later' | t: product: '[product]' | json }},
+      "lines_subscribed": {{ 'sections.cart.lines_subscribed' | t: product: '[product]' | json }},
+      "lines_undo": {{ 'sections.cart.lines_undo' | t | json }},
+      "lines_updating": {{ 'sections.cart.lines_updating' | t | json }},
+      "lines_upgrade_partial": {{ 'sections.cart.lines_upgrade_partial' | t: titles: '[titles]' | json }},
+      "checkout_discount_applied": {{ 'sections.cart.checkout_discount_applied' | t: code: '[code]' | json }},
+      "checkout_discount_removed": {{ 'sections.cart.checkout_discount_removed' | t: code: '[code]' | json }},
+      "checkout_estimator_arrives": {{ 'sections.cart.checkout_estimator_arrives' | t: date: '[date]' | json }},
+      "checkout_estimator_error": {{ 'sections.cart.checkout_estimator_error' | t | json }},
+      "checkout_estimator_none": {{ 'sections.cart.checkout_estimator_none' | t | json }},
+      "checkout_estimator_results": {{ 'sections.cart.checkout_estimator_results' | t: address: '[address]' | json }},
+      "checkout_field_date_unavailable": {{ 'sections.cart.checkout_field_date_unavailable' | t | json }},
+      "checkout_field_express_locked": {{ 'sections.cart.checkout_field_express_locked' | t: label: '[label]' | json }},
+      "checkout_terms_express_locked": {{ 'sections.cart.checkout_terms_express_locked' | t | json }},
+      "rewards_gift_chosen": {{ 'sections.cart.rewards_gift_chosen' | t: title: '[title]' | json }},
+      "rewards_gift_removed": {{ 'sections.cart.rewards_gift_removed' | t | json }},
+      "rewards_relock_discount": {{ 'sections.cart.rewards_relock_discount' | t | json }},
+      "rewards_relock_gift": {{ 'sections.cart.rewards_relock_gift' | t | json }},
+      "rewards_relock_many": {{ 'sections.cart.rewards_relock_many' | t | json }},
+      "rewards_relock_shipping": {{ 'sections.cart.rewards_relock_shipping' | t | json }},
+      "rewards_relocked": {{ 'sections.cart.rewards_relocked' | t: reward: '[reward]' | json }},
+      "rewards_status_locked": {{ 'sections.cart.rewards_status_locked' | t: amount: '[amount]' | json }},
+      "rewards_status_unlocked": {{ 'sections.cart.rewards_status_unlocked' | t | json }},
+      "rewards_unlocked": {{ 'sections.cart.rewards_unlocked' | t: reward: '[reward]' | json }}
+    },
+    "routes": {
+      "root": {{ routes.root_url | json }}, "cart": {{ routes.cart_url | json }},
+      "cart_add": {{ routes.cart_add_url | json }}, "cart_change": {{ routes.cart_change_url | json }},
+      "cart_update": {{ routes.cart_update_url | json }}, "cart_clear": {{ routes.cart_clear_url | json }},
+      "product_recommendations": {{ routes.product_recommendations_url | json }}
+    },
+    "shopCurrency": {{ shop.currency | json }},
+    "currency": {{ cart.currency.iso_code | json }},
+    "country": {{ localization.country.iso_code | json }},
+    "moneyFormat": {{ shop.money_format | json }},
+    "moneyWithCurrencyFormat": {{ shop.money_with_currency_format | json }},
+    "moneySample": {{ 123456 | money | strip_html | json }},
+    "moneyWithCurrencySample": {{ 123456 | money_with_currency | strip_html | json }},
+    "cartType": {{ settings.cart_type | json }},
+    "afterAdd": {{ settings.cart_after_add | default: 'open' | json }},
+    "iconAnimation": {{ settings.cart_icon_animation | default: 'none' | json }},
+    "itemCount": {{ cart.item_count | json }},
+    "designMode": {{ request.design_mode | json }},
+    "locale": {{ request.locale.iso_code | json }},
+    "pageType": {{ request.page_type | json }},
+    "standardEventsUrl": "https://cdn.shopify.com/storefront/standard-events.js"
+  }
+</script>
+<span class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-cart-announcer="page"></span>
+<div class="cart-toast-region cart-toast-region--page" data-cart-toast-region="page"></div>
+{%- if cl_floating -%}
+  {%- render 'cart-floating-button' -%}
+  {%- if settings.cart_type != 'drawer' -%}
+    <link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}" media="print" onload="this.media='all'">
+    <script src="{{ 'component-cart.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+{%- endif -%}
+{%- if request.page_type == 'product' and product -%}
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('shrine-recently-viewed-on') !== '1') return;
+        var h = {{ product.handle | json }};
+        var save = function () {
+          try {
+            var l = JSON.parse(localStorage.getItem('shrine-recently-viewed') || '[]');
+            if (!Array.isArray(l)) l = [];
+            l = [h].concat(l.filter(function (x) { return typeof x === 'string' && x !== h; })).slice(0, 12);
+            localStorage.setItem('shrine-recently-viewed', JSON.stringify(l));
+          } catch (e) {}
+        };
+        var check = function () { var c = window.Shopify && Shopify.customerPrivacy; if (c && typeof c.preferencesProcessingAllowed === 'function' && c.preferencesProcessingAllowed()) save(); };
+        document.addEventListener('visitorConsentCollected', function (e) { if (e.detail && e.detail.preferencesAllowed) save(); }, { once: true });
+        if (window.Shopify && Shopify.customerPrivacy) return check();
+        if (window.Shopify && typeof Shopify.loadFeatures === 'function') Shopify.loadFeatures([{ name: 'consent-tracking-api', version: '0.2' }], function (error) { if (!error) check(); });
+      } catch (e) {}
+    })();
+  </script>
+{%- endif -%}

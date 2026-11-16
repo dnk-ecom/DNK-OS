@@ -1,0 +1,12 @@
+{% comment %}
+  Provides localized messages for the global cart feedback component.
+{% endcomment %}
+<cart-feedback
+  data-cart-error-text="{{ 'cart.error' | t | escape }}"
+  data-cart-added-text="{{ 'cart.announcements.added' | t | escape }}"
+  data-cart-removed-text="{{ 'cart.announcements.removed' | t | escape }}"
+  data-cart-updated-text="{{ 'cart.announcements.updated' | t | escape }}"
+  data-cart-note-updated-text="{{ 'cart.note.updated' | t | escape }}"
+  data-cart-discount-updated-text="{{ 'cart.discount.updated' | t | escape }}"
+  data-cart-discount-invalid-text="{{ 'cart.discount.invalid' | t | escape }}"
+></cart-feedback>

@@ -1,0 +1,30 @@
+name: Shopify Theme Integrity & Anti-Regression Gate
+
+on:
+  push:
+    branches: [ main, staging, donor-lab, shrine-pro ]
+  pull_request:
+    branches: [ main, staging ]
+
+jobs:
+  verify:
+    name: 7-Gate Theme Integrity Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Deterministic Theme Integrity Auditor
+        run: |
+          python3 tools/verify_theme_integrity.py .

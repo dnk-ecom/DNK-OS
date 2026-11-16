@@ -1,0 +1,302 @@
+{
+  "accessibility": {
+    "skip_to_content": "Aller au contenu",
+    "skip_to_product_information": "Passer aux informations sur le produit",
+    "close": "Fermer",
+    "menu": "Ouvrir le menu",
+    "navigation": "Navigation principale",
+    "secondary_menu": "Menu secondaire",
+    "social_icons": "Liens vers les réseaux sociaux",
+    "back_to_menu": "Retour à {{ title }}",
+    "toggle_submenu": "Basculer le sous-menu {{ title }}",
+    "search": "Rechercher",
+    "account": "Compte",
+    "cart": "Panier",
+    "breadcrumbs": "Fil d’Ariane",
+    "pagination": "Pagination",
+    "carousel": "Carrousel",
+    "products_carousel": "Produits",
+    "loading_product_recommendations": "Chargement des recommandations de produits",
+    "product_gallery": "Galerie de produits",
+    "previous_media": "Média précédent",
+    "next_media": "Média suivant",
+    "view_image": "Voir l’image {{ index }}",
+    "view_video": "Voir la vidéo {{ index }}",
+    "media_status": "Média {{ index }} sur {{ count }}",
+    "collections_carousel": "Collections",
+    "articles_carousel": "Articles",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "play_video": "Lire la vidéo",
+    "clear_search": "Effacer la recherche",
+    "love": "amour"
+  },
+  "general": {
+    "home": "Accueil",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "share": {
+      "share": "Partager",
+      "link": "Lien à partager",
+      "copy": "Copier le lien",
+      "copied": "Copié"
+    },
+    "localization": {
+      "country": "Pays/région",
+      "countries": "Pays et régions",
+      "choose_location": "Choisissez votre pays ou région",
+      "filter_countries": "Rechercher un pays ou une région",
+      "country_results": {
+        "one": "{{ count }} résultat trouvé",
+        "other": "{{ count }} résultats trouvés"
+      },
+      "language": "Langue",
+      "languages": "Langues",
+      "choose_language": "Choisissez votre langue",
+      "no_results": "Aucun résultat trouvé"
+    },
+    "contact": {
+      "form": {
+        "name": "Nom",
+        "email": "E-mail",
+        "phone": "Numéro de téléphone",
+        "message": "Message",
+        "send": "Envoyer le message",
+        "success": "Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais."
+      }
+    },
+    "email_signup": {
+      "form": {
+        "email": "Adresse e-mail",
+        "placeholder": "Saisissez votre adresse e-mail",
+        "submit": "S'inscrire",
+        "success": "Merci pour votre inscription."
+      }
+    },
+    "payment": {
+      "methods": "Moyens de paiement",
+      "secure_options": "Payez en toute sécurité avec des moyens de paiement fiables"
+    },
+    "footer": {
+      "all_rights_reserved": "Tous droits réservés.",
+      "designed_with": "Conçu avec",
+      "by": "par"
+    },
+    "password": {
+      "enter_password": "Saisir le mot de passe de la boutique",
+      "password": "Mot de passe",
+      "submit": "Entrer",
+      "incorrect_password": "Le mot de passe saisi est incorrect.",
+      "enter_using_password": "Entrer avec un mot de passe",
+      "store_owner": "Êtes-vous propriétaire de la boutique ?",
+      "log_in": "Connectez-vous ici"
+    },
+    "facets": {
+      "apply": "Appliquer",
+      "filters": "Filtres",
+      "sort": "Trier",
+      "active_filters_count": {
+        "one": "{{ count }} filtre actif",
+        "other": "{{ count }} filtres actifs"
+      },
+      "clear_filters": "Tout effacer",
+      "price_from": "De",
+      "price_to": "À"
+    },
+    "test_modal": "Fenêtre modale de test"
+  },
+  "collections": {
+    "title": "Collections",
+    "empty": "Aucun produit trouvé.",
+    "no_collections": "Aucune collection trouvée.",
+    "placeholders": {
+      "title": "Exemple de collection"
+    },
+    "products_count": {
+      "one": "{{ count }} produit",
+      "other": "{{ count }} produits"
+    },
+    "show_products": {
+      "one": "Afficher {{ count }} produit",
+      "other": "Afficher {{ count }} produits"
+    }
+  },
+  "products": {
+    "quick_add": {
+      "title": "Ajout rapide",
+      "button": "Choisir les options",
+      "button_label": "Choisir les options pour {{ product }}",
+      "loading": "Chargement du produit…",
+      "unavailable": "Ce produit n’a pas pu être chargé.",
+      "view_product": "Voir les détails du produit"
+    },
+    "sku": "UGS : {{ sku }}",
+    "placeholders": {
+      "title": "Exemple de titre de produit",
+      "vendor": "Exemple de fournisseur",
+      "sku": "DEMO-001",
+      "description": "Présentez les matériaux, les caractéristiques et les conseils d’entretien de ce produit."
+    },
+    "badges": {
+      "sale": "Promotion",
+      "sold_out": "Épuisé"
+    },
+    "variants": {
+      "unavailable": "Indisponible"
+    },
+    "quantity": {
+      "label": "Quantité",
+      "decrease": "Diminuer la quantité",
+      "increase": "Augmenter la quantité"
+    },
+    "rating": {
+      "value": "Noté {{ rating }} sur {{ scale_max }}",
+      "detailed": {
+        "one": "{{ rating }}/{{ scale_max }} étoiles selon {{ count }} avis",
+        "other": "{{ rating }}/{{ scale_max }} étoiles selon {{ count }} avis"
+      },
+      "reviews": {
+        "one": "{{ count }} avis",
+        "other": "{{ count }} avis"
+      }
+    },
+    "price": {
+      "regular_price": "Prix normal",
+      "sale_price": "Prix promotionnel",
+      "save": "Économisez {{ savings }}",
+      "from_price": "À partir de {{ price }}",
+      "duties_and_taxes_included": "Droits et taxes inclus.",
+      "taxes_included": "Taxes incluses.",
+      "duties_included": "Droits inclus.",
+      "shipping_policy_html": "<a href=\"{{ link }}\">Livraison</a> calculée lors du paiement."
+    },
+    "form": {
+      "add_to_cart": "Ajouter au panier",
+      "buy_it_now": "Acheter maintenant",
+      "select_options": "Choisir les options",
+      "sold_out": "Épuisé",
+      "all_inventory_in_cart": "Tous les articles disponibles pour cette variante sont déjà dans votre panier.",
+      "error": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "gift_card_recipient": {
+      "send_to": "Envoyer à",
+      "send_to_self": "Mon adresse e-mail",
+      "send_to_recipient": "Un destinataire",
+      "email": "E-mail du destinataire",
+      "name": "Nom du destinataire (facultatif)",
+      "message": "Message (facultatif)",
+      "send_on": "Date d’envoi (facultative)",
+      "characters_used": "{{ used }}/{{ max }} caractères",
+      "fields_visible": "Les informations du destinataire sont maintenant visibles.",
+      "fields_hidden": "Les informations du destinataire sont maintenant masquées."
+    }
+  },
+  "cart": {
+    "empty": "Votre panier est vide.",
+    "continue_shopping": "Continuer vos achats",
+    "remove_item": "Supprimer {{ item }}",
+    "applied_discounts": "Réductions appliquées",
+    "percentage_off": "{{ value }} % de réduction",
+    "quantity": {
+      "label": "Quantité pour {{ item }}",
+      "decrease": "Diminuer la quantité de {{ item }}",
+      "increase": "Augmenter la quantité de {{ item }}"
+    },
+    "subtotal": "Sous-total",
+    "checkout": "Passer à la caisse",
+    "view_cart": "Voir le panier",
+    "announcements": {
+      "added": "Article ajouté au panier.",
+      "removed": "Article retiré du panier.",
+      "updated": "Quantité du panier mise à jour."
+    },
+    "note": {
+      "heading": "Note de commande",
+      "label": "Instructions spéciales",
+      "placeholder": "Ajoutez des instructions pour votre commande",
+      "save": "Enregistrer la note",
+      "updated": "Note de commande enregistrée."
+    },
+    "discount": {
+      "heading": "Code de réduction",
+      "label": "Code de réduction",
+      "placeholder": "Saisissez un code de réduction",
+      "apply": "Appliquer",
+      "remove": "Supprimer le code de réduction {{ code }}",
+      "updated": "Codes de réduction mis à jour.",
+      "invalid": "Ce code de réduction n’a pas pu être appliqué."
+    },
+    "view_file": "Voir le fichier",
+    "error": "Impossible de mettre à jour votre panier. Veuillez réessayer."
+  },
+  "blogs": {
+    "empty": "Aucun article trouvé.",
+    "articles_count": {
+      "one": "{{ count }} article",
+      "other": "{{ count }} articles"
+    },
+    "filter_by_tag": "Filtrer par étiquette",
+    "all_articles": "Tous les articles",
+    "tags": "Étiqueté avec",
+    "by_author": "Par {{ author }}",
+    "read_more": "Lire la suite",
+    "navigation": {
+      "label": "Navigation des articles",
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "placeholders": {
+      "title": "Exemple de titre d’article",
+      "excerpt": "Partagez un court aperçu de votre article pour aider les lecteurs à découvrir son contenu."
+    }
+  },
+  "search": {
+    "title": "Rechercher",
+    "results_title": "Résultats de recherche",
+    "label": "Rechercher dans la boutique",
+    "placeholder": "Rechercher…",
+    "predictive_placeholder": "Commencez à saisir pour rechercher…",
+    "submit": "Rechercher",
+    "empty": "Saisissez un terme de recherche pour commencer.",
+    "searching": "Recherche en cours…",
+    "suggestions": "Suggestions de recherche",
+    "groups": {
+      "suggestions": "Suggestions",
+      "products": "Produits",
+      "collections": "Collections",
+      "articles": "Articles",
+      "pages": "Pages"
+    },
+    "view_all": "Afficher tous les résultats pour « {{ terms }} »",
+    "results_count": {
+      "one": "{{ count }} résultat",
+      "other": "{{ count }} résultats"
+    },
+    "no_results": "Aucun résultat trouvé pour « {{ terms }} »",
+    "types": {
+      "article": "Article",
+      "page": "Page"
+    },
+    "show_results": {
+      "one": "Afficher {{ count }} résultat",
+      "other": "Afficher {{ count }} résultats"
+    }
+  },
+  "gift_cards": {
+    "issued": {
+      "title": "Carte-cadeau de {{ value }} pour {{ shop }}",
+      "subtext": "Carte cadeau",
+      "how_to_use_gift_card": "Utilisez le code de la carte-cadeau en ligne ou le code QR en magasin.",
+      "code": "Code de la carte-cadeau",
+      "copy_code": "Copier le code",
+      "copy_code_success": "Code copié",
+      "qr_image_alt": "Code QR de cette carte-cadeau",
+      "shop_link": "Visiter la boutique en ligne",
+      "add_to_apple_wallet": "Ajouter à Cartes",
+      "expiration_date": "Expire le {{ expires_on }}",
+      "expired": "Cette carte-cadeau a expiré"
+    }
+  }
+}

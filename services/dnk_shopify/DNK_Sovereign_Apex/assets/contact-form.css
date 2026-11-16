@@ -1,0 +1,40 @@
+/*
+  Contact form stylesheet
+
+  This file contains the layout and presentation styles for the contact form section and block.
+*/
+
+
+.contact-form-section {
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
+}
+
+.contact-form-section[data-input-background="site"] .input {
+  background-color: rgb(var(--color-site-background));
+}
+
+.contact-form-form {
+  text-align: left;
+}
+
+.contact-form-row {
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-form-status {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.contact-form-status ul {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+@media (min-width: 600px) {
+  .contact-form-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

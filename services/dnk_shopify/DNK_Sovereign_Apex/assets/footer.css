@@ -1,0 +1,368 @@
+/*
+  Footer stylesheet
+
+  This file owns the footer section layout, content blocks, bottom area, and responsive behavior.
+*/
+
+
+/*
+  Footer layout
+*/
+.footer {
+  padding-top: var(--pt);
+  padding-bottom: var(--pb);
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
+  border-top: 1px solid rgb(var(--color-text) / var(--border-opacity));
+}
+
+
+/*
+  Footer blocks
+*/
+.footer-blocks {
+  display: block;
+}
+
+.footer-block + .footer-block .footer-block-collapse {
+  border-top: 0;
+}
+
+.footer-block-summary {
+  padding: 1em 0;
+}
+
+.footer-block-title {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+}
+
+.footer-block-heading {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+}
+
+.footer-block-content {
+  padding-bottom: 1.25em;
+}
+
+.footer-block-heading {
+  display: none;
+}
+
+.footer-menu-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer-menu-list a {
+  display: block;
+  padding: 0.5em 0;
+  text-decoration: none;
+}
+
+
+.footer-text > :first-child {
+  margin-top: 0;
+}
+
+.footer-text > :last-child {
+  margin-bottom: 0;
+}
+
+.footer-text-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25em;
+}
+
+
+/*
+  Newsletter block
+*/
+.footer-block-newsletter {
+  padding-bottom: 2em;
+}
+
+.footer-block-newsletter .footer-block-collapse {
+  border: 0;
+}
+
+.footer-block-newsletter .footer-block-summary {
+  display: none;
+}
+
+.footer-block-newsletter .footer-block-heading {
+  display: block;
+  margin: 0 0 0.6em;
+}
+
+.footer-block-newsletter .footer-block-content {
+  padding-bottom: 0;
+}
+
+.footer-block-newsletter + .footer-block .footer-block-collapse {
+  border-top: 1px dotted rgb(var(--color-text) / var(--border-opacity));
+}
+
+.footer-newsletter-text > :first-child {
+  margin-top: 0;
+}
+
+.footer-newsletter-text > :last-child {
+  margin-bottom: 0;
+}
+
+.footer-newsletter-form {
+  margin-top: 1.25em;
+}
+
+.footer-newsletter-form-status {
+  margin-bottom: 1em;
+}
+
+.footer-newsletter-form-fields {
+  width: 100%;
+}
+
+.footer-newsletter-form-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.footer-newsletter-form-button {
+  color: rgb(var(--color-text));
+}
+
+.footer-newsletter-form-button .svg-icon {
+  transition: transform 200ms ease-out;
+}
+
+.footer-newsletter-social {
+  margin-top: 1.25em;
+}
+
+@media (hover: hover) {
+  .footer-newsletter-form-button:hover .svg-icon {
+    transform: translateX(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-newsletter-form-button .svg-icon {
+    transition: none;
+  }
+}
+
+
+/*
+  Footer bottom
+*/
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 2.5rem;
+  font-size: var(--fs-sm);
+}
+
+
+/*
+  Social links
+*/
+.footer-social {
+  display: flex;
+  justify-content: center;
+}
+
+
+/*
+  Localization
+*/
+.footer-localization {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+}
+
+.footer-localization-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 0.75em;
+  color: inherit;
+  background-color: transparent;
+  border: 1px solid rgb(var(--color-text) / var(--border-opacity));
+  border-radius: var(--border-radius);
+  font: inherit;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: background-color 200ms ease-out;
+}
+
+.footer-localization-button:hover {
+  background-color: rgb(var(--color-text) / 0.08);
+}
+
+.footer-localization-button:focus-visible {
+  outline-color: currentcolor;
+}
+
+.footer-localization-image {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.footer-localization-image img {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-localization-button {
+    transition: none;
+  }
+}
+
+
+/*
+  Policies
+*/
+.footer-policy-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75em;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer-policy-list li {
+  display: flex;
+  align-items: center;
+}
+
+.footer-policy-list li:not(:last-child)::after {
+  margin-inline-start: 0.75em;
+  content: "\00b7";
+}
+
+.footer-policy-list a {
+  display: flex;
+}
+
+
+/*
+  Copyright and credits
+*/
+.footer-copyright {
+  margin: 0;
+  text-align: center;
+}
+
+.footer-copyright a {
+  text-decoration: none;
+}
+
+.footer-credits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 0.5rem;
+  margin: 0;
+  margin: 0.25em 0 0;
+  background: rgb(var(--color-text) / 0.1);
+  border-radius: var(--border-radius);
+  padding: 0.25em 0.75em;
+}
+
+.footer-credits a {
+  text-decoration: none;
+}
+
+.footer-heart {
+  display: inline-flex;
+  margin: 0 0.125em;
+  color: #dc2626;
+  transform: translateY(2px) scale(1.1);
+}
+
+
+/*
+  Payment methods and Follow on Shop
+*/
+.footer-payment-icons {
+  margin-top: 0.5em;
+}
+
+.footer-follow-on-shop {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+
+/*
+  Desktop layout
+*/
+@media (min-width: 1200px) {
+  .footer-blocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+  }
+
+  .footer-block-newsletter {
+    padding-bottom: 0;
+  }
+
+  .footer-block-newsletter + .footer-block .footer-block-collapse {
+    border-top: 0;
+  }
+
+  .footer-block-collapse {
+    border: 0;
+  }
+
+  .footer-block:first-child .footer-block-collapse {
+    border-top: 0;
+  }
+
+  .footer-block-details {
+    overflow: visible;
+  }
+
+  .footer-block-summary {
+    display: none;
+  }
+
+  .footer-block-content {
+    padding-bottom: 0;
+  }
+
+  .footer-block-heading {
+    display: block;
+    margin: 0 0 0.6em;
+  }
+
+  .footer-bottom {
+    padding-top: 3em;
+    margin-top: 3em;
+    border-top: 1px solid rgb(var(--color-text) / var(--border-opacity));
+  }
+}

@@ -1,0 +1,181 @@
+{% liquid
+  assign product = closest.product
+  assign selected_variant = product.selected_or_first_available_variant
+
+  if product == blank
+    assign current_price_value = 1999
+    assign compare_price = null
+  else
+    assign current_price_value = selected_variant.price
+    assign compare_price = selected_variant.compare_at_price
+  endif
+
+  assign current_price = current_price_value | money
+  assign on_sale = false
+  assign sale_badge_label = ''
+
+  if compare_price > current_price_value
+    assign on_sale = true
+
+    if block.settings.sale_badge_type == 'percentage'
+      assign sale_badge_savings = compare_price | minus: current_price_value | times: 100.0 | divided_by: compare_price | round | append: '%'
+    else
+      assign sale_badge_savings = compare_price | minus: current_price_value | money_without_trailing_zeros
+    endif
+
+    assign sale_badge_label = 'products.price.save' | t: savings: sale_badge_savings
+  endif
+
+  capture tax_information
+    if cart.duties_included and cart.taxes_included
+      echo 'products.price.duties_and_taxes_included' | t
+    elsif cart.taxes_included
+      echo 'products.price.taxes_included' | t
+    elsif cart.duties_included
+      echo 'products.price.duties_included' | t
+    endif
+
+    if shop.shipping_policy.body != blank
+      echo ' '
+      echo 'products.price.shipping_policy_html' | t: link: shop.shipping_policy.url
+    endif
+  endcapture
+%}
+
+<div
+  class="product-main-price-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <p
+    class="product-main-price {{ block.settings.price_size }}"
+    data-product-price
+    data-regular-price-label="{{ 'products.price.regular_price' | t | escape }}"
+    data-sale-price-label="{{ 'products.price.sale_price' | t | escape }}"
+  >
+    <span class="visually-hidden" data-product-current-price-label>
+      {% if on_sale %}{{ 'products.price.sale_price' | t }}{% else %}{{ 'products.price.regular_price' | t }}{% endif %}
+    </span>
+    <span class="product-main-price-current{% if on_sale %} product-main-price-sale{% endif %}" data-product-current-price>
+      {{ current_price }}
+    </span>
+    <span class="visually-hidden" data-product-compare-price-label{% unless on_sale %} hidden{% endunless %}>
+      {{ 'products.price.regular_price' | t }}
+    </span>
+    <s class="product-main-price-compare" data-product-compare-price{% unless on_sale %} hidden{% endunless %}>
+      {% if on_sale %}{{ compare_price | money }}{% endif %}
+    </s>
+    {% if block.settings.show_sale_badge %}
+      <span
+        class="badge product-main-price-sale-badge"
+        data-product-sale-badge
+        data-sale-badge-type="{{ block.settings.sale_badge_type }}"
+        {% unless on_sale %}hidden{% endunless %}
+      >
+        {{ sale_badge_label }}
+      </span>
+    {% endif %}
+  </p>
+
+  {% if block.settings.show_tax_information and tax_information != blank %}
+    <p class="product-main-price-tax-information fs-sm">{{ tax_information }}</p>
+  {% endif %}
+
+  {% if block.settings.show_installments and selected_variant != blank %}
+    <div class="product-main-price-installments fs-sm">
+      {% assign installment_form_id = 'product-main-installments-' | append: block.id %}
+      {% form 'product', product, id: installment_form_id, class: 'product-main-price-payment-terms' %}
+        <input type="hidden" name="id" value="{{ selected_variant.id }}" data-product-variant-input>
+        {{ form | payment_terms }}
+      {% endform %}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Product price",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "price_size",
+      "label": "Price size",
+      "options": [
+        { "value": "fs-md", "label": "Medium" },
+        { "value": "fs-lg", "label": "Large" },
+        { "value": "fs-xl", "label": "Extra large" },
+        { "value": "fs-2xl", "label": "2XL" },
+        { "value": "fs-3xl", "label": "3XL" }
+      ],
+      "default": "fs-xl"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_installments",
+      "label": "Installments",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tax_information",
+      "label": "Tax information",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Sale badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sale_badge",
+      "label": "Show sale badge",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sale_badge_type",
+      "label": "Discount type",
+      "options": [
+        { "value": "percentage", "label": "Percentage" },
+        { "value": "value", "label": "Value" }
+      ],
+      "default": "percentage",
+      "visible_if": "{{ block.settings.show_sale_badge }}"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product price",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

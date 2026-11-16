@@ -1,0 +1,153 @@
+{
+  "project_id": "proj-shopify-dnk-ecom",
+  "account_id": "acct-dnk-maxim",
+  "project_name": "Shopify Theme DNK-Ecom",
+  "domain_type": "shopify_theme",
+  "design_system": {
+    "primary_colors": {
+      "bg": "#0B0F17",
+      "surface": "#161B26",
+      "text": "#F3F4F6",
+      "accent": "#10B981",
+      "border": "#2D3748"
+    },
+    "typography": {
+      "heading": "Inter, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "spacing_unit_px": 4,
+    "border_radius_px": 8,
+    "component_rules": [
+      "Theme Blocks 2.0 strictly",
+      "No inline CSS or JS",
+      "Semantic HTML5",
+      "Zero Cumulative Layout Shift"
+    ]
+  },
+  "icp": {
+    "segment_name": "High-converting Shopify 2.0 Merchants & DTC Brands",
+    "pain_points": [
+      "Bloated slow themes with low Mobile Lighthouse score (<50)",
+      "App clashes that break cart checkout and hurt conversion",
+      "Rigid sections without atomic nested blocks flexibility"
+    ],
+    "value_proposition": "Sovereign ultra-fast modular Shopify theme DNK Sovereign 1.0.0 Apex built for Shopify Theme Store ($350–$420 MSRP) with 100% W3C Web Components, native CRO organs, and zero external app dependencies",
+    "brand_voice_rules": [
+      "Direct response copy with crisp clarity",
+      "Assertive, technical precision, zero AI slop",
+      "Ukrainian for founder communications, English for code and store assets"
+    ],
+    "forbidden_cliches": [
+      "Revolutionary",
+      "Game-changer",
+      "Seamless experience",
+      "Next-level",
+      "Magic in one click"
+    ]
+  },
+  "business_rules": [
+    "100% theme-check clean with zero errors",
+    "Zero jQuery or heavy external runtime frameworks (100% W3C Custom Elements)",
+    "JSON template size strictly < 512 KB",
+    "7-Gate Theme Integrity pass with 100% CLEAN & PROTECTED"
+  ],
+  "technical_constraints": [
+    "Shopify Theme Store submission standards ($350–$420 MSRP)",
+    "7-Gate Anti-Regression Theme Integrity (tools/verify_theme_integrity.py)",
+    "Apple Silicon local APFS testing",
+    "FastMCP dual-mount architecture"
+  ],
+  "tracks": [
+    {
+      "track_id": "track-theme-core",
+      "project_id": "proj-shopify-dnk-ecom",
+      "kind": "core_rnd",
+      "title": "Track 1: R&D & Theme Core Foundry",
+      "mission": "Develop and maintain immutable SemVer master theme engine on DNK Sovereign 1.0.0 Apex with Theme Blocks 2.0 and High-CRO Cart Drawer",
+      "assigned_workhorse": "dnk_shopify",
+      "repo_root_rel": "./services/dnk_shopify/DNK_Sovereign_Apex",
+      "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_theme_core.canvas",
+      "default_actions": [
+        {
+          "action_id": "shopify.run_theme_check",
+          "label_uk": "Запустити Theme Check & 7-Gate Integrity",
+          "description_en": "Run official Shopify theme check and 7-gate integrity on DNK Sovereign Apex",
+          "surface_mode": "dual",
+          "mcp_brick": "dnk_shopify",
+          "mcp_tool_name": "shopify_verify_7gates",
+          "input_json_schema": {},
+          "ui_widget": "button",
+          "ui_tone": "primary",
+          "requires_human_confirmation": false,
+          "idempotent": true,
+          "allowed_states": ["decomposed", "running", "awaiting_approval"]
+        }
+      ],
+      "deterministic_gates": [
+        "python3 services/dnk_shopify/DNK_Sovereign_Apex/tools/verify_theme_integrity.py services/dnk_shopify/DNK_Sovereign_Apex"
+      ]
+    },
+    {
+      "track_id": "track-marketing-sales",
+      "project_id": "proj-shopify-dnk-ecom",
+      "kind": "marketing_sales",
+      "title": "Track 2: Marketing, Sales & Conversion Funnels",
+      "mission": "Craft high-converting landing pages, PDP copy, CRO offer blocks, and sales enablement documentation",
+      "assigned_workhorse": "dnk_distribution",
+      "repo_root_rel": "./services/dnk_shopify",
+      "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_marketing_sales.canvas",
+      "default_actions": [
+        {
+          "action_id": "marketing.audit_copy",
+          "label_uk": "Аудит копірайту на AI-Slop",
+          "description_en": "Run Ukrainian/English humanizer audit on PDP and landing copy",
+          "surface_mode": "dual",
+          "mcp_brick": "core_kernel",
+          "mcp_tool_name": "audit_copywriting_slop",
+          "input_json_schema": {},
+          "ui_widget": "button",
+          "ui_tone": "secondary",
+          "requires_human_confirmation": false,
+          "idempotent": true,
+          "allowed_states": ["decomposed", "running"]
+        }
+      ],
+      "deterministic_gates": [
+        "python3 scripts/system/markdown_schema_gate.py docs/projects/dnk_ecom/*.md"
+      ]
+    },
+    {
+      "track_id": "track-donor-audit",
+      "project_id": "proj-shopify-dnk-ecom",
+      "kind": "donor_audit",
+      "title": "Track 3: SOTA Competitor Audit & Reverse-Engineering",
+      "mission": "Deconstruct leading themes (Sugar, Story, Ella, Shrine, Horizon), extract CRO patterns into atomic blocks",
+      "assigned_workhorse": "dnk_shopify",
+      "repo_root_rel": "./docs/notes/sota_audits",
+      "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_donor_audit.canvas",
+      "default_actions": [
+        {
+          "action_id": "audit.verify_theme_dossier",
+          "label_uk": "Верифікувати досьє донора",
+          "description_en": "Run AST and schema checks on competitor theme deconstruction dossier",
+          "surface_mode": "dual",
+          "mcp_brick": "brick_04_shopify_engine",
+          "mcp_tool_name": "verify_donor_audit",
+          "input_json_schema": {},
+          "ui_widget": "approve_reject",
+          "ui_tone": "approve",
+          "requires_human_confirmation": true,
+          "idempotent": true,
+          "allowed_states": ["awaiting_approval"]
+        }
+      ],
+      "deterministic_gates": [
+        "python3 scripts/system/markdown_schema_gate.py docs/notes/sota_audits/*.md"
+      ]
+    }
+  ],
+  "system_inside_system_mode": true,
+  "dna_version": "1.0.0",
+  "updated_at": "2026-11-16T00:00:00Z"
+}

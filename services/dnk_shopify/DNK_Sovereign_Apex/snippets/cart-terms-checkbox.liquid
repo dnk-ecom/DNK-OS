@@ -1,0 +1,40 @@
+{%- comment -%}
+  Terms checkbox for the cart (theme block cart_tnc-checkbox and the classic cart page's terms block).
+  A native, required checkbox tied to the cart form with form="", so keyboard and screen readers work and the
+  browser blocks checkout until the checkout gate (component-cart-checkout.js) shows the merchant's warning instead.
+  Parameters: opts (the host block's settings), key (section.id: ids and warning slots), form_id, block (optional).
+{%- endcomment -%}
+{%- capture tnc_icons -%}{%- render 'checkbox-icons' -%}{%- endcapture -%}
+<div class="cart-terms"{% if opts.margin_top != nil %} style="margin-top: {{ opts.margin_top | divided_by: 10.0 }}rem;margin-bottom: {{ opts.margin_bottom | divided_by: 10.0 }}rem;"{% endif %} {{ block.shopify_attributes }}>
+  <style>
+    #TNC-Checkbox-{{ key }} {
+      font-size: {{ opts.checkbox_text_size | divided_by: 10.0 }}rem;
+    }
+   .tnc-checkbox-warning-{{ key }} {
+      font-size: {{ opts.warning_text_size | divided_by: 10.0 }}rem;
+      text-align: {{ opts.warning_alignment }};
+      color: {{ opts.warning_text_color }};
+    }
+    #TNC-Checkbox-{{ key }} svg {
+      {%- comment -%} "Text" follows the panel's text colour, so the box shows in a dark cart colour scheme (the same colour on a light panel) {%- endcomment %}
+      color: {% if opts.checkbox_color == 'text' %}rgb(var(--color-foreground)){% else %}rgb(var(--color-base-{{ opts.checkbox_color }})){% endif %};
+    }
+  </style>
+  <tnc-chekcbox
+    id="TNC-Checkbox-{{ key }}"
+    class='tnc-chekcbox flex flex-align-center{% if opts.checkbox_alignment == 'center' %} center flex-justify-center{% endif %}'
+    data-checked="false"
+    data-disable-button="{{ opts.disable_checkout_button }}"
+    data-warning-text="{{ opts.warning_text | escape }}"
+    data-warning-position="{{ opts.warning_position }}"
+    data-section="{{ key }}"
+    data-form="{{ form_id }}"
+    data-gate-express="{{ opts.gate_express }}"
+    data-cart-feature="checkout"
+  >
+    <input type="checkbox" id="TNC-Input-{{ key }}" class="tnc-checkbox__input visually-hidden" form="{{ form_id }}" required aria-describedby="TNC-Warning-{{ key }}">
+    {{ tnc_icons | replace: '<svg', '<svg aria-hidden="true" focusable="false"' }}
+    <label for="TNC-Input-{{ key }}" class="tnc-checkbox__text margin-0">{{ opts.checkbox_text }}</label>
+  </tnc-chekcbox>
+  <div id="TNC-Warning-{{ key }}" class='tnc-checkbox-warning tnc-checkbox-warning-{{ key }} tnc-checkbox-warning--under-checkbox-{{ key }} hidden' style='margin-top: 0.4em;'></div>
+</div>

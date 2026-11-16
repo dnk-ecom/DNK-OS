@@ -1,0 +1,298 @@
+{%- comment -%}
+  Bundle builder, a child of a Quantity option: the customer picks a set number of items from a collection in a
+  popup. Add to cart stays disabled until every item is picked; the tray shows the picks. Until then the option shows
+  "From" its total with the cheapest picks (data-qb-from-total, read by the option). The candidates are rendered
+  into a <template> (snippets/qb-v2-candidates.liquid) that component-quantity-breaks-v2-extras.js opens;
+  component-quantity-breaks-v2.js fills the tray and adds one line per pick.
+{%- endcomment -%}
+{%- liquid
+  # Discount values as the widget reads them: percentage as an integer, amounts in shop-currency cents
+  assign qb_amount_cents = block.settings.discount_amount | times: 100 | round | at_least: 0
+  assign qb_discount_value = 0
+  if block.settings.discount_type == 'percentage'
+    assign qb_discount_value = block.settings.discount_percentage
+  elsif block.settings.discount_type == 'amount_each'
+    assign qb_discount_value = qb_amount_cents
+  endif
+  assign qb_picks = block.settings.picks | plus: 0 | at_least: 1
+  assign qb_limit = block.settings.limit | plus: 0 | at_least: 1
+
+  # The popup heading: the title as plain text with its keywords filled in, else the button label
+  assign qb_heading = block.settings.title | replace: '[picks]', qb_picks | replace: '[chosen]', '0' | strip_html | strip
+  if qb_heading == blank
+    assign qb_heading = block.settings.button_label
+  endif
+-%}
+{%- comment -%}
+  Candidates: the collection's first products, without subscription-only ones. The template may hold fewer than
+  Products shown (products with many variants, see snippets/qb-v2-candidates.liquid), so the counts come from it.
+{%- endcomment -%}
+{%- capture qb_template -%}
+  {%- if block.settings.collection != blank -%}
+    {%- render 'qb-v2-candidates',
+      products: block.settings.collection.products,
+      limit: qb_limit,
+      kind: 'builder',
+      block: block,
+      heading: qb_heading,
+      done_label: block.settings.done_label,
+      quantity: 1,
+      discount_type: block.settings.discount_type,
+      discount_value: qb_discount_value,
+      show_price: block.settings.show_prices,
+      low_prices: true
+    -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- liquid
+  assign qb_candidates = 0
+  assign qb_available = 0
+  if qb_template contains 'data-qb-count="'
+    assign qb_candidates = qb_template | split: 'data-qb-count="' | last | split: '"' | first | plus: 0
+    assign qb_available = qb_template | split: 'data-qb-available="' | last | split: '"' | first | plus: 0
+  endif
+  # Not enough products in stock to fill the picks: the option can't be completed, so it shows as sold out
+  assign qb_short = false
+  if qb_candidates > 0
+    if qb_available == 0
+      assign qb_short = true
+    elsif block.settings.allow_repeats == false and qb_available < qb_picks
+      assign qb_short = true
+    endif
+  endif
+
+  # Nothing is picked yet: the option shows "From" its total with the cheapest picks (contract 5.4). With repeats every
+  # pick is the cheapest product, one cart line; without, the cheapest different products, one line each. The block's
+  # discount is applied per line, as the picks will be added
+  assign qb_currency_ok = true
+  if cart.currency.iso_code != shop.currency
+    assign qb_currency_ok = false
+  endif
+  assign qb_from_total = nil
+  if qb_candidates > 0 and qb_short == false
+    assign qb_low_prices = qb_template | split: 'data-qb-low-prices="' | last | split: '"' | first | split: ','
+    assign qb_lines = 1
+    assign qb_units = qb_picks
+    if block.settings.allow_repeats == false
+      assign qb_lines = qb_picks
+      assign qb_units = 1
+    endif
+    # Cards already counted, as ",3,5," (the lowest of the rest is taken each time; the first one on a tie)
+    assign qb_used = ','
+    assign qb_from_total = 0
+    for qb_line in (1..qb_lines)
+      assign qb_x = nil
+      for qb_low_price in qb_low_prices
+        assign qb_key = ',' | append: forloop.index | append: ','
+        unless qb_used contains qb_key
+          assign qb_low = qb_low_price | plus: 0
+          if qb_x == nil or qb_low < qb_x
+            assign qb_x = qb_low
+            assign qb_x_at = forloop.index
+          endif
+        endunless
+      endfor
+      if qb_x == nil
+        assign qb_from_total = nil
+        break
+      endif
+      assign qb_used = qb_used | append: qb_x_at | append: ','
+      assign qb_kx = qb_x | times: qb_units
+      assign qb_disc = 0
+      case block.settings.discount_type
+        when 'percentage'
+          assign qb_disc = qb_kx | times: qb_discount_value | divided_by: 100.0 | round
+        when 'amount_each'
+          if qb_currency_ok
+            assign qb_disc = qb_discount_value | at_most: qb_x | times: qb_units
+          endif
+        when 'free'
+          assign qb_disc = qb_kx
+      endcase
+      assign qb_from_total = qb_kx | minus: qb_disc | at_least: 0 | plus: qb_from_total
+    endfor
+  endif
+  assign qb_pending = false
+  if qb_from_total != nil and block.settings.discount_type == 'amount_each' and qb_currency_ok == false
+    assign qb_pending = true
+  endif
+
+  assign qb_title_id = 'qbv2-' | append: section.id | append: '-__QB_N__-' | append: block.id | append: '-title'
+-%}
+<div
+  class="qb-v2-builder"
+  data-qb-child="builder"
+  data-qb-ext="true"
+  data-qb-block="{{ block.id }}"
+  data-qb-picks="{{ qb_picks }}"
+  data-qb-allow-repeats="{{ block.settings.allow_repeats }}"
+  data-qb-discount-type="{{ block.settings.discount_type }}"
+  data-qb-discount-value="{{ qb_discount_value }}"
+  data-qb-required-message="{{ block.settings.required_message | escape }}"
+  data-qb-must-choose="true"
+  {%- if qb_candidates == 0 %} data-qb-require-missing="true"{% elsif qb_short %} data-qb-blocks-option="true"{% endif %}
+  {%- if qb_from_total != nil %} data-qb-from-total="{{ qb_from_total }}"{% endif %}
+  {%- if qb_pending %} data-qb-pending="true"{% endif %}
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.title != blank -%}
+    <div class="qb-v2-builder__title" id="{{ qb_title_id }}">
+      {%- render 'qb-v2-text', text: block.settings.title, ctx: 'builder', picks: qb_picks, chosen: 0 -%}
+    </div>
+  {%- endif -%}
+  {%- if qb_candidates > 0 -%}
+    <div class="qb-v2-builder__tray" data-qb-builder-tray>
+      {%- for i in (1..qb_picks) -%}
+        <span class="qb-v2-builder__slot" aria-hidden="true">?</span>
+      {%- endfor -%}
+    </div>
+    <button
+      type="button"
+      class="qb-v2-builder__button button button--secondary"
+      data-qb-action="builder"
+      aria-haspopup="dialog"
+      {%- if block.settings.title != blank %} aria-describedby="{{ qb_title_id }}"{% endif %}
+    >
+      {{- block.settings.button_label | default: block.settings.done_label | escape -}}
+    </button>
+    {{- qb_template -}}
+  {%- endif -%}
+  {%- if request.design_mode -%}
+    {%- if block.settings.collection == blank -%}
+      <div class="qb-v2-placeholder">Choose a collection in Bundle builder.</div>
+    {%- elsif qb_candidates == 0 -%}
+      <div class="qb-v2-placeholder">{{ block.settings.collection.title | escape }} has no products customers can pick.</div>
+    {%- elsif qb_short -%}
+      <div class="qb-v2-placeholder">Too few products of {{ block.settings.collection.title | escape }} are in stock to fill {{ qb_picks }} picks, so customers can't choose this option.</div>
+    {%- endif -%}
+    <script type="application/json" data-qbv2-setup="child">
+      {"type":"builder","block_id":{{ block.id | json }},"level":"__QB_LEVEL__","settings":{"picks":{{ qb_picks }},"allow_repeats":{{ block.settings.allow_repeats }},"discount_type":{{ block.settings.discount_type | json }},"discount_percentage":{{ block.settings.discount_percentage | json }},"discount_amount_cents":{{ qb_amount_cents }},"collection_handle":{{ block.settings.collection.handle | default: '' | json }},"collection_title":{{ block.settings.collection.title | default: '' | json }},"candidate_count":{{ qb_candidates }}},"products":[]}
+    </script>
+  {%- endif -%}
+</div>
+{%- comment -%}Trims the line breaks before the schema, so the block prints nothing outside its root{%- endcomment -%}
+{% schema %}
+{
+  "name": "Bundle builder",
+  "tag": null,
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products shown",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 12,
+      "info": "Products with many variants may show fewer, to keep the page fast."
+    },
+    {
+      "type": "range",
+      "id": "picks",
+      "label": "Items to choose",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_repeats",
+      "label": "Allow repeated products",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Title",
+      "default": "Choose your items",
+      "info": "Use [picks] and [chosen]."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Choose items"
+    },
+    {
+      "type": "text",
+      "id": "done_label",
+      "label": "Done button label",
+      "default": "Done"
+    },
+    {
+      "type": "text",
+      "id": "required_message",
+      "label": "Error message",
+      "default": "Choose your items first"
+    },
+    {
+      "type": "header",
+      "content": "Discount"
+    },
+    {
+      "type": "select",
+      "id": "discount_type",
+      "label": "Discount type",
+      "options": [
+        {
+          "value": "none",
+          "label": "No discount"
+        },
+        {
+          "value": "percentage",
+          "label": "Percentage off"
+        },
+        {
+          "value": "amount_each",
+          "label": "Amount off each item"
+        },
+        {
+          "value": "free",
+          "label": "Free"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Percentage",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15,
+      "visible_if": "{{ block.settings.discount_type == 'percentage' }}"
+    },
+    {
+      "type": "number",
+      "id": "discount_amount",
+      "label": "Amount",
+      "default": 5,
+      "info": "In your shop's currency, without the currency symbol. Example: 4.99",
+      "visible_if": "{{ block.settings.discount_type == 'amount_each' }}"
+    },
+    {
+      "type": "header",
+      "content": "Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_prices",
+      "label": "Show prices",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle builder"
+    }
+  ]
+}
+{% endschema %}

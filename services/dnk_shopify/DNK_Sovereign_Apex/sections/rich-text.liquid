@@ -1,0 +1,176 @@
+{% if section.index <= 3 or request.design_mode %}
+  <link href="{{ 'rich-text.css' | asset_url }}" rel="stylesheet" fetchpriority="high">
+{% endif %}
+
+<div
+  class="rich-text section-spacing"
+  data-mobile-text-alignment="{{ section.settings.mobile_text_alignment }}"
+  data-desktop-text-alignment="{{ section.settings.desktop_text_alignment }}"
+  style="
+    --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --color-accent: {{ section.settings.accent_color.red }} {{ section.settings.accent_color.green }} {{ section.settings.accent_color.blue }};
+    --mobile-text-alignment: {{ section.settings.mobile_text_alignment }};
+    --desktop-text-alignment: {{ section.settings.desktop_text_alignment }};
+    --pt: {{ section.settings.pt | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ section.settings.pb | divided_by: 16.0 | append: 'em' }};
+  "
+  data-section-css="{{ 'rich-text.css' | asset_url }}"
+>
+  <div class="container container-content">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "{{ settings.colors.background }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "{{ settings.colors.text }}"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "{{ settings.colors.accent }}"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "text_alignment",
+      "id": "mobile_text_alignment",
+      "label": "Mobile text alignment",
+      "default": "left"
+    },
+    {
+      "type": "text_alignment",
+      "id": "desktop_text_alignment",
+      "label": "Desktop text alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subheading"
+    },
+    {
+      "type": "heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "video"
+    },
+    {
+      "type": "group"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "presets": [
+    {
+      "name": "Rich text",
+      "category": "Text",
+      "settings": {
+        "mobile_text_alignment": "center",
+        "desktop_text_alignment": "center"
+      },
+      "blocks": [
+        {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Share a focused message",
+            "pb": 12
+          }
+        },
+        {
+          "type": "heading",
+          "settings": {
+            "heading": "Rich text",
+            "pb": 0
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "<p>Present a clear message with supporting text and calls to action in a focused, easy-to-read layout.</p>",
+            "pb": 12
+          }
+        },
+        {
+          "type": "group",
+          "settings": {
+            "mobile_content_direction": "column",
+            "mobile_gap": 8,
+            "desktop_content_direction": "row",
+            "desktop_gap": 10,
+            "pt": 28
+          },
+          "blocks": [
+            {
+              "type": "button",
+              "settings": {
+                "label": "Primary action",
+                "style": "btn-accent-solid"
+              }
+            },
+            {
+              "type": "button",
+              "settings": {
+                "label": "Secondary action",
+                "style": "btn-accent-outline"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,40 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "DNK_OS/config/zettcode.toml.example"
+# purpose: "Example configuration template for ZettCode in DNK OS."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-02"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+# Скопіюйте цей файл у ~/.zettcode/config.toml
+# або запустіть zettcode із змінною:
+# ZETTCODE_CONFIG=/Users/<username>/Kuzmenko/MY_LIFE_WORK/DNK_OS/config/config.toml zettcode
+
+# Приклад 1: DeepSeek (рекомендовано для швидкого та дешевого кодингу)
+[[models]]
+model = "deepseek-chat"
+display_model = "DeepSeek V3"
+token = "sk-..."                      # вкажіть ваш DEEPSEEK_API_KEY
+base_url = "https://api.deepseek.com"
+context_window = 128000
+multimodal = false
+
+[[models]]
+model = "deepseek-reasoner"
+display_model = "DeepSeek R1 (Auditor)"
+token = "sk-..."
+base_url = "https://api.deepseek.com"
+context_window = 128000
+multimodal = false
+
+# Приклад 2: OpenAI / Claude / Сумісні шлюзи
+# [[models]]
+# model = "claude-3-7-sonnet"
+# display_model = "Claude 3.7 Sonnet"
+# token = "sk-ant-..."
+# anthropic = true
+# context_window = 200000

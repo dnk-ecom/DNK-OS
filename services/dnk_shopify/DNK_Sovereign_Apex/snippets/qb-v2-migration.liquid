@@ -1,0 +1,186 @@
+{%- comment -%}
+  Quantity breaks V2: a guide inside the old Quantity selector (with quantity discounts on) that lists where each of
+  its settings lives in Quantity breaks V2. Nothing can be moved automatically, because a block can't read another
+  block's settings. blocks/product_quantity-selector.liquid renders it after the old widget while
+  request.design_mode is true, so customers never get it. It starts collapsed, is English only like the Discount
+  setup panel of Quantity breaks V2, and has no ids or form controls (quick add has nothing to rewrite).
+
+  Usage:
+  {%- if request.design_mode -%}{%- render 'qb-v2-migration' -%}{%- endif -%}
+{%- endcomment -%}
+{%- if request.design_mode -%}
+  <details class="qb-v2-migrate">
+    <summary class="qb-v2-migrate__summary">
+      <span>Moving to Quantity breaks V2</span>
+      <span class="qb-v2-migrate__note">Only you see this</span>
+    </summary>
+    <style>
+      details.qb-v2-migrate {
+        direction: ltr;
+        margin: 0.8rem 0 1.5rem;
+        border: 1px dashed rgba(var(--color-foreground), 0.35);
+        border-radius: 8px;
+        background: rgb(var(--color-background));
+        color: rgb(var(--color-foreground));
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.45;
+        letter-spacing: normal;
+        text-align: start;
+        text-transform: none;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__summary::before {
+        content: '';
+        flex: none;
+        width: 6px;
+        height: 6px;
+        margin-inline: 2px 1px;
+        border: solid currentColor;
+        border-width: 0 2px 2px 0;
+        rotate: -45deg;
+        transition: rotate 0.15s ease;
+      }
+
+      .qb-v2-migrate[open] > .qb-v2-migrate__summary::before {
+        rotate: 45deg;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__summary:focus-visible {
+        outline: 2px solid rgb(var(--color-foreground));
+        outline-offset: -2px;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__note {
+        margin-inline-start: auto;
+        color: rgba(var(--color-foreground), 0.75);
+        font-size: 12px;
+        font-weight: 400;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__body {
+        display: grid;
+        gap: 10px;
+        padding: 0 12px 12px;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__body :is(p, ol) {
+        margin: 0;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__steps {
+        display: grid;
+        gap: 4px;
+        padding-inline-start: 18px;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: inherit;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table :is(th, td) {
+        padding: 5px 10px 5px 0;
+        border-top: 1px solid rgba(var(--color-foreground), 0.12);
+        font-weight: 400;
+        text-align: start;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table :is(th, td):last-child {
+        padding-inline-end: 0;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table thead th {
+        border-top: 0;
+        color: rgba(var(--color-foreground), 0.75);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table thead th:first-child {
+        width: 46%;
+      }
+
+      .qb-v2-migrate .qb-v2-migrate__table .qb-v2-migrate__group th {
+        padding-top: 12px;
+        font-weight: 700;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .qb-v2-migrate .qb-v2-migrate__summary::before {
+          transition: none;
+        }
+      }
+    </style>
+    <div class="qb-v2-migrate__body">
+      <ol class="qb-v2-migrate__steps">
+        <li>Add a Quantity breaks V2 block to this section, with one Quantity option per offer.</li>
+        <li>Settings don't move over by themselves. The table matches each one to its new setting.</li>
+        <li>Remove this block when you're done. Both can't run in one section, so until then customers see this one and the new one stays dimmed.</li>
+      </ol>
+      <p>Discounts you created in Shopify admin keep working. The Discount setup panel under the new widget checks them.</p>
+      <table class="qb-v2-migrate__table">
+        <thead>
+          <tr>
+            <th scope="col">This block</th>
+            <th scope="col">New setting</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="qb-v2-migrate__group"><th scope="rowgroup" colspan="2">Quantity breaks V2 block</th></tr>
+          <tr><td>Heading</td><td>Heading</td></tr>
+          <tr><td>Style</td><td>Options layout</td></tr>
+          <tr><td>Prices layout</td><td>Price layout</td></tr>
+          <tr><td>Display selected indicator in Classic &amp; Compact style</td><td>Indicator style</td></tr>
+          <tr><td>Corner radius</td><td>Corner radius</td></tr>
+          <tr><td>Border width</td><td>Border thickness</td></tr>
+          <tr><td>Images width</td><td>Image size</td></tr>
+          <tr><td>Colors, Color scheme, Text accent color</td><td>Color scheme, Accent color, and Card style in each option</td></tr>
+          <tr><td>Variant selectors</td><td>Picker style, Item labels</td></tr>
+          <tr><td>Hide &amp; automatically skip sold out variants</td><td>Show sold-out values, turned off</td></tr>
+          <tr><td>Scroll to the selected variant image in product images gallery</td><td>Update gallery image</td></tr>
+          <tr><td>Update displayed product page prices</td><td>Product price display</td></tr>
+        </tbody>
+        <tbody>
+          <tr class="qb-v2-migrate__group"><th scope="rowgroup" colspan="2">Each Quantity option</th></tr>
+          <tr><td>Quantity</td><td>Quantity</td></tr>
+          <tr><td>Preselected option</td><td>Selected by default</td></tr>
+          <tr><td>Percentage off, Fixed amount off</td><td>Discount type, then Percentage or Amount</td></tr>
+          <tr><td>Compare price based on</td><td>Compare price based on</td></tr>
+          <tr><td>Label, Benefit, Caption</td><td>Title, Label, Subtitle</td></tr>
+          <tr><td>Price text, Compare price text</td><td>Price, Compare price</td></tr>
+          <tr><td>Image</td><td>Image</td></tr>
+          <tr><td>Badge text, Badge style, Badge color scheme</td><td>Badge</td></tr>
+          <tr><td>Enable variant selectors</td><td>Show variant pickers</td></tr>
+        </tbody>
+        <tbody>
+          <tr class="qb-v2-migrate__group"><th scope="rowgroup" colspan="2">Blocks in a Quantity option (Upsell/Gift #N)</th></tr>
+          <tr><td>Type: Gift (auto-added)</td><td>Free gift</td></tr>
+          <tr><td>Type: Checkbox</td><td>Checkbox upsell</td></tr>
+          <tr><td>Type: Checkbox – preselected</td><td>Checkbox upsell with Selected by default</td></tr>
+          <tr><td>Minimum offer required</td><td>The option you add the block to. A Free gift also shows in bigger options. To offer an upsell with every option, add it to the Quantity breaks V2 block instead.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+{%- endif -%}
