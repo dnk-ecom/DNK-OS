@@ -156,6 +156,11 @@ function cleanup_on_exit() {
     fi
     _CLEANUP_CALLED=1
 
+    # 0. Sync state.db back to runtime store
+    if [ -f "$HERMES_HOME/state.db" ] && [ -d "$RUNTIME_AGENT_DIR" ]; then
+        cp -f "$HERMES_HOME/state.db" "$RUNTIME_AGENT_DIR/state.db" 2>/dev/null || true
+    fi
+
     # 1. Release single-instance process lock
     python3 "$HUB_ROOT/scripts/system/process_guard.py" --release-lock "$TARGET_AGENT" >/dev/null 2>&1 || true
 
@@ -196,8 +201,12 @@ for rdir in lsp checkpoints cache logs pastes sessions terminal-sessions images;
         ln -s "$RUNTIME_AGENT_DIR/$rdir" "$HERMES_HOME/$rdir" 2>/dev/null || true
     fi
 done
+# Remove any legacy symlink for state.db to satisfy Hermes profile authority invariant
+if [ -L "$HERMES_HOME/state.db" ]; then
+    rm -f "$HERMES_HOME/state.db"
+fi
 if [ ! -e "$HERMES_HOME/state.db" ] && [ -f "$RUNTIME_AGENT_DIR/state.db" ]; then
-    ln -s "$RUNTIME_AGENT_DIR/state.db" "$HERMES_HOME/state.db" 2>/dev/null || true
+    cp "$RUNTIME_AGENT_DIR/state.db" "$HERMES_HOME/state.db" 2>/dev/null || true
 fi
 
 # Load environment variables from project .env
@@ -217,7 +226,7 @@ if [ -f "$HUB_ROOT/.env" ]; then
 fi
 
 # Ensure GitHub Token is inherited from environment or fetched via gh auth token
-if [ -z "$GH_TOKEN" ] && [ -z "$GITHUB_TOKEN" ]; then
+if [ -z "$GH_TOKEN" ] || [[ "$GH_TOKEN" == gsm://* ]] || [ -z "$GITHUB_TOKEN" ] || [[ "$GITHUB_TOKEN" == gsm://* ]]; then
     DETECTED_GH_TOKEN="$(gh auth token 2>/dev/null || true)"
     if [ -n "$DETECTED_GH_TOKEN" ]; then
         export GH_TOKEN="$DETECTED_GH_TOKEN"
@@ -395,7 +404,7 @@ print(json.dumps({'mode': res.mode, 'score': res.complexity_score, 'rationale': 
             if [ ! -x "$HERMES_PYTHON" ]; then
                 HERMES_PYTHON="python3"
             fi
-            "$HERMES_PYTHON" "$HERMES_EXEC" -z "$PROMPT_CONTENT" "${PROVIDER_EXTRA_FLAGS[@]}"
+            "$HERMES_PYTHON" "$HERMES_EXEC" "${PROVIDER_EXTRA_FLAGS[@]}" -z "$PROMPT_CONTENT"
             EXIT_CODE=$?
             exit $EXIT_CODE
         fi

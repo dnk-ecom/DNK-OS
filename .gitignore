@@ -51,3 +51,21 @@ config/config.toml
 # OS Metadata
 .DS_Store
 Thumbs.db
+
+# Agent runtime artifacts (DEC-122)
+core/orchestrator/agents/**/cache/
+core/orchestrator/agents/**/logs/
+core/orchestrator/agents/**/runtime/
+core/orchestrator/agents/**/state/
+core/orchestrator/agents/**/kanban/
+core/orchestrator/agents/**/plugin-update-checks/
+core/orchestrator/agents/**/source-checks/
+core/orchestrator/agents/**/*.lock
+core/orchestrator/agents/**/gateway*
+core/orchestrator/agents/**/spawn-ledger*
+core/orchestrator/agents/**/install_id*
+core/orchestrator/agents/**/channel_directory.json
+core/orchestrator/agents/**/processes.json*
+core/orchestrator/agents/**/cron/admissions/
+core/orchestrator/agents/**/cron/catch_up_occurrences
+core/orchestrator/agents/**/cron/ticker_*
