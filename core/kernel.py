@@ -25,13 +25,8 @@ from typing import Any, Dict, List, Optional, Union
 
 # Legacy engine fallbacks and dispatchers (isolated in core/kernel_legacy.py)
 from core.kernel_legacy import (  # noqa: E402
-    AccountingEngine,
-    CanvasEngine,
-    HermesRuntime,
-    LegacyToolDispatcher,
-    MaksymAuthEngine,
-    SwarmOrchestrator,
-    local_telemetry,
+    AccountingEngine, CanvasEngine, HermesRuntime, LegacyToolDispatcher,
+    MaksymAuthEngine, SwarmOrchestrator, local_telemetry
 )
 
 try:
@@ -47,21 +42,11 @@ from core.action_bus.hitl_bridge import HitlApprovalBridge
 from core.action_bus.models import ActionTask, ActionTaskStatus, BusEvent, BusEventType
 from core.action_bus.persistence import ActionBusPersistence
 from core.domain.dag_models import (
-    ContextCompileRequest,
-    NodeKind,
-    ThoughtDAGGraph,
-    ThoughtNode,
-    Wire,
-    WireType,
-    compile_thoughtdag_context,
+    ContextCompileRequest, NodeKind, ThoughtDAGGraph, ThoughtNode, Wire, WireType, compile_thoughtdag_context
 )
 from core.domain.identity_models import BrandDNA, ProjectWorkspace, UserProfile
 from core.domain.thought_dsl import (
-    MultiParentMergeRequest,
-    MultiParentMergeResult,
-    detect_cycles_kahn,
-    merge_multi_parent_context,
-    parse_thought_dsl,
+    MultiParentMergeRequest, MultiParentMergeResult, detect_cycles_kahn, merge_multi_parent_context, parse_thought_dsl
 )
 from core.memory.scones_store import SconesMemoryStore
 from core.orchestrator.task_dna_lifecycle import TaskDNALifecycleEngine, TaskDNAPhase

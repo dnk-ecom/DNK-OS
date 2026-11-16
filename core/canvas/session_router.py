@@ -543,7 +543,9 @@ class SpatialCanvasSessionRouter:
         candidates: List[Path] = []
         if config_path:
             candidates.append(config_path)
+        repo_root = Path(__file__).resolve().parents[2]
         candidates.extend([
+            repo_root / "core" / "config" / "vibe_coder_account.json",
             Path("core/config/vibe_coder_account.json"),
             Path("config/vibe_coder_account.json"),
             Path(".data/vibe_coder_account.json"),

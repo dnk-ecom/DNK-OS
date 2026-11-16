@@ -91,9 +91,10 @@ class ProjectEngine:
         canvas_dir: Optional[Path] = None,
         account_path: Optional[Path] = None,
     ):
-        self.projects_dir = projects_dir or Path("docs/projects")
-        self.canvas_dir = canvas_dir or Path("docs/canvas/projects")
-        self.account_path = account_path or Path("core/config/vibe_coder_account.json")
+        _root = Path(__file__).resolve().parent.parent.parent
+        self.projects_dir = projects_dir or (_root / "docs/projects" if (_root / "docs/projects").exists() else Path("docs/projects"))
+        self.canvas_dir = canvas_dir or (_root / "docs/canvas/projects" if (_root / "docs/canvas/projects").exists() else Path("docs/canvas/projects"))
+        self.account_path = account_path or (_root / "core/config/vibe_coder_account.json" if (_root / "core/config/vibe_coder_account.json").exists() else Path("core/config/vibe_coder_account.json"))
 
     def load_account(self) -> AccountSpec:
         """Loads and validates the L1 Vibe-Coder Account specification."""

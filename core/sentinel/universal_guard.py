@@ -131,9 +131,18 @@ def main():
         print(json.dumps(result))
         sys.exit(0 if result.get("allowed", True) else 1)
     except Exception as e:
-        # Fail safe (allow) with logging
-        print(json.dumps({"action": "allow", "decision": "allow", "error": str(e)}))
-        sys.exit(0)
+        # Fail-closed security standard: block execution on unhandled guard error
+        err_msg = f"SECURITY FAIL-CLOSED: Guard execution error: {str(e)}"
+        print(json.dumps({
+            "allowed": False,
+            "action": "block",
+            "decision": "deny",
+            "barrier_id": "BARRIER_SECURITY_FAIL_CLOSED",
+            "message": f"❌ BLOCKED: {err_msg}",
+            "reason": err_msg,
+            "error": str(e)
+        }))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

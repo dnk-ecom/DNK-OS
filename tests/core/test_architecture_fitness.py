@@ -18,19 +18,21 @@ from core.kernel import FastMCPKernel, create_fastmcp_server
 from core.memory.scones_store import SconesMemoryStore
 from core.project.project_engine import ProjectEngine
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
 
 def test_kernel_narrow_waist_loc():
     """Invariant: core/kernel.py must remain a Narrow Waist microkernel (< 400 LOC)."""
-    kernel_path = Path("core/kernel.py")
-    assert kernel_path.exists(), "core/kernel.py missing"
+    kernel_path = ROOT_DIR / "core" / "kernel.py"
+    assert kernel_path.exists(), f"core/kernel.py missing at {kernel_path}"
     lines = kernel_path.read_text(encoding="utf-8").splitlines()
     assert len(lines) <= 400, f"Narrow Waist violated: core/kernel.py has {len(lines)} lines (max 400)"
 
 
 def test_kernel_mcp_delegation():
     """Invariant: FastMCP protocol bindings are cleanly encapsulated in core/kernel_mcp.py."""
-    mcp_path = Path("core/kernel_mcp.py")
-    assert mcp_path.exists(), "core/kernel_mcp.py missing"
+    mcp_path = ROOT_DIR / "core" / "kernel_mcp.py"
+    assert mcp_path.exists(), f"core/kernel_mcp.py missing at {mcp_path}"
     k = FastMCPKernel()
     server = create_fastmcp_server(k)
     assert server is not None, "FastMCP server creation failed"
@@ -38,7 +40,7 @@ def test_kernel_mcp_delegation():
 
 def test_zero_hub_bleed():
     """Invariant: Zero imports or hardcoded references to archived DNK_HUB in core and services."""
-    root = Path(".")
+    root = ROOT_DIR
     violating_files = []
     for py_file in root.glob("core/**/*.py"):
         text = py_file.read_text(encoding="utf-8")
