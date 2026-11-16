@@ -1,0 +1,45 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/ledger/donors/caldoai__skills.yaml"
+# purpose: "Donor record: caldoai/skills (untangle-codebase), adapted into core/skills/untangle-codebase under DNK governance"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-07"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+id: caldoai/skills
+kind: repo
+url: https://github.com/caldoai/skills
+title: Caldo Skills (untangle-codebase, один промпт-скіл для структурного рефакторингу)
+pinned: f3cf477
+license: MIT
+track: ADAPT
+dossier: ""
+level: verified
+source: manual
+summary: "Промпт-скіл без коду: метод «чи мають ці частини змінюватися разом?» (приховані звʼязки, зайві звʼязки, надлишок, спецвипадки) + журнал рішень. Взято з адаптацією під правила DNK (scope, read-only фаза, слайси з whitelist, доказ командою)."
+assimilations:
+  - id: caldo-untangle-method
+    module: core/skills
+    what: "Метод рефакторингу: перелік проблем за трьома класами звʼязності + спецвипадки, редизайн з першопринципів, журнал рішень «фікс над проблемами», цикл перевірки субагентами"
+    method: adapt
+    status: done
+    gap: ""
+    donor_cite: "f3cf477:skills/untangle-codebase/SKILL.md:L19-L108"
+    dnk_path: core/skills/untangle-codebase/SKILL.md
+    verified: "python scripts/system/validate_skill_bundle.py core/skills/untangle-codebase -> PASS (2026-11-07); Hermes skill_utils.parse_frontmatter + iter_skill_index_files знаходять скіл через gerych_prime/skills/software-development"
+    date: "2026-11-07"
+    notes: "Дослівний оригінал у references/upstream_SKILL.md, ліцензія MIT поруч (LICENSE)."
+  - id: caldo-untangle-evidence-tools
+    module: core/skills
+    what: "Поради донора (скелет коду, граф імпортів, git як доказ спільних змін) реалізовано власним скриптом: skeleton / imports з інверсіями волатильності / cochange"
+    method: idea
+    status: done
+    gap: ""
+    donor_cite: "f3cf477:skills/untangle-codebase/SKILL.md:L100-L107"
+    dnk_path: core/skills/untangle-codebase/scripts/untangle_tools.py
+    verified: "python3 untangle_tools.py skeleton|imports|cochange на services/dnk_git_research, core/memory, apps/web/src -> exit 0 (2026-11-07)"
+    date: "2026-11-07"
+    notes: "У донора коду немає, лише текстові поради."

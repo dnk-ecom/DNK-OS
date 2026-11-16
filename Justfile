@@ -24,6 +24,10 @@ default:
 test:
     @uv run pytest tests/core -v
 
+# Run Architecture Fitness Functions (Narrow Waist < 400 LOC, Zero Hub Bleed, SCONES FTS5)
+test-fitness:
+    @uv run pytest tests/core/test_architecture_fitness.py -v
+
 # Run Shopify workhorse 7-gate integrity tests
 test-shopify:
     @uv run pytest services/dnk_shopify/tests -v
@@ -56,6 +60,22 @@ status:
 # Scaffold a new sovereign brick with 5 standard elements
 new-brick name:
     @python3 scripts/system/new_brick.py {{name}}
+
+# -----------------------------------------------------------------------------
+# 🔍 REPO INTELLIGENCE & SOTA PATTERN SEARCH (1,663 REPOSITORIES)
+# -----------------------------------------------------------------------------
+
+# Search repository catalog using bilingual FTS5 expansion
+repo-search query domain="":
+    @uv run python3 -c "from core.registry.repo_catalog import search_repos; [print(f'★ {r[\"id\"]} [{r.get(\"maturity_tier\",\"-\")}]: {r.get(\"title\",\"\")[:60]}') for r in search_repos('{{query}}', domain='{{domain}}' or None, limit=10)]"
+
+# Generate JIT prior-art reuse brief before writing code
+repo-brief task:
+    @uv run python3 -c "from services.dnk_git_research.src.reuse_brief import ReuseBriefService, format_brief_text; print(format_brief_text(ReuseBriefService(live=False).build('{{task}}', force=True)))"
+
+# Audit documentation for dead or stale code file references (SOTA Staleness Eviction)
+audit-knowledge dir="docs":
+    @uv run python3 -c "from core.sentinel.knowledge_staleness_guard import KnowledgeStalenessGuard; g = KnowledgeStalenessGuard(); r = g.audit_directory(g.root / '{{dir}}'); print(f'🛡️ Knowledge Staleness Audit: {r.scanned_docs_count} docs scanned, {r.valid_count} valid refs, {r.stale_count} stale refs.'); [print(f'  - [{s.doc_path}:{s.line_number}] -> {s.referenced_path}') for s in r.stale_items[:10]]"
 
 # -----------------------------------------------------------------------------
 # 🌌 SPATIAL CANVAS & VIBE ORCHESTRATION

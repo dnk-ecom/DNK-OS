@@ -312,7 +312,7 @@ class DNKArchifyAdapter:
         output_path: str = "docs/diagrams/dnk_hub_architecture.html",
         quality: str = "showcase",
     ) -> Dict[str, Any]:
-        """Extracts AST topology from DNK_HUB codebase and compiles a live interactive
+        """Extracts AST topology from codebase and compiles a live interactive
 
         Archify Spatial Architecture Diagram with Zero-Disk I/O.
         """

@@ -310,10 +310,10 @@ class SconesMemoryStore:
                 """
                 SELECT id, topic, observation, source, confidence, created_at
                 FROM scones_observations
-                WHERE topic LIKE ?
+                WHERE topic LIKE ? OR observation LIKE ?
                 ORDER BY id DESC LIMIT ?;
                 """,
-                (search_pattern, fetch_limit),
+                (search_pattern, search_pattern, fetch_limit),
             )
             rows = cursor.fetchall()
             results = []
@@ -354,6 +354,8 @@ class SconesMemoryStore:
         return await asyncio.to_thread(
             self._sync_query_memories, topic, limit, min_vitality, track_access, now
         )
+
+    query_memory = query_memories
 
     def prune_dead_facts(
         self, min_vitality: float = 0.1, now: Optional[float] = None

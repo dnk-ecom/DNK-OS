@@ -1,0 +1,29 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/ledger/environments.yaml"
+# purpose: "Runtime environments where assimilated logic must work, with verified stack facts and constraints"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-06"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+environments:
+  - id: dnk_hub
+    kind: runtime
+    name: DNK_HUB (основний моноліт-хаб)
+    stack: {python: ">=3.12", fastapi: ">=0.110", pydantic: ">=2.6", node: "pnpm workspace"}
+    constraints:
+      - "services/ за DOMAIN_RULES: префікс dnk_, без імпортів з core/apps/інших сервісів, конфіг лише через env"
+      - "нові файли мають MRH-заголовок"
+    verify: "pyproject.toml (requires-python), services/DOMAIN_RULES.md"
+  - id: researcher_vm
+    kind: host
+    name: Linux VM агента-дослідника (Cowork/Денчік)
+    stack: {python: "3.10", sqlite: "через $HOME, не через змонтовану папку"}
+    constraints:
+      - "SQLite на змонтованій папці дає disk I/O error: стан тримати в DNK_GIT_RESEARCH_STATE_DIR"
+      - "фонові процеси вмирають між викликами: довгі скани порціями до 170 с"
+      - "Python 3.10 нижчий за вимогу хаба (>=3.12): код сервісу не повинен покладатися на 3.12-синтаксис"
+    verify: "python --version у $HOME/venv; тести tests/services/dnk_git_research"

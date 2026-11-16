@@ -1,0 +1,60 @@
+{
+  "account_id": "acct-dnk-maxim",
+  "owner_name": "Максим Кузьменко",
+  "comms_language": "uk",
+  "code_language": "en",
+  "tone_of_voice": "Прямий, конструктивний, інженерно-точний, без води та компліментів (ADHD Protocol: картки <= 1 екран, action-first). Спілкування з Максимом виключно українською, код та артефакти — англійською.",
+  "system_invariants": [
+    "Canonical 8-Root Directory Invariant (apps/, core/, services/, packages/, infra/, docs/, tests/, scripts/)",
+    "Relative paths ONLY (./, ../) in all tool calls, code, imports, and scripts",
+    "Machine-Readable Headers (MRH) per DNK-STD-0075 on all Python/YAML/Markdown files",
+    "Zero-Waste High-Velocity Protocol (MASE <= 25 tool calls per slice)",
+    "Epistemic Armor & Anti-Sycophancy (Presupposition Inversion, 3-Flaws Dissent, Zero Flattery)",
+    "Live Runtime Anti-Mock Verification (unit mocks alone do not constitute completion)",
+    "Zero-Local-Venv (~/.dnk_runtime/ APFS 4-zone runtime pool)"
+  ],
+  "system_services": [
+    {
+      "service_id": "dnk_shopify",
+      "mount_mode": "in_ram_fastmcp",
+      "endpoint_or_module": "services.dnk_shopify.mcp_server",
+      "healthcheck_cmd": "python3 services/dnk_shopify/cli.py integrity"
+    },
+    {
+      "service_id": "dnk_spatial_canvas",
+      "mount_mode": "sqlite_wal_bus",
+      "endpoint_or_module": "core.canvas.session_router",
+      "healthcheck_cmd": "uv run pytest tests/core/test_spatial_canvas.py"
+    }
+  ],
+  "sovereign_team": [
+    "strategist",
+    "architect",
+    "denchik",
+    "gerych"
+  ],
+  "sanctioned_skill_catalog": [
+    "the_ultimate_cro_app_assimilated",
+    "shopify_cro_blocks",
+    "agent_native_assimilated",
+    "dnk_canvas_agent",
+    "anti-sycophancy"
+  ],
+  "golden_recipes": [
+    {
+      "recipe_id": "recipe-shopify-theme-foundry",
+      "title": "Shopify Theme 2.0 Apex Foundry & CRO Deconstruction",
+      "version": "1.0.0",
+      "source_project_id": "proj-shopify-dnk-ecom",
+      "required_dna_fields": [
+        "domain_type",
+        "design_system",
+        "icp",
+        "tracks"
+      ],
+      "canvas_template_path": "./docs/canvas/shopify_vibe_pipeline.canvas",
+      "verified_runs_count": 1
+    }
+  ],
+  "sacred_prompt_budget_tokens": 6000
+}

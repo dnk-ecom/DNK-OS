@@ -1,0 +1,54 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/ledger/gaps.yaml"
+# purpose: "Open capability gaps per DNK module: what the researcher should look for in the world"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-06"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+gaps:
+  - id: video-prompt-patterns
+    module: dnk_media
+    need: "Перевірені шаблони промптів і правила для генерації відео (Veo, продовження сегментів, узгодження тривалості з аудіо)"
+    terms: [video prompt, veo, text-to-video, cinematic prompt, segment extension, prompt template, камера, відео промпт]
+    priority: 2
+    status: open
+  - id: grounding-feedback-loop
+    module: dnk_git_research
+    need: "Зворотний зв'язок: чи допомогло знайдене рішення виконати задачу з першого разу, і запис результату в бібліотеку"
+    terms: [feedback loop, outcome tracking, evaluation harness, reuse metrics, success rate]
+    priority: 1
+    status: open
+  - id: dead-repo-recovery
+    module: dnk_git_research
+    need: "Відновлення метаданих і коду репозиторіїв, що зникли з GitHub, до видалення з каталогу"
+    terms: [software heritage, archive, wayback, repository mirror, swhid]
+    priority: 3
+    status: open
+  - id: dag-parallel-execution
+    module: dnk_node_tasks
+    need: "Паралельне виконання вузлів графа задач з обмеженням одночасності (graph_engine дає лише топологічний порядок і критичний шлях)"
+    terms: [parallel walk, semaphore, concurrency limit, dag executor, bounded parallelism, паралельне виконання, ліміт одночасних вузлів]
+    priority: 1
+    status: open
+  - id: dag-failure-propagation
+    module: dnk_node_tasks
+    need: "Збій вузла позначає всі залежні вузли як заблоковані й не виконує їх, зі звітом причин"
+    terms: [upstream failure, failure propagation, skip dependents, error cascade, dag diagnostics, збій вузла, збої залежних задач, зупинка залежних]
+    priority: 1
+    status: open
+  - id: plan-apply-stale-guard
+    module: dnk_node_tasks
+    need: "Розділення plan і apply: зберігається план, перед застосуванням перевіряється, що стан не змінився (serial і lineage)"
+    terms: [plan apply, saved plan, stale plan, state serial, lineage, dry run, human approval]
+    priority: 2
+    status: open
+  - id: state-locking
+    module: dnk_node_tasks
+    need: "Блокування стану графа між кількома агентами/процесами (зараз лише потокові локи всередині процесу)"
+    terms: [state lock, distributed lock, lock info, concurrent agents, optimistic concurrency]
+    priority: 2
+    status: open

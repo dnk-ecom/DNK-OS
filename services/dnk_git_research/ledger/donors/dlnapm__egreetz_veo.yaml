@@ -1,0 +1,39 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/ledger/donors/dlnapm__egreetz_veo.yaml"
+# purpose: "Donor record: DLNAPM/eGreetz_Veo, candidate mechanics for video prompt patterns (clean-room only, no license)"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-06"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+id: dlnapm/egreetz_veo
+kind: repo
+url: https://github.com/DLNAPM/eGreetz_Veo
+title: eGreetz Veo (вітальні відео через Veo + Gemini TTS)
+pinned: c6ff94b
+license: none
+track: CLEAN_ROOM
+dossier: services/dnk_git_research/docs/examples/eGreetz_Veo.dossier.md
+level: verified
+source: manual
+summary: "Донор ідей: ліцензії немає, тож код копіювати не можна, лише відтворювати механіку власним кодом."
+assimilations:
+  - id: egreetz-duration-rule
+    module: dnk_media
+    what: "Тривалість відео з довжини озвучки: базова 7 або 14 с, при аудіо цільова тривалість не менша за ceil(аудіо+1)"
+    method: clean_room
+    status: candidate
+    gap: video-prompt-patterns
+    donor_cite: "c6ff94b:services/geminiService.ts:L81-L88"
+    notes: "Рішення про прийняття ще не ухвалено."
+  - id: egreetz-extension-loop
+    module: dnk_media
+    what: "Цикл продовження сегмента відео з промптом безшовного продовження, доки не набрано цільову тривалість"
+    method: clean_room
+    status: candidate
+    gap: video-prompt-patterns
+    donor_cite: "c6ff94b:services/geminiService.ts:L196-L221"
+    notes: "Ліміти ітерацій і обробку помилок у донорі не прочитано."

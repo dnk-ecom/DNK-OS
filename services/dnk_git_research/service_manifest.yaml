@@ -1,0 +1,136 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/service_manifest.yaml"
+# purpose: "SaaP ServicePluginCard specification v1alpha2 for dnk_git_research"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "2.1.0"
+# updated_at: "2026-11-06"
+# author: "DNK-e.com Maksym & Denchik Prime (Chief Autonomous Builder)"
+# --- END DNK-MRH-HEADER ---
+
+apiVersion: dnk.os/v1alpha2
+kind: ServicePluginCard
+metadata:
+  service_id: dnk_git_research
+  name: DNK Git Research - Codebase AST & Symbol Mining Engine
+  version: 2.1.0
+  domain: research
+  author: DNK-e.com Maksym & Denchik Prime
+  description: Autonomous Git repository analysis and AST miner extracting code semantics,
+    dependencies, commit evolution metrics, and SOTA open-source assimilation patterns.
+  tags:
+    - research
+    - git_research
+    - ast
+    - sota
+spec:
+  lifecycle: Active
+  domain: research
+  entrypoint: services.dnk_git_research.cli:main
+  transport:
+    protocol: fastmcp
+    mode: stdio
+    command: python3
+    args:
+      - -m
+      - services.dnk_git_research.cli
+    env_passthrough:
+      - PYTHONPATH
+      - DNK_ENV
+  fastmcp_tools:
+    - name: git_research_search_repos
+      description: Searches GitHub for repositories matching semantic architecture requirements
+      input_schema:
+        type: object
+        properties:
+          query:
+            type: string
+          limit:
+            type: integer
+            default: 10
+    - name: git_research_audit_repo
+      description: Audits repository license, maturity tier, and bounded context fit
+      input_schema:
+        type: object
+        properties:
+          repo:
+            type: string
+    - name: git_research_assimilate_patterns
+      description: Synthesizes clean-room SOTA Diataxis specification for DNK OS modules
+      input_schema:
+        type: object
+        properties:
+          repo:
+            type: string
+          target:
+            type: string
+            default: core/engine
+    - name: git_research_reuse_brief
+      description: Gated JIT prior-art search before an agent writes code. Simple or repetitive tasks return SKIP with no search; specific mechanics return a brief with ADOPT / ADAPT / CLEAN_ROOM / BUILD verdicts, license evidence and next steps. Cached per task mechanics.
+      input_schema:
+        type: object
+        properties:
+          task:
+            type: string
+          target_files:
+            type: array
+            items:
+              type: string
+          tags:
+            type: array
+            items:
+              type: string
+          force:
+            type: boolean
+            default: false
+          live:
+            type: boolean
+            default: true
+          verify_licenses:
+            type: boolean
+            default: false
+        required:
+          - task
+    - name: git_research_curate_plan
+      description: Read-only audit of the repo catalog. Scores every entry from GitHub signals and structural checks (truncated duplicates, dead or archived repos, risk keywords, typosquats) and returns a KEEP / WATCH / QUARANTINE / REMOVE plan. Never changes the catalog.
+      input_schema:
+        type: object
+        properties:
+          max_requests:
+            type: integer
+            default: 50
+          refresh_days:
+            type: integer
+            default: 14
+          show:
+            type: integer
+            default: 20
+    - name: git_research_curate_apply
+      description: Apply an approved curation plan. Requires confirm=true; makes a SQLite backup first and moves rows to a quarantine table (never hard-deletes). Entries can be restored by id.
+      input_schema:
+        type: object
+        properties:
+          plan_file:
+            type: string
+          tiers:
+            type: array
+            items:
+              type: string
+            default: [REMOVE, QUARANTINE]
+          confirm:
+            type: boolean
+            default: false
+        required:
+          - plan_file
+  governance:
+    spend_guard:
+      max_cost_per_invocation_usd: 0.05
+      monthly_budget_usd: 50.0
+      max_tokens_per_task: 16000
+    circuit_breaker:
+      failure_threshold: 3
+      timeout_seconds: 30
+    health:
+      health_check_endpoint: /health

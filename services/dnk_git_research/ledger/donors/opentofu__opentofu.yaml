@@ -1,0 +1,60 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_git_research/ledger/donors/opentofu__opentofu.yaml"
+# purpose: "Donor record: opentofu/opentofu, DAG execution, plan/apply stale guard, state locking mechanics (MPL-2.0, ideas only: Go code, different language)"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-07"
+# author: "DNK-e.com Maksym & Claude"
+# --- END DNK-MRH-HEADER ---
+id: opentofu/opentofu
+kind: repo
+url: https://github.com/opentofu/opentofu
+title: OpenTofu (форк Terraform під MPL-2.0; замінює hashicorp/terraform як донор)
+pinned: 90d4525
+license: MPL-2.0
+track: ADAPT (файловий копілефт); код Go, тож беремо механіку
+level: verified
+source: manual
+summary: "Зрілий рушій виконання DAG. hashicorp/terraform під BUSL-1.1 лише CLEAN_ROOM, тому донором є форк."
+assimilations:
+  - id: tofu-bounded-parallel-walk
+    module: dnk_node_tasks
+    what: "Паралельний обхід графа задач; кількість одночасних вузлів обмежена семафором, за замовчуванням 10, від'ємне значення відхиляється"
+    method: idea
+    status: candidate
+    gap: dag-parallel-execution
+    donor_cite: "90d4525:internal/tofu/context.go:L116-L119"
+    notes: "Сам обхід у internal/dag/walk.go L18; семафор у context.go L43 і L87."
+  - id: tofu-upstream-failure
+    module: dnk_node_tasks
+    what: "Вузли, чий збій спричинений збоєм залежностей, окремо відстежуються (upstreamFailed) і не виконуються; діагностика збирається під локом"
+    method: idea
+    status: candidate
+    gap: dag-failure-propagation
+    donor_cite: "90d4525:internal/dag/walk.go:L63-L69"
+  - id: tofu-transitive-reduction
+    module: dnk_node_tasks
+    what: "Транзитивна редукція графа перед виконанням (прибирає зайві ребра), цикли ловить алгоритм сильно зв'язних компонент Тар'яна"
+    method: idea
+    status: candidate
+    donor_cite: "90d4525:internal/dag/dag.go:L89-L93"
+    notes: "Цикли в dnk_node_tasks уже ловить detect_cycle_with_new_edge; нове тут лише редукція."
+  - id: tofu-saved-plan-stale-guard
+    module: dnk_node_tasks
+    what: "Збережений план застосовується лише якщо serial і lineage стану збігаються з тими, з яких план створено; інакше помилка «plan is stale»"
+    method: idea
+    status: candidate
+    gap: plan-apply-stale-guard
+    donor_cite: "90d4525:internal/backend/local/backend_local.go:L379-L395"
+    notes: "Для першого плану (порожні метадані) порівнюється лише serial, щоб помилка була точною."
+  - id: tofu-state-locker
+    module: dnk_node_tasks
+    what: "Блокування стану під час операції: Lock перед зміною, відкладений Unlock; зберігається інформація про того, хто тримає лок"
+    method: idea
+    status: candidate
+    gap: state-locking
+    donor_cite: "90d4525:internal/command/meta_backend.go:L1059-L1063"
+    notes: "Реалізація інтерфейсу в internal/states/statemgr/locker.go прочитана лише за назвою, не за вмістом."
