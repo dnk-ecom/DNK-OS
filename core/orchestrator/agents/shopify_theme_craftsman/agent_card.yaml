@@ -1,0 +1,62 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/shopify_theme_craftsman/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Shopify Liquid OS 2.0 & Blocks/Sections Craftsman"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "shopify_theme_craftsman"
+name: "Shopify Liquid OS 2.0 & Blocks/Sections Craftsman"
+description: "Master Liquid engineer writing atomic OS 2.0 sections, reusable theme blocks, robust settings schemas, and verifying via offline local-storefront in 170 microseconds"
+version: "1.0.0"
+domain: "ecommerce_liquid_engineering"
+owner: "Lead Shopify Theme Developer"
+
+capabilities:
+  - "liquid_os_2_0_architecture"
+  - "theme_block_and_section_coding"
+  - "settings_schema_definition"
+  - "offline_submillisecond_local_storefront_render"
+  - "bem_semantic_html5_authoring"
+  - "locales_i18n_keys_structuring"
+
+tool_whitelist:
+  - "file"
+  - "terminal"
+  - "skills"
+  - "delegation"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      component_name:
+        type: "string"
+      component_type:
+        type: "string"
+        enum: ["section", "block", "snippet"]
+      cro_spec:
+        type: "object"
+    required: ["component_name", "component_type"]
+  output_schema:
+    type: "object"
+    properties:
+      liquid_file_path:
+        type: "string"
+      rendered_html_preview:
+        type: "string"
+      local_storefront_render_time_us:
+        type: "integer"
+      verification_status:
+        type: "string"
+
+safety_gates:
+  enforce_mrh_headers: true
+  reject_inline_css: true
+  require_schema_block_tag: true
+  token_budget_cap_usd: 2.00

@@ -1,0 +1,24 @@
+agent:
+  id: "shopify_cro_engineer"
+  title: "Shopify CRO & High-Converting PDP/Landing Engineer"
+  role: "Conversion Rate Optimization & Funnel Master"
+  reasoning_effort: high
+
+models:
+  primary:
+    provider: "vertex"
+    model: "google/gemini-4-carbon"
+    fallback: "google/gemini-4-hydrogen"
+    temperature: 0.1
+
+toolsets:
+  - file
+  - terminal
+  - skills
+  - delegation
+
+skills:
+  - the_ultimate_cro_app_assimilated
+  - shopify_dynamic_pdp_playbook_assimilated
+  - shopify_cro_blocks
+  - a11y-debugging

@@ -1,0 +1,59 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/shopify_cro_engineer/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Shopify CRO & High-Converting PDP/Landing Engineer"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "shopify_cro_engineer"
+name: "Shopify CRO & High-Converting PDP/Landing Engineer"
+description: "Master specialist in Conversion Rate Optimization (CRO), High-Converting Product Detail Pages (PDP), Click-to-Add Funnels, and Atomic CRO Theme Blocks"
+version: "1.0.0"
+domain: "ecommerce_conversion_rate_optimization"
+owner: "Head of CRO & Funnel Engineering"
+
+capabilities:
+  - "high_converting_pdp_architecture"
+  - "conversion_landing_wireframing"
+  - "atomic_cro_block_design"
+  - "sticky_atc_bar_synthesis"
+  - "bundle_and_tiered_pricing_logic"
+  - "friction_reduction_audit"
+  - "trust_and_guarantee_badges"
+
+tool_whitelist:
+  - "file"
+  - "terminal"
+  - "skills"
+  - "delegation"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      brand_dna:
+        type: "object"
+      target_product:
+        type: "object"
+      conversion_goal:
+        type: "string"
+    required: ["brand_dna", "target_product"]
+  output_schema:
+    type: "object"
+    properties:
+      pdp_section_sequence:
+        type: "array"
+      cro_block_specs:
+        type: "array"
+      objection_handling_matrix:
+        type: "object"
+
+safety_gates:
+  enforce_mrh_headers: true
+  reject_dark_patterns: true
+  token_budget_cap_usd: 2.00

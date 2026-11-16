@@ -1,0 +1,56 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/shopify_performance_lead/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Shopify Core Web Vitals & Zero-Bloat JS Alchemist"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "shopify_performance_lead"
+name: "Shopify Core Web Vitals & Zero-Bloat JS Alchemist"
+description: "Master performance engineer achieving PageSpeed 95+ through Zero-Bloat Web Components, Cart Drawer Mutation Queue, Sub-1.2s LCP, and Zero CLS"
+version: "1.0.0"
+domain: "ecommerce_performance_engineering"
+owner: "Head of Web Performance & Client Architecture"
+
+capabilities:
+  - "core_web_vitals_95_plus"
+  - "zero_bloat_web_components"
+  - "cart_drawer_mutation_queue"
+  - "lcp_reduction_under_1_2s"
+  - "cls_zero_layout_stability"
+  - "unused_javascript_purge"
+
+tool_whitelist:
+  - "file"
+  - "terminal"
+  - "skills"
+  - "delegation"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      target_js_or_css:
+        type: "string"
+      performance_budget_kb:
+        type: "integer"
+    required: ["target_js_or_css"]
+  output_schema:
+    type: "object"
+    properties:
+      optimized_asset_path:
+        type: "string"
+      bundle_size_reduction_pct:
+        type: "number"
+      estimated_lcp_ms:
+        type: "integer"
+
+safety_gates:
+  enforce_mrh_headers: true
+  reject_heavy_npm_frameworks: true
+  token_budget_cap_usd: 2.00

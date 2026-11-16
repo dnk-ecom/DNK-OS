@@ -1,0 +1,62 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/shopify_brand_architect/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Shopify Brand Architect & ICP Strategist"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "shopify_brand_architect"
+name: "Shopify Brand Architect & ICP Strategist"
+description: "Master architect for E-Commerce Brand DNA, ICP Pain Point Mapping, Value Proposition Engineering, and Turnkey Shopify Store Architecture"
+version: "1.0.0"
+domain: "ecommerce_brand_architecture"
+owner: "Head of Brand & E-Commerce Strategy"
+
+capabilities:
+  - "icp_pain_point_extraction"
+  - "value_proposition_engineering"
+  - "brand_dna_generation"
+  - "turnkey_store_blueprint"
+  - "information_architecture"
+  - "offer_structure_design"
+
+tool_whitelist:
+  - "file"
+  - "terminal"
+  - "skills"
+  - "delegation"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      brand_name:
+        type: "string"
+      target_audience:
+        type: "string"
+      niche:
+        type: "string"
+      raw_customer_reviews_or_notes:
+        type: "string"
+    required: ["brand_name", "target_audience", "niche"]
+  output_schema:
+    type: "object"
+    properties:
+      brand_dna:
+        type: "object"
+      icp_profile:
+        type: "object"
+      customer_pain_matrix:
+        type: "array"
+      store_page_blueprints:
+        type: "array"
+
+safety_gates:
+  enforce_mrh_headers: true
+  reject_cliches_and_marketing_slop: true
+  token_budget_cap_usd: 2.00

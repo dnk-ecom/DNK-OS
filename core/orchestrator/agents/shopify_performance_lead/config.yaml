@@ -1,0 +1,23 @@
+agent:
+  id: "shopify_performance_lead"
+  title: "Shopify Core Web Vitals & Zero-Bloat JS Alchemist"
+  role: "Performance Lead & Client Optimization Master"
+  reasoning_effort: high
+
+models:
+  primary:
+    provider: "vertex"
+    model: "deepseek-ai/deepseek-v4.1-flash-maas"
+    fallback: "google/gemini-4-carbon"
+    temperature: 0.1
+
+toolsets:
+  - file
+  - terminal
+  - skills
+  - delegation
+
+skills:
+  - debug-optimize-lcp
+  - modern-web-guidance
+  - memory-leak-debugging

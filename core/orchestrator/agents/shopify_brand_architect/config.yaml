@@ -1,0 +1,24 @@
+agent:
+  id: "shopify_brand_architect"
+  title: "Shopify Brand Architect & ICP Strategist"
+  role: "Brand DNA & High-Converting Turnkey Store Architect"
+  reasoning_effort: high
+
+models:
+  primary:
+    provider: "vertex"
+    model: "google/gemini-4-carbon"
+    fallback: "xai/grok-4.20-reasoning"
+    temperature: 0.15
+
+toolsets:
+  - file
+  - terminal
+  - skills
+  - delegation
+
+skills:
+  - consultant_assimilated
+  - founder_skill_assimilated
+  - dnk_elephant_goldfish
+  - ukrainian-humanizer

@@ -1,0 +1,23 @@
+agent:
+  id: "shopify_theme_craftsman"
+  title: "Shopify Liquid OS 2.0 & Blocks/Sections Craftsman"
+  role: "Liquid Master & OS 2.0 Theme Builder"
+  reasoning_effort: medium
+
+models:
+  primary:
+    provider: "vertex"
+    model: "google/gemini-4-hydrogen"
+    fallback: "google/gemini-4-argon"
+    temperature: 0.05
+
+toolsets:
+  - file
+  - terminal
+  - skills
+  - delegation
+
+skills:
+  - shopify_theme_builder_assimilated
+  - shopify_theme_handbook_assimilated
+  - harness_engineering_playbook_assimilated

@@ -1,0 +1,59 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/shopify_store_auditor/agent_card.yaml"
+# purpose: "A2A Agent Card specification for Shopify Theme Store 7-Gate Quality & Compliance Auditor"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "shopify_store_auditor"
+name: "Shopify Theme Store 7-Gate Quality & Compliance Auditor"
+description: "Zero-Context Adversarial Auditor validating 100% compliance with Shopify Theme Store guidelines, running theme-check, 7-Gate anti-regression suite, and locale parity"
+version: "1.0.0"
+domain: "ecommerce_theme_store_certification"
+owner: "Head of QA & Theme Store Certification"
+
+capabilities:
+  - "shopify_7gate_anti_regression"
+  - "theme_store_acceptance_checklist_100"
+  - "theme_check_official_linter"
+  - "locale_parity_validation_uk_en"
+  - "a11y_wcag_aa_verification"
+  - "adversarial_code_review"
+
+tool_whitelist:
+  - "file"
+  - "terminal"
+  - "skills"
+  - "delegation"
+
+task_contract:
+  input_schema:
+    type: "object"
+    properties:
+      theme_path:
+        type: "string"
+      target_slice:
+        type: "string"
+    required: ["theme_path"]
+  output_schema:
+    type: "object"
+    properties:
+      verdict:
+        type: "string"
+        enum: ["APPROVED", "REJECTED", "CHANGES_REQUESTED"]
+      theme_check_errors:
+        type: "integer"
+      theme_store_checklist_score_pct:
+        type: "number"
+      blocking_issues:
+        type: "array"
+
+safety_gates:
+  enforce_mrh_headers: true
+  reject_phantom_done: true
+  token_budget_cap_usd: 5.00

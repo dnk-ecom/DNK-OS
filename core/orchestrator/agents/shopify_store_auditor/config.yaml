@@ -1,0 +1,24 @@
+agent:
+  id: "shopify_store_auditor"
+  title: "Shopify Theme Store 7-Gate Quality & Compliance Auditor"
+  role: "Lead Theme Store Certification & 7-Gate Gatekeeper"
+  reasoning_effort: xhigh
+
+models:
+  primary:
+    provider: "vertex"
+    model: "xai/grok-4.20-reasoning"
+    fallback: "google/gemini-4-carbon"
+    temperature: 0.05
+
+toolsets:
+  - file
+  - terminal
+  - skills
+  - delegation
+
+skills:
+  - scrutineer_assimilated
+  - open_code_review_assimilated
+  - anti-sycophancy
+  - a11y-debugging
