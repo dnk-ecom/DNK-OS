@@ -155,6 +155,35 @@ def is_pr_creation_request(tool_name: str, tool_input: dict) -> bool:
     return False
 
 
+def check_structural_barriers(tool_name: str, tool_input: dict, repo_root: Path) -> Optional[dict]:
+    """Check commands and tool calls against core/config/structural_barriers.json."""
+    barriers_file = repo_root / "core" / "config" / "structural_barriers.json"
+    if not barriers_file.exists():
+        return None
+    try:
+        with open(barriers_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        barriers = data.get("barriers", [])
+        payload_str = ""
+        if tool_name in ("terminal", "execute_code", "run_command"):
+            payload_str = tool_input.get("command") or tool_input.get("code") or ""
+        else:
+            payload_str = json.dumps(tool_input)
+        for b in barriers:
+            pattern = b.get("pattern")
+            tool_pat = b.get("tool_name", ".*")
+            if pattern and re.search(tool_pat, tool_name):
+                if re.search(pattern, payload_str):
+                    return {
+                        "action": "block",
+                        "barrier_id": b.get("id"),
+                        "message": f"❌ BLOCKED by Structural Barrier [{b.get('id')}]: {b.get('message')}"
+                    }
+    except Exception:
+        pass
+    return None
+
+
 def main():
     try:
         raw_input = sys.stdin.read()
@@ -179,6 +208,13 @@ def main():
         for sp in (repo_root / ".venv" / "lib").glob("python*/site-packages"):
             if str(sp) not in sys.path:
                 sys.path.insert(0, str(sp))
+
+        # 0.0. Declarative Structural Barriers Check (Second Violation / Security Guard)
+        barrier_block = check_structural_barriers(tool_name, tool_input, repo_root)
+        if barrier_block:
+            print(json.dumps(barrier_block))
+            sys.exit(0)
+
         tracker = load_tracker(session_id)
         modified_args = {}
         modified_tool_name = None

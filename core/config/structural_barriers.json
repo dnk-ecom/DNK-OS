@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-11-16T23:00:00Z",
+  "barriers": [
+    {
+      "id": "BARRIER_001_LOCAL_VENV",
+      "tool_name": "execute_code|bash|terminal|run_command",
+      "pattern": "python[0-9.]*\\s+-m\\s+venv|virtualenv\\s+",
+      "severity": "BLOCKING",
+      "message": "VIOLATION OF GEMINI.MD: Local .venv creation forbidden. Use shared runtime ~/.dnk_runtime/venv."
+    },
+    {
+      "id": "BARRIER_002_NPM_YARN_BLOCK",
+      "tool_name": "execute_code|bash|terminal|run_command",
+      "pattern": "(^|\\s)(npm\\s+install|npm\\s+i|yarn\\s+add|yarn\\s+install)(\\s|$)",
+      "severity": "BLOCKING",
+      "message": "VIOLATION OF APFS STORE: Use 'pnpm' for node package management to leverage global hardlink store."
+    },
+    {
+      "id": "BARRIER_003_DESTRUCTIVE_GIT",
+      "tool_name": "execute_code|bash|terminal|run_command",
+      "pattern": "git\\s+push.*(--force|-f)\\s+(origin\\s+)?(main|master)",
+      "severity": "BLOCKING",
+      "message": "VIOLATION OF SAFETY: Force push to main/master is strictly blocked."
+    },
+    {
+      "id": "BARRIER_004_SYSTEM_DESTRUCTION",
+      "tool_name": "execute_code|bash|terminal|run_command",
+      "pattern": "rm\\s+-[a-zA-Z]*r[a-zA-Z]*f?\\s+(\\/|~|\\$HOME)(\\s|$)",
+      "severity": "BLOCKING",
+      "message": "VIOLATION OF SAFETY: Destructive root or home deletion command blocked."
+    }
+  ]
+}
