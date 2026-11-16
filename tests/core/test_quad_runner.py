@@ -7,7 +7,7 @@
 # status: "Active"
 # version: "1.0.0"
 # updated_at: "2026-11-16"
-# author: "DNK-e.com Maksym & Antigravity"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 import json
@@ -119,3 +119,32 @@ def test_role_persona_mapping():
     assert ROLE_PERSONA_MAP["denchik"] == "denchik"
     assert ROLE_PERSONA_MAP["auditor"] == "auditor"
     assert ROLE_PERSONA_MAP["gerych"] == "gerych_prime"
+
+
+def test_quad_runner_execute_node_with_revision_loop(runner_test_env):
+    """Verify SovereignQuadRunner integration with Bounded Revision Loop (DEC-120)."""
+    runner, canvas_path, router = runner_test_env
+    from core.orchestrator.fan_in_aggregator import AgentOutput
+    from core.orchestrator.bounded_revision_loop import RevisionLoopState
+
+    def builder_mock(attempt: int, remediation):
+        return [
+            AgentOutput(
+                agent_id="denchik",
+                task_id="task_runner_build",
+                summary="Synthesized module via quad runner",
+                produced_files={"built.py": "def foo():\n    return 'quad'\n"},
+                command_results=[{"command": "pytest", "exit_code": 0}],
+            )
+        ]
+
+    res = runner.execute_node_with_revision_loop(
+        canvas_path=canvas_path,
+        node_id="node_builder",
+        builder_fn=builder_mock,
+    )
+
+    assert res.passed is True
+    assert res.status == RevisionLoopState.APPROVED
+    assert res.total_revisions == 1
+

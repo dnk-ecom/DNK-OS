@@ -7,7 +7,7 @@
 # status: "Active"
 # version: "1.0.0"
 # updated_at: "2026-11-15"
-# author: "Antigravity & Gerych"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 import json
@@ -430,3 +430,118 @@ def test_topological_sort_subdag_kahn():
     assert len(order) == 3
     assert order[0] == "n_root"
     assert set(order[1:3]) == {"n_branch_a", "n_branch_b"}
+
+
+def test_compile_lod_dna_slice_projections():
+    """Verify Role-Based LOD DNA Projection (ADR-092 / DEC-120)."""
+    from core.canvas.session_router import compile_lod_dna_slice
+    from core.domain.vibe_core_contracts import ProjectDNA, DesignSystemTokens, ICPProfile, TrackSpec, TrackKind
+
+    dna = ProjectDNA(
+        project_id="proj-lod-test",
+        account_id="acct-dnk-maksym",
+        project_name="LOD Test Project",
+        domain_type="shopify_theme",
+        design_system=DesignSystemTokens(
+            spacing_unit_px=8,
+            border_radius_px=12,
+            primary_colors={"accent": "#10B981"},
+            component_rules=["Strict atomic blocks"]
+        ),
+        icp=ICPProfile(
+            segment_name="High-Growth DTC",
+            pain_points=["Slow checkout", "High bounce"],
+            value_proposition="Ultra-fast zero-app theme",
+            brand_voice_rules=["Crisp clarity", "Technical precision"],
+            forbidden_cliches=["Revolutionary", "Game-changer"]
+        ),
+        business_rules=["Zero jQuery", "100% theme-check clean"],
+        technical_constraints=["Theme store guidelines", "FastMCP dual-mount"],
+        tracks=[
+            TrackSpec(
+                track_id="track-1",
+                project_id="proj-lod-test",
+                kind=TrackKind.CORE_RND,
+                title="Track 1",
+                mission="Mission",
+                assigned_workhorse="dnk_shopify",
+                repo_root_rel="./theme",
+                root_canvas_path="./canvas/test.canvas",
+            )
+        ]
+    )
+
+    # 1. Builder projection (Denchik): includes tokens & constraints, excludes cliches
+    builder_slice = compile_lod_dna_slice(dna, "denchik")
+    assert "LOD: Builder Projection" in builder_slice
+    assert "Spacing=8px" in builder_slice
+    assert "Theme store guidelines" in builder_slice
+    assert "Game-changer" not in builder_slice
+    assert "High-Growth DTC" not in builder_slice
+
+    # 2. Copywriter projection (Strategist): includes ICP & cliches, excludes CSS tokens
+    copy_slice = compile_lod_dna_slice(dna, "strategist")
+    assert "LOD: Strategist & Copywriting Projection" in copy_slice
+    assert "High-Growth DTC" in copy_slice
+    assert "Game-changer" in copy_slice
+    assert "Spacing=8px" not in copy_slice
+
+    # 3. Auditor / Architecture projection (Gerych): includes constraints & business rules
+    arch_slice = compile_lod_dna_slice(dna, "gerych")
+    assert "LOD: Architecture & Auditor Projection" in arch_slice
+    assert "Theme store guidelines" in arch_slice
+    assert "Zero jQuery" in arch_slice
+
+
+def test_context_surgery_token_budget_pruning(tmp_path: Path):
+    """Verify that Context Surgery prunes massive upstream contracts to stay <= 1500 tokens."""
+    db_path = tmp_path / "budget_test.db"
+    canvas_path = tmp_path / "budget_pipeline.canvas"
+
+    # Parent node has a massive 12,000 character output (~3000 tokens)
+    massive_summary = "CRITICAL FACT: Key finding A. " + ("Data payload filler text " * 500)
+    canvas_data = {
+        "nodes": [
+            {
+                "id": "node_heavy_parent",
+                "type": "text",
+                "text": "### Parent Heavy\n**Agent**: `researcher`\nHeavy research.",
+                "x": 0,
+                "y": 0,
+                "width": 300,
+                "height": 200,
+            },
+            {
+                "id": "node_child_receiver",
+                "type": "text",
+                "text": "### Child Receiver\n**Agent**: `denchik`\nImplement based on findings.",
+                "x": 400,
+                "y": 0,
+                "width": 300,
+                "height": 200,
+            },
+        ],
+        "edges": [
+            {
+                "id": "edge_h_to_c",
+                "fromNode": "node_heavy_parent",
+                "toNode": "node_child_receiver",
+            }
+        ],
+    }
+    canvas_path.write_text(json.dumps(canvas_data, indent=2), encoding="utf-8")
+    router = SpatialCanvasSessionRouter(db_path=db_path)
+
+    # Crystallize parent with massive summary
+    router.crystallize_node(canvas_path, "node_heavy_parent", massive_summary, ["artifacts/big.json"])
+
+    # Compile child context with max_upstream_tokens = 1500
+    ctx = router.compile_node_context(canvas_path, "node_child_receiver", max_upstream_tokens=1500)
+
+    # Must be pruned/condensed to fit token budget (1500 tokens * 4 chars = 6000 chars limit)
+    assert len(ctx.upstream_contracts) == 1
+    contract = ctx.upstream_contracts[0]
+    assert len(contract.summary) <= 6000
+    assert "[condensed <= 1500 tok]" in contract.summary
+    assert "Key finding A" in contract.summary
+

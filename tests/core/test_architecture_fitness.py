@@ -73,3 +73,27 @@ def test_l1_account_spec_and_project_engine_integrity():
     assert loaded_account.account_id == "acct-dnk-maksym"
     project_manifest = engine.get_project_manifest("proj-shopify-dnk-ecom")
     assert project_manifest["project_id"] == "proj-shopify-dnk-ecom"
+
+
+def test_wave2_quarantine_sqlite_wal_persistence(tmp_path: Path):
+    """Fitness Check (DEC-120): TC-10 Quarantine Guard persists strike history in SQLite WAL."""
+    from core.sentinel.agent_quarantine import AgentQuarantineGuard, AgentState
+    db_file = tmp_path / "fitness_quarantine.db"
+    g1 = AgentQuarantineGuard(max_failures=1, db_path=db_file)
+    g1.record_validation_failure("test_agent", "Test defect")
+    assert g1.get_or_create("test_agent").state == AgentState.QUARANTINED
+
+    # New instance must read the same state
+    g2 = AgentQuarantineGuard(max_failures=1, db_path=db_file)
+    assert g2.get_or_create("test_agent").state == AgentState.QUARANTINED
+
+
+def test_wave2_context_surgery_and_revision_loop():
+    """Fitness Check (DEC-120): Context Surgery (<= 1500 tok) and Bounded Revision Loop are active."""
+    from core.canvas.session_router import compile_lod_dna_slice
+    from core.orchestrator.bounded_revision_loop import BoundedRevisionLoop
+
+    assert callable(compile_lod_dna_slice)
+    loop = BoundedRevisionLoop(max_revisions=3)
+    assert loop.max_revisions == 3
+

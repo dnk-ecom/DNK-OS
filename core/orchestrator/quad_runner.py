@@ -7,7 +7,7 @@
 # status: "Active"
 # version: "1.0.0"
 # updated_at: "2026-11-16"
-# author: "DNK-e.com Maksym & Antigravity"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 """
@@ -133,6 +133,26 @@ class SovereignQuadRunner:
             "agent_role": envelope["agent_role"],
             "persona": envelope["persona"],
         }
+
+    def execute_node_with_revision_loop(
+        self,
+        canvas_path: Path,
+        node_id: str,
+        builder_fn: Any,
+        context: Optional[Dict[str, Any]] = None,
+        max_revisions: int = 3,
+    ) -> Any:
+        """
+        Executes a node with the Bounded Revision Loop FSM (Builder <-> Auditor).
+        Allows up to 3 automatic revisions before tripping quarantine (DEC-120).
+        """
+        from core.orchestrator.bounded_revision_loop import BoundedRevisionLoop
+
+        loop = BoundedRevisionLoop(
+            session_router=self.router,
+            max_revisions=max_revisions,
+        )
+        return loop.execute_loop(canvas_path, node_id, builder_fn, context=context)
 
 
 if __name__ == "__main__":

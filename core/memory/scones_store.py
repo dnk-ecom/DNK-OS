@@ -7,7 +7,7 @@
 # status: "Active"
 # version: "1.1.0"
 # updated_at: "2026-09-24"
-# author: "DNK-e.com Maksym & Antigravity"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 """
@@ -22,6 +22,7 @@ Uses Python standard library sqlite3 with zero external dependencies.
 import asyncio
 import json
 import logging
+import re
 import sqlite3
 import threading
 import time
@@ -303,17 +304,28 @@ class SconesMemoryStore:
         now: Optional[float] = None,
     ) -> List[Dict[str, Any]]:
         self._ensure_initialized()
-        search_pattern = f"%{topic.lower().strip()}%"
+        words = [w for w in re.split(r"\s+", topic.lower().strip()) if w]
+        if not words:
+            return []
+
+        where_clauses = ["(topic LIKE ? OR observation LIKE ?)" for _ in words]
+        where_sql = " AND ".join(where_clauses)
+        params: List[Any] = []
+        for w in words:
+            params.extend([f"%{w}%", f"%{w}%"])
+
         fetch_limit = limit * 2 if min_vitality is not None else limit
+        params.append(fetch_limit)
+
         with self._get_connection() as conn:
             cursor = conn.execute(
-                """
+                f"""
                 SELECT id, topic, observation, source, confidence, created_at
                 FROM scones_observations
-                WHERE topic LIKE ? OR observation LIKE ?
+                WHERE {where_sql}
                 ORDER BY id DESC LIMIT ?;
                 """,
-                (search_pattern, search_pattern, fetch_limit),
+                tuple(params),
             )
             rows = cursor.fetchall()
             results = []

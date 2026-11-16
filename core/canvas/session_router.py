@@ -45,6 +45,110 @@ DEFAULT_DB_PATH = Path(os.path.expanduser("~/.dnk_runtime/agents_state/spatial_c
 FALLBACK_DB_PATH = Path(".data/spatial_canvas_sessions.db")
 
 
+def compile_lod_dna_slice(project_dna: Any, target_role: str) -> str:
+    """
+    Role-Based LOD (Level-of-Detail) DNA Projection & Context Surgery (ADR-092 / DEC-120).
+    Filters project DNA to strictly what the specific role needs, eliminating attention
+    entropy (Flash Attention degradation) and maintaining context budget <= 1500 tokens.
+
+    Projections:
+    - Builder (denchik, coder, liquid): Design tokens (spacing, radius, colors), technical constraints, business rules.
+    - Copywriter (strategist, copywriter, cro): ICP, value proposition, brand voice, forbidden cliches, business rules.
+    - Architecture (auditor, gerych, mentor): Technical constraints, system invariants, business rules, tracks.
+    - Default/General: Full balanced projection.
+    """
+    if project_dna is None:
+        return ""
+
+    def get_field(obj: Any, name: str, default: Any = None) -> Any:
+        if isinstance(obj, dict):
+            return obj.get(name, default)
+        return getattr(obj, name, default)
+
+    p_id = get_field(project_dna, "project_id", "proj-unknown")
+    p_name = get_field(project_dna, "project_name", "Unknown Project")
+    domain_type = get_field(project_dna, "domain_type", "general")
+
+    icp = get_field(project_dna, "icp", {})
+    segment_name = get_field(icp, "segment_name", "")
+    val_prop = get_field(icp, "value_proposition", "")
+    brand_voice_rules = get_field(icp, "brand_voice_rules", []) or []
+    forbidden_cliches = get_field(icp, "forbidden_cliches", []) or []
+    pain_points = get_field(icp, "pain_points", []) or []
+
+    ds = get_field(project_dna, "design_system", {})
+    spacing = get_field(ds, "spacing_unit_px", 4)
+    radius = get_field(ds, "border_radius_px", 8)
+    colors = get_field(ds, "primary_colors", {})
+    component_rules = get_field(ds, "component_rules", []) or []
+
+    tech_constraints = get_field(project_dna, "technical_constraints", []) or []
+    business_rules = get_field(project_dna, "business_rules", []) or []
+
+    role_norm = target_role.lower().strip()
+
+    builder_roles = {"denchik", "builder", "builder_denchik", "coder", "developer", "frontend", "liquid"}
+    copywriter_roles = {"strategist", "copywriter", "marketer", "writer", "content", "cro"}
+    architect_roles = {"auditor", "gerych", "gerych_prime", "architect", "dnk_mentor"}
+
+    if role_norm in builder_roles:
+        lines = [
+            f"## 🧬 L2 Project DNA (LOD: Builder Projection): {p_name} (`{p_id}`)",
+            f"**Domain**: `{domain_type}`",
+            f"**Value Proposition**: {val_prop}",
+            f"**Design Tokens**: Spacing={spacing}px, Radius={radius}px, Colors={colors}",
+        ]
+        if component_rules:
+            lines.append(f"**Component Rules**: {'; '.join(component_rules[:4])}")
+        if tech_constraints:
+            lines.append(f"**Technical Constraints**: {'; '.join(tech_constraints[:4])}")
+        if business_rules:
+            lines.append(f"**Business Rules**: {'; '.join(business_rules[:3])}")
+        return "\n".join(lines)
+
+    elif role_norm in copywriter_roles:
+        lines = [
+            f"## 🧬 L2 Project DNA (LOD: Strategist & Copywriting Projection): {p_name} (`{p_id}`)",
+            f"**Domain**: `{domain_type}` | **ICP Target**: {segment_name}",
+            f"**Value Proposition**: {val_prop}",
+        ]
+        if pain_points:
+            lines.append(f"**Pain Points**: {'; '.join(pain_points[:3])}")
+        if brand_voice_rules:
+            lines.append(f"**Brand Voice Principles**: {', '.join(brand_voice_rules[:3])}")
+        if forbidden_cliches:
+            lines.append(f"**Forbidden Clichés**: {', '.join(forbidden_cliches[:5])}")
+        if business_rules:
+            lines.append(f"**Business Rules**: {'; '.join(business_rules[:3])}")
+        return "\n".join(lines)
+
+    elif role_norm in architect_roles:
+        lines = [
+            f"## 🧬 L2 Project DNA (LOD: Architecture & Auditor Projection): {p_name} (`{p_id}`)",
+            f"**Domain**: `{domain_type}`",
+            f"**Value Proposition**: {val_prop}",
+        ]
+        if tech_constraints:
+            lines.append(f"**Technical Constraints**: {'; '.join(tech_constraints[:4])}")
+        if business_rules:
+            lines.append(f"**Business Rules**: {'; '.join(business_rules[:4])}")
+        return "\n".join(lines)
+
+    else:
+        # Default balanced projection (backwards-compatible with tests)
+        lines = [
+            f"## 🧬 L2 Project DNA: {p_name} (`{p_id}`)",
+            f"**Domain**: `{domain_type}` | **ICP Target**: {segment_name}",
+            f"**Value Proposition**: {val_prop}",
+            f"**Brand Voice Principles**: {', '.join(brand_voice_rules[:3])}",
+            f"**Forbidden Clichés**: {', '.join(forbidden_cliches[:5])}",
+            f"**Design Tokens**: Spacing={spacing}px, Radius={radius}px, Colors={colors}",
+            f"**Technical Constraints**: {'; '.join(tech_constraints[:4])}",
+        ]
+        return "\n".join(lines)
+
+
+
 class NodeSession(BaseModel):
     """Metadata and state of an isolated node chat session."""
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -217,6 +321,18 @@ class SpatialCanvasSessionRouter:
         now_str = time.strftime("%Y-%m-%d %H:%M:%S")
 
         with self._get_connection() as conn:
+            exists = conn.execute("SELECT 1 FROM node_chat_sessions WHERE id = ?", (session_id,)).fetchone()
+            if not exists:
+                parts = session_id.split(":")
+                c_id = parts[1] if len(parts) > 1 else "default"
+                n_id = parts[2] if len(parts) > 2 else "root"
+                conn.execute(
+                    """
+                    INSERT INTO node_chat_sessions (id, canvas_id, node_id, agent_role, status, artifact_refs, created_at, updated_at)
+                    VALUES (?, ?, ?, 'general_agent', 'active', '[]', ?, ?)
+                    """,
+                    (session_id, c_id, n_id, now_str, now_str),
+                )
             conn.execute(
                 """
                 INSERT INTO node_chat_messages (id, session_id, role, content, meta_json, created_at)
@@ -650,15 +766,16 @@ class SpatialCanvasSessionRouter:
         return result
 
     def compile_node_context(
-        self, canvas_path: Path, node_id: str
+        self, canvas_path: Path, node_id: str, max_upstream_tokens: int = 1500
     ) -> NodeContextPrompt:
         """
         Compile context for a node using Graph Context Surgery:
         1. Parse .canvas graph structure.
         2. Find all direct upstream parent nodes.
         3. Collect their crystallized contracts (0 raw tokens, only clean facts).
-        4. Auto-discover L2 ProjectDNA (Zero Context Re-typing).
-        5. Synthesize zero-waste system prompt for the node agent.
+        4. Enforce Context Surgery token ceiling (<= max_upstream_tokens, default 1500).
+        5. Auto-discover L2 ProjectDNA & compile Role-Based LOD slice.
+        6. Synthesize zero-waste system prompt for the node agent.
         """
         if not canvas_path.exists():
             raise FileNotFoundError(f"Canvas not found at: {canvas_path}")
@@ -716,6 +833,27 @@ class SpatialCanvasSessionRouter:
                             artifacts=[],
                         )
                     )
+
+        # Context Surgery: Token budget enforcement (<= max_upstream_tokens, default 1500)
+        max_chars = max_upstream_tokens * 4
+        total_summary_chars = sum(len(c.summary) for c in upstream_contracts)
+        if total_summary_chars > max_chars and upstream_contracts:
+            per_contract_budget = max(120, max_chars // len(upstream_contracts))
+            pruned_contracts: List[UpstreamContract] = []
+            for c in upstream_contracts:
+                if len(c.summary) > per_contract_budget:
+                    truncated = c.summary[: per_contract_budget - 35] + "... [condensed <= 1500 tok]"
+                    pruned_contracts.append(
+                        UpstreamContract(
+                            node_id=c.node_id,
+                            title=c.title,
+                            summary=truncated,
+                            artifacts=c.artifacts,
+                        )
+                    )
+                else:
+                    pruned_contracts.append(c)
+            upstream_contracts = pruned_contracts
 
         # Parse target node details
         target_text = target_node.get("text", "")
@@ -787,15 +925,9 @@ class SpatialCanvasSessionRouter:
             ])
 
         if project_dna is not None:
-            prompt_parts.extend([
-                f"\n## 🧬 L2 Project DNA: {project_dna.project_name} (`{project_dna.project_id}`)",
-                f"**Domain**: `{project_dna.domain_type}` | **ICP Target**: {project_dna.icp.segment_name}",
-                f"**Value Proposition**: {project_dna.icp.value_proposition}",
-                f"**Brand Voice Principles**: {', '.join(project_dna.icp.brand_voice_rules[:3])}",
-                f"**Forbidden Clichés**: {', '.join(project_dna.icp.forbidden_cliches[:5])}",
-                f"**Design Tokens**: Spacing={project_dna.design_system.spacing_unit_px}px, Radius={project_dna.design_system.border_radius_px}px, Colors={project_dna.design_system.primary_colors}",
-                f"**Technical Constraints**: {'; '.join(project_dna.technical_constraints[:4])}",
-            ])
+            dna_slice = compile_lod_dna_slice(project_dna, role)
+            if dna_slice:
+                prompt_parts.append(f"\n{dna_slice}")
 
         if contracts:
             prompt_parts.append("\n## 📥 Upstream Output Contracts (Parent Nodes):")

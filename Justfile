@@ -77,6 +77,10 @@ repo-brief task:
 audit-knowledge dir="docs":
     @uv run python3 -c "from core.sentinel.knowledge_staleness_guard import KnowledgeStalenessGuard; g = KnowledgeStalenessGuard(); r = g.audit_directory(g.root / '{{dir}}'); print(f'🛡️ Knowledge Staleness Audit: {r.scanned_docs_count} docs scanned, {r.valid_count} valid refs, {r.stale_count} stale refs.'); [print(f'  - [{s.doc_path}:{s.line_number}] -> {s.referenced_path}') for s in r.stale_items[:10]]"
 
+# Run interactive live verification test across all 5 core subsystems
+live-test:
+    @uv run python3 scripts/system/live_system_test.py
+
 # -----------------------------------------------------------------------------
 # 🌌 SPATIAL CANVAS & VIBE ORCHESTRATION
 # -----------------------------------------------------------------------------

@@ -1,13 +1,13 @@
 # --- DNK-MRH-HEADER ---
 # mrh_id: "core/sentinel/agent_quarantine.py"
-# purpose: "Automated Agent Quarantine & Circuit Breaker (assimilated from Worley UAIP TC-10 agent_suspension)."
+# purpose: "Automated Agent Quarantine & Circuit Breaker with Persistent SQLite WAL Ledger (assimilated from Worley UAIP TC-10 agent_suspension)."
 # canonical_source: true
-# alters_files: []
+# alters_files: ["~/.dnk_runtime/agents_state/agent_quarantine.db", ".data/agent_quarantine.db"]
 # triggers_tasks: []
 # status: "Active"
-# version: "1.0.0"
+# version: "1.1.0"
 # updated_at: "2026-11-16"
-# author: "Antigravity & DNK-e.com Maksym"
+# author: "DNK-e.com"
 # --- END DNK-MRH-HEADER ---
 
 from __future__ import annotations
@@ -15,12 +15,18 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
+from pathlib import Path
+import sqlite3
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger("dnk.sentinel.quarantine")
+
+DEFAULT_QUARANTINE_DB = Path(os.path.expanduser("~/.dnk_runtime/agents_state/agent_quarantine.db"))
+FALLBACK_QUARANTINE_DB = Path(".data/agent_quarantine.db")
 
 
 class QuarantineReason(str, Enum):
@@ -72,6 +78,7 @@ class AgentQuarantineGuard:
     """
     Automated Agent Circuit Breaker & Quarantine Gate (UAIP TC-10).
     Guarantees strict adherence to MASE bounds (<=25 calls) and stops runaway failure loops.
+    Persists strike history and quarantine states across sessions via SQLite WAL ledger.
     """
 
     MAX_CONSECUTIVE_FAILURES: int = 3
@@ -81,15 +88,157 @@ class AgentQuarantineGuard:
         self,
         max_failures: int = MAX_CONSECUTIVE_FAILURES,
         max_slice_calls: int = MAX_TOOL_CALLS_PER_SLICE,
+        db_path: Optional[Path | str] = None,
     ) -> None:
         self.max_failures = max_failures
         self.max_slice_calls = max_slice_calls
+        if db_path is not None:
+            self.db_path = Path(db_path) if db_path != ":memory:" else db_path
+        elif os.environ.get("PYTEST_CURRENT_TEST"):
+            self.db_path = ":memory:"
+        elif DEFAULT_QUARANTINE_DB.parent.exists():
+            self.db_path = DEFAULT_QUARANTINE_DB
+        else:
+            self.db_path = FALLBACK_QUARANTINE_DB
+
         self._registry: Dict[str, AgentHealthRecord] = {}
+        self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        if self.db_path == ":memory:":
+            if not hasattr(self, "_mem_conn") or self._mem_conn is None:
+                self._mem_conn = sqlite3.connect(":memory:", timeout=15.0)
+                self._mem_conn.row_factory = sqlite3.Row
+            return self._mem_conn
+
+        path = Path(self.db_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(path), timeout=15.0)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
+        conn.execute("PRAGMA foreign_keys=ON;")
+        return conn
+
+    def _init_db(self) -> None:
+        with self._get_connection() as conn:
+            conn.executescript("""
+                CREATE TABLE IF NOT EXISTS agent_quarantine_ledger (
+                    agent_id TEXT PRIMARY KEY,
+                    state TEXT NOT NULL DEFAULT 'active',
+                    consecutive_failures INTEGER NOT NULL DEFAULT 0,
+                    tool_calls_in_slice INTEGER NOT NULL DEFAULT 0,
+                    total_tool_calls INTEGER NOT NULL DEFAULT 0,
+                    last_tripped_reason TEXT,
+                    last_incident_sha256 TEXT,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS agent_quarantine_incidents (
+                    incident_id TEXT PRIMARY KEY,
+                    agent_id TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    details TEXT NOT NULL,
+                    receipt_sha256 TEXT NOT NULL,
+                    tripped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(agent_id) REFERENCES agent_quarantine_ledger(agent_id) ON DELETE CASCADE
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_incidents_agent ON agent_quarantine_incidents(agent_id);
+            """)
+
+    def _save_record(self, rec: AgentHealthRecord, incident: Optional[QuarantineIncident] = None) -> None:
+        with self._get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO agent_quarantine_ledger
+                (agent_id, state, consecutive_failures, tool_calls_in_slice, total_tool_calls, last_tripped_reason, last_incident_sha256, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(agent_id) DO UPDATE SET
+                    state = excluded.state,
+                    consecutive_failures = excluded.consecutive_failures,
+                    tool_calls_in_slice = excluded.tool_calls_in_slice,
+                    total_tool_calls = excluded.total_tool_calls,
+                    last_tripped_reason = excluded.last_tripped_reason,
+                    last_incident_sha256 = excluded.last_incident_sha256,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (
+                    rec.agent_id,
+                    rec.state.value if hasattr(rec.state, "value") else str(rec.state),
+                    rec.consecutive_failures,
+                    rec.tool_calls_in_slice,
+                    rec.total_tool_calls,
+                    rec.last_tripped_reason.value if rec.last_tripped_reason and hasattr(rec.last_tripped_reason, "value") else (str(rec.last_tripped_reason) if rec.last_tripped_reason else None),
+                    rec.last_incident_sha256,
+                ),
+            )
+            if incident:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO agent_quarantine_incidents
+                    (incident_id, agent_id, reason, details, receipt_sha256, tripped_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        incident.incident_id,
+                        incident.agent_id,
+                        incident.reason.value if hasattr(incident.reason, "value") else str(incident.reason),
+                        incident.details,
+                        incident.receipt_sha256,
+                        incident.tripped_at,
+                    ),
+                )
 
     def get_or_create(self, agent_id: str) -> AgentHealthRecord:
-        if agent_id not in self._registry:
-            self._registry[agent_id] = AgentHealthRecord(agent_id=agent_id)
-        return self._registry[agent_id]
+        if agent_id in self._registry:
+            return self._registry[agent_id]
+
+        with self._get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM agent_quarantine_ledger WHERE agent_id = ?", (agent_id,)
+            ).fetchone()
+
+            if row:
+                inc_rows = conn.execute(
+                    "SELECT * FROM agent_quarantine_incidents WHERE agent_id = ? ORDER BY tripped_at ASC",
+                    (agent_id,),
+                ).fetchall()
+                incidents = [
+                    QuarantineIncident(
+                        incident_id=r["incident_id"],
+                        agent_id=r["agent_id"],
+                        reason=QuarantineReason(r["reason"]),
+                        details=r["details"],
+                        receipt_sha256=r["receipt_sha256"],
+                        tripped_at=str(r["tripped_at"]),
+                    )
+                    for r in inc_rows
+                ]
+                rec = AgentHealthRecord(
+                    agent_id=row["agent_id"],
+                    state=AgentState(row["state"]),
+                    consecutive_failures=row["consecutive_failures"],
+                    tool_calls_in_slice=row["tool_calls_in_slice"],
+                    total_tool_calls=row["total_tool_calls"],
+                    last_tripped_reason=QuarantineReason(row["last_tripped_reason"]) if row["last_tripped_reason"] else None,
+                    last_incident_sha256=row["last_incident_sha256"],
+                    incidents=incidents,
+                )
+                self._registry[agent_id] = rec
+                return rec
+            else:
+                rec = AgentHealthRecord(agent_id=agent_id)
+                conn.execute(
+                    """
+                    INSERT INTO agent_quarantine_ledger
+                    (agent_id, state, consecutive_failures, tool_calls_in_slice, total_tool_calls)
+                    VALUES (?, ?, 0, 0, 0)
+                    """,
+                    (agent_id, rec.state.value),
+                )
+                self._registry[agent_id] = rec
+                return rec
 
     def assert_can_execute(self, agent_id: str) -> None:
         """Throws AgentQuarantinedError if the agent is currently locked in quarantine."""
@@ -143,6 +292,8 @@ class AgentQuarantineGuard:
                 incident_sha256=rec.last_incident_sha256 or "",
             )
 
+        self._save_record(rec)
+
     def record_validation_failure(self, agent_id: str, defect_summary: str) -> None:
         """Tracks consecutive validation failures and trips circuit breaker after 3 failures."""
         rec = self.get_or_create(agent_id)
@@ -156,6 +307,7 @@ class AgentQuarantineGuard:
             )
         else:
             rec.state = AgentState.DEGRADED
+            self._save_record(rec)
 
     def record_success(self, agent_id: str) -> None:
         """Resets failure counter and slice tool-calls upon checkpoint/verified milestone."""
@@ -164,6 +316,7 @@ class AgentQuarantineGuard:
             rec.consecutive_failures = 0
             rec.tool_calls_in_slice = 0
             rec.state = AgentState.ACTIVE
+            self._save_record(rec)
 
     def trip_quarantine(self, agent_id: str, reason: QuarantineReason, details: str) -> QuarantineIncident:
         """Directly trips the agent circuit breaker and creates an unforgeable incident receipt."""
@@ -192,6 +345,8 @@ class AgentQuarantineGuard:
         rec.last_incident_sha256 = receipt_sha256
         rec.incidents.append(incident)
 
+        self._save_record(rec, incident)
+
         logger.critical(
             "CIRCUIT BREAKER TRIPPED for agent '%s' (%s). Incident: %s",
             agent_id,
@@ -207,4 +362,5 @@ class AgentQuarantineGuard:
         rec.consecutive_failures = 0
         rec.tool_calls_in_slice = 0
         rec.last_tripped_reason = None
+        self._save_record(rec)
         logger.info("Agent '%s' released from quarantine by approver '%s'", agent_id, approver)
