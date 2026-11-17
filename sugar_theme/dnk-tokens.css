@@ -1,0 +1,333 @@
+/* --- DNK-MRH-HEADER ---
+/* mrh_id: "assets/dnk-brand-sugar-theme-demo-tokens.css"
+/* purpose: "Compiled Design Tokens for Shopify Liquid Theme (Sugar Theme Demo)"
+/* --- END DNK-MRH-HEADER --- */
+
+:root {
+  --color-background: #ffffff;
+  --color-background-rgb: 255 255 255;
+  --color-surface-primary: #ffffff;
+  --color-surface-primary-rgb: 255 255 255;
+  --color-gradient-background: #b40919;
+  --color-gradient-background-rgb: 180 9 25;
+  --color-foreground: #ffffff;
+  --color-foreground-rgb: 255 255 255;
+  --color-text-primary: #04182b;
+  --color-text-primary-rgb: 4 24 43;
+  --color-background-contrast: #538fdf;
+  --color-background-contrast-rgb: 83 143 223;
+  --color-accent: #182f4f;
+  --color-accent-rgb: 24 47 79;
+  --color-action-primary: #182f4f;
+  --color-action-primary-rgb: 24 47 79;
+  --color-button: #182f4f;
+  --color-button-rgb: 24 47 79;
+  --color-button-text: #08172b;
+  --color-button-text-rgb: 8 23 43;
+  --color-action-primary-text: #ffffff;
+  --color-action-primary-text-rgb: 255 255 255;
+  --color-secondary-button: #08172b;
+  --color-secondary-button-rgb: 8 23 43;
+  --color-action-secondary: #ffffff;
+  --color-action-secondary-rgb: 255 255 255;
+  --color-secondary-button-text: #e8eff9;
+  --color-secondary-button-text-rgb: 232 239 249;
+  --color-link: #6aa5f6;
+  --color-link-rgb: 106 165 246;
+  --color-badge-foreground: #e8eff9;
+  --color-badge-foreground-rgb: 232 239 249;
+  --color-badge-background: #08172b;
+  --color-badge-background-rgb: 8 23 43;
+  --color-badge-border: #e8eff9;
+  --color-badge-border-rgb: 232 239 249;
+  --color-payment-terms-background-color: #08172b;
+  --color-payment-terms-background-color-rgb: 8 23 43;
+  --color-scheme-scheme-1-surface: #ffffff;
+  --color-scheme-scheme-1-surface-rgb: 255 255 255;
+  --color-scheme-scheme-1-text: #04182b;
+  --color-scheme-scheme-1-text-rgb: 4 24 43;
+  --color-scheme-scheme-2-surface: #f5fafe;
+  --color-scheme-scheme-2-surface-rgb: 245 250 254;
+  --color-scheme-scheme-2-text: #04182b;
+  --color-scheme-scheme-2-text-rgb: 4 24 43;
+  --color-scheme-scheme-3-surface: #182f4f;
+  --color-scheme-scheme-3-surface-rgb: 24 47 79;
+  --color-scheme-scheme-3-text: #ffffff;
+  --color-scheme-scheme-3-text-rgb: 255 255 255;
+  --color-scheme-scheme-4-surface: #3f89f1;
+  --color-scheme-scheme-4-surface-rgb: 63 137 241;
+  --color-scheme-scheme-4-text: #ffffff;
+  --color-scheme-scheme-4-text-rgb: 255 255 255;
+  --color-scheme-scheme-5-surface: #08172b;
+  --color-scheme-scheme-5-surface-rgb: 8 23 43;
+  --color-scheme-scheme-5-text: #e8eff9;
+  --color-scheme-scheme-5-text-rgb: 232 239 249;
+  --color-button-letter-spacing: 0px;
+  --color-button-primary-bg: #182f4f;
+  --color-button-primary-bg-rgb: 24 47 79;
+  --color-button-primary-bg-surface: #182f4f;
+  --color-button-primary-bg-surface-rgb: 24 47 79;
+  --color-button-primary-bg-layer: #b604b6;
+  --color-button-primary-bg-layer-rgb: 182 4 182;
+  --color-button-primary-text: #ffffff;
+  --color-button-primary-text-rgb: 255 255 255;
+  --color-button-primary-border: 0px;
+  --color-button-primary-border-color: #182f4f;
+  --color-button-primary-border-color-rgb: 24 47 79;
+  --color-button-secondary-bg: #3f89f1;
+  --color-button-secondary-bg-rgb: 63 137 241;
+  --color-button-secondary-bg-surface: #3f89f1;
+  --color-button-secondary-bg-surface-rgb: 63 137 241;
+  --color-button-secondary-bg-layer: #035901;
+  --color-button-secondary-bg-layer-rgb: 3 89 1;
+  --color-button-secondary-text: #ffffff;
+  --color-button-secondary-text-rgb: 255 255 255;
+  --color-button-secondary-border: 0px;
+  --color-button-secondary-border-color: #3f89f1;
+  --color-button-secondary-border-color-rgb: 63 137 241;
+  --color-button-outline-border: 1px;
+  --color-button-outline-border-opacity: 1.0;
+  --color-hmd-active: #182f4f;
+  --color-hmd-active-rgb: 24 47 79;
+  --color-hmd-active-text: #ffffff;
+  --color-hmd-active-text-rgb: 255 255 255;
+  --color-hmd-bg-rgb: initial;
+  --color-hmd-footer-bg-rgb: initial;
+  --color-hmd-footer-color: ;
+  --color-hmd-trigger-color: ;
+  --color-hdl-dd-border: #010001;
+  --color-hdl-dd-border-rgb: 1 0 1;
+  --color-hdl-dd-shadow: #00040c;
+  --color-hdl-dd-shadow-rgb: 0 4 12;
+  --color-hdl-active: #182f4f;
+  --color-hdl-active-rgb: 24 47 79;
+  --color-hdl-active-text: #ffffff}</style>
+
+<span
+  class="sugar-header-desktop visually-hidden"
+  data-hdl-layout="inline"
+  data-hdl-indicator="background"
+  
+  
+  
+  
+  
+  data-hdl-style="bold"
+  
+  data-_sf="ayuiwrmxialdjawxik__desktop"
+></span>
+
+<link href="//sugarthe.me/cdn/shop/t/21/assets/block-desktop-menu.css?v=90014228572782357471793240670" rel="stylesheet" type="text/css" media="all" />
+<div class="sugar-desktop-menu" style="display: contents;
+  --color-hic-color: initial}</style><div
+  class="sugar-header-icons header__icons header-localization"
+  style="--header-icons-gap: 8px;
+  --color-cart-bubble-bg: #182f4f;
+  --color-cart-bubble-bg-rgb: 24 47 79;
+  --color-cart-bubble-text: #ffffff;
+  --color-cart-bubble-text-rgb: 255 255 255;
+  --color-sch-pad: #0e120e;
+  --color-sch-pad-rgb: 14 18 14;
+  --color-sch-sep-color: initial;
+  --color-sch-shadow-color: initial;
+  --color-sch-close-color: initial;
+  --color-sugar-cart-announcements-arrow-color: initial;
+  --color-sccd-bg: #21182f;
+  --color-sccd-bg-rgb: 33 24 47;
+  --color-sccd-bg-rgb: initial;
+  --color-sccd-text: #ffffff;
+  --color-sccd-text-rgb: 255 255 255;
+  --color-sccd-text-rgb: #ffffff;
+  --color-sccd-text-rgb-rgb: 255 255 255;
+  --color-sccd-num-color: #182f4f;
+  --color-sccd-num-color-rgb: 24 47 79;
+  --color-sccd-lbl-color: #182f4f;
+  --color-sccd-lbl-color-rgb: 24 47 79;
+  --color-sccd-box-bg: #ffffff;
+  --color-sccd-box-bg-rgb: 255 255 255;
+  --color-sccd-hl-color: #62c062;
+  --color-sccd-hl-color-rgb: 98 192 98;
+  --color-sccd-hl-bg: #ffe066;
+  --color-sccd-hl-bg-rgb: 255 224 102;
+  --color-sccd-hl-bg-text: #121212;
+  --color-sccd-hl-bg-text-rgb: 18 18 18;
+  --color-sccd-hl-ul-color: #ff3d00;
+  --color-sccd-hl-ul-color-rgb: 255 61 0;
+  --color-sugar-cart-price-color: inherit;
+  --color-scf-pad: #101400;
+  --color-scf-pad-rgb: 16 20 0;
+  --color-scf-sep-color: initial;
+  --color-ps-savings-color: #3f89f1;
+  --color-ps-savings-color-rgb: 63 137 241;
+  --color-ps-subtotal-color: rgb(var(--color-accent, var(--color-button)));
+  --color-mq-bg: #ffffff;
+  --color-mq-bg-rgb: 255 255 255;
+  --color-mq-fg: #04182b;
+  --color-mq-fg-rgb: 4 24 43;
+  --color-mqt-gap: #180628;
+  --color-mqt-gap-rgb: 24 6 40;
+  --color-mqt-cbg-rgb: initial;
+  --color-mqi-color: initial;
+  --color-mqi-icon-color: initial;
+  --color-cdi-btn-color: #3f89f1"
+  data-_sf="an0jisxfzvu1eymhlc__cart_discount_input_igde8b"
+>
+  <sugar-discount-input class="sugar-cart-discount-input__widget">
+    <form class="sugar-cart-discount-input__form">
+      <div class="sugar-cart-discount-input__wrap sugar-cart-discount-input__wrap--inside_padded">
+        <input
+          type="text"
+          class="sugar-cart-discount-input__field"
+          placeholder="discount code"
+          autocomplete="off"
+          aria-label="discount code"
+        >
+        <button type="submit" class="sugar-cart-discount-input__btn sugar-cart-discount-input__btn--filled">
+          <span data-btn-text><strong>apply</strong></span>
+          <span data-spinner class="sugar-cart-discount-input__spinner"></span>
+        </button>
+      </div>
+    </form>
+    <div class="sugar-cart-discount-input__message" data-discount-message aria-live="polite"></div>
+  </sugar-discount-input>
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+    </div>
+  </div>
+</sugar-cart-drawer>
+</section>
+
+    <main id="maincontent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      <section id="shopify-section-template--28159262785781__page_redirect_fkdanb" class="shopify-section section-page-redirect"><link href="//sugarthe.me/cdn/shop/t/21/assets/section-page-redirect.css?v=148305046872351442811793240814" rel="stylesheet" type="text/css" media="all" />
+<div class="sugar-page-redirect sugar-page-redirect--overlay color-scheme-1 gradient" style="--pr-bg:initial;
+  --color-ft-bg-size: initial;
+  --color-mlb-fg: #ffffff;
+  --color-mlb-fg-rgb: 255 255 255;
+  --color-mlb-invert-fg: #182f4f;
+  --color-mlb-invert-fg-rgb: 24 47 79;
+  --color-mlb-border-color: #ffffff;
+  --color-mlb-border-color-rgb: 255 255 255;
+  --color-mlb-active-bg: #182f4f;
+  --color-mlb-active-bg-rgb: 24 47 79;
+  --color-mlb-active-fg: #ffffff;
+  --color-mlb-active-fg-rgb: 255 255 255;
+  --color-mlb-active-border: #ffffff"
+  aria-label="page navigation"
+  data-mlb
+  data-mlb-offset="20"
+  data-_sf="ay0u1vmpdugliuzfxb__jump-links"
+><div class="sugar-mini-link-buttons__row" data-mlb-row><a
+  class="sugar-mini-link-buttons__btn"
+  href="#features"
+  
+  data-mlb-target="features"
+  
+  data-_sf="at2herhplk21sdfzcd__jump-features"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>features</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#templates"
+  
+  data-mlb-target="templates"
+  
+  data-_sf="atmqwzzmzdhpkufhid__jump-templates"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>templates</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#reviews"
+  
+  data-mlb-target="reviews"
+  
+  data-_sf="at2vnsfo3zedzz2t5u__jump-reviews"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>reviews</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#faq"
+  
+  data-mlb-target="faq"
+  
+  data-_sf="arvrkdlhjcxblrhpbd__jump-faq"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>faq</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#buy"
+  
+  data-mlb-target="buy"
+  data-mlb-icon
+  data-_sf="ac2dmbgtqrvhfsgx2t__jump-buy"
+><span class="sugar-mini-link-buttons__btn-icon"><span class="sugar-icon" style="--icon-url: url('https://cdn.shopify.com/s/files/1/0830/1510/6797/files/ms-arrow_upward--400.svg');
+  --color-lb-bg: #b43f89;
+  --color-lb-bg-rgb: 180 63 137;
+  --color-lb-color: #ffffff;
+  --color-lb-color-rgb: 255 255 255;
+  --color-lb-shadow: #00000f;
+  --color-lb-shadow-rgb: 0 0 15;
+  --color-lb-sh-color: initial;
+  --color-fc-icon-h: #180200;
+  --color-fc-icon-h-rgb: 24 2 0;
+  --color-pd-overlay: #000000;
+  --color-pd-overlay-rgb: 0 0 0;
+  --color-pd-close-color: currentColor;
+  --color-tx-color: #005502;
+  --color-tx-color-rgb: 0 85 2;
+  --color-ti-1-color: #3f89f1;
+  --color-ti-1-color-rgb: 63 137 241;
+  --color-ti-1-transform: #001a00;
+  --color-ti-1-transform-rgb: 0 26 0;
+  --color-term: #080104;
+  --color-term-rgb: 8 1 4;
+  --color-has-account: #020205;
+  --color-has-account-rgb: 2 2 5;
+  --color-mib-ov-fg: #ffffff;
+  --color-mib-ov-fg-rgb: 255 255 255;
+  --color-icon-size: #010201;
+  --color-icon-size-rgb: 1 2 1;
+  --color-tint: #010400;
+  --color-tint-rgb: 1 4 0;
+
+  /* Fluid Typography Scale */
+  --font-size-base: 16px;
+  --font-size-sm: clamp(0.8125rem, 0.78rem + 0.15vw, 0.875rem);
+  --font-size-h3: clamp(18.0px, 1.1rem + 0.5vw, 20.0px);
+  --font-size-h2: clamp(21.2px, 1.4rem + 1vw, 25.0px);
+  --font-size-h1: clamp(25.0px, 1.8rem + 1.8vw, 31.2px);
+  --font-size-display: clamp(29.3px, 2.2rem + 2.5vw, 39.1px);
+
+  /* Fluid Spacing & 8pt Grid */
+  --spacing-base: 8px;
+  --gutter-mobile: 16px;
+  --gutter-desktop: 32px;
+  --container-max-width: 1440px;
+
+  /* Transitions & Animation Easing */
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-dur-fast: 150ms;
+  --motion-dur-base: 250ms;
+  --motion-dur-slow: 400ms;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}

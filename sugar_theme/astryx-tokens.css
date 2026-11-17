@@ -1,0 +1,20 @@
+/* --- DNK-MRH-HEADER ---
+/* mrh_id: "apps_web_styles_astryx_tokens_sugar_theme_demo"
+/* purpose: "Meta Astryx Agent-Native tokens for Sugar Theme Demo (ADR-009 / DEC-142)"
+/* --- END DNK-MRH-HEADER --- */
+
+@layer astryx-theme {
+  :root {
+    /* Astryx Surface Tokens mapped to Core Palette */
+    --astryx-surface-canvas: var(--bg-app, #f1f2f4);
+    --astryx-surface-card: var(--bg-surface, #ffffff);
+    --astryx-surface-panel: var(--bg-surface-secondary, #f6f6f7);
+    --astryx-border-subtle: var(--border-subtle, #e3e5e8);
+    --astryx-border-default: var(--border-base, #c9cccf);
+    --astryx-agent-shopify: var(--color-accent, #182f4f);
+
+    /* Motion & Transitions */
+    --astryx-transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    --astryx-transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
