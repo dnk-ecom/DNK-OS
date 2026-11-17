@@ -255,4 +255,256 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
         )
         return json.dumps(plan.model_dump(), ensure_ascii=False)
 
+    @mcp.tool()
+    async def record_error_reflexion(
+        tool_or_command: str, symptom: str, root_cause: str, solution: str, source: str = "agent"
+    ) -> str:
+        """Records a structured error reflexion into SCONES memory to prevent repeating mistakes."""
+        topic = f"error_solution:{tool_or_command.lower().strip()}"
+        payload = {
+            "tool_or_command": tool_or_command,
+            "symptom": symptom,
+            "root_cause": root_cause,
+            "solution": solution,
+            "source": source,
+        }
+        res_id = await k.record_observation(topic, json.dumps(payload, ensure_ascii=False), source=source)
+        return json.dumps({"recorded": True, "id": res_id, "topic": topic}, ensure_ascii=False)
+
+    @mcp.tool()
+    async def query_error_solutions(query: str, limit: int = 3) -> str:
+        """Queries past reflexions and known solutions from SCONES memory for an error or tool failure."""
+        topic = f"error_solution:{query.lower().strip()}" if not query.startswith("error_solution:") else query.lower().strip()
+        memories = await k.query_memory(topic, limit=limit)
+        return json.dumps(memories, ensure_ascii=False)
+
+    @mcp.tool()
+    def execute_code_mode(code: str, timeout_sec: int = 30) -> str:
+        """
+        Executes a self-contained Python script in-memory with access to the DNK OS Microkernel (k)
+        and standard libraries (CE-MCP / Anthropic Code Mode). Eliminates multi-turn LLM latency.
+        """
+        import io
+        import sys
+        import traceback
+
+        stdout_capture = io.StringIO()
+        stderr_capture = io.StringIO()
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+
+        local_env = {
+            "kernel": k,
+            "k": k,
+            "json": json,
+            "result": None,
+        }
+
+        try:
+            sys.stdout = stdout_capture
+            sys.stderr = stderr_capture
+            exec(code, local_env, local_env)
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+            res_val = local_env.get("result")
+            return json.dumps(
+                {
+                    "success": True,
+                    "stdout": stdout_capture.getvalue(),
+                    "stderr": stderr_capture.getvalue(),
+                    "result": res_val,
+                    "exit_code": 0,
+                },
+                ensure_ascii=False,
+            )
+        except Exception as e:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+            return json.dumps(
+                {
+                    "success": False,
+                    "stdout": stdout_capture.getvalue(),
+                    "stderr": stderr_capture.getvalue() + "\n" + traceback.format_exc(),
+                    "error": str(e),
+                    "exit_code": 1,
+                },
+                ensure_ascii=False,
+            )
+
+    @mcp.tool()
+    def compile_brand_design_tokens(spec_json_or_yaml: str) -> str:
+        """
+        Compiles a W3C DTCG Design Token specification into multi-target outputs:
+        Shopify Theme CSS (:root & RGB channels), settings_schema.json, Tailwind v4 @theme,
+        HyperFrames Media/Motion tokens, and DESIGN.md brand documentation.
+        """
+        import yaml
+        from core.design_system import BrandTokensSpec, DesignTokenCompiler
+
+        try:
+            data = yaml.safe_load(spec_json_or_yaml)
+            if not isinstance(data, dict):
+                return json.dumps({"success": False, "error": "Spec must be a valid JSON or YAML mapping"}, ensure_ascii=False)
+            spec = BrandTokensSpec.model_validate(data)
+            res = DesignTokenCompiler.compile_all(spec)
+            return json.dumps({"success": True, "result": res.model_dump()}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("compile_brand_design_tokens failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def lint_brand_design_tokens(spec_json_or_yaml: str) -> str:
+        """
+        Deterministically lints a Brand Token specification against WCAG 2.2 AA / APCA
+        contrast minimums, 8pt spatial grid, 16px body font floor, and 60-30-10 CRO color allocation.
+        """
+        import yaml
+        from core.design_system import BrandTokensSpec, DesignTokenLinter
+
+        try:
+            data = yaml.safe_load(spec_json_or_yaml)
+            if not isinstance(data, dict):
+                return json.dumps({"success": False, "error": "Spec must be a valid YAML/JSON mapping"}, ensure_ascii=False)
+            spec = BrandTokensSpec.model_validate(data)
+            report = DesignTokenLinter.lint_spec(spec)
+            return json.dumps({"success": True, "report": report.model_dump()}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("lint_brand_design_tokens failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def extract_brand_design_tokens(source_type: str, raw_content: str, brand_name: str = "Client Brand") -> str:
+        """
+        Extracts structured DTCG Brand Tokens from raw sources ('shopify_settings' or 'css').
+        """
+        import json as pyjson
+        from core.design_system import DesignTokenExtractor
+
+        try:
+            if source_type == "shopify_settings":
+                settings_dict = pyjson.loads(raw_content)
+                spec = DesignTokenExtractor.from_shopify_settings(settings_dict, brand_name=brand_name)
+            else:
+                spec = DesignTokenExtractor.from_css_string(raw_content, brand_name=brand_name)
+
+            return json.dumps({"success": True, "spec": spec.model_dump()}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("extract_brand_design_tokens failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def distill_brand_design_system(
+        donor_path: str,
+        brand_name: str = "DNK Sovereign Brand",
+        target_output_dir: str = "",
+        target_theme_dir: str = "",
+    ) -> str:
+        """
+        Coordinates the 5-stage Design System Swarm to distill, calibrate 60-30-10 CRO,
+        audit WCAG contrast, and physically emit multi-target design tokens from any donor theme or asset directory.
+        """
+        from core.orchestrator.design_system_runner import DesignSystemSwarmRunner, DesignSystemBrief
+
+        try:
+            runner = DesignSystemSwarmRunner()
+            brief = DesignSystemBrief(
+                donor_path=donor_path,
+                brand_name=brand_name,
+                target_output_dir=target_output_dir or None,
+                target_theme_dir=target_theme_dir or None,
+            )
+            res = runner.execute_turnkey_distillation(brief)
+            return json.dumps({"success": True, "result": res.model_dump()}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("distill_brand_design_system failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def get_client_tickets(deal_id: str = "deal_noku_2026", status: str = "all") -> str:
+        """
+        Retrieves real-time in-context review tickets and comments left by the client
+        directly on the Shopify storefront via the In-Context Sensor (DOM elements, sections, selectors).
+        """
+        from core.client_cockpit.engine import ClientCockpitEngine
+        try:
+            engine = ClientCockpitEngine()
+            tickets = engine.get_tickets(deal_id=deal_id, status=None if status == "all" else status)
+            return json.dumps({"deal_id": deal_id, "tickets": tickets, "count": len(tickets)}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("get_client_tickets failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def resolve_client_ticket(deal_id: str, ticket_id: str, resolution_note: str = "", status: str = "resolved") -> str:
+        """
+        Resolves or updates an in-context client ticket from the Shopify storefront,
+        recording the agent's code fix and notifying the client cockpit.
+        """
+        from core.client_cockpit.engine import ClientCockpitEngine
+        try:
+            engine = ClientCockpitEngine()
+            ticket = engine.resolve_ticket(deal_id=deal_id, ticket_id=ticket_id, resolution_note=resolution_note, status=status)
+            return json.dumps({"success": True, "ticket": ticket}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("resolve_client_ticket failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def get_cockpit_status(deal_id: str = "deal_noku_2026") -> str:
+        """
+        Returns full client cockpit status: 6-stage roadmap progress, revision quota usage,
+        active tickets, and deliverable artifacts for an e-commerce client deal.
+        """
+        from core.client_cockpit.engine import ClientCockpitEngine
+        try:
+            engine = ClientCockpitEngine()
+            state = engine.get_cockpit_state(deal_id=deal_id)
+            return json.dumps({"deal_id": deal_id, "state": state}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("get_cockpit_status failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def distribution_check_compliance(text: str, is_promotional: bool = False) -> str:
+        """Validates marketing copy against brand guidelines, banned words, legal claims, and FTC rules."""
+        from services.dnk_distribution.src.service import check_compliance
+        report = check_compliance(text=text, is_promotional=is_promotional)
+        return json.dumps(report.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def distribution_evaluate_rlsf(
+        publication_id: str,
+        views: int,
+        retention_rate_3s: float,
+        completion_rate: float,
+        shares: int = 0,
+        likes: int = 0,
+        comments: int = 0,
+        hook_type: str = ""
+    ) -> str:
+        """Computes RLSF multi-objective social reward signals and assigns performance tier."""
+        from services.dnk_distribution.src.service import evaluate_social_metrics
+        from services.dnk_distribution.src.social_feedback import SocialMetrics
+        metrics = SocialMetrics(
+            publication_id=publication_id,
+            views=views,
+            retention_rate_3s=retention_rate_3s,
+            completion_rate=completion_rate,
+            shares=shares,
+            likes=likes,
+            comments=comments,
+        )
+        report = evaluate_social_metrics(metrics=metrics, hook_type=hook_type or None)
+        return json.dumps(report.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def distribution_mine_themes(comments_json: str) -> str:
+        """Mines customer comments to extract objections, buying intents, and copy angles."""
+        from services.dnk_distribution.src.service import mine_audience_themes
+        from services.dnk_distribution.src.theme_miner import CommentItem
+        raw_items = json.loads(comments_json) if isinstance(comments_json, str) else comments_json
+        parsed = [CommentItem(**c) for c in raw_items]
+        res = mine_audience_themes(parsed)
+        return json.dumps(res.model_dump(), ensure_ascii=False)
+
     return mcp
