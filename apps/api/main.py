@@ -15,6 +15,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.routers.kernel_router import router as kernel_router, get_kernel
+from apps.api.routers.swarm_live_ws import router as swarm_live_router
+from apps.api.routers.taskboard_canvas_router import router as taskboard_canvas_router
+from apps.api.routers.actions_router import router as actions_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("dnk.api")
@@ -34,8 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount Microkernel v2.5.0 Router
+# Mount Microkernel v2.5.0 Routers
 app.include_router(kernel_router)
+app.include_router(swarm_live_router)
+app.include_router(taskboard_canvas_router)
+app.include_router(actions_router)
 
 
 @app.get("/health", tags=["Telemetry"])

@@ -17,6 +17,10 @@ from core.action_bus.bus import (
     create_action_bus,
     get_default_action_bus,
 )
+from core.action_bus.dual_surface_registry import (
+    ActionDispatchResult,
+    DualSurfaceActionRegistry,
+)
 from core.action_bus.hitl_bridge import HitlApprovalBridge
 from core.action_bus.models import (
     ActionExecutionResponse,
@@ -70,4 +74,6 @@ __all__ = [
     "CanvasNodeMoveRequest",
     "CanvasBatchMutationRequest",
     "HitlApprovalDecisionRequest",
+    "DualSurfaceActionRegistry",
+    "ActionDispatchResult",
 ]
