@@ -113,6 +113,10 @@ audit-knowledge dir="docs":
 live-test:
     @uv run python3 scripts/system/live_system_test.py
 
+# Run live interactive demonstration of Dual-Surface Action Engine (Human <-> Agent <-> HITL)
+demo-actions:
+    @uv run python3 scripts/demo_dual_surface_live.py
+
 # -----------------------------------------------------------------------------
 # 🌌 SPATIAL CANVAS & VIBE ORCHESTRATION
 # -----------------------------------------------------------------------------
