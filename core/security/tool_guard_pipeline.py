@@ -90,6 +90,20 @@ class ToolGuardPipeline:
             if isinstance(path_val, str) and (path_val.startswith("/Users/") or path_val.startswith("/root/") or path_val.startswith("/home/")):
                 return ToolGuardResult(allowed=False, reason=f"Absolute path '{path_val}' rejected. DNK OS requires relative paths (./ or ../)")
 
+        # Invariant 3: Mandate Scope Boundary Check (DEC-151)
+        mutating_tools = ["write_file", "write_to_file", "patch", "edit_file", "replace_file_content", "file_write"]
+        if ctx.tool_name in mutating_tools:
+            path_val = ctx.arguments.get("path") or ctx.arguments.get("file_path") or ctx.arguments.get("target_path")
+            if isinstance(path_val, str):
+                from core.orchestrator.agents.denchik.builder_guard import DenchikMandateGuard
+                mandate = ctx.metadata.get("mandate") or DenchikMandateGuard.get_active_mandate()
+                if mandate:
+                    try:
+                        mandate.assert_tool_allowed(ctx.tool_name)
+                        mandate.scope.assert_path_allowed(path_val)
+                    except Exception as ex:
+                        return ToolGuardResult(allowed=False, reason=f"MandateViolation: {ex}", security_level="critical")
+
         return ToolGuardResult(allowed=True)
 
     async def around_execute(self, ctx: ToolExecutionContext, handler: Callable[..., Any]) -> Tuple[bool, Any, Optional[str]]:
