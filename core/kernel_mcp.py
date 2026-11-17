@@ -507,4 +507,47 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
         res = mine_audience_themes(parsed)
         return json.dumps(res.model_dump(), ensure_ascii=False)
 
+    # --- DSH Superagent Assimilated Tools (DEC-151) ---
+    @mcp.tool()
+    def mandate_validate_scope(allowed_paths_json: str, negative_scope_json: str, target_path: str) -> str:
+        """Validates if a target path is allowed under Mandate scope boundaries (DSH / DEC-151)."""
+        from core.domain.mandate_contracts import MandateScope
+        allowed = json.loads(allowed_paths_json) if isinstance(allowed_paths_json, str) else allowed_paths_json
+        neg = json.loads(negative_scope_json) if isinstance(negative_scope_json, str) else negative_scope_json
+        scope = MandateScope(allowed_paths=allowed, negative_scope=neg)
+        is_allowed = scope.is_path_allowed(target_path)
+        return json.dumps({"target_path": target_path, "is_allowed": is_allowed}, ensure_ascii=False)
+
+    @mcp.tool()
+    def command_run_adaptive(command: str, timeout_foreground: float = 5.0) -> str:
+        """Executes a command with 5-second foreground shift to background job if taking longer (DEC-151)."""
+        import asyncio
+        from core.action_bus.command_runner import CommandRunner
+        runner = CommandRunner()
+        result = asyncio.run(runner.run_command_adaptive(command=command, timeout_foreground=timeout_foreground))
+        return json.dumps(result.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def outbox_enqueue_message(destination_channel: str, payload_json: str, idempotency_key: str = "") -> str:
+        """Enqueues an outbox message with deterministic receipt before transmission (DSH / DEC-151)."""
+        from core.outbox.service import TransactionalOutbox
+        outbox = TransactionalOutbox()
+        raw_payload = json.loads(payload_json) if payload_json.startswith("{") or payload_json.startswith("[") else payload_json
+        msg = outbox.enqueue(
+            destination_channel=destination_channel,
+            payload=raw_payload,
+            idempotency_key=idempotency_key or None
+        )
+        return json.dumps(msg.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
+    def outbox_get_receipt(receipt_id: str) -> str:
+        """Retrieves outbox delivery status and receipt metadata by receipt ID (DEC-151)."""
+        from core.outbox.service import TransactionalOutbox
+        outbox = TransactionalOutbox()
+        msg = outbox.get_receipt(receipt_id=receipt_id)
+        if not msg:
+            return json.dumps({"found": False, "receipt_id": receipt_id})
+        return json.dumps({"found": True, "message": msg.model_dump()}, ensure_ascii=False)
+
     return mcp
