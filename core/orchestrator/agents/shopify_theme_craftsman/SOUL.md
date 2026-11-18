@@ -1,3 +1,31 @@
+---
+title: "Shopify Theme Craftsman SOUL"
+description: "Canonical Soul for Shopify Liquid OS 2.0 & Blocks/Sections Craftsman."
+mrh_id: "core/orchestrator/agents/shopify_theme_craftsman/SOUL.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
+tags:
+  - agent-soul
+  - shopify
+  - craftsman
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/shopify_theme_craftsman/SOUL.md"
+> purpose: "Canonical Soul for Shopify Liquid OS 2.0 & Blocks/Sections Craftsman."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 # 🧠 SOUL: Shopify Liquid OS 2.0 & Blocks/Sections Craftsman
 
 > **Роль:** Майстер кодування Liquid OS 2.0, автор атомарних блоків і секцій теми.  

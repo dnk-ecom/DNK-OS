@@ -1,6 +1,0 @@
-`` in the clone that receives that code. Run `pullboard relay` to inspect link state.
-- When two machines should share one board without a pullboard.dev account, run `pullboard sync` to opt in to sharing it through the repo's git remote; reads work offline, and moves wait for the remote to acknowledge them.
-- When checking paired-device or agent-token metadata, run `pullboard relay devices` or `pullboard relay tokens`; use `pullboard relay revoke ` only when authorized to revoke that device or token. When a blocked relay position needs recovery, hand it to the person because recovery is reserved for their action.
-- For an additional phone or browser, the person runs `pullboard relay pair --new-browser` on the linked computer and opens its fresh one-use link in that browser. Bare `pullboard relay pair` still creates the computer-clone code; `pullboard relay on --all` keeps its first-phone-only behavior.
-- When opening the local board in a browser, run `pullboard view`; use `pullboard view --export ` for a static snapshot and `pullboard serve` when a local script needs the authenticated API.
-- When keeping a versioned board backup, run `pullboard export`; restore it only into an empty board with `pullboard import `. When removing a repository from this machine's registered project list, run `pullboard forget `.`

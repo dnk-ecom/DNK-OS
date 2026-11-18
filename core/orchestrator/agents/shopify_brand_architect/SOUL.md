@@ -1,3 +1,31 @@
+---
+title: "Shopify Brand Architect SOUL"
+description: "Canonical Soul for Shopify Brand Architect & ICP Strategist."
+mrh_id: "core/orchestrator/agents/shopify_brand_architect/SOUL.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
+tags:
+  - agent-soul
+  - shopify
+  - brand-architect
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/shopify_brand_architect/SOUL.md"
+> purpose: "Canonical Soul for Shopify Brand Architect & ICP Strategist."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 # 🧠 SOUL: Shopify Brand Architect & ICP Strategist
 
 > **Роль:** Головний архітектор бренду, аналітик цільової аудиторії (ICP) та інженер ціннісних пропозицій.  

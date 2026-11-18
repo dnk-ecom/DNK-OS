@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "core/orchestrator/agents/dnk_mentor/SOUL.md"
-# purpose: "Canonical Soul & Architectural Protocol for DNK Mentor (Chief Architect & Socratic Inception Supervisor)."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.2.0"
-# updated_at: "2026-10-17"
-# author: "DNK-e.com Maksym & Gerych"
-# --- END DNK-MRH-HEADER ---
+---
+title: "DNK MENTOR SOUL"
+description: "Canonical Soul & Architectural Protocol for DNK Mentor (Chief Architect & Socratic Inception Supervisor)."
+mrh_id: "core/orchestrator/agents/dnk_mentor/SOUL.md"
+status: Active
+version: "1.2.0"
+updated: 2026-11-18
+tags:
+  - agent-soul
+  - architect
+  - mentor
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/orchestrator/agents/dnk_mentor/SOUL.md"
+> purpose: "Canonical Soul & Architectural Protocol for DNK Mentor (Chief Architect & Socratic Inception Supervisor)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.2.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏛️ DNK MENTOR — Chief Architect, Socratic Inception & Epistemic Armor Agent
 
