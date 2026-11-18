@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<!--
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/projects/dnk_ecom/proposals/noku_white/index.html"
+# purpose: "Authentic, human-to-human, bespoke Shopify Online Store 2.0 (Theme Blocks) proposal for Andrii Nikolaiev & NOKU (https://noku.store/)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "4.0.0"
+# updated_at: "2026-11-17"
+# author: "Maksym Kuzmenko"
+# --- END DNK-MRH-HEADER ---
+-->
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOKU Store | План оновлення та перезапуску магазину</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFFFF;
+      --bg-subtle: #F8F9FA;
+      --bg-card: #FFFFFF;
+      --border: #E5E7EB;
+      --border-dark: #D1D5DB;
+      --text: #111827;
+      --text-secondary: #4B5563;
+      --text-muted: #9CA3AF;
+      --accent: #0F172A;
+      --green: #008060;
+      --green-light: #F0FDF4;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.65;
+      font-size: 15px;
+      padding-bottom: 96px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 840px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 40px 0 24px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 36px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+    .brand-mark {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+    .meta-date {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .header-recipient {
+      font-size: 14px;
+      color: var(--text-secondary);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: var(--radius);
+      display: inline-block;
+    }
+
+    /* TYPOGRAPHY */
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 44px 0 18px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    p {
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+
+    .intro-letter {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 28px 0 32px 0;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ZERO DOWNTIME BADGE */
+    .guarantee-box {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 24px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .guarantee-icon {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .guarantee-text h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 4px;
+    }
+    .guarantee-text p {
+      font-size: 13.5px;
+      color: #14532D;
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+
+    /* THEME BLOCKS EXPLANATION */
+    .feature-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: #FFFFFF;
+      margin: 24px 0;
+    }
+    .feature-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .pill-tech {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* VISUAL MOODBOARD / DESIGN SPEC */
+    .moodboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 640px) {
+      .moodboard-grid { grid-template-columns: 1fr; }
+    }
+    .mood-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--bg-subtle);
+      text-align: left;
+    }
+    .mood-tag {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .mood-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .mood-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* MATERIAL SWATCHES */
+    .swatch-row {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    @media (max-width: 500px) {
+      .swatch-row { flex-direction: column; }
+    }
+    .swatch {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #FFFFFF;
+    }
+    .swatch-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    /* PDP MOCKUP WIREFRAME */
+    .wireframe-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: #FAFAFA;
+      margin: 24px 0;
+    }
+    .wire-row {
+      display: flex;
+      gap: 24px;
+    }
+    @media (max-width: 640px) {
+      .wire-row { flex-direction: column; }
+    }
+    .wire-left {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    .wire-right {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .wire-pill {
+      font-size: 12.5px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .wire-pill strong { color: var(--text); }
+
+    /* SPEC LIST */
+    .spec-list {
+      list-style: none;
+      margin: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .spec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .spec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+
+    /* SCOPE TABLE */
+    .scope-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .scope-table th {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--text);
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .scope-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .scope-table tr:hover td {
+      background: var(--bg-subtle);
+    }
+
+    /* PRICING & TERMS */
+    .price-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin: 36px 0;
+      text-align: center;
+    }
+    .price-amount {
+      font-size: 44px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      margin: 8px 0;
+    }
+    .price-terms {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 20px 0;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    @media (max-width: 600px) {
+      .price-terms { flex-direction: column; gap: 8px; }
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-size: 15px;
+      margin-top: 12px;
+      transition: background 0.15s ease;
+    }
+    .cta-button:hover {
+      background: #1E293B;
+    }
+
+    .footnote {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-top">
+        <div class="brand-mark">NOKU × MAKSYM KUZMENKO</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <a href="./cockpit.html" style="font-size:12px; font-weight:600; text-decoration:none; color:var(--accent); background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;">
+            <span>⚡ Client Cockpit</span> <span>↗</span>
+          </a>
+          <div class="meta-date">17.11.2026 · ПРОПОЗИЦІЯ</div>
+        </div>
+      </div>
+      <div class="header-recipient">
+        Для: <strong>Андрія Ніколаєва та партнерки (бренд NOKU)</strong>
+      </div>
+    </header>
+
+    <!-- TITLE -->
+    <h1>План оновлення магазину noku.store</h1>
+    <p style="font-size:16px;">
+      Перехід на модульну архітектуру Shopify Online Store 2.0 (Theme Blocks), налаштування продаючої картки комплекту (дошка + літери + цінники) та верифікація відгуків з Etsy для Google Shopping.
+    </p>
+
+    <!-- ZERO DOWNTIME GUARANTEE -->
+    <div class="guarantee-box">
+      <div class="guarantee-icon">✓</div>
+      <div class="guarantee-text">
+        <h4>100% безперервність діючого бізнесу під час розробки</h4>
+        <p>
+          Ваш поточний сайт <strong>noku.store</strong> продовжує працювати і приймати замовлення в звичайному режимі. Вся розробка та наповнення ведуться на закритому тестовому сервері. Перемикання на нову тему відбудеться безшовно за 5 хвилин без жодної хвилини простою.
+        </p>
+      </div>
+    </div>
+
+    <!-- INTRO LETTER -->
+    <div class="intro-letter">
+      <strong>Андрію, привіт!</strong><br><br>
+      Я пам'ятаю нашу розмову від 10 листопада. Ти дуже точно окреслив суть: <em>«У нас якісний продукт власного виробництва, і ми не маємо виглядати як китайський дропшип. Нам потрібен чистий чорно-білий мінімалізм, як у хорошого меблевого бренду або George &amp; Willy»</em>.<br><br>
+      Нижче — предметний опис того, що конкретно я зроблю своїми руками за 14 робочих днів, щоб закрити твої ключові болі, та на яких умовах ми це запускаємо.
+    </div>
+
+    <!-- SECTION 1: VISUAL MOODBOARD FOR WIFE -->
+    <h2>1. Візуальний концепт: Естетика дорогого бренду</h2>
+    <p>
+      Ми прибираємо з сайту всі випадкові жовті плашки, зелені зірочки та дешеві елементи безкоштовної теми Minimog. Сайт NOKU отримує витриману монохромну галерейну естетику на рівні трьох світових бенчмарків:
+    </p>
+
+    <div class="moodboard-grid">
+      <div class="mood-card">
+        <div class="mood-tag">Бенчмарк #1 · NZ</div>
+        <div class="mood-name">George &amp; Willy</div>
+        <div class="mood-desc">
+          Еталонна геометрія ліній, ідеальний баланс повітря та шрифту. Меню-борд виглядає як статусна частина інтер'єру кав'ярні, а не звичайний шматок заліза.
+        </div>
+      </div>
+      <div class="mood-card">
+        <div class="mood-tag">Бенчмарк #2 · NZ</div>
+        <div class="mood-name">Made of Tomorrow</div>
+        <div class="mood-desc">
+          Матова фактура гнутого металу, лаконічні настільні цінники, чиста подача кольорів і матеріалів для вимогливих дизайнерів.
+        </div>
+      </div>
+      <div class="mood-card">
+        <div class="mood-tag">Бенчмарк #3 · USA</div>
+        <div class="mood-name">Quince / Rhode</div>
+        <div class="mood-desc">
+          Абсолютний мінімалізм: білий фон, великі нестислі фотографії текстури сталі, чіткі контрастні кнопки без візуального шуму.
+        </div>
+      </div>
+    </div>
+
+    <div class="swatch-row">
+      <div class="swatch">
+        <div class="swatch-circle" style="background: linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%);"></div>
+        <div>
+          <strong style="font-size:13px; color:var(--accent);">Brushed Stainless Steel 304</strong>
+          <div style="font-size:11.5px; color:var(--text-muted);">Шліфована нержавіюча сталь</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background: #18181B;"></div>
+        <div>
+          <strong style="font-size:13px; color:var(--accent);">Matte Industrial Black</strong>
+          <div style="font-size:11.5px; color:var(--text-muted);">Порошкове матове фарбування</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-circle" style="background: #FFFFFF; border: 1px solid #CBD5E1;"></div>
+        <div>
+          <strong style="font-size:13px; color:var(--accent);">Gallery Snow White</strong>
+          <div style="font-size:11.5px; color:var(--text-muted);">Чистий студійний фон без сірості</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: THEME BLOCKS EXPLANATION -->
+    <h2>2. Архітектура Shopify Theme Blocks (Online Store 2.0)</h2>
+    <p>
+      На зідзвоні ти сказав дуже правильну річ: <em>«Хочеться, щоб деякі моменти можна було самостійно видаляти або додавати як блок»</em>.
+    </p>
+
+    <div class="feature-box">
+      <div class="feature-header">
+        <strong>Що таке Theme Blocks і чому це важливо для NOKU:</strong>
+        <span class="pill-tech">Shopify 2.0 Native</span>
+      </div>
+      <p style="font-size:14px; margin-bottom:12px;">
+        У новій архітектурі Shopify Theme Blocks кожен функціональний модуль (вибір комплекту, таблиця розмірів, фотоматеріали, відгуки, блок відео) є **автономним будівельним блоком** у вашій стандартній панелі Shopify (Customize).
+      </p>
+      <ul class="spec-list">
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Управління без програміста:</strong> Ви або ваш менеджер можете мишкою перетягувати блоки місцями, додавати нові поля або тимчасово вимикати їх для конкретного товару в один клік.
+          </div>
+        </li>
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Нуль сторонніх підписок:</strong> Ми реалізуємо комплектацію та бандли на рідному коді Shopify блоків — вам не доведеться платити щомісячну абонплату за сторонні додатки на зразок Kaching чи WideBundles.
+          </div>
+        </li>
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Швидкість завантаження:</strong> Нативні блоки не тягнуть зовнішніх скриптів, тому сторінки на телефонах замовників із США чи Польщі відкриваються миттєво.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- SECTION 3: PDP & BUNDLES -->
+    <h2>3. Картка товару: Концепт «Готовий комплект для закладу»</h2>
+    <p>
+      Зараз на сайті є порожні позиції: людина бачить дошку, але не може в один клік укомплектувати її магнітними літерами та цінниками для вітрини. Щоб докупити літери, їй треба йти в інший розділ, що ріже конверсію та середній чек.
+    </p>
+
+    <div class="wireframe-box">
+      <div style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px; font-family:'JetBrains Mono';">
+        Структура нової картки товару (Stainless Steel Menu Board)
+      </div>
+      <div class="wire-row">
+        <div class="wire-left">
+          <div style="width:100%; height:140px; background:linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#475569; font-weight:600; margin-bottom:10px;">
+            Фото дошки в інтер'єрі кав'ярні
+          </div>
+          <strong style="color:var(--text);">Великі чіткі фото сталі</strong><br>
+          без водяних знаків та стиснення.
+        </div>
+        <div class="wire-right">
+          <div style="font-size:18px; font-weight:700; color:var(--accent);">Stainless Steel Menu Board</div>
+          <div style="font-size:20px; font-weight:600; font-family:'JetBrains Mono';">$285.00</div>
+          
+          <div style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+            • Розмір: 1000×600 мм<br>
+            • Обробка: Brushed Stainless Steel
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:var(--radius); padding:12px; margin-top:4px;">
+            <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-family:'JetBrains Mono';">
+              Укомплектувати робочий простір:
+            </div>
+            <div class="wire-pill">
+              <span>☑ <strong>Набір магнітних літер та цифр</strong> (145 шт)</span>
+              <span style="font-family:'JetBrains Mono'; font-weight:600;">+$45</span>
+            </div>
+            <div class="wire-pill" style="margin-top:6px;">
+              <span>☑ <strong>Комплект цінників на вітрину</strong> (20 шт + підставки)</span>
+              <span style="font-family:'JetBrains Mono'; font-weight:600;">+$65</span>
+            </div>
+          </div>
+
+          <div style="background:var(--accent); color:#FFFFFF; text-align:center; padding:12px; border-radius:var(--radius); font-weight:600; font-size:14px; margin-top:2px;">
+            Додати повний комплект у кошик ($395.00)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: REVIEWS -->
+    <h2>4. Вирішення проблеми з відгуками (Etsy ➔ Shopify ➔ Google Shopping)</h2>
+    <p>
+      Ти казав, що відгуки на поточному сайті — це те, що тебе дратує найбільше. Поточний додаток показує відгуки з Etsy як «неверифіковані», шрифти роз'їжджаються, а в Google Shopping немає зірочок.
+    </p>
+
+    <div class="feature-box">
+      <div class="feature-header">
+        <strong>Що ми робимо технічно:</strong>
+        <span class="pill-tech" style="color:var(--green); border-color:#BBF7D0;">Готове рішення</span>
+      </div>
+      <ul class="spec-list">
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Безшовний імпорт з Etsy:</strong> Всі твої реальні відгуки та фотографії клієнтів з Etsy підтягуються зі статусом <code>Verified Buyer</code> через надійний сервіс без сторонніх логотипів.
+          </div>
+        </li>
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Чистий дизайн блоку:</strong> Відгуки верстаються в загальному стилі сайту (шрифти Jost/Inter, чорно-білий мінімалізм), без кривих рамок і сторонніх банерів.
+          </div>
+        </li>
+        <li class="spec-item">
+          <span class="spec-dot"></span>
+          <div>
+            <strong>Зірочки в Google Shopping:</strong> Впроваджуємо офіційну мікророзмітку <code>Schema.org AggregateRating</code>, щоб коли люди шукають твої товари в Google — вони бачили рейтинг 4.9★ та кількість відгуків.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- SECTION 5: SCOPE OF WORK -->
+    <h2>5. Що конкретно входить у розробку «під ключ» (Scope of Work)</h2>
+    <table class="scope-table">
+      <thead>
+        <tr>
+          <th>Розділ / Елемент</th>
+          <th>Що саме робимо</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Головна сторінка</strong></td>
+          <td>Чистий преміальний вигляд у стилі George &amp; Willy. Блок під відеоінструкції з офісу (монтаж меню), категорії, відгуки, блок довіри. Прибираємо всі жовті та зелені плашки.</td>
+        </tr>
+        <tr>
+          <td><strong>Картка товару (Theme Blocks)</strong></td>
+          <td>2 адаптовані шаблони: (1) для меню-бордів із блоком вибору аксесуарів (літери, цінники), (2) для супутніх товарів. Чіткі описи, таблиці розмірів, допродажі.</td>
+        </tr>
+        <tr>
+          <td><strong>Повна міграція каталогу</strong></td>
+          <td>Ми самі переносимо та налаштовуємо всі ваші діючі ~25 товарів з фото та цінами. Вам не доведеться нічого заповнювати вручну.</td>
+        </tr>
+        <tr>
+          <td><strong>Оптова / B2B сторінка</strong></td>
+          <td>Акуратний розділ для мережевих кав'ярень, дизайнерів інтер'єру та франшиз (умови опту, зразки, швидке формування специфікації).</td>
+        </tr>
+        <tr>
+          <td><strong>Кошик (Slide Cart Drawer)</strong></td>
+          <td>Швидкий висувний кошик без перезавантаження сторінки з нагадуванням додати магнітні символи перед оформленням.</td>
+        </tr>
+        <tr>
+          <td><strong>Швидкість та мобільна версія</strong></td>
+          <td>Нова архітектура Shopify 2.0 без зайвого коду. Швидке відкриття на телефонах з ЄС та США (Core Web Vitals у зеленій зоні).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- SECTION 6: TIMELINE -->
+    <h2>6. Графік виконання: 14 робочих днів</h2>
+    <p style="margin-bottom:8px;">
+      <strong>Дні 1–3:</strong> Узгодження стилю та макета нової картки товару під твій асортимент.<br>
+      <strong>Дні 4–7:</strong> Верстка головної сторінки та налаштування блоку комплектів у картці.<br>
+      <strong>Дні 8–11:</strong> Перенесення відгуків з Etsy, налаштування B2B-сторінки та мікророзмітки Google.<br>
+      <strong>Дні 12–14:</strong> Тестування кошика та чекауту, фінальні правки від тебе і дружини, реліз на <code>noku.store</code>.
+    </p>
+
+    <!-- SECTION 7: BUDGET & TERMS -->
+    <div class="price-box">
+      <div style="font-size:13px; font-weight:600; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono';">
+        Повний перезапуск магазину під ключ
+      </div>
+      <div class="price-amount">$1,500</div>
+      <p style="font-size:14px; color:var(--text-secondary); max-width:540px; margin:0 auto;">
+        Фіксована ціна. У вартість уже включено нативну розробку комплектів (Theme Blocks) та інтеграцію відгуків з Etsy зі Schema.org, без жодних прихованих доплат за правки.
+      </p>
+
+      <div class="price-terms">
+        <div>
+          <span style="color:var(--text-muted);">Передоплата для старту (50%):</span><br>
+          <strong style="font-family:'JetBrains Mono'; font-size:16px;">$750.00</strong>
+        </div>
+        <div>
+          <span style="color:var(--text-muted);">Залишок після здачі (50%):</span><br>
+          <strong style="font-family:'JetBrains Mono'; font-size:16px;">$750.00</strong>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+        * Залишок оплачується лише після того, як ви з дружиною перевірите сайт на тестовому домені та схвалите запуск.
+      </p>
+
+      <a href="https://t.me/kuzmenko_top" class="cta-button" target="_blank" rel="noopener">
+        Погодити план та призначити старт →
+      </a>
+      <div style="margin-top:14px;">
+        <a href="./cockpit.html" style="font-size:13px; font-weight:600; color:var(--text-secondary); text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-subtle); transition:all 0.15s ease;">
+          <span>📋 Переглянути Живий Client Cockpit (Roadmap &amp; Vault)</span>
+          <span>↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- FOOTNOTE -->
+    <div class="footnote">
+      <strong>Щодо подальшого ведення:</strong> Як ми говорили на зідзвоні, після релізу сайт не повинен стояти на місці. Коли ми здамо проект і ти побачиш результат у роботі — ми зможемо перейти на формат щомісячного супроводу ($350/міс): додавання нових товарів, розробка сторінок під рекламу та постійні покращення конверсії.
+    </div>
+  </div>
+
+  <script src="./dnk_sensor.js"></script>
+</body>
+</html>

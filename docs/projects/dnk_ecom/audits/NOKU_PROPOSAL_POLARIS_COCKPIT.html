@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<!--
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/projects/dnk_ecom/audits/NOKU_PROPOSAL_POLARIS_COCKPIT.html"
+# purpose: "Personalized Interactive Commercial Proposal & Ecom Growth Cockpit for NOKU (https://noku.store/) styled in DNK OS Polaris 2.0 Design System."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+-->
+<html lang="uk" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOKU × DNK-Ecom | Інтерактивна Комерційна Пропозиція та План Розвитку</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* DNK OS POLARIS CORE DESIGN TOKENS (DEC-139) */
+    :root[data-theme="dark"] {
+      --bg-app: #0D0E10;
+      --surface-card: #16181B;
+      --surface-subdued: #1E2024;
+      --border-subdued: #2A2D34;
+      --border-default: #3E424B;
+      --text-primary: #F0F2F5;
+      --text-secondary: #9BA1A6;
+      --text-muted: #6B7280;
+      --action-primary: #30CD90;
+      --action-hover: #28B37D;
+      --action-subdued: rgba(48, 205, 144, 0.12);
+      --badge-accent: #30CD90;
+      --badge-accent-bg: rgba(48, 205, 144, 0.16);
+      --accent-gold: #F59E0B;
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --code-bg: #121316;
+    }
+
+    :root[data-theme="light"] {
+      --bg-app: #F1F2F4;
+      --surface-card: #FFFFFF;
+      --surface-subdued: #F7F8F9;
+      --border-subdued: #E1E3E5;
+      --border-default: #C9CCCF;
+      --text-primary: #202223;
+      --text-secondary: #6D7175;
+      --text-muted: #8C9196;
+      --action-primary: #008060;
+      --action-hover: #006E52;
+      --action-subdued: rgba(0, 128, 96, 0.1);
+      --badge-accent: #008060;
+      --badge-accent-bg: rgba(0, 128, 96, 0.12);
+      --accent-gold: #D97706;
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --code-bg: #F4F6F8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding-bottom: 80px;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      border-bottom: 1px solid var(--border-subdued);
+      background: var(--surface-card);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .topbar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+    .brand-pill {
+      background: var(--badge-accent-bg);
+      color: var(--badge-accent);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .theme-toggle-btn {
+      background: var(--surface-subdued);
+      border: 1px solid var(--border-subdued);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      padding: 48px 0 32px 0;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--badge-accent-bg);
+      color: var(--badge-accent);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero-title span {
+      color: var(--action-primary);
+    }
+    .hero-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin-bottom: 32px;
+    }
+
+    /* GRID & CARDS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subdued);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* PROBLEM VS SOLUTION */
+    .diff-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .diff-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .diff-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .diff-icon.bad { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+    .diff-icon.good { background: var(--badge-accent-bg); color: var(--action-primary); }
+
+    /* BUNDLE SIMULATOR (PDP CRO) */
+    .simulator {
+      background: var(--surface-subdued);
+      border: 1px solid var(--border-subdued);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .sim-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subdued);
+    }
+    .sim-row:last-child { border-bottom: none; }
+    .sim-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .sim-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .sim-total-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 2px dashed var(--border-default);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .sim-total-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--action-primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* REVIEWS SYNC DIAGRAM */
+    .flow-badge {
+      background: var(--surface-subdued);
+      border: 1px solid var(--border-subdued);
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .stars { color: var(--accent-gold); font-size: 14px; }
+
+    /* ROI CALCULATOR */
+    .roi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 640px) {
+      .roi-grid { grid-template-columns: 1fr; }
+    }
+    .roi-card {
+      background: var(--surface-subdued);
+      border: 1px solid var(--border-subdued);
+      padding: 18px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .roi-num {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--action-primary);
+      margin: 6px 0;
+    }
+    .roi-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* ROADMAP / STAGES */
+    .timeline {
+      position: relative;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .step-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--badge-accent-bg);
+      color: var(--action-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .step-body h4 { font-size: 15px; margin-bottom: 4px; font-weight: 600; }
+    .step-body p { font-size: 13px; color: var(--text-secondary); }
+
+    /* PRICING & CTA */
+    .pricing-box {
+      background: linear-gradient(135deg, var(--surface-card) 0%, var(--surface-subdued) 100%);
+      border: 2px solid var(--action-primary);
+      border-radius: 14px;
+      padding: 36px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(48, 205, 144, 0.15);
+      margin-top: 36px;
+    }
+    .price-tag {
+      font-size: 48px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--action-primary);
+      margin: 12px 0;
+    }
+    .price-desc {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 28px auto;
+      font-size: 15px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--action-primary);
+      color: #000000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .cta-btn:hover {
+      background: var(--action-hover);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand-logo">
+        <span>NOKU</span>
+        <span style="color:var(--text-muted); font-weight:400;">×</span>
+        <span>DNK-ECOM</span>
+        <span class="brand-pill">Polaris 2.0 Spec</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+          <span id="theme-icon">☀️</span>
+          <span id="theme-text">Світла тема</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-badge">
+        <span>⚡</span> Персоналізований Cockpit для Андрія Ніколаєва (noku.store)
+      </div>
+      <h1 class="hero-title">
+        Преміальна архітектура Shopify 2.0: <span>картки товарів (Kits)</span>, верифікація Etsy-відгуків та окупність інвестицій
+      </h1>
+      <p class="hero-subtitle">
+        Повна трансформація магазину під стандарти світових бенчмарків (<em>George &amp; Willy, Made of Tomorrow, Quince</em>) без жодного натяку на дропшип-дешевизну, з нульовою абонплатою за зайві додатки та гарантованим дедлайном 14 робочих днів.
+      </p>
+    </section>
+
+    <!-- BLOCK 1: СУТЬ ТРАНСФОРМАЦІЇ -->
+    <div class="grid-2">
+      <!-- Поточний стан -->
+      <div class="card">
+        <div class="card-title">
+          <span>Поточний сайт (Minimog v5.2)</span>
+          <span style="font-size:12px; color:#EF4444; font-family:'JetBrains Mono'; font-weight:600;">[ТОЧКИ ТЕРТЯ]</span>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary);">
+          Гарний продукт власного виробництва обмежений рамками шаблонної теми ThemeForest:
+        </p>
+        <ul class="diff-list">
+          <li class="diff-item">
+            <span class="diff-icon bad">✕</span>
+            <div><strong>Відсутність бандлів (Kits):</strong> Покупець не може в 1 клік зібрати комплект (меню-борд + магнітні символи + набір цінників). Втрата 40% AOV.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon bad">✕</span>
+            <div><strong>Зламані відгуки:</strong> Поточний додаток не адаптований по шрифтах і показує відгуки з Etsy як «Unverified», блокуючи зірочки в Google Shopping.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon bad">✕</span>
+            <div><strong>Дропшип-тригери:</strong> Випадкові зелені зірки та жовті бейджі теми знецінюють відчуття преміум-сталі для спешелті-кав'ярень.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon bad">✕</span>
+            <div><strong>B2B бар'єр:</strong> Оптова сторінка являє собою звичайну контактну форму замість зручного інструменту формування замовлення для мереж.</div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Рішення DNK OS -->
+      <div class="card">
+        <div class="card-title">
+          <span>Рішення на ядрі DNK OS Polaris</span>
+          <span style="font-size:12px; color:var(--action-primary); font-family:'JetBrains Mono'; font-weight:600;">[СТАНДАРТ 2026]</span>
+        </div>
+        <p style="font-size:13px; color:var(--text-secondary);">
+          Чистий монохромний преміум у стилі George &amp; Willy на рідних блоках Shopify 2.0:
+        </p>
+        <ul class="diff-list">
+          <li class="diff-item">
+            <span class="diff-icon good">✓</span>
+            <div><strong>Модульний PDP-конфігуратор:</strong> Нативний вибір комплектацій без сторонніх важких аппок. Клієнт бачить підсумкову ціну та склад набору миттєво.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon good">✓</span>
+            <div><strong>Синхронізація відгуків Etsy:</strong> Інтеграція через валідований JSON-LD Schema.org. Відображення верифікованих зірок у пошуку та Google Shopping.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon good">✓</span>
+            <div><strong>Естетика дорогого бренду:</strong> Монохромна типографіка Jost/Inter, акценти з нержавіючої сталі, високий траст для архітекторів і дизайнерів.</div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-icon good">✓</span>
+            <div><strong>Нуль зайвих підписок:</strong> Заощадження $1,750+ на рік за рахунок відмови від зовнішніх бандл- і відгукових плагінів.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BLOCK 2: ЖИВИЙ СИМУЛЯТОР БАНДЛІВ (PDP CRO) -->
+    <div class="card" style="margin-bottom:32px;">
+      <div class="card-title">
+        <span>Інтерактивний прототип картки товару (Кафе-Бандл)</span>
+        <span class="brand-pill">AOV Booster +45%</span>
+      </div>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">
+        Як виглядатиме покупка для власника кав'ярні: замість купівлі однієї дошки він формує готовий робочий простір прямо на першому екрані:
+      </p>
+
+      <div class="simulator">
+        <div class="sim-row">
+          <label class="sim-label">
+            <input type="checkbox" id="item-board" checked disabled>
+            <span><strong>Stainless Steel Menu Board Set</strong> (Основна дошка 1000×600мм)</span>
+          </label>
+          <span class="sim-price">$285.00</span>
+        </div>
+        <div class="sim-row">
+          <label class="sim-label">
+            <input type="checkbox" id="item-letters" checked onchange="calcBundle()">
+            <span><strong>+ Набір магнітних літер та цифр</strong> (Black / 145 символів)</span>
+          </label>
+          <span class="sim-price">$45.00</span>
+        </div>
+        <div class="sim-row">
+          <label class="sim-label">
+            <input type="checkbox" id="item-tags" checked onchange="calcBundle()">
+            <span><strong>+ Комплект металевих цінників на вітрину</strong> (20 шт. + холдери)</span>
+          </label>
+          <span class="sim-price">$65.00</span>
+        </div>
+        <div class="sim-row">
+          <label class="sim-label">
+            <input type="checkbox" id="item-signs" onchange="calcBundle()">
+            <span><strong>+ Настільна табличка «Reserve / Order Here»</strong> (A5 Steel Stand)</span>
+          </label>
+          <span class="sim-price">$35.00</span>
+        </div>
+
+        <div class="sim-total-box">
+          <div>
+            <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Середній чек замовлення (AOV):</div>
+            <div style="font-size:13px; color:var(--action-primary); font-weight:600;" id="bundle-discount-label">Комплектна знижка 10% врахована автоматично</div>
+          </div>
+          <div class="sim-total-val" id="bundle-total">$355.50</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 3: ЕКОНОМІКА ТА ЕКОНОМІЯ НА ДОДАТКАХ -->
+    <div class="card" style="margin-bottom:32px;">
+      <div class="card-title">
+        <span>Калькулятор прямої економії на софті (Shopify App Zero-Bloat)</span>
+        <span class="brand-pill">Чистий ROI</span>
+      </div>
+      <p style="font-size:14px; color:var(--text-secondary);">
+        Більшість розробників навішують на магазин 5–7 платних підписок, які щомісяця тягнуть кошти і вбивають швидкість завантаження. Наше ядро замінює їх нативним кодом:
+      </p>
+
+      <div class="roi-grid">
+        <div class="roi-card">
+          <div class="roi-sub">Бандли та Quantity Breaks</div>
+          <div class="roi-num">$468</div>
+          <div class="roi-sub">економія на Kaching / WideBundles на рік</div>
+        </div>
+        <div class="roi-card">
+          <div class="roi-sub">Синхронізація відгуків</div>
+          <div class="roi-num">$588</div>
+          <div class="roi-sub">економія на Loox / Yotpo на рік</div>
+        </div>
+        <div class="roi-card">
+          <div class="roi-sub">In-Cart Upsell &amp; Drawer</div>
+          <div class="roi-num">$696</div>
+          <div class="roi-sub">економія на Monster Cart на рік</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface-subdued); padding:16px; border-radius:8px; border:1px solid var(--border-subdued); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong style="color:var(--text-primary); font-size:15px;">Сумарна пряма економія бізнесу:</strong>
+          <div style="font-size:13px; color:var(--text-muted);">Без урахування росту продажів за рахунок конверсії</div>
+        </div>
+        <div style="font-size:22px; font-weight:700; color:var(--action-primary); font-family:'JetBrains Mono';">
+          +$1,752 / рік
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 4: ДЕДЛАЙН ТА ЕТАПИ (14 РОБОЧИХ ДНІВ) -->
+    <div class="card" style="margin-bottom:32px;">
+      <div class="card-title">
+        <span>Прозорий графік запуску «під ключ» (14 днів)</span>
+        <span class="brand-pill">Без затримок</span>
+      </div>
+      <div class="timeline">
+        <div class="step-item">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Дні 1–3: Архітектура та бренд-дизайн (Polaris Minimalist)</h4>
+            <p>Фіксація дизайн-системи NOKU (типографіка, палітра сталі, відсутність зайвих кольорів). Розробка та погодження прототипу картки товару.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Дні 4–7: Верстка головної сторінки та нативного PDP-модуля</h4>
+            <p>Збірка сторінки товару з конфігуратором бандлів. Розробка інтерактивної головної сторінки з фокусом на відеоінструкції та живі інтер'єри кав'ярень.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Дні 8–11: Інтеграція Etsy-відгуків, B2B сторінки та Google Shopping</h4>
+            <p>Налаштування показу зірок у пошуку, перенесення реальних відгуків, підключення оптового модуля для мережевих покупців.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Дні 12–14: QA, перевірка мобільної швидкості (CWV 90+) та реліз</h4>
+            <p>Фінальне тестування на реальних замовленнях, полірування чекауту, передача прав та запуск оновленого сайту.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 5: ПРАЙС ТА ФОРМАТ СПІВПРАЦІ -->
+    <div class="pricing-box">
+      <span class="brand-pill" style="margin-bottom:12px; display:inline-block;">Повний комплекс «під ключ»</span>
+      <h2 style="font-size:28px; font-weight:700;">Перезапуск NOKU Store на новій архітектурі</h2>
+      <div class="price-tag">$1,500</div>
+      <p class="price-desc">
+        Фіксована інвестиція, яка окупається за рахунок економії на додатках і перших же гуртових замовлень на кав'ярні. Усі подальші правки в межах ТЗ включені без доплат.
+      </p>
+
+      <div style="margin-bottom:28px; display:inline-block; text-align:left; font-size:14px; background:var(--surface-subdued); padding:16px 24px; border-radius:8px; border:1px solid var(--border-subdued);">
+        <div><strong>Що входить у вартість:</strong></div>
+        <div style="color:var(--text-secondary); margin-top:6px;">
+          ✓ Повністю нова тема на Shopify Theme Blocks 2.0<br>
+          ✓ Індивідуальний конфігуратор бандлів на картці товару<br>
+          ✓ Безшовна інтеграція та валідація відгуків з Etsy для Google Shopping<br>
+          ✓ Сторінка гуртових / B2B замовлень для мереж<br>
+          ✓ Мобільна оптимізація швидкості (Core Web Vitals 90+)<br>
+          ✓ 14 днів гарантійної підтримки після релізу
+        </div>
+      </div>
+
+      <div>
+        <a href="https://t.me/kuzmenko_top" class="cta-btn" target="_blank" rel="noopener">
+          <span>🚀 Затвердити план та призначити старт</span>
+        </a>
+      </div>
+      <div style="font-size:12px; color:var(--text-muted); margin-top:12px;">
+        Опціональний супровід та A/B тестування після релізу: $350 / місяць
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+      document.getElementById('theme-text').textContent = next === 'dark' ? 'Світла тема' : 'Темна тема';
+    }
+
+    function calcBundle() {
+      let total = 285.00; // Base board
+      const hasLetters = document.getElementById('item-letters').checked;
+      const hasTags = document.getElementById('item-tags').checked;
+      const hasSigns = document.getElementById('item-signs').checked;
+
+      if (hasLetters) total += 45.00;
+      if (hasTags) total += 65.00;
+      if (hasSigns) total += 35.00;
+
+      // Apply 10% kit discount if at least 2 accessories selected
+      const count = (hasLetters ? 1 : 0) + (hasTags ? 1 : 0) + (hasSigns ? 1 : 0);
+      let discount = 0;
+      if (count >= 2) {
+        discount = total * 0.10;
+        document.getElementById('bundle-discount-label').style.display = 'block';
+        document.getElementById('bundle-discount-label').textContent = `Комплектна знижка 10% (-$${discount.toFixed(2)}) врахована автоматично`;
+      } else {
+        document.getElementById('bundle-discount-label').style.display = 'none';
+      }
+
+      const finalPrice = total - discount;
+      document.getElementById('bundle-total').textContent = `$${finalPrice.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>

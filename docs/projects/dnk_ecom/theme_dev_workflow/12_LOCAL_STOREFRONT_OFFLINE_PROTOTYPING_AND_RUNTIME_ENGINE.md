@@ -1,5 +1,7 @@
 ---
 title: "12. Модуль офлайн-рантайму та швидкого прототипування тем: Local-Storefront Engine"
+description: "Інженерна специфікація офлайн-рантайму local-storefront (lsf) для генерації інтерактивних прототипів магазинів за 30 секунд у DNK Agentic Store OS."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md"
 status: approved
 type: specification
 domain: shopify
@@ -10,7 +12,7 @@ version: "1.0.0"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md"
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md"
 > purpose: "Інженерна специфікація офлайн-рантайму local-storefront (lsf) для генерації інтерактивних прототипів магазинів за 30 секунд у DNK Agentic Store OS."
 > canonical_source: true
 > alters_files: []
@@ -25,8 +27,8 @@ version: "1.0.0"
 # ⚡ МОДУЛЬ 12: LOCAL-STOREFRONT ОФЛАЙН-РАНТАЙМ ТА АГЕНТСЬКЕ ПРОТОТИПУВАННЯ
 
 > **Сесія-джерело:** [Shopify Local Theme DEV](conversation://f7b3cd8d-fc69-4a4f-bb8a-c21c9d7cec31) (`f7b3cd8d-fc69-4a4f-bb8a-c21c9d7cec31`)  
-> **Повний майстер-аудит:** [`Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md)  
-> **Локальний репозиторій ядра:** [`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront)
+> **Повний майстер-аудит:** [`Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md`](../DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md)  
+> **Локальний репозиторій ядра:** [`../DNK_Vibe/local-storefront`](../DNK_Vibe/local-storefront)
 
 ---
 

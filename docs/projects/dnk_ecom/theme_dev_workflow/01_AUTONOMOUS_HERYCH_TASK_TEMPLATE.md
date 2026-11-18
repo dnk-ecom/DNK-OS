@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md"
 # purpose: "Standardized Task Specification Template for Hermes Agent Gerych to Audit Any Donor Branch"
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-10"
 # author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🤖 Бойове технічне завдання для Gerych23: Автономний аудит гілки-донора
 
@@ -102,14 +104,14 @@ python3 tools/distill_molecules.py \
 
 ```bash
 # 1. Аудит та дистиляція гілки casaio (еталон L5 Atomic Gold):
-gerych4 --query "Виконай аудит гілки casaio за інструкцією /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
+gerych4 --query "Виконай аудит гілки casaio за інструкцією ../SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
 
 # 2. Аудит та дистиляція гілки ella (мега-маркет):
-gerych4 --query "Виконай аудит гілки ella за інструкцією /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
+gerych4 --query "Виконай аудит гілки ella за інструкцією ../SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
 
 # 3. Аудит та дистиляція гілки shrine-pro (DTC комбайн):
-gerych4 --query "Виконай аудит гілки shrine-pro за інструкцією /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
+gerych4 --query "Виконай аудит гілки shrine-pro за інструкцією ../SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
 
 # 4. Аудит та дистиляція гілки sugar (Theme Blocks 2.0 & No-App комбайн):
-gerych4 --query "Виконай аудит гілки sugar за інструкцією /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
+gerych4 --query "Виконай аудит гілки sugar за інструкцією ../SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md" --oneshot
 ```

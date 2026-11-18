@@ -1,5 +1,7 @@
 ---
 title: "Gerych (Gemini 4 Carbon) Theme Distillation Verdict & Architectural Protocol"
+description: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK Sovereign 1.0.0 Apex Commercial Theme Synthesis ($350-$420 MSRP Grade)."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md"
 status: active
 type: verdict
 domain: shopify_ecosystem
@@ -11,7 +13,7 @@ date: "2026-11-12"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "_Shopify_Theme_DEV_Workflow/10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md"
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md"
 > purpose: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK Sovereign 1.0.0 Apex Commercial Theme Synthesis ($350-$420 MSRP Grade)."
 > canonical_source: true
 > alters_files: []
@@ -131,6 +133,6 @@ date: "2026-11-12"
 ---
 
 ## ЧАСТИНА 4. СИНТЕЗ ТА ПАКУВАННЯ ТЕМИ
-Синтез реалізовано автоматизованим скриптом [`scripts/synthesize_dnk_sovereign_1_0_0.py`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_HUB/scripts/synthesize_dnk_sovereign_1_0_0.py).
-Тема в [`themes/dnk-sovereign`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/themes/dnk-sovereign) пройшла всі перевірки з результатом **0 offenses**, а фінальний релізний пакет скомпільовано у [`themes/DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/themes/DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip).
+Синтез реалізовано автоматизованим скриптом [`scripts/synthesize_dnk_sovereign_1_0_0.py`](../DNK_HUB/scripts/synthesize_dnk_sovereign_1_0_0.py).
+Тема в [`themes/dnk-sovereign`](../themes/dnk-sovereign) пройшла всі перевірки з результатом **0 offenses**, а фінальний релізний пакет скомпільовано у [`themes/DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip`](../themes/DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip).
 

@@ -1,5 +1,7 @@
 ---
 title: "Канонічний майстер-аудит сесії Sugar Theme Ecosystem Audit (DNK-ThemeCraft Core)"
+description: "Повний майстер-аудит сесії Sugar Theme Ecosystem Audit: деконструкція механіки, формул інтерполяції, структур даних, Theme Blocks 2.0, Web Components, No-App мега-блоків та синтез у суверенне ядро DNK Sovereign Theme Core."
+mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
 status: approved
 type: report
 domain: shopify
@@ -10,7 +12,7 @@ version: "2.5.0"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
+> mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
 > purpose: "Повний майстер-аудит сесії Sugar Theme Ecosystem Audit: деконструкція механіки, формул інтерполяції, структур даних, Theme Blocks 2.0, Web Components, No-App мега-блоків та синтез у суверенне ядро DNK Sovereign Theme Core."
 > canonical_source: true
 > alters_files:
@@ -74,8 +76,8 @@ flowchart TD
 ## 🧭 2. МЕТАДАНІ СЕСІЇ ТА ОБСЯГ ДОСЛІДЖЕНИХ ДАНИХ
 
 - **Досліджена сесія:** `Sugar Theme Ecosystem Audit` (ID: `0061aea4-3fe7-4786-bd08-294ed4df1b49`).
-- **Цільова робоча директорія:** [`Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/).
-- **Донорський Worktree:** [`DNK-Ecom_git_mirrow/sugar`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/sugar) (1195 файлів).
+- **Цільова робоча директорія:** [`Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/`](../DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/).
+- **Донорський Worktree:** [`DNK-Ecom_git_mirrow/sugar`](../DNKEcom/DNK-Ecom_git_mirrow/sugar) (1195 файлів).
 - **Результати незалежної верифікації агентом Gerych-root:**
   - Загальний обсяг даних: **727 робочих файлів** (~5.14 ГБ).
   - Валідність JSON: **77/77 файлів валідні** (зокрема `sugar_nesting_graph.json` на 726 КБ, `media_manifest.json` та 69 JSON-шаблонів воронок).
@@ -93,7 +95,7 @@ Sugar Theme відмовилася від застарілої концепці�
 3. **Метод 1 Майка (Existing Files Only)**: Будь-яка складна сторінка (Quiz, Bundle PDP, Listicle, Scratch & Win) збирається виключно через конфігурацію існуючих блоків у JSON-шаблоні, без написання кастомного роздутого JS чи порушення ліміту розміру файлу 512 КБ.
 
 ### 3.2. Топологія Theme Blocks 2.0 (296 блоків)
-На основі аналізу графу [`sugar_nesting_graph.json`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/sugar_nesting_graph.json) зафіксовано чітку двокомпонентну класифікацію:
+На основі аналізу графу [`sugar_nesting_graph.json`](../DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/sugar_nesting_graph.json) зафіксовано чітку двокомпонентну класифікацію:
 - **151 блок-контейнер**: Містять тег `{% content_for 'blocks' %}`, приймають дочірні блоки відповідно до `schema.blocks[].type` або семантичного `allowlist` (`@theme`, `@app`). Максимальна зафіксована глибина рекурсії — **8 рівнів**.
 - **145 блоків-листків (Leaf Blocks)**: Кінцеві візуальні вузли (заголовки, кнопки, свотчі, ціни, іконки, таймери), які не мають внутрішніх контейнерів і безпосередньо рендерять розмітку.
 
@@ -342,7 +344,7 @@ sequenceDiagram
 
 ## 🏛️ 6. СИНТЕЗ У СУВЕРЕННЕ ЯДРО DNK OS (DNK SOVEREIGN THEME CORE)
 
-Усі виявлені інженерні прориви успішно асимільовані у власне суверенне ядро [`DNK Sovereign Theme Core`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/themes/dnk-sovereign/) (архів `DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip`).
+Усі виявлені інженерні прориви успішно асимільовані у власне суверенне ядро [`DNK Sovereign Theme Core`](../themes/dnk-sovereign/) (архів `DNK_Sovereign_1.0.0_Apex_Theme_Store_Ready.zip`).
 
 ### 6.1. Матриця асиміляції компонентів:
 | Компонент Sugar Theme | Суверенний еквівалент DNK Core | Покращення в DNK Core |
@@ -377,7 +379,7 @@ sequenceDiagram
 
 ### ⏭️ Наступна ціль у конвеєрі аудиту:
 **Сесія 2: Shrine Pro (v2.0.0)**  
-- **Робоча директорія:** [`Audit_Shopify_Themes_Sell_WF/Shrine_Theme_Ecosystem_Audit/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Shrine_Theme_Ecosystem_Audit/)  
+- **Робоча директорія:** [`Audit_Shopify_Themes_Sell_WF/Shrine_Theme_Ecosystem_Audit/`](../DNKEcom/Audit_Shopify_Themes_Sell_WF/Shrine_Theme_Ecosystem_Audit/)  
 - **Ключові технологічні фокуси:**
   1. Революційна архітектура **Cart Drawer V2** з багаторівневою шкалою безкоштовної доставки та прогресу подарунків (Tiered Free Gifts Progress Bar).
   2. Sticky Add to Cart тригери та оптимізація мобільного скролу.

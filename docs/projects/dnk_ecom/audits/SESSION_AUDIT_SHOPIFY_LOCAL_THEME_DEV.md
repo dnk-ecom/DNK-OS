@@ -1,5 +1,7 @@
 ---
 title: "Канонічний майстер-аудит сесії Shopify Local Theme DEV (Local Storefront Core)"
+description: "Повний майстер-аудит та архів корисних знахідок сесії Shopify Local Theme DEV: деконструкція 0xtlt/local-storefront (lsf), архітектура офлайн-рантайму Rust, інтеграція з DNK Agentic Store OS та прототипування за секунди."
+mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
 status: approved
 type: report
 domain: shopify
@@ -10,7 +12,7 @@ version: "1.0.0"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
+> mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
 > purpose: "Повний майстер-аудит та архів корисних знахідок сесії Shopify Local Theme DEV: деконструкція 0xtlt/local-storefront (lsf), архітектура офлайн-рантайму Rust, інтеграція з DNK Agentic Store OS та прототипування за секунди."
 > canonical_source: true
 > alters_files:
@@ -74,7 +76,7 @@ flowchart TD
 - **Досліджена сесія:** [Shopify Local Theme DEV](conversation://f7b3cd8d-fc69-4a4f-bb8a-c21c9d7cec31) (`f7b3cd8d-fc69-4a4f-bb8a-c21c9d7cec31`).
 - **Дата аналізу:** 13–16 листопада 2026 р.
 - **Аналізований репозиторій:** [`0xtlt/local-storefront`](https://github.com/0xtlt/local-storefront) (CLI-пакет: `local-storefront`).
-- **Канонічна локація карантинного коду:** [`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront) (клоновано за правилом Rule 10 через `safe_repo_clone.py`, 100% ізоляція від індексатора IDE).
+- **Канонічна локація карантинного коду:** [`../DNK_Vibe/local-storefront`](../DNK_Vibe/local-storefront) (клоновано за правилом Rule 10 через `safe_repo_clone.py`, 100% ізоляція від індексатора IDE).
 
 ---
 
@@ -254,4 +256,4 @@ shopify-local/
 - **Статус аудиту:** **УСПІШНО ЗАВЕРШЕНО ТА ЗАТВЕРДЖЕНО (APPROVED)** ✅
 - **Отриманий стратегічний актив:** Повна документація та інженерна архітектура зв'язки **DNK Agentic Store OS + local-storefront**.
 - **Карантин коду:** Репозиторій `0xtlt/local-storefront` надійно заархівовано у `DNK_Vibe/local-storefront`.
-- **Готовність до інтеграції:** Специфікація модуля зафіксована у [12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md).
+- **Готовність до інтеграції:** Специфікація модуля зафіксована у [12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md](../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md).

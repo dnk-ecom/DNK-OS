@@ -1,5 +1,5 @@
 <!-- --- DNK-MRH-HEADER ---
-mrh_id: "_Shopify_Theme_DEV_Workflow/11_DNK_ECOM_DOCUMENTATION_ARCHITECTURE_AND_AGENT_HARNESS.md"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_DNK_ECOM_DOCUMENTATION_ARCHITECTURE_AND_AGENT_HARNESS.md"
 purpose: "Головна специфікація архітектури документації DNK Ecom, стандарту Agent-Native (llms.txt, skill.md) та інженерного хайвею онбордингу."
 canonical_source: true
 alters_files: []

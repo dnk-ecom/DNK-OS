@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md"
 # purpose: "Exhaustive Architectural Specification & Governance Standard for DNK Sovereign Commercial Theme (Shopify Theme Store Submission Grade)."
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🏛️ ОФІЦІЙНА ТЕХНІЧНА СПЕЦИФІКАЦІЯ ТЕМИ СВІТОВОГО РІВНЯ ДЛЯ SHOPIFY THEME STORE
 ## DNK Sovereign Theme (Apex D2C Architecture)

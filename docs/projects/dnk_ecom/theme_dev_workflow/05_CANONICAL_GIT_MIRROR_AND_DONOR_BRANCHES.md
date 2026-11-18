@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/05_CANONICAL_GIT_MIRROR_AND_DONOR_BRANCHES.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/05_CANONICAL_GIT_MIRROR_AND_DONOR_BRANCHES.md"
 # purpose: "Canonical Guide to DNK-Ecom_git_mirrow and Cleanroom Donor Branches on GitHub"
 # canonical_source: true
 # alters_files: []
@@ -9,12 +10,13 @@
 # updated_at: "2026-11-10"
 # author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🏛️ Канонічний репозиторій тем-донорів: `DNK-Ecom_git_mirrow` та гілки GitHub
 
 Єдиним офіційним джерелом правди (Single Source of Truth — SSOT) для всіх тем-донорів в екосистемі DNK є:
 - **Віддалений репозиторій на GitHub**: [`https://github.com/DNKShopify/DNK-e.com`](https://github.com/DNKShopify/DNK-e.com)
-- **Локальне робоче дзеркало (Git Worktrees)**: `DNK-Ecom_git_mirrow/` (`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/DNK-Ecom_git_mirrow`)
+- **Локальне робоче дзеркало (Git Worktrees)**: `DNK-Ecom_git_mirrow/` (`../SHOPIFY/DNKShopify/DNKEcom/DNK-Ecom_git_mirrow`)
 
 Кожна тема-донор зберігається як окрема ізольована гілка в Git, що підключена як окремий воркплейс через `.bare` репозиторій.
 

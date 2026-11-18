@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/02_MOLECULAR_DISTILLATION_ENGINE.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/02_MOLECULAR_DISTILLATION_ENGINE.md"
 # purpose: "Technical Engineering Specification for Theme Component Distillation and Cleanroom Sanitization"
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-10"
 # author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🧪 Двигун молекулярної дистиляції та Cleanroom-санації тем
 

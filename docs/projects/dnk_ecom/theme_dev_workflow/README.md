@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/README.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/README.md"
 # purpose: "Master Engine & Self-Improving Recursive Molecular Theme Audit & Distillation Framework"
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-10"
 # author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🧬 Самопокращуваний воркфлоу молекулярного аудиту та дистиляції тем Shopify (Shopify Theme DEV Workflow)
 
@@ -23,7 +25,7 @@
 > [!IMPORTANT]
 > **Єдиною офіційною бібліотекою тем-донорів (Single Source of Truth — SSOT) є:**
 > - Віддалений репозиторій: **[`https://github.com/DNKShopify/DNK-e.com`](https://github.com/DNKShopify/DNK-e.com)**
-> - Локальне дзеркало Git Worktrees: **`DNK-Ecom_git_mirrow/`** (`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/SHOPIFY/DNKShopify/DNKEcom/DNK-Ecom_git_mirrow`)
+> - Локальне дзеркало Git Worktrees: **`DNK-Ecom_git_mirrow/`** (`../SHOPIFY/DNKShopify/DNKEcom/DNK-Ecom_git_mirrow`)
 
 Усі теми в цьому репозиторії зберігаються як ізольовані гілки (`sugar`, `story`, `casaio`, `ella`, `shrine-pro`, `tinker` тощо) і **вже пройшли або проходять Cleanroom-санацію**:
 1. Повністю знешкоджено ліцензійні замки, ECDSA-блокування та запити до віддалених серверів перевірки.

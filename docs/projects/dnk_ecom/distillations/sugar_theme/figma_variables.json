@@ -1,0 +1,1282 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "brand": "Sugar Theme Demo",
+    "exportedAt": "2026-11-17",
+    "generator": "DNK OS Design Token Compiler"
+  },
+  "collections": [
+    {
+      "name": "Brand Design Tokens",
+      "modes": [
+        {
+          "modeId": "mode_default",
+          "name": "Default"
+        }
+      ],
+      "variables": [
+        {
+          "name": "color/background",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/surface-primary",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/gradient-background",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#b40919"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/foreground",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/text-primary",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#04182b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/background-contrast",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#538fdf"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/accent",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/action-primary",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#08172b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/action-primary-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/secondary-button",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#08172b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/action-secondary",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/secondary-button-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#e8eff9"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/link",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#6aa5f6"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/badge-foreground",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#e8eff9"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/badge-background",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#08172b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/badge-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#e8eff9"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/payment-terms-background-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#08172b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-1-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-1-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#04182b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-2-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#f5fafe"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-2-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#04182b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-3-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-3-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-4-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-4-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-5-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#08172b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scheme-scheme-5-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#e8eff9"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-letter-spacing",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "0px"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-bg-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-bg-layer",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#b604b6"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "0px"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-primary-border-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-bg-surface",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-bg-layer",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#035901"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "0px"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-secondary-border-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-outline-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "1px"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/button-outline-border-opacity",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "1.0"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-active",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-active-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-bg-rgb",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-footer-bg-rgb",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-footer-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": ""
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hmd-trigger-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": ""
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hdl-dd-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#010001"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hdl-dd-shadow",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#00040c"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hdl-active",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hdl-active-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff}</style>\n\n<span\n  class=\"sugar-header-desktop visually-hidden\"\n  data-hdl-layout=\"inline\"\n  data-hdl-indicator=\"background\"\n  \n  \n  \n  \n  \n  data-hdl-style=\"bold\"\n  \n  data-_sf=\"ayuiwrmxialdjawxik__desktop\"\n></span>\n\n<link href=\"//sugarthe.me/cdn/shop/t/21/assets/block-desktop-menu.css?v=90014228572782357471793240670\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n<div class=\"sugar-desktop-menu\" style=\"display: contents"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/hic-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial}</style><div\n  class=\"sugar-header-icons header__icons header-localization\"\n  style=\"--header-icons-gap: 8px"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/cart-bubble-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/cart-bubble-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sch-pad",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#0e120e"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sch-sep-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sch-shadow-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sch-close-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sugar-cart-announcements-arrow-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#21182f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-bg-rgb",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-text-rgb",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-num-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-lbl-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-box-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-hl-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#62c062"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-hl-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffe066"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-hl-bg-text",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#121212"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sccd-hl-ul-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ff3d00"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/sugar-cart-price-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "inherit"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scf-pad",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#101400"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/scf-sep-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/ps-savings-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/ps-subtotal-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "rgb(var(--color-accent, var(--color-button)))"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mq-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mq-fg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#04182b"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mqt-gap",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#180628"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mqt-cbg-rgb",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mqi-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mqi-icon-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/cdi-btn-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1\"\n  data-_sf=\"an0jisxfzvu1eymhlc__cart_discount_input_igde8b\"\n>\n  <sugar-discount-input class=\"sugar-cart-discount-input__widget\">\n    <form class=\"sugar-cart-discount-input__form\">\n      <div class=\"sugar-cart-discount-input__wrap sugar-cart-discount-input__wrap--inside_padded\">\n        <input\n          type=\"text\"\n          class=\"sugar-cart-discount-input__field\"\n          placeholder=\"discount code\"\n          autocomplete=\"off\"\n          aria-label=\"discount code\"\n        >\n        <button type=\"submit\" class=\"sugar-cart-discount-input__btn sugar-cart-discount-input__btn--filled\">\n          <span data-btn-text><strong>apply</strong></span>\n          <span data-spinner class=\"sugar-cart-discount-input__spinner\"></span>\n        </button>\n      </div>\n    </form>\n    <div class=\"sugar-cart-discount-input__message\" data-discount-message aria-live=\"polite\"></div>\n  </sugar-discount-input>\n</div>\n\n\n</div>\n\n</div>\n\n\n</div>\n\n    </div>\n  </div>\n</sugar-cart-drawer>\n</section>\n\n    <main id=\"maincontent\" class=\"content-for-layout focus-none\" role=\"main\" tabindex=\"-1\">\n      <section id=\"shopify-section-template--28159262785781__page_redirect_fkdanb\" class=\"shopify-section section-page-redirect\"><link href=\"//sugarthe.me/cdn/shop/t/21/assets/section-page-redirect.css?v=148305046872351442811793240814\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n<div class=\"sugar-page-redirect sugar-page-redirect--overlay color-scheme-1 gradient\" style=\"--pr-bg:initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/ft-bg-size",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-fg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-invert-fg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-border-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-active-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#182f4f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-active-fg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mlb-active-border",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff\"\n  aria-label=\"page navigation\"\n  data-mlb\n  data-mlb-offset=\"20\"\n  data-_sf=\"ay0u1vmpdugliuzfxb__jump-links\"\n><div class=\"sugar-mini-link-buttons__row\" data-mlb-row><a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#features\"\n  \n  data-mlb-target=\"features\"\n  \n  data-_sf=\"at2herhplk21sdfzcd__jump-features\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>features</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#templates\"\n  \n  data-mlb-target=\"templates\"\n  \n  data-_sf=\"atmqwzzmzdhpkufhid__jump-templates\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>templates</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#reviews\"\n  \n  data-mlb-target=\"reviews\"\n  \n  data-_sf=\"at2vnsfo3zedzz2t5u__jump-reviews\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>reviews</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#faq\"\n  \n  data-mlb-target=\"faq\"\n  \n  data-_sf=\"arvrkdlhjcxblrhpbd__jump-faq\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>faq</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#buy\"\n  \n  data-mlb-target=\"buy\"\n  data-mlb-icon\n  data-_sf=\"ac2dmbgtqrvhfsgx2t__jump-buy\"\n><span class=\"sugar-mini-link-buttons__btn-icon\"><span class=\"sugar-icon\" style=\"--icon-url: url('https://cdn.shopify.com/s/files/1/0830/1510/6797/files/ms-arrow_upward--400.svg')"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/lb-bg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#b43f89"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/lb-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/lb-shadow",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#00000f"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/lb-sh-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "initial"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/fc-icon-h",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#180200"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/pd-overlay",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#000000"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/pd-close-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "currentColor"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/tx-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#005502"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/ti-1-color",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#3f89f1"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/ti-1-transform",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#001a00"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/term",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#080104"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/has-account",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#020205"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/mib-ov-fg",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#ffffff"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/icon-size",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#010201"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "color/tint",
+          "type": "COLOR",
+          "valuesByMode": {
+            "Default": "#010400"
+          },
+          "scopes": [
+            "ALL_FILLS",
+            "STROKE_COLOR"
+          ]
+        },
+        {
+          "name": "spacing/xs",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 4.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/sm",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 8.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/md",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 16.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/lg",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 24.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/xl",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 32.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/2xl",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 48.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        },
+        {
+          "name": "spacing/3xl",
+          "type": "FLOAT",
+          "valuesByMode": {
+            "Default": 64.0
+          },
+          "scopes": [
+            "GAP",
+            "PADDING",
+            "CORNER_RADIUS"
+          ]
+        }
+      ]
+    }
+  ]
+}

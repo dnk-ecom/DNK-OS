@@ -1,5 +1,7 @@
 ---
 title: "Shopify Theme Distillation System & Universal Elements Architecture Blueprint"
+description: "Master Engineering Blueprint: End-to-End Recursive Knowledge & Solutions Distillation System, Exhaustive Technical Description of ALL Theme Elements, and Construction Guide for World-Class Shopify Theme Store Submission ($350-$420 MSRP Grade)."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md"
 status: active
 type: blueprint
 domain: shopify_ecosystem
@@ -11,7 +13,7 @@ date: "2026-11-12"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "_Shopify_Theme_DEV_Workflow/09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md"
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md"
 > purpose: "Master Engineering Blueprint: End-to-End Recursive Knowledge & Solutions Distillation System, Exhaustive Technical Description of ALL Theme Elements, and Construction Guide for World-Class Shopify Theme Store Submission ($350-$420 MSRP Grade)."
 > canonical_source: true
 > alters_files: []

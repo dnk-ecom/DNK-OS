@@ -1,0 +1,471 @@
+{
+  "schema_version": "dtcg-2025.10",
+  "meta": {
+    "brand_name": "Sugar Theme Demo",
+    "archetype": "ecommerce_conversion",
+    "cro_allocation_rule": "60-30-10",
+    "typography_ratio_name": "Major Third",
+    "typography_ratio": 1.25,
+    "base_font_size_px": 16,
+    "spacing_grid_base_px": 8,
+    "font_family_display": "Figtree, sans-serif",
+    "font_family_body": "Figtree, sans-serif"
+  },
+  "primitives": {},
+  "semantic": {
+    "color": {
+      "background": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "surface-primary": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "gradient-background": {
+        "$value": "#b40919",
+        "$type": "color"
+      },
+      "foreground": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "text-primary": {
+        "$value": "#04182b",
+        "$type": "color"
+      },
+      "background-contrast": {
+        "$value": "#538fdf",
+        "$type": "color"
+      },
+      "accent": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "action-primary": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "button": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "button-text": {
+        "$value": "#08172b",
+        "$type": "color"
+      },
+      "action-primary-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "secondary-button": {
+        "$value": "#08172b",
+        "$type": "color"
+      },
+      "action-secondary": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "secondary-button-text": {
+        "$value": "#e8eff9",
+        "$type": "color"
+      },
+      "link": {
+        "$value": "#6aa5f6",
+        "$type": "color"
+      },
+      "badge-foreground": {
+        "$value": "#e8eff9",
+        "$type": "color"
+      },
+      "badge-background": {
+        "$value": "#08172b",
+        "$type": "color"
+      },
+      "badge-border": {
+        "$value": "#e8eff9",
+        "$type": "color"
+      },
+      "payment-terms-background-color": {
+        "$value": "#08172b",
+        "$type": "color"
+      },
+      "scheme-scheme-1-surface": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "scheme-scheme-1-text": {
+        "$value": "#04182b",
+        "$type": "color"
+      },
+      "scheme-scheme-2-surface": {
+        "$value": "#f5fafe",
+        "$type": "color"
+      },
+      "scheme-scheme-2-text": {
+        "$value": "#04182b",
+        "$type": "color"
+      },
+      "scheme-scheme-3-surface": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "scheme-scheme-3-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "scheme-scheme-4-surface": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "scheme-scheme-4-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "scheme-scheme-5-surface": {
+        "$value": "#08172b",
+        "$type": "color"
+      },
+      "scheme-scheme-5-text": {
+        "$value": "#e8eff9",
+        "$type": "color"
+      },
+      "button-letter-spacing": {
+        "$value": "0px",
+        "$type": "color"
+      },
+      "button-primary-bg": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "button-primary-bg-surface": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "button-primary-bg-layer": {
+        "$value": "#b604b6",
+        "$type": "color"
+      },
+      "button-primary-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "button-primary-border": {
+        "$value": "0px",
+        "$type": "color"
+      },
+      "button-primary-border-color": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "button-secondary-bg": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "button-secondary-bg-surface": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "button-secondary-bg-layer": {
+        "$value": "#035901",
+        "$type": "color"
+      },
+      "button-secondary-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "button-secondary-border": {
+        "$value": "0px",
+        "$type": "color"
+      },
+      "button-secondary-border-color": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "button-outline-border": {
+        "$value": "1px",
+        "$type": "color"
+      },
+      "button-outline-border-opacity": {
+        "$value": "1.0",
+        "$type": "color"
+      },
+      "hmd-active": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "hmd-active-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "hmd-bg-rgb": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "hmd-footer-bg-rgb": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "hmd-footer-color": {
+        "$value": "",
+        "$type": "color"
+      },
+      "hmd-trigger-color": {
+        "$value": "",
+        "$type": "color"
+      },
+      "hdl-dd-border": {
+        "$value": "#010001",
+        "$type": "color"
+      },
+      "hdl-dd-shadow": {
+        "$value": "#00040c",
+        "$type": "color"
+      },
+      "hdl-active": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "hdl-active-text": {
+        "$value": "#ffffff}</style>\n\n<span\n  class=\"sugar-header-desktop visually-hidden\"\n  data-hdl-layout=\"inline\"\n  data-hdl-indicator=\"background\"\n  \n  \n  \n  \n  \n  data-hdl-style=\"bold\"\n  \n  data-_sf=\"ayuiwrmxialdjawxik__desktop\"\n></span>\n\n<link href=\"//sugarthe.me/cdn/shop/t/21/assets/block-desktop-menu.css?v=90014228572782357471793240670\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n<div class=\"sugar-desktop-menu\" style=\"display: contents",
+        "$type": "color"
+      },
+      "hic-color": {
+        "$value": "initial}</style><div\n  class=\"sugar-header-icons header__icons header-localization\"\n  style=\"--header-icons-gap: 8px",
+        "$type": "color"
+      },
+      "cart-bubble-bg": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "cart-bubble-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "sch-pad": {
+        "$value": "#0e120e",
+        "$type": "color"
+      },
+      "sch-sep-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "sch-shadow-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "sch-close-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "sugar-cart-announcements-arrow-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "sccd-bg": {
+        "$value": "#21182f",
+        "$type": "color"
+      },
+      "sccd-bg-rgb": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "sccd-text": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "sccd-text-rgb": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "sccd-num-color": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "sccd-lbl-color": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "sccd-box-bg": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "sccd-hl-color": {
+        "$value": "#62c062",
+        "$type": "color"
+      },
+      "sccd-hl-bg": {
+        "$value": "#ffe066",
+        "$type": "color"
+      },
+      "sccd-hl-bg-text": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "sccd-hl-ul-color": {
+        "$value": "#ff3d00",
+        "$type": "color"
+      },
+      "sugar-cart-price-color": {
+        "$value": "inherit",
+        "$type": "color"
+      },
+      "scf-pad": {
+        "$value": "#101400",
+        "$type": "color"
+      },
+      "scf-sep-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "ps-savings-color": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "ps-subtotal-color": {
+        "$value": "rgb(var(--color-accent, var(--color-button)))",
+        "$type": "color"
+      },
+      "mq-bg": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "mq-fg": {
+        "$value": "#04182b",
+        "$type": "color"
+      },
+      "mqt-gap": {
+        "$value": "#180628",
+        "$type": "color"
+      },
+      "mqt-cbg-rgb": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "mqi-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "mqi-icon-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "cdi-btn-color": {
+        "$value": "#3f89f1\"\n  data-_sf=\"an0jisxfzvu1eymhlc__cart_discount_input_igde8b\"\n>\n  <sugar-discount-input class=\"sugar-cart-discount-input__widget\">\n    <form class=\"sugar-cart-discount-input__form\">\n      <div class=\"sugar-cart-discount-input__wrap sugar-cart-discount-input__wrap--inside_padded\">\n        <input\n          type=\"text\"\n          class=\"sugar-cart-discount-input__field\"\n          placeholder=\"discount code\"\n          autocomplete=\"off\"\n          aria-label=\"discount code\"\n        >\n        <button type=\"submit\" class=\"sugar-cart-discount-input__btn sugar-cart-discount-input__btn--filled\">\n          <span data-btn-text><strong>apply</strong></span>\n          <span data-spinner class=\"sugar-cart-discount-input__spinner\"></span>\n        </button>\n      </div>\n    </form>\n    <div class=\"sugar-cart-discount-input__message\" data-discount-message aria-live=\"polite\"></div>\n  </sugar-discount-input>\n</div>\n\n\n</div>\n\n</div>\n\n\n</div>\n\n    </div>\n  </div>\n</sugar-cart-drawer>\n</section>\n\n    <main id=\"maincontent\" class=\"content-for-layout focus-none\" role=\"main\" tabindex=\"-1\">\n      <section id=\"shopify-section-template--28159262785781__page_redirect_fkdanb\" class=\"shopify-section section-page-redirect\"><link href=\"//sugarthe.me/cdn/shop/t/21/assets/section-page-redirect.css?v=148305046872351442811793240814\" rel=\"stylesheet\" type=\"text/css\" media=\"all\" />\n<div class=\"sugar-page-redirect sugar-page-redirect--overlay color-scheme-1 gradient\" style=\"--pr-bg:initial",
+        "$type": "color"
+      },
+      "ft-bg-size": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "mlb-fg": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "mlb-invert-fg": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "mlb-border-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "mlb-active-bg": {
+        "$value": "#182f4f",
+        "$type": "color"
+      },
+      "mlb-active-fg": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "mlb-active-border": {
+        "$value": "#ffffff\"\n  aria-label=\"page navigation\"\n  data-mlb\n  data-mlb-offset=\"20\"\n  data-_sf=\"ay0u1vmpdugliuzfxb__jump-links\"\n><div class=\"sugar-mini-link-buttons__row\" data-mlb-row><a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#features\"\n  \n  data-mlb-target=\"features\"\n  \n  data-_sf=\"at2herhplk21sdfzcd__jump-features\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>features</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#templates\"\n  \n  data-mlb-target=\"templates\"\n  \n  data-_sf=\"atmqwzzmzdhpkufhid__jump-templates\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>templates</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#reviews\"\n  \n  data-mlb-target=\"reviews\"\n  \n  data-_sf=\"at2vnsfo3zedzz2t5u__jump-reviews\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>reviews</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#faq\"\n  \n  data-mlb-target=\"faq\"\n  \n  data-_sf=\"arvrkdlhjcxblrhpbd__jump-faq\"\n><span class=\"sugar-mini-link-buttons__btn-text inline-richtext\"><strong>faq</strong></span>\n</a>\n\n\n<a\n  class=\"sugar-mini-link-buttons__btn\"\n  href=\"#buy\"\n  \n  data-mlb-target=\"buy\"\n  data-mlb-icon\n  data-_sf=\"ac2dmbgtqrvhfsgx2t__jump-buy\"\n><span class=\"sugar-mini-link-buttons__btn-icon\"><span class=\"sugar-icon\" style=\"--icon-url: url('https://cdn.shopify.com/s/files/1/0830/1510/6797/files/ms-arrow_upward--400.svg')",
+        "$type": "color"
+      },
+      "lb-bg": {
+        "$value": "#b43f89",
+        "$type": "color"
+      },
+      "lb-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "lb-shadow": {
+        "$value": "#00000f",
+        "$type": "color"
+      },
+      "lb-sh-color": {
+        "$value": "initial",
+        "$type": "color"
+      },
+      "fc-icon-h": {
+        "$value": "#180200",
+        "$type": "color"
+      },
+      "pd-overlay": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "pd-close-color": {
+        "$value": "currentColor",
+        "$type": "color"
+      },
+      "tx-color": {
+        "$value": "#005502",
+        "$type": "color"
+      },
+      "ti-1-color": {
+        "$value": "#3f89f1",
+        "$type": "color"
+      },
+      "ti-1-transform": {
+        "$value": "#001a00",
+        "$type": "color"
+      },
+      "term": {
+        "$value": "#080104",
+        "$type": "color"
+      },
+      "has-account": {
+        "$value": "#020205",
+        "$type": "color"
+      },
+      "mib-ov-fg": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "icon-size": {
+        "$value": "#010201",
+        "$type": "color"
+      },
+      "tint": {
+        "$value": "#010400",
+        "$type": "color"
+      }
+    }
+  },
+  "typography": {},
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 48,
+    "3xl": 64
+  },
+  "motion": {
+    "dur_fast_ms": 150,
+    "dur_base_ms": 250,
+    "dur_slow_ms": 400,
+    "ease_default": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "ease_spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "ease_in_out": "cubic-bezier(0.65, 0, 0.35, 1)"
+  },
+  "elevation": {
+    "shadow_xs": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "shadow_sm": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+    "shadow_md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+    "shadow_lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+  }
+}

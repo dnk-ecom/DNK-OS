@@ -1,5 +1,7 @@
 ---
 title: "Канонічна майстер-специфікація побудови теми DNK-Ecom для Shopify Theme Store ($350–$420 MSRP)"
+description: "Вичерпна інженерна специфікація побудови флагманської теми DNK-Ecom у DNK OS: повний синтез 10 донорів, відповідність офіційним стандартам Shopify Theme Store ($350-$420 MSRP), Zero-Framework Web Components, 100% Theme Blocks 2.0 та Core Web Vitals 90+ Green."
+mrh_id: "docs/projects/dnk_ecom/MASTER_SPECIFICATION_DNK_ECOM_THEME_STORE.md"
 status: approved
 type: specification
 domain: shopify
@@ -75,15 +77,15 @@ flowchart TD
 
 ### 2.1. Що вже розгорнуто та працює на 100%:
 1. **Базова збірка `DNK_Sovereign_Apex`**:
-   - Розташування: [`services/dnk_shopify/DNK_Sovereign_Apex/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS/services/dnk_shopify/DNK_Sovereign_Apex/).
+   - Розташування: [`services/dnk_shopify/DNK_Sovereign_Apex/`](./services/dnk_shopify/DNK_Sovereign_Apex/).
    - Обсяг: **348 файлів** (77 блоків, 38 секцій, 121 сніпет, 88 ассетів, 15 шаблонів, 5 локалей).
    - Валідація: **100% Strict Liquid PASS** (`260 file(s) checked, 0 problem(s)` у `local-storefront check`).
 2. **Офлайн-рантайм `LocalStorefrontManager`**:
-   - Розташування: [`services/dnk_shopify/runtime/local_storefront.py`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS/services/dnk_shopify/runtime/local_storefront.py).
+   - Розташування: [`services/dnk_shopify/runtime/local_storefront.py`](./services/dnk_shopify/runtime/local_storefront.py).
    - Швидкість: **1.2 – 2.5 мс** на повний рендер сторінок; WebSocket live-reload (10 ms feedback).
    - Інтеграція: CLI команди `lsf-*` та 5 FastMCP інструментів для автономних агентів.
 3. **Агент-компаньйон `DNK-ThemeCraft`**:
-   - Розташування: [`services/dnk_shopify/companion/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS/services/dnk_shopify/companion/).
+   - Розташування: [`services/dnk_shopify/companion/`](./services/dnk_shopify/companion/).
    - База знань: граф таксономії на 7.3 МБ, 30 ранжованих золотих молекул, специфікації Shopify 2026-10.
 4. **Автоматичні тести якості**:
    - `services/dnk_shopify/tests/`: **16/16 тестів пройдено успішно** (`test_brick.py` + `test_local_storefront.py`).

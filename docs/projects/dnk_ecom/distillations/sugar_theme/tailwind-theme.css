@@ -1,0 +1,227 @@
+/* Tailwind CSS v4 @theme block */
+@theme {
+  --color-background: #ffffff;
+  --color-surface-primary: #ffffff;
+  --color-gradient-background: #b40919;
+  --color-foreground: #ffffff;
+  --color-text-primary: #04182b;
+  --color-background-contrast: #538fdf;
+  --color-accent: #182f4f;
+  --color-action-primary: #182f4f;
+  --color-button: #182f4f;
+  --color-button-text: #08172b;
+  --color-action-primary-text: #ffffff;
+  --color-secondary-button: #08172b;
+  --color-action-secondary: #ffffff;
+  --color-secondary-button-text: #e8eff9;
+  --color-link: #6aa5f6;
+  --color-badge-foreground: #e8eff9;
+  --color-badge-background: #08172b;
+  --color-badge-border: #e8eff9;
+  --color-payment-terms-background-color: #08172b;
+  --color-scheme-scheme-1-surface: #ffffff;
+  --color-scheme-scheme-1-text: #04182b;
+  --color-scheme-scheme-2-surface: #f5fafe;
+  --color-scheme-scheme-2-text: #04182b;
+  --color-scheme-scheme-3-surface: #182f4f;
+  --color-scheme-scheme-3-text: #ffffff;
+  --color-scheme-scheme-4-surface: #3f89f1;
+  --color-scheme-scheme-4-text: #ffffff;
+  --color-scheme-scheme-5-surface: #08172b;
+  --color-scheme-scheme-5-text: #e8eff9;
+  --color-button-letter-spacing: 0px;
+  --color-button-primary-bg: #182f4f;
+  --color-button-primary-bg-surface: #182f4f;
+  --color-button-primary-bg-layer: #b604b6;
+  --color-button-primary-text: #ffffff;
+  --color-button-primary-border: 0px;
+  --color-button-primary-border-color: #182f4f;
+  --color-button-secondary-bg: #3f89f1;
+  --color-button-secondary-bg-surface: #3f89f1;
+  --color-button-secondary-bg-layer: #035901;
+  --color-button-secondary-text: #ffffff;
+  --color-button-secondary-border: 0px;
+  --color-button-secondary-border-color: #3f89f1;
+  --color-button-outline-border: 1px;
+  --color-button-outline-border-opacity: 1.0;
+  --color-hmd-active: #182f4f;
+  --color-hmd-active-text: #ffffff;
+  --color-hmd-bg-rgb: initial;
+  --color-hmd-footer-bg-rgb: initial;
+  --color-hmd-footer-color: ;
+  --color-hmd-trigger-color: ;
+  --color-hdl-dd-border: #010001;
+  --color-hdl-dd-shadow: #00040c;
+  --color-hdl-active: #182f4f;
+  --color-hdl-active-text: #ffffff}</style>
+
+<span
+  class="sugar-header-desktop visually-hidden"
+  data-hdl-layout="inline"
+  data-hdl-indicator="background"
+  
+  
+  
+  
+  
+  data-hdl-style="bold"
+  
+  data-_sf="ayuiwrmxialdjawxik__desktop"
+></span>
+
+<link href="//sugarthe.me/cdn/shop/t/21/assets/block-desktop-menu.css?v=90014228572782357471793240670" rel="stylesheet" type="text/css" media="all" />
+<div class="sugar-desktop-menu" style="display: contents;
+  --color-hic-color: initial}</style><div
+  class="sugar-header-icons header__icons header-localization"
+  style="--header-icons-gap: 8px;
+  --color-cart-bubble-bg: #182f4f;
+  --color-cart-bubble-text: #ffffff;
+  --color-sch-pad: #0e120e;
+  --color-sch-sep-color: initial;
+  --color-sch-shadow-color: initial;
+  --color-sch-close-color: initial;
+  --color-sugar-cart-announcements-arrow-color: initial;
+  --color-sccd-bg: #21182f;
+  --color-sccd-bg-rgb: initial;
+  --color-sccd-text: #ffffff;
+  --color-sccd-text-rgb: #ffffff;
+  --color-sccd-num-color: #182f4f;
+  --color-sccd-lbl-color: #182f4f;
+  --color-sccd-box-bg: #ffffff;
+  --color-sccd-hl-color: #62c062;
+  --color-sccd-hl-bg: #ffe066;
+  --color-sccd-hl-bg-text: #121212;
+  --color-sccd-hl-ul-color: #ff3d00;
+  --color-sugar-cart-price-color: inherit;
+  --color-scf-pad: #101400;
+  --color-scf-sep-color: initial;
+  --color-ps-savings-color: #3f89f1;
+  --color-ps-subtotal-color: rgb(var(--color-accent, var(--color-button)));
+  --color-mq-bg: #ffffff;
+  --color-mq-fg: #04182b;
+  --color-mqt-gap: #180628;
+  --color-mqt-cbg-rgb: initial;
+  --color-mqi-color: initial;
+  --color-mqi-icon-color: initial;
+  --color-cdi-btn-color: #3f89f1"
+  data-_sf="an0jisxfzvu1eymhlc__cart_discount_input_igde8b"
+>
+  <sugar-discount-input class="sugar-cart-discount-input__widget">
+    <form class="sugar-cart-discount-input__form">
+      <div class="sugar-cart-discount-input__wrap sugar-cart-discount-input__wrap--inside_padded">
+        <input
+          type="text"
+          class="sugar-cart-discount-input__field"
+          placeholder="discount code"
+          autocomplete="off"
+          aria-label="discount code"
+        >
+        <button type="submit" class="sugar-cart-discount-input__btn sugar-cart-discount-input__btn--filled">
+          <span data-btn-text><strong>apply</strong></span>
+          <span data-spinner class="sugar-cart-discount-input__spinner"></span>
+        </button>
+      </div>
+    </form>
+    <div class="sugar-cart-discount-input__message" data-discount-message aria-live="polite"></div>
+  </sugar-discount-input>
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+    </div>
+  </div>
+</sugar-cart-drawer>
+</section>
+
+    <main id="maincontent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      <section id="shopify-section-template--28159262785781__page_redirect_fkdanb" class="shopify-section section-page-redirect"><link href="//sugarthe.me/cdn/shop/t/21/assets/section-page-redirect.css?v=148305046872351442811793240814" rel="stylesheet" type="text/css" media="all" />
+<div class="sugar-page-redirect sugar-page-redirect--overlay color-scheme-1 gradient" style="--pr-bg:initial;
+  --color-ft-bg-size: initial;
+  --color-mlb-fg: #ffffff;
+  --color-mlb-invert-fg: #182f4f;
+  --color-mlb-border-color: #ffffff;
+  --color-mlb-active-bg: #182f4f;
+  --color-mlb-active-fg: #ffffff;
+  --color-mlb-active-border: #ffffff"
+  aria-label="page navigation"
+  data-mlb
+  data-mlb-offset="20"
+  data-_sf="ay0u1vmpdugliuzfxb__jump-links"
+><div class="sugar-mini-link-buttons__row" data-mlb-row><a
+  class="sugar-mini-link-buttons__btn"
+  href="#features"
+  
+  data-mlb-target="features"
+  
+  data-_sf="at2herhplk21sdfzcd__jump-features"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>features</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#templates"
+  
+  data-mlb-target="templates"
+  
+  data-_sf="atmqwzzmzdhpkufhid__jump-templates"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>templates</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#reviews"
+  
+  data-mlb-target="reviews"
+  
+  data-_sf="at2vnsfo3zedzz2t5u__jump-reviews"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>reviews</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#faq"
+  
+  data-mlb-target="faq"
+  
+  data-_sf="arvrkdlhjcxblrhpbd__jump-faq"
+><span class="sugar-mini-link-buttons__btn-text inline-richtext"><strong>faq</strong></span>
+</a>
+
+
+<a
+  class="sugar-mini-link-buttons__btn"
+  href="#buy"
+  
+  data-mlb-target="buy"
+  data-mlb-icon
+  data-_sf="ac2dmbgtqrvhfsgx2t__jump-buy"
+><span class="sugar-mini-link-buttons__btn-icon"><span class="sugar-icon" style="--icon-url: url('https://cdn.shopify.com/s/files/1/0830/1510/6797/files/ms-arrow_upward--400.svg');
+  --color-lb-bg: #b43f89;
+  --color-lb-color: #ffffff;
+  --color-lb-shadow: #00000f;
+  --color-lb-sh-color: initial;
+  --color-fc-icon-h: #180200;
+  --color-pd-overlay: #000000;
+  --color-pd-close-color: currentColor;
+  --color-tx-color: #005502;
+  --color-ti-1-color: #3f89f1;
+  --color-ti-1-transform: #001a00;
+  --color-term: #080104;
+  --color-has-account: #020205;
+  --color-mib-ov-fg: #ffffff;
+  --color-icon-size: #010201;
+  --color-tint: #010400;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}

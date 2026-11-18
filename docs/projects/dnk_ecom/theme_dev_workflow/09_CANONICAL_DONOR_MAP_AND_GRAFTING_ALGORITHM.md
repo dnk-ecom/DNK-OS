@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/09_CANONICAL_DONOR_MAP_AND_GRAFTING_ALGORITHM.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_CANONICAL_DONOR_MAP_AND_GRAFTING_ALGORITHM.md"
 # purpose: "Canonical Active Donor Themes Genome Map & Complete 6-Stage Cleanroom Molecular Grafting Algorithm for Shopify Theme Store ($350-$420 MSRP)."
 # canonical_source: true
 # alters_files: []
@@ -9,13 +10,14 @@
 # updated_at: "2026-11-16"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🧬 КАРТА АКТИВНИХ ТЕМ-ДОНОРІВ ТА ПОВНИЙ АЛГОРИТМ СТРУКТУРИЗАЦІЇ І ГРАФТИНГУ
 ## DNK Sovereign Apex Theme Architecture ($350–$420 MSRP)
 
 > **Єдине джерело істини (SSOT):**  
 > Репозиторій: [`https://github.com/DNKShopify/DNK-e.com`](https://github.com/DNKShopify/DNK-e.com)  
-> Локальне дзеркало: `/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow` (Bare repo `.bare` + 18 Git Worktrees).
+> Локальне дзеркало: `../DNKEcom/DNK-Ecom_git_mirrow` (Bare repo `.bare` + 18 Git Worktrees).
 
 ---
 

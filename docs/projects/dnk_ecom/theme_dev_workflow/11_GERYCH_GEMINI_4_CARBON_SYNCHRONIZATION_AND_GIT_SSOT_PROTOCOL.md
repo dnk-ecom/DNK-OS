@@ -1,5 +1,7 @@
 ---
 title: "Gerych (Gemini 4 Carbon) Synchronization & Git SSOT Protocol"
+description: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK Sovereign 1.0.0 Apex into https://github.com/DNKShopify/DNK-e.com."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md"
 status: active
 type: protocol
 domain: shopify_ecosystem
@@ -11,7 +13,7 @@ date: "2026-11-12"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "_Shopify_Theme_DEV_Workflow/11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md"
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md"
 > purpose: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK Sovereign 1.0.0 Apex into https://github.com/DNKShopify/DNK-e.com."
 > canonical_source: true
 > alters_files: []
@@ -112,9 +114,9 @@ flowchart TD
 
 ### Крок 1. Синхронізація гілки `ks-origin`
 ```bash
-cd /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/ks-origin
+cd ../DNKEcom/DNK-Ecom_git_mirrow/ks-origin
 git pull origin ks-origin
-cp /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/KSOrigin_Theme_Ecosystem_Audit/AUDIT_KS_Origin_1.1.0.md ./
+cp ../DNKEcom/Audit_Shopify_Themes_Sell_WF/KSOrigin_Theme_Ecosystem_Audit/AUDIT_KS_Origin_1.1.0.md ./
 git add AUDIT_KS_Origin_1.1.0.md
 git commit -m "docs(ks-origin): attach donor audit passport and sync latest Shopify updates"
 git push origin ks-origin
@@ -122,18 +124,18 @@ git push origin ks-origin
 
 ### Крок 2. Створення нової гілки `elixir`
 ```bash
-cd /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow
+cd ../DNKEcom/DNK-Ecom_git_mirrow
 git --git-dir=.bare branch elixir
 git --git-dir=.bare worktree add elixir elixir
 cd elixir
 
 # Розгортання Cleanroom Elixir 1.6.2
-python3 /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/scripts/cleanroom_elixir_1_6_2.py \
-  --input /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_Audit_Workflow/raw_vault/elixir \
+python3 ../DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/scripts/cleanroom_elixir_1_6_2.py \
+  --input ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_Audit_Workflow/raw_vault/elixir \
   --output ./
 
-cp /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/AUDIT_Elixir_1.6.2.md ./
-cp /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/SHOPIFY_THEME_CHECK_AND_CLEANROOM_REPORT.md ./
+cp ../DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/AUDIT_Elixir_1.6.2.md ./
+cp ../DNKEcom/Audit_Shopify_Themes_Sell_WF/Elixir_Theme_Ecosystem_Audit/SHOPIFY_THEME_CHECK_AND_CLEANROOM_REPORT.md ./
 
 git add .
 git commit -m "feat(elixir): add cleanroom sanitized Elixir 1.6.2 donor theme with zero DRM and audit passport"
@@ -142,9 +144,9 @@ git push -u origin elixir
 
 ### Крок 3. Оновлення гілки `main` до DNK Sovereign 1.0.0 Apex
 ```bash
-cd /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/main
+cd ../DNKEcom/DNK-Ecom_git_mirrow/main
 find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
-cp -R /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/themes/dnk-sovereign/* ./
+cp -R ../themes/dnk-sovereign/* ./
 git add -A
 git commit -m "feat(main): promote DNK Sovereign 1.0.0 Apex as the sovereign flagship theme core"
 git push origin main
@@ -152,15 +154,15 @@ git push origin main
 
 ### Крок 4. Створення та публікація гілки `audit-workflows`
 ```bash
-cd /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow
+cd ../DNKEcom/DNK-Ecom_git_mirrow
 git --git-dir=.bare branch audit-workflows
 git --git-dir=.bare worktree add audit-workflows audit-workflows
 cd audit-workflows
 
-cp -R /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow ./
-cp -R /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_Audit_Workflow ./
+cp -R ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow ./
+cp -R ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_Audit_Workflow ./
 mkdir -p audits
-for d in /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/*_Theme_Ecosystem_Audit; do
+for d in ../DNKEcom/Audit_Shopify_Themes_Sell_WF/*_Theme_Ecosystem_Audit; do
   cp -R "$d" ./audits/
 done
 

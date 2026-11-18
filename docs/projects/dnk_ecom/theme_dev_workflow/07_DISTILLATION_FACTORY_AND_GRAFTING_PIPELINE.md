@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md"
 # purpose: "Step-by-Step Distillation Factory, Grafting Pipeline & Gerych Terminal Pairing Protocol for Assembling DNK Sovereign Theme."
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🏭 ФАБРИКА ДИСТИЛЯЦІЇ ТА ГРАФТИНГУ: ПОКРОКОВЕ СКЛАДАННЯ ТЕМИ
 ## Тандем Antigravity (Chief Architect) + Gerych-root (Gemini 4 Carbon)
@@ -85,5 +87,5 @@ flowchart TD
 Команда для запуску чергової фази в терміналі:
 
 ```bash
-/Users/kuzmenko.top/.local/bin/gerych-root -q "Виконай Фазу 1 збирання DNK Sovereign Theme згідно з _Shopify_Theme_DEV_Workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md: створи базові dnk-tokens.css та layout/theme.liquid у новому каталозі themes/dnk-sovereign" --oneshot
+~/.local/bin/gerych-root -q "Виконай Фазу 1 збирання DNK Sovereign Theme згідно з _Shopify_Theme_DEV_Workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md: створи базові dnk-tokens.css та layout/theme.liquid у новому каталозі themes/dnk-sovereign" --oneshot
 ```

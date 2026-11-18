@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md"
 # purpose: "Master Briefing Prompts: New Session Kickoff & Gerych-root Autonomous Terminal Mission for Shopify Theme Companion Agent."
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🧠 ДВОКОМПОНЕНТНИЙ МАЙСТЕР-ПРОМПТ ДЛЯ СТВОРЕННЯ АГЕНТА-КОМПАНЬЙОНА РОЗРОБНИКА ТЕМ SHOPIFY
 
@@ -27,7 +29,7 @@
 ### 🏛️ ТЕХНІЧНИЙ КОНТЕКСТ ТА БАЗА ЗНАНЬ ПРОЕКТУ:
 1. **Канонічна бібліотека донорів (Single Source of Truth):**
    - Віддалений репозиторій: `https://github.com/DNKShopify/DNK-e.com`
-   - Локальний воркспейс з 14 Git Worktrees: `/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/`
+   - Локальний воркспейс з 14 Git Worktrees: `../DNKEcom/DNK-Ecom_git_mirrow/`
    - Ключові донори для аналізу:
      * `sugar` (v2.3.10 DNK — еталон Theme Blocks 2.0, 296 блоків, media-sizes-scope, data-sugar-animating).
      * `shrine-pro` (v2.0.0 — еталон Cart Drawer V2, tiered gifts progress, sticky triggers).
@@ -39,7 +41,7 @@
    - Пайплайн дистиляції описано в: `_Shopify_Theme_DEV_Workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md`
    - Жорсткі інваріанти: 0% jQuery/Alpine/React (тільки нативні Web Components `customElements.define`), 100% Theme Blocks 2.0 (`content_for 'blocks'`), LCP < 1.8s, CLS = 0, TBT < 150ms, ліміт шаблонів <= 512KB (цільовий <= 350KB), 100% `t:` i18n (`uk.json` + `en.default.json`), повна відсутність DRM/телеметрії.
 3. **Автономний термінальний партнер:**
-   - Працюй у тандемі з локальним автономним агентом `Gerych-root` (на базі моделі Google Gemini 4 Carbon), викликаючи його через `/Users/kuzmenko.top/.local/bin/gerych-root -q "<TASK>" --oneshot`.
+   - Працюй у тандемі з локальним автономним агентом `Gerych-root` (на базі моделі Google Gemini 4 Carbon), викликаючи його через `~/.local/bin/gerych-root -q "<TASK>" --oneshot`.
 
 ### 🎯 ЗАДАЧІ СЕСІЇ:
 1. **Ініціалізація та конфігурація Агента-Компаньйона:**
@@ -69,9 +71,9 @@
 Твоє завдання — виконати автономну інженерну місію зі створення та наповнення бази знань для агента-компаньйона розробника тем Shopify (Shopify Theme Architect Companion).
 
  Працюй безпосередньо у файловій системі за адресою:
-Базова директорія проекту: /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom
-Директорія дзеркал донорів: /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/
-Директорія розробки воркфлоу: /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/
+Базова директорія проекту: ../DNKEcom
+Директорія дзеркал донорів: ../DNKEcom/DNK-Ecom_git_mirrow/
+Директорія розробки воркфлоу: ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/
 
 ### 🛠️ ЕТАПИ ТВОЄЇ АВТОНОМНОЇ РОБОТИ:
 
@@ -112,8 +114,8 @@
 
 ```bash
 # 1. Запуск через файл промпту:
-/Users/kuzmenko.top/.local/bin/gerych-root -f /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/companion_task_prompt.txt --oneshot
+~/.local/bin/gerych-root -f ../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/companion_task_prompt.txt --oneshot
 
 # Або прямий виклик однією командою:
-/Users/kuzmenko.top/.local/bin/gerych-root -q "Виконай місію створення Shopify Theme Companion Agent згідно з інструкцією в _Shopify_Theme_DEV_Workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md" --oneshot
+~/.local/bin/gerych-root -q "Виконай місію створення Shopify Theme Companion Agent згідно з інструкцією в _Shopify_Theme_DEV_Workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md" --oneshot
 ```

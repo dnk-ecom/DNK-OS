@@ -1,0 +1,284 @@
+{
+  "nodes": [
+    {
+      "id": "donor_tinker",
+      "type": "text",
+      "text": "### 📦 Донор: Tinker (Horizon)\n- **Що беремо**: Theme Blocks 2.0 (вкладеність до 8 рівнів)\n- **Механіки**: `blocks/_group.liquid`, `@theme` AI Sidekick discovery, `{% doc %}` пропси\n- **Що виправляємо**: перевантаженість застарілими поліфілами, адаптуємо під наш `DnkElement`",
+      "x": -900,
+      "y": -350,
+      "width": 340,
+      "height": 200,
+      "color": "4"
+    },
+    {
+      "id": "donor_sugar",
+      "type": "text",
+      "text": "### ⚡ Донор: Sugar Theme\n- **Що беремо**: `__sugarGiftLinesSplit` (Cleanroom Attribution Fetch)\n- **Механіки**: виконання fetch через чистий iframe для обходу сторонніх додатків, розділення запиту ATC на primary + rider gifts (100% точність пікселів)\n- **Що виправляємо**: переводимо з Alpine.js на нативні Web Components",
+      "x": -900,
+      "y": -120,
+      "width": 340,
+      "height": 200,
+      "color": "3"
+    },
+    {
+      "id": "donor_story",
+      "type": "text",
+      "text": "### 🎨 Донор: Story & Maestrooo\n- **Що беремо**: Чиста модульність W3C Custom Elements\n- **Механіки**: Scoped stylesheets (стилі підвантажуються тільки для активних секцій), 0 CLS aspect-ratio контейнери\n- **Що виправляємо**: перехід від монолітних секцій OS 2.0 до Theme Blocks 2.0",
+      "x": -900,
+      "y": 110,
+      "width": 340,
+      "height": 190,
+      "color": "5"
+    },
+    {
+      "id": "donor_shrine",
+      "type": "text",
+      "text": "### 🛒 Донор: Shrine Pro\n- **Що беремо**: No-App High-CRO Архітектура\n- **Механіки**: Cart Drawer зі змінним прогрес-баром безкоштовної доставки, Sticky ATC, Volume Pricing\n- **Що виправляємо**: очищення від обфускованих трекерів, переписування під суворі правила Shopify Theme Store",
+      "x": -900,
+      "y": 330,
+      "width": 340,
+      "height": 200,
+      "color": "1"
+    },
+    {
+      "id": "donor_skeleton",
+      "type": "text",
+      "text": "### 💀 Донор: Shopify Skeleton Theme\n- **Що беремо**: Офіційний мінімалістичний кістяк Shopify Core\n- **Механіки**: `layout/theme.liquid` з новою розміткою `{% block %}`, валідний `settings_schema.json`\n- **Що виправляємо**: додаємо повноцінний преміальний дизайн та високу конверсію",
+      "x": -900,
+      "y": 560,
+      "width": 340,
+      "height": 180,
+      "color": "6"
+    },
+    {
+      "id": "core_checkpoints",
+      "type": "text",
+      "text": "# 🛡️ 7-Gate Checkpoint Engine\nДетерміновані ворота якості у ядрі `services/dnk_shopify/engine/checkpoints.py`:\n\n```bash\njust shopify-checkpoints\n```\nКожен крок розробки блокується, поки поточні ворота не покажуть **100% PASSED**.",
+      "x": -480,
+      "y": -250,
+      "width": 380,
+      "height": 190,
+      "color": "2"
+    },
+    {
+      "id": "core_runtime",
+      "type": "text",
+      "text": "## ⚙️ W3C Microkernel & Design Tokens\n- **`assets/dnk-tokens.css`**: 8pt шкала, Polaris Emerald / Electric Mint / Obsidian\n- **`assets/dnk-base.css`**: CSSOM Reset + 12-Column Subgrid\n- **`assets/dnk-core.js`**: `DnkElement`, Event Bus, `CartMutationQueue`, Cleanroom Fetch",
+      "x": -480,
+      "y": -30,
+      "width": 380,
+      "height": 180,
+      "color": "2"
+    },
+    {
+      "id": "git_branching",
+      "type": "text",
+      "text": "## 🌿 3-Tier Git Architecture\n- **`mvp`** (Active Development) — покрокова розробка (Gate 0 ➔ 6)\n- **`pre-release`** (QA & Testing) — аудит перед релізом (Lighthouse, Theme Check)\n- **`main`** (Commercial Sale) — офіційний продаж у Theme Store ($380–$420 MSRP)",
+      "x": -480,
+      "y": 180,
+      "width": 380,
+      "height": 180,
+      "color": "2"
+    },
+    {
+      "id": "gate_0",
+      "type": "text",
+      "text": "### [✅ PASSED] Gate 0: Foundation\n- `assets/dnk-tokens.css`\n- `assets/dnk-base.css` (12-col subgrid, CSSOM reset)",
+      "x": -40,
+      "y": -350,
+      "width": 340,
+      "height": 110,
+      "color": "4"
+    },
+    {
+      "id": "gate_1",
+      "type": "text",
+      "text": "### [✅ PASSED] Gate 1: Core Runtime\n- `assets/dnk-core.js`\n- `DnkElement` base, Cart Mutation Queue, Iframe Cleanroom Fetch",
+      "x": -40,
+      "y": -210,
+      "width": 340,
+      "height": 110,
+      "color": "4"
+    },
+    {
+      "id": "gate_2",
+      "type": "text",
+      "text": "### [⏳ IN PROGRESS] Gate 2: Global Chrome\n- `layout/theme.liquid` (Accessible scaffold, skip-links)\n- `sections/header.liquid` (Sticky, blocks composition)\n- `blocks/_header-logo.liquid` & `_header-menu.liquid`\n- `sections/footer.liquid`",
+      "x": -40,
+      "y": -70,
+      "width": 340,
+      "height": 150,
+      "color": "3"
+    },
+    {
+      "id": "gate_3",
+      "type": "text",
+      "text": "### [🔒] Gate 3: High-CRO Cart Drawer\n- `sections/cart-drawer.liquid`\n- Multi-tier dynamic free shipping progress bar\n- 1-click in-cart cross-sells & upsell cards\n- In-drawer discount code input",
+      "x": -40,
+      "y": 110,
+      "width": 340,
+      "height": 140,
+      "color": "1"
+    },
+    {
+      "id": "gate_4",
+      "type": "text",
+      "text": "### [🔒] Gate 4: PDP 2.0 Theme Blocks\n- `sections/main-product.liquid`\n- Category Metafields Visual Swatches (0 apps)\n- Sticky Add to Cart (Desktop & Mobile)\n- Dual Volume Pricing (Quantity Breaks)",
+      "x": -40,
+      "y": 280,
+      "width": 340,
+      "height": 140,
+      "color": "1"
+    },
+    {
+      "id": "gate_5",
+      "type": "text",
+      "text": "### [🔒] Gate 5: Discovery & Facets\n- `sections/main-collection.liquid`\n- Section Rendering API filtering (< 80ms, 0 reload)\n- Product card з вторинним медіа при ховері",
+      "x": -40,
+      "y": 450,
+      "width": 340,
+      "height": 130,
+      "color": "1"
+    },
+    {
+      "id": "gate_6",
+      "type": "text",
+      "text": "### [🔒] Gate 6: Theme Store Certification\n- 100% шаблонів акаунтів покупця (`templates/customers/*.json`)\n- 100% локалізація `locales/en.default.json`\n- `shopify theme check` = 0 помилок, 0 warnings",
+      "x": -40,
+      "y": 610,
+      "width": 340,
+      "height": 140,
+      "color": "1"
+    },
+    {
+      "id": "store_requirements",
+      "type": "text",
+      "text": "# 🏆 Shopify Theme Store 100% Green Gate\n- **Швидкість**: Mobile Lighthouse >= 90+, Desktop 98+\n- **Доступність**: WCAG 2.2 AA (фокусні пастки, контраст >= 4.5:1)\n- **No-App Економіка**: Економія мерчанту $3,000–$6,000/рік\n- **Zero Console Errors**: 0 неперехоплених промісів чи попереджень\n- **Sidekick Friendly**: 100% сумісність із Shopify Canvas",
+      "x": 380,
+      "y": -80,
+      "width": 380,
+      "height": 220,
+      "color": "4"
+    },
+    {
+      "id": "commercial_release",
+      "type": "text",
+      "text": "# 🚀 Commercial Launch\n- **Shopify Theme Store**: $380–$420 MSRP\n- **Перший клієнтський магазин**: розгортання бойового магазину за лічені години на готовій платформі\n- **Гілка**: `main`",
+      "x": 380,
+      "y": 200,
+      "width": 380,
+      "height": 170,
+      "color": "4"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_tinker_checkpoints",
+      "fromNode": "donor_tinker",
+      "fromSide": "right",
+      "toNode": "core_checkpoints",
+      "toSide": "left",
+      "label": "Theme Blocks 2.0"
+    },
+    {
+      "id": "edge_sugar_runtime",
+      "fromNode": "donor_sugar",
+      "fromSide": "right",
+      "toNode": "core_runtime",
+      "toSide": "left",
+      "label": "Attribution Iframe Fetch"
+    },
+    {
+      "id": "edge_story_runtime",
+      "fromNode": "donor_story",
+      "fromSide": "right",
+      "toNode": "core_runtime",
+      "toSide": "left",
+      "label": "Custom Elements & Tokens"
+    },
+    {
+      "id": "edge_shrine_cart",
+      "fromNode": "donor_shrine",
+      "fromSide": "right",
+      "toNode": "gate_3",
+      "toSide": "left",
+      "label": "No-App CRO & Drawer"
+    },
+    {
+      "id": "edge_skeleton_chrome",
+      "fromNode": "donor_skeleton",
+      "fromSide": "right",
+      "toNode": "gate_2",
+      "toSide": "left",
+      "label": "theme.liquid Base"
+    },
+    {
+      "id": "edge_checkpoints_gate0",
+      "fromNode": "core_checkpoints",
+      "fromSide": "right",
+      "toNode": "gate_0",
+      "toSide": "left",
+      "label": "Step 0"
+    },
+    {
+      "id": "edge_gate0_gate1",
+      "fromNode": "gate_0",
+      "fromSide": "bottom",
+      "toNode": "gate_1",
+      "toSide": "top",
+      "label": "Passed"
+    },
+    {
+      "id": "edge_gate1_gate2",
+      "fromNode": "gate_1",
+      "fromSide": "bottom",
+      "toNode": "gate_2",
+      "toSide": "top",
+      "label": "In Progress"
+    },
+    {
+      "id": "edge_gate2_gate3",
+      "fromNode": "gate_2",
+      "fromSide": "bottom",
+      "toNode": "gate_3",
+      "toSide": "top"
+    },
+    {
+      "id": "edge_gate3_gate4",
+      "fromNode": "gate_3",
+      "fromSide": "bottom",
+      "toNode": "gate_4",
+      "toSide": "top"
+    },
+    {
+      "id": "edge_gate4_gate5",
+      "fromNode": "gate_4",
+      "fromSide": "bottom",
+      "toNode": "gate_5",
+      "toSide": "top"
+    },
+    {
+      "id": "edge_gate5_gate6",
+      "fromNode": "gate_5",
+      "fromSide": "bottom",
+      "toNode": "gate_6",
+      "toSide": "top"
+    },
+    {
+      "id": "edge_gate6_store",
+      "fromNode": "gate_6",
+      "fromSide": "right",
+      "toNode": "store_requirements",
+      "toSide": "left",
+      "label": "Verify All Gates"
+    },
+    {
+      "id": "edge_store_commercial",
+      "fromNode": "store_requirements",
+      "fromSide": "bottom",
+      "toNode": "commercial_release",
+      "toSide": "top",
+      "label": "Promote to main"
+    }
+  ]
+}

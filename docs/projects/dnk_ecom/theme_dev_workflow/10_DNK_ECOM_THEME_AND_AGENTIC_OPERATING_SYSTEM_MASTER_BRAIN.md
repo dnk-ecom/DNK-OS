@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/10_DNK_ECOM_THEME_AND_AGENTIC_OPERATING_SYSTEM_MASTER_BRAIN.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/10_DNK_ECOM_THEME_AND_AGENTIC_OPERATING_SYSTEM_MASTER_BRAIN.md"
 # purpose: "Unified Master Brain: Molecular Theme Architecture, Autonomous Agentic Store Operations (Bypassing Shopify), and Engineering Knowledge Core for DNK Ecom."
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🧠 DNK ECOM MASTER BRAIN: МОЛЕКУЛЯРНА АРХІТЕКТУРА ТЕМИ ТА АВТОНОМНА АГЕНТИВНА ЕКОСИСТЕМА (ОБХОДЯЧИ SHOPIFY)
 

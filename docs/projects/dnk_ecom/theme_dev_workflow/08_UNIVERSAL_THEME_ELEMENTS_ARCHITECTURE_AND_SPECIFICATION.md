@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md"
 # purpose: "Exhaustive Technical Specification & Architectural Blueprint of ALL Elements for Building a World-Class Shopify Theme (Theme Store Commercial Grade $350-$420 MSRP)"
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🏛️ ПОВНИЙ ТЕХНІЧНИЙ ОПИС УСІХ ЕЛЕМЕНТІВ ТЕМИ ТА СИСТЕМА ДИСТИЛЯЦІЇ
 ## DNK Sovereign Commercial Theme (Shopify Theme Store Submission Standard)
@@ -360,13 +362,13 @@ python3 tools/dnk_theme_distillation_factory.py \
 
 ```bash
 # 1. Запуск перевірки валідності всіх схем нової теми:
-/Users/kuzmenko.top/.local/bin/gerych-root -q "Виконай валідацію схем у themes/dnk-sovereign: перевір відповідність RFC 8259 та підтримку @app блоків у всіх секціях згідно з 08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md" --oneshot --model=gemini-4-argon --provider=vertex
+~/.local/bin/gerych-root -q "Виконай валідацію схем у themes/dnk-sovereign: перевір відповідність RFC 8259 та підтримку @app блоків у всіх секціях згідно з 08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md" --oneshot --model=gemini-4-argon --provider=vertex
 
 # 2. Аудит доступності (WCAG 2.1 AA) компонентів кошика та селекторів:
-/Users/kuzmenko.top/.local/bin/gerych-root -q "Перевір доступність (aria-labels, keyboard focus, role attributes) у assets/dnk-core.js та blocks/cart_*.liquid у themes/dnk-sovereign" --oneshot --model=gemini-4-argon --provider=vertex
+~/.local/bin/gerych-root -q "Перевір доступність (aria-labels, keyboard focus, role attributes) у assets/dnk-core.js та blocks/cart_*.liquid у themes/dnk-sovereign" --oneshot --model=gemini-4-argon --provider=vertex
 
 # 3. Синхронізація словників локалізації en.default.json та uk.json:
-/Users/kuzmenko.top/.local/bin/gerych-root -q "Знайди всі t: ключі у sections/ та blocks/ themes/dnk-sovereign і переконайся, що в locales/uk.json немає жодного пропущеного перекладу" --oneshot --model=gemini-4-argon --provider=vertex
+~/.local/bin/gerych-root -q "Знайди всі t: ключі у sections/ та blocks/ themes/dnk-sovereign і переконайся, що в locales/uk.json немає жодного пропущеного перекладу" --oneshot --model=gemini-4-argon --provider=vertex
 ```
 
 Цей стандарт є єдиною непорушною інженерною конституцією для випуску комерційної теми DNK Sovereign Theme світового рівня.

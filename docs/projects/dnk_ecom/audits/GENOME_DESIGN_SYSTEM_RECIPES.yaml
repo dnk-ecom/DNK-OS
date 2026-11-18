@@ -1,0 +1,171 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/projects/dnk_ecom/audits/GENOME_DESIGN_SYSTEM_RECIPES.yaml"
+# purpose: "Machine-Readable Genome Catalog of Reusable Design System Recipes for Shopify & Social Media Motion."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym, Antigravity & Denchik"
+# --- END DNK-MRH-HEADER ---
+
+schema_version: "2.5.0"
+catalog_name: "DNK OS Cross-Channel Design System Genome"
+last_audited: "2026-11-17"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 1. SHOPIFY E-COMMERCE CONVERSION MOLECULES (THEME BLOCKS 2.0)
+# ══════════════════════════════════════════════════════════════════════════════
+shopify_molecules:
+  sticky_atc:
+    id: "MOL-SHOPIFY-001"
+    name: "Mobile Sticky Buy Bar"
+    source_file: "services/dnk_shopify/DNK_Sovereign_Apex/blocks/product_sticky-atc.liquid"
+    type: "theme_block_2_0"
+    cro_lift_estimate: "+14% to +18% mobile CVR"
+    tokens_required:
+      - "--color-accent"
+      - "--color-accent-rgb"
+      - "--text-on-accent"
+      - "--bg-surface"
+      - "--border-subtle"
+      - "--font-size-base"
+    behavior: "Reveals smoothly when main buy button scrolls past viewport top (IntersectionObserver)"
+
+  tiered_cart_rewards:
+    id: "MOL-SHOPIFY-002"
+    name: "Tiered Free Shipping & Gift Progress Bar"
+    source_file: "services/dnk_shopify/DNK_Sovereign_Apex/snippets/cart-rewards.liquid"
+    type: "cart_drawer_snippet"
+    cro_lift_estimate: "+22% to +26% AOV increase"
+    tiers:
+      tier_1: "Free Standard Shipping (e.g. $75)"
+      tier_2: "Free Deluxe Mystery Gift (e.g. $120)"
+      tier_3: "15% Instant Cart Discount (e.g. $160)"
+    tokens_required:
+      - "--color-accent"
+      - "--color-success"
+      - "--bg-surface-secondary"
+
+  quantity_breaks:
+    id: "MOL-SHOPIFY-003"
+    name: "Visual Volume Breaks Selector"
+    source_file: "services/dnk_shopify/DNK_Sovereign_Apex/blocks/product_quantity-breaks-v2.liquid"
+    type: "theme_block_2_0"
+    cro_lift_estimate: "+18% to +32% multi-unit purchases"
+    tiers:
+      - { qty: 1, discount_percent: 0, badge: "Starter" }
+      - { qty: 2, discount_percent: 15, badge: "Most Popular", highlight: true }
+      - { qty: 3, discount_percent: 25, badge: "Best Value" }
+    tokens_required:
+      - "--color-accent"
+      - "--color-accent-subtle"
+      - "--border-base"
+
+  before_after_slider:
+    id: "MOL-SHOPIFY-004"
+    name: "Touch Interactive Before/After Visualizer"
+    source_file: "services/dnk_shopify/DNK_Sovereign_Apex/blocks/before-after-slider.liquid"
+    type: "theme_block_2_0"
+    cro_lift_estimate: "+24% engagement time on PDP"
+    tokens_required:
+      - "--color-accent"
+      - "--radius-md"
+      - "--shadow-card"
+
+  comparison_table:
+    id: "MOL-SHOPIFY-005"
+    name: "Us vs Cheap Alternatives Matrix"
+    source_file: "services/dnk_shopify/DNK_Sovereign_Apex/blocks/comparison-table.liquid"
+    type: "theme_block_2_0"
+    cro_lift_estimate: "+12% trust factor lift"
+    tokens_required:
+      - "--color-success"
+      - "--color-critical"
+      - "--bg-surface"
+      - "--border-subtle"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 2. SOCIAL MEDIA & MOTION DESIGN MOLECULES (HYPERFRAMES / REMOTION / 9:16)
+# ══════════════════════════════════════════════════════════════════════════════
+social_motion_molecules:
+  safe_zones_9_16:
+    viewport: { width: 1080, height: 1920, aspect_ratio: "9:16" }
+    top_danger_zone_px: 120 # Overlaid by search & story header
+    bottom_danger_zone_px: 340 # Overlaid by captions, audio tag, like buttons
+    horizontal_padding_px: 48
+    safe_content_box:
+      x_min: 48
+      x_max: 1032
+      y_min: 120
+      y_max: 1580
+      optimal_hook_center_y: 720 # Rule-of-thirds upper focal point
+
+  motion_spring_presets:
+    spring_gentle:
+      tension: 120
+      friction: 14
+      cubic_bezier: "cubic-bezier(0.25, 1, 0.5, 1)"
+      usage: "Card fade-ins, modal presentation, ambient backgrounds"
+    spring_snappy:
+      tension: 280
+      friction: 20
+      cubic_bezier: "cubic-bezier(0.16, 1, 0.3, 1)"
+      usage: "Focal CTAs, sticky buy bars, badge appearance"
+    spring_bouncy:
+      tension: 380
+      friction: 16
+      cubic_bezier: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+      usage: "Cart count increment (+1), trust badge pops, confetti"
+    spring_focal:
+      tension: 200
+      friction: 22
+      cubic_bezier: "cubic-bezier(0.4, 0, 0.2, 1)"
+      usage: "Product detail zoom, carousel page transition"
+
+  kinetic_subtitles_preset:
+    source_file: "services/dnk_media/src/kinetic_subtitles.py"
+    font_family: "Inter, -apple-system, sans-serif"
+    font_weight: 800
+    font_size_px: 54
+    line_height: 1.2
+    normal_color: "#FFFFFF"
+    accent_highlight_color: "var(--color-accent, #008060)"
+    pop_scale_on_strong: 1.15
+    stroke_width_px: 4
+    stroke_color: "rgba(0, 0, 0, 0.75)"
+
+  five_scene_promo_storyboard:
+    scene_1_hook:
+      duration_sec: 3.0
+      focus: "Pattern interrupt headline + bold visual stop"
+      motion: "spring_snappy"
+    scene_2_problem:
+      duration_sec: 4.0
+      focus: "Pain agitation (split comparison or customer frustration)"
+      motion: "spring_gentle"
+    scene_3_solution:
+      duration_sec: 5.0
+      focus: "Product bento-grid feature reveal (3D rotation or macro zoom)"
+      motion: "spring_focal"
+    scene_4_proof:
+      duration_sec: 5.0
+      focus: "Star rating + customer quote popup + unboxing clip"
+      motion: "spring_bouncy"
+    scene_5_cta:
+      duration_sec: 3.0
+      focus: "Focal CTA button matching Shopify storefront theme"
+      motion: "spring_snappy"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 3. CROSS-CHANNEL TOKEN MAPPING RULES
+# ══════════════════════════════════════════════════════════════════════════════
+cross_channel_mapping:
+  primary_accent:
+    dtcg_path: "semantic.color.action-primary.$value"
+    shopify_css: "--color-accent: {val}; --color-accent-rgb: {rgb};"
+    tailwind_v4: "--color-accent: {val};"
+    astryx_layer: "--astryx-agent-shopify: var(--color-accent);"
+    reels_subtitles: "accent_highlight_color = '{val}'"
+    meta_ads_banner: "border_highlight = '{val}', cta_background = '{val}'"

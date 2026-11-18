@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/04_BENCHMARK_AND_COMPARISON_MATRIX.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/04_BENCHMARK_AND_COMPARISON_MATRIX.md"
 # purpose: "Quantitative Multi-Theme Comparative Benchmark Matrix for Canonical DNK-e.com Branches"
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-10"
 # author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 📊 Зведена порівняльна матриця канонічних гілок `DNK-e.com`
 

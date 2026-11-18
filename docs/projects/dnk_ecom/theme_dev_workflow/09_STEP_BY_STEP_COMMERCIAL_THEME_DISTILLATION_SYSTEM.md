@@ -1,5 +1,6 @@
+<!--
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/09_STEP_BY_STEP_COMMERCIAL_THEME_DISTILLATION_SYSTEM.md"
+# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_STEP_BY_STEP_COMMERCIAL_THEME_DISTILLATION_SYSTEM.md"
 # purpose: "Complete Technical Blueprint & Step-by-Step Production Pipeline for Building a World-Class Commercial Shopify Theme ($350-$420 MSRP)."
 # canonical_source: true
 # alters_files: []
@@ -9,6 +10,7 @@
 # updated_at: "2026-11-12"
 # author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
 # --- END DNK-MRH-HEADER ---
+-->
 
 # 🏆 СИСТЕМА ДИСТИЛЯЦІЇ ЗНАНЬ ТА ПОКРОКОВОГО СТВОРЕННЯ ВЛАСНОЇ ТЕМИ
 ## DNK Sovereign Theme — Apex Commercial D2C Standard ($350–$420 MSRP)
@@ -21,7 +23,7 @@
 ## 🛡️ 1. ЗАЛІЗОБЕТОННИЙ ЗАХИСТ ВІД РЕГРЕСІЙ ТА ПОМИЛОК АГЕНТІВ
 
 Щоб виключити людські та агентські помилки (як-от передчасне видалення `quantity-breaks.liquid`), створено та впроваджено обов'язковий автоматичний валідатор:
-**[`tools/verify_theme_integrity.py`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/tools/verify_theme_integrity.py)**.
+**[`tools/verify_theme_integrity.py`](../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/tools/verify_theme_integrity.py)**.
 
 ### 7 Обов'язкових Інженерних Шлюзів (All Gates Must PASS):
 
@@ -181,7 +183,7 @@ sequenceDiagram
 ```
 
 ### Етап 1: Витяг та індексація молекул (Molecular Extraction)
-Кожен донор у нашому дзеркалі [`DNK-Ecom_git_mirrow`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow) надає найкращі в індустрії компоненти:
+Кожен донор у нашому дзеркалі [`DNK-Ecom_git_mirrow`](../DNKEcom/DNK-Ecom_git_mirrow) надає найкращі в індустрії компоненти:
 - **Sugar Theme**: 12-колонний універсальний канвас (`custom-columns`), медіа-рушій (`media-sizes-scope`).
 - **Shrine Pro (Cleanroom)**: Cart Drawer CRO Engine, Дворівневий Quantity Breaks, Sticky ATC.
 - **Elixir Theme**: Порівняльні таблиці V2, динамічні бандли.
