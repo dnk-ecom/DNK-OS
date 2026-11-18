@@ -82,6 +82,7 @@ export default {
                 block: body.block_id || '',
                 selector: body.selector || '',
                 bounding_box: body.bounding_box || null,
+                relative_anchor: body.bounding_box && body.bounding_box.relative_anchor ? body.bounding_box.relative_anchor : null,
               },
               client_instruction: comment,
               category: category,

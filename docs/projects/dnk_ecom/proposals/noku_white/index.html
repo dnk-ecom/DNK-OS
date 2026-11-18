@@ -2,112 +2,350 @@
 <!--
 # --- DNK-MRH-HEADER ---
 # mrh_id: "docs/projects/dnk_ecom/proposals/noku_white/index.html"
-# purpose: "Authentic, human-to-human, bespoke Shopify Online Store 2.0 (Theme Blocks) proposal for Andrii Nikolaiev & NOKU (https://noku.store/)."
+# purpose: "Sovereign SOTA Commercial Proposal & Modernization Plan for NOKU (https://noku.store/) with Dual Optics & Interactive PDP Simulator."
 # canonical_source: true
 # alters_files: []
 # triggers_tasks: []
 # status: "Active"
-# version: "4.0.0"
-# updated_at: "2026-11-17"
-# author: "Maksym Kuzmenko"
+# version: "5.0.0"
+# updated_at: "2026-11-18"
+# author: "Maksym Kuzmenko & Antigravity"
 # --- END DNK-MRH-HEADER ---
 -->
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NOKU Store | План оновлення та перезапуску магазину</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* POLARIS SNOW WHITE (DEFAULT OPTICS) */
+    html[data-theme="light"] {
       --bg: #FFFFFF;
-      --bg-subtle: #F8F9FA;
+      --bg-subtle: #F8FAFC;
       --bg-card: #FFFFFF;
-      --border: #E5E7EB;
-      --border-dark: #D1D5DB;
-      --text: #111827;
-      --text-secondary: #4B5563;
-      --text-muted: #9CA3AF;
+      --bg-elevated: #F1F5F9;
+      --border: #E2E8F0;
+      --border-dark: #CBD5E1;
+      --border-focus: #008060;
+      --text: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
       --accent: #0F172A;
+      --accent-hover: #1E293B;
       --green: #008060;
       --green-light: #F0FDF4;
-      --radius: 8px;
-      --radius-lg: 12px;
+      --green-border: #BBF7D0;
+      --cyan: #0284C7;
+      --cyan-light: #F0F9FF;
+      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+      --card-shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
+      --topbar-bg: rgba(255, 255, 255, 0.92);
+      --code-bg: #F1F5F9;
+      --hero-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+      --wireframe-bg: #F8FAFC;
+    }
+
+    /* DNK OBSIDIAN DARK (DUAL OPTICS TOGGLE) */
+    html[data-theme="dark"] {
+      --bg: #091114;
+      --bg-subtle: #0F1D22;
+      --bg-card: #0F1D22;
+      --bg-elevated: #152830;
+      --border: #1E3842;
+      --border-dark: #2A4E5C;
+      --border-focus: #14B8A6;
+      --text: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --accent: #F8FAFC;
+      --accent-hover: #E2E8F0;
+      --green: #10B981;
+      --green-light: rgba(16, 185, 129, 0.1);
+      --green-border: rgba(16, 185, 129, 0.25);
+      --cyan: #38BDF8;
+      --cyan-light: rgba(56, 189, 248, 0.1);
+      --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(20, 184, 166, 0.15);
+      --card-shadow-hover: 0 16px 40px -5px rgba(0, 0, 0, 0.7), 0 0 16px rgba(16, 185, 129, 0.2);
+      --topbar-bg: rgba(15, 29, 34, 0.9);
+      --code-bg: #152830;
+      --hero-gradient: linear-gradient(180deg, #091114 0%, #0F1D22 100%);
+      --wireframe-bg: #152830;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.65;
-      font-size: 15px;
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      font-size: 15.5px;
       padding-bottom: 96px;
       -webkit-font-smoothing: antialiased;
+      transition: padding-top 0.22s ease, background-color 0.25s ease, color 0.25s ease;
     }
 
     .container {
-      max-width: 840px;
+      max-width: 880px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    /* HEADER */
-    .header {
-      padding: 40px 0 24px 0;
+    /* TOPBAR */
+    .topbar {
+      position: sticky;
+      top: var(--dnk-banner-offset, 0px);
+      background: var(--topbar-bg);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      margin-bottom: 36px;
+      padding: 14px 0;
+      z-index: 100;
+      transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
     }
-    .header-top {
+      z-index: 100;
+      transition: var(--transition);
+    }
+    .topbar-inner {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 16px;
+      align-items: center;
+    }
+    .brand-mark-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-avatar {
+      width: 26px;
+      height: 26px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: -0.05em;
     }
     .brand-mark {
       font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.02em;
-    }
-    .meta-date {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .header-recipient {
       font-size: 14px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-cockpit-link {
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
       color: var(--text-secondary);
       background: var(--bg-subtle);
       border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: var(--radius);
-      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .btn-cockpit-link:hover {
+      color: var(--text);
+      border-color: var(--border-focus);
+      background: var(--bg-elevated);
+    }
+    .theme-toggle-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .theme-toggle-btn:hover {
+      color: var(--text);
+      border-color: var(--border-dark);
     }
 
-    /* TYPOGRAPHY */
-    h1 {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.25;
-      margin-bottom: 16px;
-      color: var(--accent);
+    /* HERO */
+    .hero {
+      padding: 44px 0 28px 0;
     }
-    h2 {
-      font-size: 20px;
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .badge-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
       font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .badge-pill.status-live {
+      background: var(--green-light);
+      border-color: var(--green-border);
+      color: var(--green);
+    }
+
+    h1 {
+      font-size: clamp(30px, 4vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .hero-lead {
+      font-size: 17px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 24px;
+      max-width: 820px;
+    }
+
+    /* RECIPIENT CARD */
+    .recipient-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      margin-bottom: 28px;
+      font-size: 13.5px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .recipient-info strong { color: var(--text); }
+    .project-domain {
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    /* ZERO DOWNTIME GUARANTEE */
+    .guarantee-box {
+      background: var(--green-light);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin: 24px 0 32px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .guarantee-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--green);
+      color: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .guarantee-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .guarantee-text p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+      line-height: 1.55;
+    }
+
+    /* EXECUTIVE MEMO */
+    .intro-letter {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border-focus);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 24px 0 36px 0;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    .memo-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 8px;
+    }
+    .memo-text {
+      color: var(--text);
+      font-size: 14.5px;
+      margin-bottom: 14px;
+    }
+    .memo-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .memo-badges strong { color: var(--text); }
+
+    /* HEADINGS */
+    h2 {
+      font-size: 22px;
+      font-weight: 800;
       letter-spacing: -0.02em;
-      margin: 44px 0 18px 0;
-      padding-bottom: 8px;
+      margin: 48px 0 20px 0;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border);
-      color: var(--accent);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
+      font-size: 16.5px;
+      font-weight: 700;
+      margin-bottom: 8px;
       color: var(--text);
     }
     p {
@@ -115,307 +353,641 @@
       color: var(--text-secondary);
     }
 
-    .intro-letter {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin: 28px 0 32px 0;
-      font-size: 15px;
-      line-height: 1.7;
-    }
-
-    /* ZERO DOWNTIME BADGE */
-    .guarantee-box {
-      background: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      margin: 24px 0;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-    .guarantee-icon {
-      color: var(--green);
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1;
-    }
-    .guarantee-text h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #166534;
-      margin-bottom: 4px;
-    }
-    .guarantee-text p {
-      font-size: 13.5px;
-      color: #14532D;
-      margin-bottom: 0;
-      line-height: 1.5;
-    }
-
-    /* THEME BLOCKS EXPLANATION */
-    .feature-box {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      background: #FFFFFF;
-      margin: 24px 0;
-    }
-    .feature-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .pill-tech {
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      padding: 3px 8px;
-      border-radius: 4px;
-      color: var(--accent);
-    }
-
-    /* VISUAL MOODBOARD / DESIGN SPEC */
+    /* MOODBOARD BENCHMARKS */
     .moodboard-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 20px 0;
+      gap: 18px;
+      margin: 22px 0;
     }
-    @media (max-width: 640px) {
+    @media (max-width: 680px) {
       .moodboard-grid { grid-template-columns: 1fr; }
     }
     .mood-card {
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      background: var(--bg-subtle);
-      text-align: left;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      background: var(--bg-card);
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
     }
-    .mood-tag {
+    .mood-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--border-dark);
+    }
+    .mood-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .mood-country {
       font-size: 11px;
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
+      font-weight: 600;
       color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
     .mood-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 4px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
     }
     .mood-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* MATERIAL SWATCHES */
+    .swatch-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 20px 0 32px 0;
+    }
+    @media (max-width: 600px) {
+      .swatch-row { grid-template-columns: 1fr; }
+    }
+    .swatch {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      box-shadow: var(--card-shadow);
+    }
+    .swatch-preview {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    .swatch-steel {
+      background: linear-gradient(135deg, #CFD8DC 0%, #ECEFF1 40%, #B0BEC5 70%, #CFD8DC 100%);
+    }
+    .swatch-black {
+      background: #18181B;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .swatch-white {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+    }
+
+    /* THEME BLOCKS EXPLANATION */
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      background: var(--bg-card);
+      box-shadow: var(--card-shadow);
+      margin: 24px 0 32px 0;
+    }
+    .feature-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .feature-tag {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background: var(--cyan-light);
+      border: 1px solid rgba(2, 132, 199, 0.25);
+      color: var(--cyan);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .spec-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .spec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .spec-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .spec-item div {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .spec-item strong { color: var(--text); }
+
+    /* INTERACTIVE BUNDLE SIMULATOR (PDP CRO) */
+    .simulator-wrapper {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      background: var(--wireframe-bg);
+      margin: 26px 0 36px 0;
+      box-shadow: var(--card-shadow);
+    }
+    .simulator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .simulator-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .badge-live-demo {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--green-light);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 28px;
+    }
+    @media (max-width: 680px) {
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+    
+    .sim-photo-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .sim-mockup-frame {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #334155;
+      font-weight: 700;
+      font-size: 13.5px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    html[data-theme="dark"] .sim-mockup-frame {
+      background: linear-gradient(135deg, #1E3842 0%, #0F1D22 100%);
+      color: #F8FAFC;
+    }
+
+    .sim-config-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sim-prod-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .sim-base-price {
+      font-size: 24px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+    .sim-spec-pill {
       font-size: 12.5px;
       color: var(--text-secondary);
       line-height: 1.5;
     }
 
-    /* MATERIAL SWATCHES */
-    .swatch-row {
-      display: flex;
-      gap: 16px;
-      margin: 16px 0;
-    }
-    @media (max-width: 500px) {
-      .swatch-row { flex-direction: column; }
-    }
-    .swatch {
-      flex: 1;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #FFFFFF;
-    }
-    .swatch-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.1);
-      flex-shrink: 0;
-    }
-
-    /* PDP MOCKUP WIREFRAME */
-    .wireframe-box {
+    .sim-bundle-box {
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 24px;
-      background: #FAFAFA;
-      margin: 24px 0;
+      padding: 16px;
+      margin-top: 4px;
     }
-    .wire-row {
+    .bundle-headline {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .bundle-option {
       display: flex;
-      gap: 24px;
-    }
-    @media (max-width: 640px) {
-      .wire-row { flex-direction: column; }
-    }
-    .wire-left {
-      flex: 1;
-      background: #FFFFFF;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-subtle);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+    .bundle-option:last-child { margin-bottom: 0; }
+    .bundle-option:hover {
+      border-color: var(--border-focus);
+    }
+    .bundle-option.checked {
+      background: var(--green-light);
+      border-color: var(--green-border);
+    }
+    .bundle-option-left {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .bundle-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border-dark);
+      border-radius: 4px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 800;
+      color: transparent;
+      background: var(--bg-card);
+      transition: all 0.15s;
+    }
+    .bundle-option.checked .bundle-checkbox {
+      background: var(--green);
+      border-color: var(--green);
+      color: #FFFFFF;
+    }
+    .bundle-price-tag {
+      font-family: var(--font-mono);
       font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
     }
-    .wire-right {
-      flex: 1.2;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .wire-pill {
-      font-size: 12.5px;
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: var(--radius);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .wire-pill strong { color: var(--text); }
 
-    /* SPEC LIST */
-    .spec-list {
-      list-style: none;
-      margin: 16px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .spec-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .spec-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
+    .sim-btn-add {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
       margin-top: 8px;
-      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .sim-btn-add:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+
+    /* REVIEWS FLOW DIAGRAM */
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    @media (max-width: 600px) {
+      .flow-diagram { grid-template-columns: 1fr; }
+    }
+    .flow-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .flow-step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+    .flow-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .flow-sub {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
     }
 
     /* SCOPE TABLE */
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin: 24px 0 32px 0;
+      box-shadow: var(--card-shadow);
+      background: var(--bg-card);
+    }
     .scope-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 20px 0;
       font-size: 14px;
+      text-align: left;
     }
     .scope-table th {
-      text-align: left;
-      padding: 10px 12px;
-      border-bottom: 2px solid var(--text);
-      font-weight: 600;
-      color: var(--accent);
+      background: var(--bg-subtle);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     .scope-table td {
-      padding: 12px;
+      padding: 16px 18px;
       border-bottom: 1px solid var(--border);
       color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.55;
     }
+    .scope-table tr:last-child td { border-bottom: none; }
     .scope-table tr:hover td {
       background: var(--bg-subtle);
     }
+    .scope-table strong { color: var(--text); }
 
-    /* PRICING & TERMS */
-    .price-box {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      margin: 36px 0;
-      text-align: center;
-    }
-    .price-amount {
-      font-size: 44px;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--accent);
-      margin: 8px 0;
-    }
-    .price-terms {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin: 20px 0;
-      padding: 16px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
+    /* TIMELINE CARDS */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 20px 0 32px 0;
     }
     @media (max-width: 600px) {
-      .price-terms { flex-direction: column; gap: 8px; }
+      .timeline-grid { grid-template-columns: 1fr; }
     }
-
-    .cta-button {
-      display: inline-block;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-weight: 600;
-      padding: 14px 32px;
+    .timeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      text-decoration: none;
-      font-size: 15px;
-      margin-top: 12px;
-      transition: background 0.15s ease;
+      padding: 16px 20px;
+      box-shadow: var(--card-shadow);
     }
-    .cta-button:hover {
-      background: #1E293B;
+    .timeline-days {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .timeline-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .timeline-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
     }
 
-    .footnote {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 36px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
+    /* PRICING HERO CARD */
+    .price-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-focus);
+      border-radius: var(--radius-xl);
+      padding: 40px 32px;
+      margin: 40px 0;
+      text-align: center;
+      box-shadow: 0 20px 50px -10px rgba(0, 128, 96, 0.15);
+      position: relative;
     }
+    .price-badge-top {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .price-headline {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .price-amount {
+      font-size: clamp(48px, 6vw, 64px);
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .price-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+
+    .price-milestones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 540px;
+      margin: 0 auto 28px;
+      padding: 18px 24px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+    @media (max-width: 500px) {
+      .price-milestones { grid-template-columns: 1fr; }
+    }
+    .milestone-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .milestone-val {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .cta-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--green), #006e52);
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 36px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(0, 128, 96, 0.4);
+      transition: var(--transition);
+    }
+    .cta-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 128, 96, 0.55);
+    }
+
+    .cockpit-nav-row {
+      margin-top: 18px;
+    }
+    .link-cockpit-secondary {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .link-cockpit-secondary:hover {
+      color: var(--text);
+      border-color: var(--border-dark);
+      background: var(--bg-elevated);
+    }
+
+    /* FOOTNOTE */
+    .footnote-box {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 48px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .footnote-box strong { color: var(--text-secondary); }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- HEADER -->
-    <header class="header">
-      <div class="header-top">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand-mark-group">
+        <div class="brand-avatar">N</div>
         <div class="brand-mark">NOKU × MAKSYM KUZMENKO</div>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <a href="./cockpit.html" style="font-size:12px; font-weight:600; text-decoration:none; color:var(--accent); background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;">
-            <span>⚡ Client Cockpit</span> <span>↗</span>
-          </a>
-          <div class="meta-date">17.11.2026 · ПРОПОЗИЦІЯ</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="theme-toggle-btn" id="btn-theme-toggle" title="Змінити тему оформлення">
+          <span id="theme-icon">🌙</span> <span id="theme-text">DNK Dark</span>
+        </button>
+        <a href="./cockpit.html" class="btn-cockpit-link">
+          <span>⚡ Client Cockpit</span> <span>↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- HERO HEADER -->
+    <section class="hero">
+      <div class="meta-row">
+        <span class="badge-pill status-live">● ПРОПОЗИЦІЯ V5.0</span>
+        <span class="badge-pill">SHOPIFY ONLINE STORE 2.0</span>
+        <span class="badge-pill">SLA: 14 РОБОЧИХ ДНІВ</span>
+      </div>
+
+      <h1>План оновлення та перезапуску магазину noku.store</h1>
+      <p class="hero-lead">
+        Перехід на нативну модульну архітектуру Shopify Online Store 2.0 (Theme Blocks), створення продаючої картки комплекту з вибором літер та цінників, ліквідація візуального шуму безкоштовної теми Minimog та валідація 1,000+ відгуків з Etsy для Google Shopping.
+      </p>
+
+      <div class="recipient-bar">
+        <div class="recipient-info">
+          Адресат: <strong>Андрій Ніколаєв та партнерка</strong>
+        </div>
+        <div class="project-domain">
+          Діючий магазин: <a href="https://noku.store" target="_blank" style="color:inherit; text-decoration:underline;">noku.store</a>
         </div>
       </div>
-      <div class="header-recipient">
-        Для: <strong>Андрія Ніколаєва та партнерки (бренд NOKU)</strong>
-      </div>
-    </header>
-
-    <!-- TITLE -->
-    <h1>План оновлення магазину noku.store</h1>
-    <p style="font-size:16px;">
-      Перехід на модульну архітектуру Shopify Online Store 2.0 (Theme Blocks), налаштування продаючої картки комплекту (дошка + літери + цінники) та верифікація відгуків з Etsy для Google Shopping.
-    </p>
+    </section>
 
     <!-- ZERO DOWNTIME GUARANTEE -->
     <div class="guarantee-box">
@@ -423,75 +995,81 @@
       <div class="guarantee-text">
         <h4>100% безперервність діючого бізнесу під час розробки</h4>
         <p>
-          Ваш поточний сайт <strong>noku.store</strong> продовжує працювати і приймати замовлення в звичайному режимі. Вся розробка та наповнення ведуться на закритому тестовому сервері. Перемикання на нову тему відбудеться безшовно за 5 хвилин без жодної хвилини простою.
+          Ваш діючий сайт <strong>noku.store</strong> працює і приймає замовлення у звичайному режимі без жодної зупинки. Уся розробка, верстка та міграція каталогу ведуться на закритому тестовому сервері. Фінальне перемикання на нову тему займає до 5 хвилин без простою.
         </p>
       </div>
     </div>
 
     <!-- EXECUTIVE PROJECT MEMO (NO AI SLOP) -->
     <div class="intro-letter">
-      <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono'; margin-bottom:6px;">
-        Вихідні параметри перезапуску noku.store
+      <div class="memo-tag">Вихідні параметри проекту · Executive Memo</div>
+      <div class="memo-text">
+        <strong>Ціль розробки:</strong> Переведення магазину на автономні блоки Shopify Theme Blocks 2.0, створення продаючої картки комплекту (дошка + літери + цінники для вітрини), інтеграція відгуків з Etsy зі статусом Verified Buyer та мікророзміткою Schema.org для Google Shopping.
       </div>
-      <p style="margin-bottom:8px; color:var(--text);">
-        <strong>Ціль проекту:</strong> Переведення магазину на модульну архітектуру Shopify Online Store 2.0 (Theme Blocks), ліквідація візуального шуму безкоштовної теми Minimog, створення продаючої картки комплекту з оптовими знижками та пряма синхронізація 1,000+ верифікованих відгуків з Etsy для розблокування зірочок у Google Shopping.
-      </p>
-      <div style="font-size:13px; color:var(--text-secondary); display:flex; flex-wrap:wrap; gap:16px; margin-top:10px; border-top:1px solid var(--border); padding-top:10px; font-family:'JetBrains Mono';">
+      <div class="memo-badges">
         <span>⏱️ Термін: <strong>14 робочих днів</strong></span>
         <span>🛡️ Безпека: <strong>100% без простою діючого сайту</strong></span>
-        <span>💼 Формат: <strong>Під ключ (розробка + перенесення каталогу)</strong></span>
+        <span>💼 Формат: <strong>Під ключ (розробка + перенесення ~25 товарів)</strong></span>
       </div>
     </div>
 
-    <!-- SECTION 1: VISUAL MOODBOARD FOR WIFE -->
+    <!-- SECTION 1: VISUAL MOODBOARD -->
     <h2>1. Візуальний концепт: Естетика дорогого бренду</h2>
     <p>
-      Ми прибираємо з сайту всі випадкові жовті плашки, зелені зірочки та дешеві елементи безкоштовної теми Minimog. Сайт NOKU отримує витриману монохромну галерейну естетику на рівні трьох світових бенчмарків:
+      Ми прибираємо з сайту всі випадкові жовті плашки, зелені зірочки та дешеві елементи безкоштовної теми Minimog. Магазин NOKU отримує витриману монохромну галерейну естетику на рівні світових лідерів:
     </p>
 
     <div class="moodboard-grid">
       <div class="mood-card">
-        <div class="mood-tag">Бенчмарк #1 · NZ</div>
+        <div class="mood-card-header">
+          <span class="mood-country">🇳🇿 Нова Зеландія</span>
+        </div>
         <div class="mood-name">George &amp; Willy</div>
         <div class="mood-desc">
-          Еталонна геометрія ліній, ідеальний баланс повітря та шрифту. Меню-борд виглядає як статусна частина інтер'єру кав'ярні, а не звичайний шматок заліза.
+          Еталонна геометрія ліній, ідеальний баланс повітря та шрифту. Меню-борд виглядає як статусна частина інтер'єру кав'ярні, а не шматок заліза.
         </div>
       </div>
+
       <div class="mood-card">
-        <div class="mood-tag">Бенчмарк #2 · NZ</div>
+        <div class="mood-card-header">
+          <span class="mood-country">🇳🇿 Нова Зеландія</span>
+        </div>
         <div class="mood-name">Made of Tomorrow</div>
         <div class="mood-desc">
-          Матова фактура гнутого металу, лаконічні настільні цінники, чиста подача кольорів і матеріалів для вимогливих дизайнерів.
+          Матова фактура гнутого металу, лаконічні настільні цінники, чиста подача кольорів і матеріалів для вимогливих дизайнерів інтер'єру.
         </div>
       </div>
+
       <div class="mood-card">
-        <div class="mood-tag">Бенчмарк #3 · USA</div>
+        <div class="mood-card-header">
+          <span class="mood-country">🇺🇸 США</span>
+        </div>
         <div class="mood-name">Quince / Rhode</div>
         <div class="mood-desc">
-          Абсолютний мінімалізм: білий фон, великі нестислі фотографії текстури сталі, чіткі контрастні кнопки без візуального шуму.
+          Абсолютний студійний мінімалізм: білий галерейний фон, великі нестислі фотографії текстури сталі, чіткі кнопки без візуального сміття.
         </div>
       </div>
     </div>
 
     <div class="swatch-row">
       <div class="swatch">
-        <div class="swatch-circle" style="background: linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%);"></div>
+        <div class="swatch-preview swatch-steel"></div>
         <div>
-          <strong style="font-size:13px; color:var(--accent);">Brushed Stainless Steel 304</strong>
+          <strong style="font-size:13px; color:var(--text);">Brushed Stainless 304</strong>
           <div style="font-size:11.5px; color:var(--text-muted);">Шліфована нержавіюча сталь</div>
         </div>
       </div>
       <div class="swatch">
-        <div class="swatch-circle" style="background: #18181B;"></div>
+        <div class="swatch-preview swatch-black"></div>
         <div>
-          <strong style="font-size:13px; color:var(--accent);">Matte Industrial Black</strong>
+          <strong style="font-size:13px; color:var(--text);">Matte Industrial Black</strong>
           <div style="font-size:11.5px; color:var(--text-muted);">Порошкове матове фарбування</div>
         </div>
       </div>
       <div class="swatch">
-        <div class="swatch-circle" style="background: #FFFFFF; border: 1px solid #CBD5E1;"></div>
+        <div class="swatch-preview swatch-white"></div>
         <div>
-          <strong style="font-size:13px; color:var(--accent);">Gallery Snow White</strong>
+          <strong style="font-size:13px; color:var(--text);">Gallery Snow White</strong>
           <div style="font-size:11.5px; color:var(--text-muted);">Чистий студійний фон без сірості</div>
         </div>
       </div>
@@ -500,208 +1078,298 @@
     <!-- SECTION 2: THEME BLOCKS EXPLANATION -->
     <h2>2. Архітектура Shopify Theme Blocks (Online Store 2.0)</h2>
     <p>
-      На зідзвоні ти сказав дуже правильну річ: <em>«Хочеться, щоб деякі моменти можна було самостійно видаляти або додавати як блок»</em>.
+      На зідзвоні ти наголосив: <em>«Хочеться, щоб деякі моменти можна було самостійно видаляти або додавати як блок»</em>.
     </p>
 
-    <div class="feature-box">
-      <div class="feature-header">
+    <div class="feature-card">
+      <div class="feature-top">
         <strong>Що таке Theme Blocks і чому це важливо для NOKU:</strong>
-        <span class="pill-tech">Shopify 2.0 Native</span>
+        <span class="feature-tag">Shopify 2.0 Native</span>
       </div>
-      <p style="font-size:14px; margin-bottom:12px;">
-        У новій архітектурі Shopify Theme Blocks кожен функціональний модуль (вибір комплекту, таблиця розмірів, фотоматеріали, відгуки, блок відео) є **автономним будівельним блоком** у вашій стандартній панелі Shopify (Customize).
+      <p style="font-size:14px; margin-bottom:14px;">
+        У новій архітектурі Shopify кожен функціональний модуль (вибір комплекту, таблиця розмірів, фотоматеріали, відгуки, відеоінструкція монтажу) є **автономним будівельним блоком** у вашому стандартному редакторі теми (Shopify Customize).
       </p>
       <ul class="spec-list">
         <li class="spec-item">
-          <span class="spec-dot"></span>
+          <span class="spec-icon">✓</span>
           <div>
-            <strong>Управління без програміста:</strong> Ви або ваш менеджер можете мишкою перетягувати блоки місцями, додавати нові поля або тимчасово вимикати їх для конкретного товару в один клік.
+            <strong>Управління мишкою без програміста:</strong> Ви або ваш менеджер можете перетягувати блоки місцями, додавати нові поля або тимчасово приховувати їх для конкретного товару в один клік.
           </div>
         </li>
         <li class="spec-item">
-          <span class="spec-dot"></span>
+          <span class="spec-icon">✓</span>
           <div>
-            <strong>Нуль сторонніх підписок:</strong> Ми реалізуємо комплектацію та бандли на рідному коді Shopify блоків — вам не доведеться платити щомісячну абонплату за сторонні додатки на зразок Kaching чи WideBundles.
+            <strong>Нуль щомісячних абонплат за додатки:</strong> Комплектація, бандли та допродажі реалізуються на чистому нативному коді теми — вам не потрібно платити по $30–$50 щомісяця за сторонні віджети на зразок Kaching чи WideBundles.
           </div>
         </li>
         <li class="spec-item">
-          <span class="spec-dot"></span>
+          <span class="spec-icon">✓</span>
           <div>
-            <strong>Швидкість завантаження:</strong> Нативні блоки не тягнуть зовнішніх скриптів, тому сторінки на телефонах замовників із США чи Польщі відкриваються миттєво.
+            <strong>Максимальна швидкість на смартфонах:</strong> Нативні блоки не тягнуть зовнішніх важких скриптів, тому сторінки на телефонах замовників із США, Німеччини чи Польщі відкриваються миттєво (Core Web Vitals у зеленій зоні).
           </div>
         </li>
       </ul>
     </div>
 
-    <!-- SECTION 3: PDP & BUNDLES -->
+    <!-- SECTION 3: INTERACTIVE BUNDLE SIMULATOR -->
     <h2>3. Картка товару: Концепт «Готовий комплект для закладу»</h2>
     <p>
-      Зараз на сайті є порожні позиції: людина бачить дошку, але не може в один клік укомплектувати її магнітними літерами та цінниками для вітрини. Щоб докупити літери, їй треба йти в інший розділ, що ріже конверсію та середній чек.
+      Зараз на сайті є порожні позиції: людина бачить дошку, але не може в один клік укомплектувати її магнітними літерами та цінниками для вітрини. Щоб докупити літери, їй треба переходити в інший розділ каталогу, що ріже конверсію та середній чек.
     </p>
 
-    <div class="wireframe-box">
-      <div style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--text-muted); margin-bottom:12px; font-family:'JetBrains Mono';">
-        Структура нової картки товару (Stainless Steel Menu Board)
+    <!-- LIVE INTERACTIVE CALCULATOR -->
+    <div class="simulator-wrapper">
+      <div class="simulator-header">
+        <span class="simulator-title">Інтерактивна модель нової картки товару (Спробуйте клікнути)</span>
+        <span class="badge-live-demo">● LIVE SIMULATOR</span>
       </div>
-      <div class="wire-row">
-        <div class="wire-left">
-          <div style="width:100%; height:140px; background:linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#475569; font-weight:600; margin-bottom:10px;">
+
+      <div class="sim-grid">
+        <div class="sim-photo-col">
+          <div class="sim-mockup-frame">
             Фото дошки в інтер'єрі кав'ярні
           </div>
-          <strong style="color:var(--text);">Великі чіткі фото сталі</strong><br>
-          без водяних знаків та стиснення.
+          <strong style="font-size:13.5px; color:var(--text);">Великі чіткі фото сталі</strong>
+          <span style="font-size:12px; color:var(--text-muted); margin-top:2px;">без водяних знаків та стиснення</span>
         </div>
-        <div class="wire-right">
-          <div style="font-size:18px; font-weight:700; color:var(--accent);">Stainless Steel Menu Board</div>
-          <div style="font-size:20px; font-weight:600; font-family:'JetBrains Mono';">$285.00</div>
+
+        <div class="sim-config-col">
+          <div class="sim-prod-name">Stainless Steel Menu Board</div>
+          <div class="sim-base-price" id="calc-total-display">$395.00</div>
           
-          <div style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
-            • Розмір: 1000×600 мм<br>
-            • Обробка: Brushed Stainless Steel
+          <div class="sim-spec-pill">
+            • Базовий розмір: 1000×600 мм (Нержавіюча сталь 304)<br>
+            • У комплекті: магнітна основа + прихований настінний монтаж
           </div>
 
-          <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:var(--radius); padding:12px; margin-top:4px;">
-            <div style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--accent); margin-bottom:8px; font-family:'JetBrains Mono';">
-              Укомплектувати робочий простір:
+          <div class="sim-bundle-box">
+            <div class="bundle-headline">Укомплектувати робочий простір (Theme Block):</div>
+
+            <div class="bundle-option checked" id="opt-board" data-price="285" onclick="toggleOption(this)">
+              <div class="bundle-option-left">
+                <div class="bundle-checkbox">✓</div>
+                <span>Магнітна дошка з направляючими</span>
+              </div>
+              <span class="bundle-price-tag">$285</span>
             </div>
-            <div class="wire-pill">
-              <span>☑ <strong>Набір магнітних літер та цифр</strong> (145 шт)</span>
-              <span style="font-family:'JetBrains Mono'; font-weight:600;">+$45</span>
+
+            <div class="bundle-option checked" id="opt-letters" data-price="45" onclick="toggleOption(this)">
+              <div class="bundle-option-left">
+                <div class="bundle-checkbox">✓</div>
+                <span>Набір магнітних літер та цифр (145 шт)</span>
+              </div>
+              <span class="bundle-price-tag">+$45</span>
             </div>
-            <div class="wire-pill" style="margin-top:6px;">
-              <span>☑ <strong>Комплект цінників на вітрину</strong> (20 шт + підставки)</span>
-              <span style="font-family:'JetBrains Mono'; font-weight:600;">+$65</span>
+
+            <div class="bundle-option checked" id="opt-tags" data-price="65" onclick="toggleOption(this)">
+              <div class="bundle-option-left">
+                <div class="bundle-checkbox">✓</div>
+                <span>Комплект цінників на вітрину (20 шт + підставки)</span>
+              </div>
+              <span class="bundle-price-tag">+$65</span>
             </div>
           </div>
 
-          <div style="background:var(--accent); color:#FFFFFF; text-align:center; padding:12px; border-radius:var(--radius); font-weight:600; font-size:14px; margin-top:2px;">
-            Додати повний комплект у кошик ($395.00)
-          </div>
+          <button class="sim-btn-add" id="btn-add-bundle">
+            <span>Додати укомплектований набір у кошик</span>
+            <span id="btn-price-sum" style="font-family:var(--font-mono);">($395.00)</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- SECTION 4: REVIEWS -->
+    <!-- SECTION 4: REVIEWS PIPELINE -->
     <h2>4. Вирішення проблеми з відгуками (Etsy ➔ Shopify ➔ Google Shopping)</h2>
     <p>
-      Ти казав, що відгуки на поточному сайті — це те, що тебе дратує найбільше. Поточний додаток показує відгуки з Etsy як «неверифіковані», шрифти роз'їжджаються, а в Google Shopping немає зірочок.
+      На зідзвоні ти зазначив, що відгуки на поточному сайті — це те, що дратує найбільше. Поточний додаток показує відгуки з Etsy як «неверифіковані», шрифти роз'їжджаються, а в пошуку Google відсутній рейтинг зірочок.
     </p>
 
-    <div class="feature-box">
-      <div class="feature-header">
-        <strong>Що ми робимо технічно:</strong>
-        <span class="pill-tech" style="color:var(--green); border-color:#BBF7D0;">Готове рішення</span>
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-title">Etsy Marketplace</div>
+        <div class="flow-sub">1,000+ реальних відгуків з фотографіями клієнтів імпортуються автоматично.</div>
       </div>
-      <ul class="spec-list">
-        <li class="spec-item">
-          <span class="spec-dot"></span>
-          <div>
-            <strong>Безшовний імпорт з Etsy:</strong> Всі твої реальні відгуки та фотографії клієнтів з Etsy підтягуються зі статусом <code>Verified Buyer</code> через надійний сервіс без сторонніх логотипів.
-          </div>
-        </li>
-        <li class="spec-item">
-          <span class="spec-dot"></span>
-          <div>
-            <strong>Чистий дизайн блоку:</strong> Відгуки верстаються в загальному стилі сайту (шрифти Jost/Inter, чорно-білий мінімалізм), без кривих рамок і сторонніх банерів.
-          </div>
-        </li>
-        <li class="spec-item">
-          <span class="spec-dot"></span>
-          <div>
-            <strong>Зірочки в Google Shopping:</strong> Впроваджуємо офіційну мікророзмітку <code>Schema.org AggregateRating</code>, щоб коли люди шукають твої товари в Google — вони бачили рейтинг 4.9★ та кількість відгуків.
-          </div>
-        </li>
-      </ul>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-title">Shopify Storefront</div>
+        <div class="flow-sub">Рендеринг зі статусом Verified Buyer у чистому чорно-білому стилі бренду.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-title">Google Shopping</div>
+        <div class="flow-sub">Офіційна мікророзмітка Schema.org показує рейтинг 4.9★ прямо у видачі Google.</div>
+      </div>
     </div>
 
-    <!-- SECTION 5: SCOPE OF WORK -->
+    <!-- SECTION 5: SCOPE OF WORK TABLE -->
     <h2>5. Що конкретно входить у розробку «під ключ» (Scope of Work)</h2>
-    <table class="scope-table">
-      <thead>
-        <tr>
-          <th>Розділ / Елемент</th>
-          <th>Що саме робимо</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Головна сторінка</strong></td>
-          <td>Чистий преміальний вигляд у стилі George &amp; Willy. Блок під відеоінструкції з офісу (монтаж меню), категорії, відгуки, блок довіри. Прибираємо всі жовті та зелені плашки.</td>
-        </tr>
-        <tr>
-          <td><strong>Картка товару (Theme Blocks)</strong></td>
-          <td>2 адаптовані шаблони: (1) для меню-бордів із блоком вибору аксесуарів (літери, цінники), (2) для супутніх товарів. Чіткі описи, таблиці розмірів, допродажі.</td>
-        </tr>
-        <tr>
-          <td><strong>Повна міграція каталогу</strong></td>
-          <td>Ми самі переносимо та налаштовуємо всі ваші діючі ~25 товарів з фото та цінами. Вам не доведеться нічого заповнювати вручну.</td>
-        </tr>
-        <tr>
-          <td><strong>Оптова / B2B сторінка</strong></td>
-          <td>Акуратний розділ для мережевих кав'ярень, дизайнерів інтер'єру та франшиз (умови опту, зразки, швидке формування специфікації).</td>
-        </tr>
-        <tr>
-          <td><strong>Кошик (Slide Cart Drawer)</strong></td>
-          <td>Швидкий висувний кошик без перезавантаження сторінки з нагадуванням додати магнітні символи перед оформленням.</td>
-        </tr>
-        <tr>
-          <td><strong>Швидкість та мобільна версія</strong></td>
-          <td>Нова архітектура Shopify 2.0 без зайвого коду. Швидке відкриття на телефонах з ЄС та США (Core Web Vitals у зеленій зоні).</td>
-        </tr>
-      </tbody>
-    </table>
+    
+    <div class="table-container">
+      <table class="scope-table">
+        <thead>
+          <tr>
+            <th>Розділ / Елемент</th>
+            <th>Що саме робимо</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Головна сторінка</strong></td>
+            <td>Чистий преміальний вигляд у стилі George &amp; Willy. Блок під відеоінструкції з офісу (монтаж меню), категорії товарів, відгуки, блок довіри. Прибираємо всі жовті та зелені плашки Minimog.</td>
+          </tr>
+          <tr>
+            <td><strong>Картка товару (Theme Blocks)</strong></td>
+            <td>2 адаптовані шаблони: (1) для меню-бордів із блоком комплектації аксесуарами (літери, цінники), (2) для супутніх товарів. Чіткі описи, таблиці розмірів, допродажі.</td>
+          </tr>
+          <tr>
+            <td><strong>Повна міграція каталогу</strong></td>
+            <td>Ми самі переносимо та налаштовуємо всі ваші діючі ~25 товарів з фото та цінами. Вам не доведеться нічого переносити або заповнювати вручну.</td>
+          </tr>
+          <tr>
+            <td><strong>Оптова / B2B сторінка</strong></td>
+            <td>Акуратний розділ для мережевих кав'ярень, дизайнерів інтер'єру та франшиз (умови опту, зразки сталі, швидке формування специфікації).</td>
+          </tr>
+          <tr>
+            <td><strong>Кошик (Slide Cart Drawer)</strong></td>
+            <td>Швидкий висувний кошик без перезавантаження сторінки з нагадуванням додати магнітні символи або додаткові рейки перед оформленням.</td>
+          </tr>
+          <tr>
+            <td><strong>Швидкість та мобільна версія</strong></td>
+            <td>Нова архітектура Shopify 2.0 без зайвого стороннього коду. Миттєве відкриття на телефонах із США, Німеччини та Польщі (CWV у зеленій зоні).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- SECTION 6: TIMELINE -->
     <h2>6. Графік виконання: 14 робочих днів</h2>
-    <p style="margin-bottom:8px;">
-      <strong>Дні 1–3:</strong> Узгодження стилю та макета нової картки товару під твій асортимент.<br>
-      <strong>Дні 4–7:</strong> Верстка головної сторінки та налаштування блоку комплектів у картці.<br>
-      <strong>Дні 8–11:</strong> Перенесення відгуків з Etsy, налаштування B2B-сторінки та мікророзмітки Google.<br>
-      <strong>Дні 12–14:</strong> Тестування кошика та чекауту, фінальні правки від тебе і дружини, реліз на <code>noku.store</code>.
-    </p>
-
-    <!-- SECTION 7: BUDGET & TERMS -->
-    <div class="price-box">
-      <div style="font-size:13px; font-weight:600; text-transform:uppercase; color:var(--text-muted); font-family:'JetBrains Mono';">
-        Повний перезапуск магазину під ключ
+    <div class="timeline-grid">
+      <div class="timeline-card">
+        <div class="timeline-days">Дні 1–3</div>
+        <div class="timeline-title">Архітектура та картка товару</div>
+        <div class="timeline-desc">Узгодження колірної палітри сталі, типографіки та макета нової картки комплекту під ваш асортимент.</div>
       </div>
+      <div class="timeline-card">
+        <div class="timeline-days">Дні 4–7</div>
+        <div class="timeline-title">Головна та Theme Blocks</div>
+        <div class="timeline-desc">Верстка головної сторінки, налаштування модульних блоків у Shopify Customize, міграція каталогу.</div>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-days">Дні 8–11</div>
+        <div class="timeline-title">Відгуки Etsy та B2B розділ</div>
+        <div class="timeline-desc">Перенесення відгуків з Etsy, валідація мікророзмітки Google Shopping, налаштування оптової сторінки.</div>
+      </div>
+      <div class="timeline-card">
+        <div class="timeline-days">Дні 12–14</div>
+        <div class="timeline-title">QA, полішинг та реліз</div>
+        <div class="timeline-desc">Тестування кошика та чекауту, фінальні правки від тебе і партнерки, безшовне перемикання на noku.store.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: PRICING & TERMS -->
+    <div class="price-card">
+      <div class="price-badge-top">Turnkey Package · All Included</div>
+      <div class="price-headline">Повний перезапуск магазину під ключ</div>
       <div class="price-amount">$1,500</div>
-      <p style="font-size:14px; color:var(--text-secondary); max-width:540px; margin:0 auto;">
-        Фіксована ціна. У вартість уже включено нативну розробку комплектів (Theme Blocks) та інтеграцію відгуків з Etsy зі Schema.org, без жодних прихованих доплат за правки.
+      <p class="price-subtitle">
+        Фіксована прозора ціна. У вартість уже включено створення нативних Theme Blocks, міграцію 25 товарів та валідацію відгуків з Etsy зі Schema.org — без жодних прихованих доплат за правки.
       </p>
 
-      <div class="price-terms">
+      <div class="price-milestones">
         <div>
-          <span style="color:var(--text-muted);">Передоплата для старту (50%):</span><br>
-          <strong style="font-family:'JetBrains Mono'; font-size:16px;">$750.00</strong>
+          <div class="milestone-label">Передоплата для старту (50%):</div>
+          <div class="milestone-val">$750.00</div>
         </div>
         <div>
-          <span style="color:var(--text-muted);">Залишок після здачі (50%):</span><br>
-          <strong style="font-family:'JetBrains Mono'; font-size:16px;">$750.00</strong>
+          <div class="milestone-label">Залишок після здачі (50%):</div>
+          <div class="milestone-val">$750.00</div>
         </div>
       </div>
 
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
-        * Залишок оплачується лише після того, як ви з дружиною перевірите сайт на тестовому домені та схвалите запуск.
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+        * Залишок оплачується виключно після того, як ви з партнеркою перевірите готовий магазин на тестовому домені та схвалите запуск.
       </p>
 
-      <a href="https://t.me/kuzmenko_top" class="cta-button" target="_blank" rel="noopener">
-        Погодити план та призначити старт →
+      <a href="https://t.me/kuzmenko_top" class="cta-btn-primary" target="_blank" rel="noopener">
+        <span>Погодити план та призначити старт</span>
+        <span>→</span>
       </a>
-      <div style="margin-top:14px;">
-        <a href="./cockpit.html" style="font-size:13px; font-weight:600; color:var(--text-secondary); text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-subtle); transition:all 0.15s ease;">
-          <span>📋 Переглянути Живий Client Cockpit (Roadmap &amp; Vault)</span>
+
+      <div class="cockpit-nav-row">
+        <a href="./cockpit.html" class="link-cockpit-secondary">
+          <span>📋 Відкрити Живий Client Cockpit (Roadmap &amp; Vault)</span>
           <span>↗</span>
         </a>
       </div>
     </div>
 
     <!-- FOOTNOTE -->
-    <div class="footnote">
-      <strong>Щодо подальшого ведення:</strong> Як ми говорили на зідзвоні, після релізу сайт не повинен стояти на місці. Коли ми здамо проект і ти побачиш результат у роботі — ми зможемо перейти на формат щомісячного супроводу ($350/міс): додавання нових товарів, розробка сторінок під рекламу та постійні покращення конверсії.
+    <div class="footnote-box">
+      <strong>Щодо подальшого ведення:</strong> Як ми обговорювали на зідзвоні, після релізу магазин не повинен зупинятися. Коли ми здамо проект і ви побачите результат у роботі — ми зможемо перейти на формат щомісячного супроводу ($350/міс): додавання нових позицій, розробка сторінок під рекламу в Meta/Google та регулярне покращення конверсії.
     </div>
+
   </div>
 
+  <!-- IN-CONTEXT REVIEW SENSOR -->
   <script src="./dnk_sensor.js"></script>
+
+  <!-- INTERACTIVE LOGIC: DUAL OPTICS & BUNDLE CALCULATOR -->
+  <script>
+    // 1. Dual Optics Switcher
+    (function() {
+      const htmlEl = document.documentElement;
+      const themeBtn = document.getElementById('btn-theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
+
+      const savedTheme = localStorage.getItem('dnk_proposal_theme') || 'light';
+      setTheme(savedTheme);
+
+      themeBtn.addEventListener('click', () => {
+        const current = htmlEl.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+      });
+
+      function setTheme(t) {
+        htmlEl.setAttribute('data-theme', t);
+        localStorage.setItem('dnk_proposal_theme', t);
+        if (t === 'dark') {
+          themeIcon.textContent = '☀️';
+          themeText.textContent = 'Polaris White';
+        } else {
+          themeIcon.textContent = '🌙';
+          themeText.textContent = 'DNK Dark';
+        }
+      }
+    })();
+
+    // 2. Interactive PDP Bundle Calculator
+    function toggleOption(el) {
+      el.classList.toggle('checked');
+      recalcTotal();
+    }
+
+    function recalcTotal() {
+      let sum = 0;
+      const options = document.querySelectorAll('.bundle-option');
+      options.forEach(opt => {
+        if (opt.classList.contains('checked')) {
+          sum += parseFloat(opt.getAttribute('data-price') || 0);
+        }
+      });
+
+      const totalDisplay = document.getElementById('calc-total-display');
+      const btnSum = document.getElementById('btn-price-sum');
+      
+      if (totalDisplay) totalDisplay.textContent = `$${sum.toFixed(2)}`;
+      if (btnSum) btnSum.textContent = `($${sum.toFixed(2)})`;
+    }
+
+    document.getElementById('btn-add-bundle')?.addEventListener('click', () => {
+      alert('✨ Це інтерактивна демонстрація нативного Theme Block! У вашому новому магазині покупець в 1 клік додаватиме такий укомплектований набір у кошик.');
+    });
+  </script>
 </body>
 </html>
