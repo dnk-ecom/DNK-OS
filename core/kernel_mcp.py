@@ -620,4 +620,25 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
             return json.dumps({"found": False, "receipt_id": receipt_id})
         return json.dumps({"found": True, "message": msg.model_dump()}, ensure_ascii=False)
 
+    @mcp.tool()
+    def google_vertex_status() -> str:
+        """Returns the active Google Cloud Vertex AI account, project, ADC token health, and models."""
+        from scripts.system.google_agent_gateway import GoogleAuthManager, GeminiPayloadTranslator
+        token = GoogleAuthManager.get_token()
+        data = {
+            "active_account": GoogleAuthManager.get_active_account(),
+            "active_project": GoogleAuthManager.get_active_project(),
+            "adc_token_valid": bool(token and token.startswith("ya29.")),
+            "supported_models": GeminiPayloadTranslator.SUPPORTED_MODELS,
+        }
+        return json.dumps(data, ensure_ascii=False, indent=2)
+
+    @mcp.tool()
+    def repo_assimilate_sota(repo_url: str, target_module: str = "core") -> str:
+        """Executes the Autonomous SOTA Ingestion & Distillation Pipeline (Spec, EGM Rubric, PSOD Task)."""
+        from services.dnk_git_research.src.sota_pipeline import SOTAPipelineRunner
+        runner = SOTAPipelineRunner()
+        output = runner.run(repo_input=repo_url, target_module=target_module)
+        return json.dumps(output.model_dump(), ensure_ascii=False, indent=2)
+
     return mcp

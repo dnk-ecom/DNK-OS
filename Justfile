@@ -20,6 +20,10 @@ default:
 # 🛡️ VERIFICATION & TESTS
 # -----------------------------------------------------------------------------
 
+# Run comprehensive 7-vector SOTA 2026 Design System Benchmark audit
+audit-sota:
+    @~/.dnk_runtime/venv/bin/python3 scripts/system/audit_design_system_sota_2026.py
+
 # Run all core SOTA unit tests in strict isolation
 test:
     @uv run pytest tests/core -v
@@ -91,6 +95,10 @@ bootstrap-runtime:
     touch ~/.dnk_runtime/.metadata_never_index
     @echo "✅ Рантайм готовий. Spotlight заблоковано (.metadata_never_index)."
 
+# Install non-bypassable local git pre-commit hook enforcing all 8/8 checks (DEC-147)
+install-hooks:
+    @python3 scripts/system/install_git_hooks.py
+
 # Check workspace hygiene and status
 status:
     @echo "🛡️ Перевірка стану системи..."
@@ -108,6 +116,10 @@ new-brick name:
 # -----------------------------------------------------------------------------
 # 🔍 REPO INTELLIGENCE & SOTA PATTERN SEARCH (1,663 REPOSITORIES)
 # -----------------------------------------------------------------------------
+
+# Run autonomous SOTA open-source assimilation pipeline (Spec + EGM + TaskDNA + Catalog)
+sota-assimilate repo target="core":
+    @uv run python3 services/dnk_git_research/cli.py sota-assimilate {{repo}} --target {{target}}
 
 # Search repository catalog using bilingual FTS5 expansion
 repo-search query domain="":
@@ -177,6 +189,18 @@ api:
 mcp-stdio:
     @uv run python3 core/kernel.py
 
+# Check Google Cloud Vertex AI & Gemini authentication and model availability
+agent-status:
+    @uv run python3 scripts/system/google_agent_gateway.py --status
+
+# Start local Universal Google Cloud Agent Gateway (OpenAI/Anthropic compatible bridge)
+agent-gateway port="11436":
+    @uv run python3 scripts/system/google_agent_gateway.py --server --port {{port}}
+
+# Run any terminal agent through Google Cloud Vertex AI proxy environment
+agent-run *args:
+    @uv run python3 scripts/system/google_agent_gateway.py --run {{args}}
+
 # Launch Denchik Sovereign Master Developer (Hermes Agent Runtime)
 denchik *args:
     @bash scripts/system/denchik.sh {{args}}
@@ -192,4 +216,8 @@ publish-preview:
 # Deploy NOKU Commercial Proposal to Cloudflare Pages (https://noku-proposal.pages.dev)
 deploy-noku-proposal:
     @pnpm dlx wrangler pages deploy docs/projects/dnk_ecom/proposals/noku_white --project-name=noku-proposal --branch=main --commit-dirty=true
+
+# Scaffold a new secure, isolated client portal with Edge Password Gate
+create-client-portal client_name:
+    @uv run python3 scripts/system/create_client_portal.py --client {{client_name}}
 

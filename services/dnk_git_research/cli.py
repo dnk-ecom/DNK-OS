@@ -31,6 +31,10 @@ def main():
     assimilate_p = subparsers.add_parser("assimilate", help="Assimilate repository into DNK OS")
     assimilate_p.add_argument("repo", type=str, help="Repository owner/name")
     assimilate_p.add_argument("--target", type=str, default="core/engine", help="Target DNK context")
+    # SOTA Autonomous Assimilation Pipeline
+    sota_p = subparsers.add_parser("sota-assimilate", help="Autonomous SOTA assimilation pipeline: Spec, EGM Rubric, PSOD Task, Catalog Sync")
+    sota_p.add_argument("repo", type=str, help="Repository owner/name or GitHub URL")
+    sota_p.add_argument("--target", type=str, default="core", help="Target DNK module (core, dnk_shopify, dnk_media, dnk_distribution)")
 
     # Reuse brief (JIT prior-art search, gated: simple/repetitive tasks are skipped)
     brief_p = subparsers.add_parser("brief", help="Reuse brief: has the world already solved this task?")
@@ -389,6 +393,13 @@ def main():
     if args.command == "search":
         results = engine.search_repositories(args.query, limit=args.limit)
         print(json.dumps([r.model_dump() for r in results], indent=2, ensure_ascii=False))
+
+    elif args.command == "sota-assimilate":
+        from services.dnk_git_research.src.sota_pipeline import SOTAPipelineRunner
+        runner = SOTAPipelineRunner()
+        output = runner.run(args.repo, target_module=args.target)
+        print(output.model_dump_json(indent=2))
+        sys.exit(0)
 
     elif args.command == "assimilate":
         repos = engine.search_repositories(args.repo, limit=1)
