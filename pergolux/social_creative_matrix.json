@@ -1,0 +1,90 @@
+{
+  "brand_name": "Pergolux",
+  "viewport_formats": {
+    "reels_tiktok_9_16": {
+      "width": 1080,
+      "height": 1920,
+      "aspect_ratio": "9:16",
+      "safe_zones": {
+        "top_margin_px": 120,
+        "bottom_margin_px": 340,
+        "side_margin_px": 48
+      },
+      "headline_max_chars": 40,
+      "optimal_focal_y": 720
+    },
+    "feed_square_1_1": {
+      "width": 1080,
+      "height": 1080,
+      "aspect_ratio": "1:1",
+      "safe_zones": {
+        "margin_px": 40
+      },
+      "headline_max_chars": 55
+    },
+    "portrait_ad_4_5": {
+      "width": 1080,
+      "height": 1350,
+      "aspect_ratio": "4:5",
+      "safe_zones": {
+        "margin_px": 48
+      },
+      "headline_max_chars": 48
+    }
+  },
+  "motion_physics": {
+    "spring_snappy": {
+      "tension": 280,
+      "friction": 20,
+      "cubic_bezier": "cubic-bezier(0.16, 1, 0.3, 1)"
+    },
+    "spring_gentle": {
+      "tension": 120,
+      "friction": 14,
+      "cubic_bezier": "cubic-bezier(0.25, 1, 0.5, 1)"
+    },
+    "spring_bouncy": {
+      "tension": 380,
+      "friction": 16,
+      "cubic_bezier": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    }
+  },
+  "kinetic_subtitles": {
+    "font_family": "Inter, -apple-system, sans-serif",
+    "highlight_color": "#0F766E",
+    "normal_color": "#FFFFFF",
+    "pop_scale": 1.15
+  },
+  "content_matrix_blueprint": [
+    {
+      "scene": "01_hook",
+      "duration_sec": 3.0,
+      "motion": "spring_snappy",
+      "goal": "Pattern Interrupt"
+    },
+    {
+      "scene": "02_pain",
+      "duration_sec": 4.0,
+      "motion": "spring_gentle",
+      "goal": "Problem Agitation"
+    },
+    {
+      "scene": "03_solution_bento",
+      "duration_sec": 5.0,
+      "motion": "spring_snappy",
+      "goal": "Feature Showcase"
+    },
+    {
+      "scene": "04_social_proof",
+      "duration_sec": 5.0,
+      "motion": "spring_bouncy",
+      "goal": "Customer Reviews"
+    },
+    {
+      "scene": "05_focal_cta",
+      "duration_sec": 3.0,
+      "motion": "spring_snappy",
+      "goal": "Storefront Conversion"
+    }
+  ]
+}
