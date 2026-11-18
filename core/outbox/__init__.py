@@ -12,5 +12,6 @@
 
 from core.outbox.models import OutboxMessage
 from core.outbox.service import TransactionalOutbox
+from core.outbox.worker import OutboxWorkerDaemon, default_channel_dispatcher
 
-__all__ = ["OutboxMessage", "TransactionalOutbox"]
+__all__ = ["OutboxMessage", "TransactionalOutbox", "OutboxWorkerDaemon", "default_channel_dispatcher"]

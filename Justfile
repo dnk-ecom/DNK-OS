@@ -44,6 +44,18 @@ test-distribution:
 test-workhorses:
     @uv run pytest services/dnk_shopify/tests services/dnk_media/tests services/dnk_distribution/tests -v
 
+# Run DSH Superagent assimilation test suite (DEC-151)
+test-dsh:
+    @uv run pytest tests/core/test_mandate_contracts.py tests/core/test_command_runner.py tests/core/test_transactional_outbox.py tests/core/test_github_source_adapter.py tests/core/test_denchik_builder_guard.py tests/core/test_outbox_worker.py -v
+
+# Drain pending Transactional Outbox messages once (DEC-151)
+outbox-drain:
+    @uv run python3 -m core.outbox.worker --drain
+
+# Run background Transactional Outbox Worker Daemon (DEC-151)
+outbox-daemon:
+    @uv run python3 -m core.outbox.worker --daemon
+
 # -----------------------------------------------------------------------------
 # 🛍️ SHOPIFY THEME DEV & MOLECULAR GRAFTING
 # -----------------------------------------------------------------------------
@@ -117,6 +129,14 @@ live-test:
 demo-actions:
     @uv run python3 scripts/demo_dual_surface_live.py
 
+# Hydrate and bootstrap quarantined external GPL services (AperiSolve etc.) in ../DNK_Vibe
+hydrate-vibe:
+    @uv run python3 scripts/system/hydrate_quarantined_services.py
+
+# Check status of quarantined services without downloading
+check-vibe:
+    @uv run python3 scripts/system/hydrate_quarantined_services.py --check-only
+
 # -----------------------------------------------------------------------------
 # 🌌 SPATIAL CANVAS & VIBE ORCHESTRATION
 # -----------------------------------------------------------------------------
@@ -160,3 +180,16 @@ mcp-stdio:
 # Launch Denchik Sovereign Master Developer (Hermes Agent Runtime)
 denchik *args:
     @bash scripts/system/denchik.sh {{args}}
+
+# -----------------------------------------------------------------------------
+# 🚀 DEPLOYMENT & PREVIEWS (Cloudflare Pages & GitOps)
+# -----------------------------------------------------------------------------
+
+# Safely publish all design systems and showcases to isolated dnk-preview branch & Cloudflare Pages
+publish-preview:
+    @bash scripts/system/publish_preview_branch.sh
+
+# Deploy NOKU Commercial Proposal to Cloudflare Pages (https://noku-proposal.pages.dev)
+deploy-noku-proposal:
+    @pnpm dlx wrangler pages deploy docs/projects/dnk_ecom/proposals/noku_white --project-name=noku-proposal --branch=main --commit-dirty=true
+
