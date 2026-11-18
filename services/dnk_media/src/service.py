@@ -33,6 +33,16 @@ from services.dnk_media.src.sound_design import (
     DuckingSettings,
     sound_design_engine,
 )
+from services.dnk_media.src.provenance import (
+    ProvenanceEngine,
+    provenance_engine,
+)
+from services.dnk_media.contracts.schemas import (
+    ProvenanceSignRequest,
+    ProvenanceSignResponse,
+    ProvenanceVerifyRequest,
+    ProvenanceVerifyResponse,
+)
 
 
 def cut_silence(
@@ -100,3 +110,64 @@ def compose_sound_design(
 def process_data(query: str) -> str:
     """Generic fallback string processor for basic connectivity check."""
     return f"Processed: {query}"
+
+
+def sign_provenance(
+    image_path: str,
+    author_name: str = "DNK-e.com",
+    author_url: Optional[str] = "https://dnk-e.com",
+    copyright_notice: Optional[str] = None,
+    watermark_payload: Optional[str] = None,
+    output_path: Optional[str] = None,
+) -> ProvenanceSignResponse:
+    """Signs media file with C2PA manifest & metadata steganography (DEC-143)."""
+    req = ProvenanceSignRequest(
+        image_path=image_path,
+        author_name=author_name,
+        author_url=author_url,
+        copyright_notice=copyright_notice,
+        watermark_payload=watermark_payload,
+        output_path=output_path,
+    )
+    return provenance_engine.sign_asset(req)
+
+
+def verify_provenance(
+    image_path: str,
+    expected_author: Optional[str] = None,
+) -> ProvenanceVerifyResponse:
+    """Verifies provenance, metadata chunks and manifest integrity (DEC-143)."""
+    req = ProvenanceVerifyRequest(
+        image_path=image_path,
+        expected_author=expected_author,
+    )
+    return provenance_engine.verify_asset(req)
+
+
+def compose_video_9_16(
+    transcript: str,
+    source_video_path: Optional[str] = None,
+    duration_ms: Optional[int] = None,
+    style_preset: str = "hormozi_bold",
+    enable_silence_cut: bool = True,
+    enable_smart_reframe: bool = True,
+    enable_sound_design: bool = True,
+    output_path: Optional[str] = None,
+    dry_run: bool = True
+) -> Any:
+    """Harmonizes kinetic subtitles, smart reframing, dead-air cuts, and audio into 9:16 video."""
+    from services.dnk_media.contracts.schemas import VideoCompositionRequest
+    from services.dnk_media.src.composer import video_composer
+
+    req = VideoCompositionRequest(
+        transcript=transcript,
+        source_video_path=source_video_path,
+        duration_ms=duration_ms,
+        style_preset=style_preset,
+        enable_silence_cut=enable_silence_cut,
+        enable_smart_reframe=enable_smart_reframe,
+        enable_sound_design=enable_sound_design,
+        output_path=output_path
+    )
+    return video_composer.compose(request=req, dry_run=dry_run)
+

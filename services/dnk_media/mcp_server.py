@@ -8,6 +8,7 @@
 # author: "DNK Swarm & Antigravity"
 # --- END DNK-MRH-HEADER ---
 
+import asyncio
 import json
 from typing import List, Dict, Any, Optional
 from mcp.server.fastmcp import FastMCP
@@ -17,6 +18,13 @@ from services.dnk_media.src.service import (
     generate_kinetic_subtitles,
     compose_sound_design,
     process_data,
+    sign_provenance,
+    verify_provenance,
+)
+from core.adapters.dnk_agentic_video_adapter import (
+    DNKAgenticVideoAdapter,
+    ProcessingMode,
+    fetch_youtube_transcript,
 )
 
 mcp = FastMCP("dnk_media")
@@ -66,6 +74,132 @@ def media_sound_design(
     from services.dnk_media.src.sound_design import DuckingSettings
     plan = compose_sound_design(video_duration_s, custom_settings=DuckingSettings(music_preset=music_preset))
     return plan.model_dump()
+
+
+@mcp.tool()
+def media_fetch_youtube_transcript(
+    url_or_video_id: str,
+    languages: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """Fetch structured transcript from YouTube without downloading video bytes."""
+    res = fetch_youtube_transcript(url_or_video_id, languages=languages)
+    return res.model_dump()
+
+
+@mcp.tool()
+async def media_analyze_youtube(
+    video_url: str,
+    prompt: str = "Analyze key points and moments",
+    mode: str = "agentic",
+) -> Dict[str, Any]:
+    """Analyze YouTube video using Gemini 3.8 Agentic Video Understanding (dynamic zooming, 88% token reduction)."""
+    adapter = DNKAgenticVideoAdapter()
+    proc_mode = ProcessingMode.AGENTIC if mode.lower() == "agentic" else ProcessingMode.STATIC
+    res = await adapter.analyze_video(video_url, prompt=prompt, mode=proc_mode)
+    return res.model_dump()
+
+
+@mcp.tool()
+async def media_retrieve_video_moments(
+    video_url: str,
+    target_description: str,
+) -> List[Dict[str, Any]]:
+    """Pinpoint exact start and end timestamps (MM:SS) for key actions or moments in video."""
+    adapter = DNKAgenticVideoAdapter()
+    moments = await adapter.retrieve_moments(video_url, target_description)
+    return [m.model_dump() for m in moments]
+
+
+@mcp.tool()
+async def media_generate_video_chapters(
+    video_url: str,
+) -> List[Dict[str, Any]]:
+    """Generate structured semantic video chapters with timestamps and summaries."""
+    adapter = DNKAgenticVideoAdapter()
+    chapters = await adapter.generate_smart_chapters(video_url)
+    return [c.model_dump() for c in chapters]
+
+
+@mcp.tool()
+async def media_extract_video_insights(
+    video_url: str,
+    focus_query: str = "Key ideas, architectural insights, and actionable thoughts",
+) -> Dict[str, Any]:
+    """Extract core thesis, key architectural ideas, actionable takeaways, and moments from video."""
+    adapter = DNKAgenticVideoAdapter()
+    return await adapter.extract_actionable_insights(video_url, focus_query=focus_query)
+
+
+@mcp.tool()
+async def media_benchmark_video_sota(
+    topic: str,
+    video_diamond: str,
+    video_source_url: str = "",
+) -> Dict[str, Any]:
+    """Benchmark a video diamond against active SOTA leaders as of today and synthesize DNK adaptation."""
+    from core.orchestrator.video_sota_research_bridge import VideoSotaResearchBridge
+    bridge = VideoSotaResearchBridge()
+    res = await bridge.benchmark_video_diamond(topic, video_diamond, video_source_url=video_source_url)
+    return res.model_dump()
+
+
+@mcp.tool()
+def media_sign_provenance(
+    image_path: str,
+    author_name: str = "DNK-e.com",
+    author_url: str = "https://dnk-e.com",
+    copyright_notice: Optional[str] = None,
+    watermark_payload: Optional[str] = None,
+    output_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Sign media file with C2PA manifest & metadata steganography (DEC-143)."""
+    res = sign_provenance(
+        image_path=image_path,
+        author_name=author_name,
+        author_url=author_url,
+        copyright_notice=copyright_notice,
+        watermark_payload=watermark_payload,
+        output_path=output_path,
+    )
+    return res.model_dump()
+
+
+@mcp.tool()
+def media_verify_provenance(
+    image_path: str,
+    expected_author: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Verify C2PA manifest, metadata chunks and authorship of a media asset (DEC-143)."""
+    res = verify_provenance(image_path=image_path, expected_author=expected_author)
+    return res.model_dump()
+
+
+@mcp.tool()
+def media_compose_video_9_16(
+    transcript: str,
+    source_video_path: Optional[str] = None,
+    duration_ms: Optional[int] = None,
+    style_preset: str = "hormozi_bold",
+    enable_silence_cut: bool = True,
+    enable_smart_reframe: bool = True,
+    enable_sound_design: bool = True,
+    output_path: Optional[str] = None,
+    dry_run: bool = True
+) -> Dict[str, Any]:
+    """Harmonizes kinetic subtitles, smart reframing, dead-air jump cuts, and audio into 9:16 video."""
+    from services.dnk_media.src.service import compose_video_9_16
+    res = compose_video_9_16(
+        transcript=transcript,
+        source_video_path=source_video_path,
+        duration_ms=duration_ms,
+        style_preset=style_preset,
+        enable_silence_cut=enable_silence_cut,
+        enable_smart_reframe=enable_smart_reframe,
+        enable_sound_design=enable_sound_design,
+        output_path=output_path,
+        dry_run=dry_run
+    )
+    return res.model_dump()
 
 
 @mcp.tool()

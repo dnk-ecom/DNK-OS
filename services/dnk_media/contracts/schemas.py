@@ -82,3 +82,74 @@ class SoundDesignResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     success: bool
     plan: SoundDesignPlan
+
+
+class ProvenanceSignRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    image_path: str = Field(..., description="Path to media file")
+    author_name: str = Field(default="DNK-e.com", description="Creator/Author identity")
+    author_url: Optional[str] = Field(default="https://dnk-e.com", description="Author web portfolio or URI")
+    copyright_notice: Optional[str] = Field(default="Copyright (c) 2026 DNK-e.com. All rights reserved.", description="Legal copyright declaration")
+    watermark_payload: Optional[str] = Field(default=None, description="Steganographic watermark payload or ID")
+    output_path: Optional[str] = Field(default=None, description="Output destination file")
+
+
+class ProvenanceSignResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    asset_sha256: str
+    asset_bytes: int
+    format: str
+    claim_generator: str
+    author: str
+    created_at: str
+    c2pa_mode: str  # "embedded_c2pa" | "sidecar_manifest"
+    signed_asset_path: str
+    manifest_path: Optional[str] = None
+    verification_token: str
+
+
+class ProvenanceVerifyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    image_path: str = Field(..., description="Path to media file to verify")
+    expected_author: Optional[str] = Field(default=None, description="Expected author name")
+
+
+class ProvenanceVerifyResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    valid: bool
+    asset_sha256: str
+    detected_author: Optional[str] = None
+    c2pa_mode: str
+    embedded_metadata: Dict[str, str] = Field(default_factory=dict)
+    message: str
+
+
+class VideoCompositionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    source_video_path: Optional[str] = Field(default=None, description="Path to source video or raw recording")
+    transcript: str = Field(..., description="Spoken transcript text for alignment and kinetic subtitles")
+    words: Optional[List[Dict[str, Any]]] = Field(default=None, description="Optional word-level timestamps")
+    duration_ms: Optional[int] = Field(default=None, description="Total video duration in ms (estimated if None)")
+    style_preset: str = Field(default="hormozi_bold", description="Subtitles style: hormozi_bold | minimal_clean | cyberpunk_neon")
+    enable_silence_cut: bool = Field(default=True, description="Whether to generate silence jump-cuts")
+    enable_smart_reframe: bool = Field(default=True, description="Whether to reframe 16:9/1:1 to 9:16 vertical crop")
+    enable_sound_design: bool = Field(default=True, description="Whether to compose audio ducking and SFX cues")
+    output_path: Optional[str] = Field(default=None, description="Output mp4 path")
+    author_name: str = Field(default="DNK-e.com", description="Author for C2PA provenance")
+
+
+class VideoCompositionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    composition_id: str
+    target_dimensions: str = "1080x1920 (9:16)"
+    estimated_duration_ms: int
+    silence_cut_plan: Optional[SilenceCutPlan] = None
+    reframe_plan: Optional[SmartReframePlan] = None
+    subtitles_track: Optional[KineticSubtitleTrack] = None
+    sound_design_plan: Optional[SoundDesignPlan] = None
+    ass_subtitle_path: Optional[str] = None
+    ffmpeg_recipe: str
+    output_video_path: Optional[str] = None
+    is_rendered: bool = False

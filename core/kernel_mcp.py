@@ -256,6 +256,27 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
         return json.dumps(plan.model_dump(), ensure_ascii=False)
 
     @mcp.tool()
+    def media_compose_video_9_16(
+        transcript: str,
+        source_video_path: str = "",
+        duration_ms: int = 0,
+        style_preset: str = "hormozi_bold",
+        output_path: str = "",
+        dry_run: bool = True
+    ) -> str:
+        """Composes 9:16 vertical video combining kinetic subtitles, smart reframing, dead-air cuts, and audio."""
+        from services.dnk_media.src.service import compose_video_9_16
+        res = compose_video_9_16(
+            transcript=transcript,
+            source_video_path=source_video_path or None,
+            duration_ms=duration_ms if duration_ms > 0 else None,
+            style_preset=style_preset,
+            output_path=output_path or None,
+            dry_run=dry_run
+        )
+        return json.dumps(res.model_dump(), ensure_ascii=False)
+
+    @mcp.tool()
     async def record_error_reflexion(
         tool_or_command: str, symptom: str, root_cause: str, solution: str, source: str = "agent"
     ) -> str:
@@ -462,6 +483,55 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
             return json.dumps({"deal_id": deal_id, "state": state}, ensure_ascii=False, indent=2)
         except Exception as e:
             logger.exception("get_cockpit_status failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def client_success_get_inbox(deal_id: str = "deal_noku_2026") -> str:
+        """
+        Queries the Client Success Agent inbox for incoming visual area review tickets,
+        bounding box coordinates, client instructions, and automated Scope Guard triage.
+        """
+        from core.client_cockpit.engine import ClientCockpitEngine
+        try:
+            engine = ClientCockpitEngine()
+            tickets = engine.get_tickets(deal_id=deal_id, status="open")
+            return json.dumps({
+                "deal_id": deal_id,
+                "open_tickets_count": len(tickets),
+                "inbox": tickets,
+            }, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("client_success_get_inbox failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def client_success_dispatch_to_builder(deal_id: str, ticket_id: str, builder: str = "denchik") -> str:
+        """
+        Packages an in-context visual review ticket into an atomic builder task for Denchik / Shopify Theme Craftsman.
+        """
+        from core.client_cockpit.engine import ClientCockpitEngine
+        try:
+            engine = ClientCockpitEngine()
+            state = engine.get_cockpit_state(deal_id=deal_id)
+            ticket = next((t for t in state.get("tickets", []) if t["ticket_id"] == ticket_id), None)
+            if not ticket:
+                return json.dumps({"success": False, "error": f"Ticket {ticket_id} not found"}, ensure_ascii=False)
+
+            task_dna = {
+                "builder": builder,
+                "deal_id": deal_id,
+                "ticket_id": ticket_id,
+                "instruction": ticket["comment"],
+                "target_selector": ticket.get("selector"),
+                "section_id": ticket.get("section_id"),
+                "block_id": ticket.get("block_id"),
+                "bounding_box": ticket.get("bounding_box"),
+                "status": "dispatched",
+            }
+            engine.resolve_ticket(deal_id, ticket_id, resolution_note=f"Dispatched to {builder}", status="in_progress")
+            return json.dumps({"success": True, "task_dna": task_dna}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("client_success_dispatch_to_builder failed")
             return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
 
     @mcp.tool()
