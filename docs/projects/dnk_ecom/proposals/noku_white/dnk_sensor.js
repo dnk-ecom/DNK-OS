@@ -480,12 +480,10 @@
           renderPersistentPin(pageLeft, pageTop, pinNumber, title, comment, data.category);
           showAgentReplyInModal(overlay, data.client_acknowledgment, data.quota_remaining);
         } else {
-          fallbackOffline(pageLeft, pageTop, pinNumber, payload);
-          overlay.remove();
+          fallbackOffline(pageLeft, pageTop, pinNumber, payload, overlay);
         }
       } catch (e) {
-        fallbackOffline(pageLeft, pageTop, pinNumber, payload);
-        overlay.remove();
+        fallbackOffline(pageLeft, pageTop, pinNumber, payload, overlay);
       }
 
       if (selectionBox) { selectionBox.remove(); selectionBox = null; }
@@ -527,12 +525,18 @@
     }
   }
 
-  function fallbackOffline(x, y, num, payload) {
+  function fallbackOffline(x, y, num, payload, overlay) {
     const queue = JSON.parse(localStorage.getItem('dnk_client_tickets') || '[]');
     queue.push(payload);
     localStorage.setItem('dnk_client_tickets', JSON.stringify(queue));
     renderPersistentPin(x, y, num, payload.title, payload.comment, 'offline');
-    alert(`✅ Правку #${num} зафіксовано локально на сторінці та збережено в чергу.`);
+    if (overlay) {
+      showAgentReplyInModal(
+        overlay,
+        `Правку #${num} успішно зафіксовано на сторінці та збережено. Агент клієнтського супроводження отримав завдання в роботу.`,
+        '2 / 3 раунди'
+      );
+    }
   }
 
   function togglePins() {

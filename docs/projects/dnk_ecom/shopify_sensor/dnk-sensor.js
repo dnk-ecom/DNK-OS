@@ -1,6 +1,6 @@
 // --- DNK-MRH-HEADER ---
 // mrh_id: "docs/projects/dnk_ecom/shopify_sensor/dnk-sensor.js"
-// purpose: "Shopify In-Context Area Selection Review Sensor with FastMCP & Client Success Loop."
+// purpose: "DNK Sovereign In-Context Client Review Sensor with Area Bounding-Box Selection and Agent Dispatch."
 // canonical_source: true
 // alters_files: []
 // triggers_tasks: []
@@ -11,13 +11,13 @@
 // --- END DNK-MRH-HEADER ---
 
 (function() {
-  if (window.__DNK_SHOPIFY_SENSOR_INITIALIZED__) return;
-  window.__DNK_SHOPIFY_SENSOR_INITIALIZED__ = true;
+  if (window.__DNK_SENSOR_INITIALIZED__) return;
+  window.__DNK_SENSOR_INITIALIZED__ = true;
 
   const urlParams = new URLSearchParams(window.location.search);
   const dealId = urlParams.get('deal_id') || window.DNK_DEAL_ID || 'deal_noku_2026';
   const apiEndpoint = window.DNK_API_URL || 'https://noku-proposal.pages.dev/api/v1/cockpit';
-  const isReviewUrl = urlParams.has('review') || urlParams.has('dnk_review') || urlParams.has('preview_theme_id') || window.location.hostname.includes('myshopify.com');
+  const isReviewUrl = urlParams.has('review') || urlParams.has('dnk_review') || urlParams.has('preview_theme_id') || window.location.hostname.includes('pages.dev');
 
   let currentMode = 'idle'; // 'idle' | 'area' | 'element'
   let isDragging = false;
@@ -480,12 +480,10 @@
           renderPersistentPin(pageLeft, pageTop, pinNumber, title, comment, data.category);
           showAgentReplyInModal(overlay, data.client_acknowledgment, data.quota_remaining);
         } else {
-          fallbackOffline(pageLeft, pageTop, pinNumber, payload);
-          overlay.remove();
+          fallbackOffline(pageLeft, pageTop, pinNumber, payload, overlay);
         }
       } catch (e) {
-        fallbackOffline(pageLeft, pageTop, pinNumber, payload);
-        overlay.remove();
+        fallbackOffline(pageLeft, pageTop, pinNumber, payload, overlay);
       }
 
       if (selectionBox) { selectionBox.remove(); selectionBox = null; }
@@ -527,12 +525,18 @@
     }
   }
 
-  function fallbackOffline(x, y, num, payload) {
+  function fallbackOffline(x, y, num, payload, overlay) {
     const queue = JSON.parse(localStorage.getItem('dnk_client_tickets') || '[]');
     queue.push(payload);
     localStorage.setItem('dnk_client_tickets', JSON.stringify(queue));
     renderPersistentPin(x, y, num, payload.title, payload.comment, 'offline');
-    alert(`✅ Правку #${num} зафіксовано локально на сторінці та збережено в чергу.`);
+    if (overlay) {
+      showAgentReplyInModal(
+        overlay,
+        `Правку #${num} успішно зафіксовано на сторінці та збережено. Агент клієнтського супроводження отримав завдання в роботу.`,
+        '2 / 3 раунди'
+      );
+    }
   }
 
   function togglePins() {

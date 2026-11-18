@@ -1,6 +1,6 @@
 ---
-title: "Тема «Зернятко» (Zernyatko) MVP v0.1.0 Summary"
-description: "Підсумковий живий лог та технічний паспорт готовності комерційної флагманської теми «Зернятко» версії 0.1.0."
+title: "Тема «Зерно» (Zerno) MVP v0.1.0 Summary"
+description: "Підсумковий живий лог та технічний паспорт готовності комерційної флагманської теми «Зерно» версії 0.1.0."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_summary_mvp_v010.md"
 status: passed
 type: release_summary
@@ -13,13 +13,13 @@ verified_by: "shopify theme check && just shopify-checkpoints"
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_summary_mvp_v010.md"
-> purpose: "Підсумковий живий лог та технічний паспорт готовності комерційної флагманської теми «Зернятко» версії 0.1.0."
+> purpose: "Підсумковий живий лог та технічний паспорт готовності комерційної флагманської теми «Зерно» версії 0.1.0."
 > canonical_source: true
 > alters_files:
 >   - "main/*"
 >   - "pre-release/*"
 >   - "mvp/*"
->   - "Зернятко.zip"
+>   - "Зерно.zip"
 > triggers_tasks: []
 > status: "Passed"
 > version: "0.1.0"
@@ -28,16 +28,16 @@ verified_by: "shopify theme check && just shopify-checkpoints"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
-# 🌾 Тема «Зернятко» (Zernyatko) MVP v0.1.0 Summary
+# 🌾 Тема «Зерно» (Zerno) MVP v0.1.0 Summary
 
 > [!IMPORTANT]
 > **MVP v0.1.0 Повністю Завершено та Верифіковано.**
-> Тема «Зернятко» спроєктована з чистого аркуша (clean-slate), без застарілих бібліотек (нуль jQuery, Alpine.js, Tailwind runtime), на базі нативних W3C Custom Elements, Theme Blocks 2.0 та офіційного стандарту Shopify Theme Store. Версія зафіксована на 0.1.0 до повного створення і затвердження робочої теми.
+> Тема «Зерно» спроєктована з чистого аркуша (clean-slate), без застарілих бібліотек (нуль jQuery, Alpine.js, Tailwind runtime), на базі нативних W3C Custom Elements, Theme Blocks 2.0 та офіційного стандарту Shopify Theme Store. Версія зафіксована на 0.1.0 до повного створення і затвердження робочої теми.
 > 
 > - **Офіційний Shopify Theme Check:** 48 файлів перевірено, **0 помилок, 0 попереджень**.
 > - **7-Gate Автономний Аудит (`just shopify-checkpoints`):** 7 з 7 чеклистів пройдено детерміновано (100% Green).
 > - **Unit Tests (`services/dnk_shopify/tests/test_brick.py`):** 13 з 13 тестів пройдено за 0.45s.
-> - **Розмір архіву розгортання:** `Зернятко.zip` (також `Зернятко-upload.zip` / `Zernyatko.zip`) — **73 KB** чистого коду.
+> - **Розмір архіву розгортання:** `Зерно.zip` (також `Зерно-upload.zip` / `Zerno.zip`) — **73 KB** чистого коду.
 
 ---
 
@@ -79,6 +79,6 @@ verified_by: "shopify theme check && just shopify-checkpoints"
 ---
 
 ## 📦 Архів Розгортання (Ready for Merchant Import)
-- **Файли:** `Зернятко.zip` (а також `Зернятко-upload.zip` та `Zernyatko.zip`)
+- **Файли:** `Зерно.zip` (а також `Зерно-upload.zip` та `Zerno.zip`)
 - **Розмір:** 73 KB
 - **Вміст:** канонічні директорії Shopify (`assets/`, `blocks/`, `config/`, `layout/`, `locales/`, `sections/`, `snippets/`, `templates/`) без артефактів розробки.
