@@ -1,0 +1,73 @@
+/* sugar:assets/block-sticky-product-badge.css@2.0.0 */
+.sugar-sticky-product-badge {
+    position: absolute;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: var(--spb-dir, row);
+    gap: var(--spb-gap, 4px);
+    white-space: nowrap;
+    line-height: 1;
+    font-size: var(--spb-text-size, 12px);
+    font-weight: 600;
+    padding: var(--spb-pad-y, 6px) var(--spb-pad-x, 10px);
+    background: var(--spb-bg, #121212);
+    color: var(--spb-color, #ffffff);
+    border-radius: var(--spb-radius, var(--corner-badge));
+    border: var(--spb-border, 0) solid var(--spb-border-color, currentColor);
+    transform: translate(var(--spb-tx, 0), var(--spb-ty, 0));
+  }
+
+  /* Horizontal placement. The host publishes --sp-badge-inset so a floating bar
+     can sit the badge further in than a full-width one. */
+  .sugar-sticky-product-badge[data-spb-align="left"] {
+    left: var(--sp-badge-inset, 10px);
+  }
+
+  .sugar-sticky-product-badge[data-spb-align="right"] {
+    right: var(--sp-badge-inset, 10px);
+  }
+
+  .sugar-sticky-product-badge[data-spb-align="center"] {
+    left: 50%;
+    --spb-tx: -50%;
+  }
+
+  /* Vertical placement. "Inside" centres on the bar; "Edge" straddles the border
+     the bar does not sit against — the host pins that side, since only it knows
+     whether the bar is at the top or the bottom of the screen. */
+  .sugar-sticky-product-badge[data-spb-placement="inside"] {
+    top: 50%;
+    --spb-ty: -50%;
+  }
+
+  .sugar-sticky-product-badge__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.15em;
+    height: 1.15em;
+    color: var(--spb-icon-color, currentColor);
+  }
+
+  .sugar-sticky-product-badge__icon .sugar-icon {
+    font-size: 1.15em;
+    line-height: 1;
+  }
+
+  .sugar-sticky-product-badge__icon .sugar-icon-emoji {
+    font-size: 1em;
+    line-height: 1;
+  }
+
+  .sugar-sticky-product-badge__icon img {
+    width: 1.15em;
+    height: 1.15em;
+    object-fit: contain;
+  }
+
+  .sugar-sticky-product-badge__text {
+    line-height: 1;
+  }

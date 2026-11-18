@@ -1,0 +1,30 @@
+/* sugar:assets/block-custom-sticky-mobile.css@2.0.0 */
+/* A floating docked top bar sits in normal flow, inset from both screen edges. */
+  .sugar-custom-sticky-mobile[data-docked='true'][data-position='top'][data-style='floating'] {
+    padding: 8px 0;
+  }
+
+  .sugar-custom-sticky-mobile[data-style='floating'] .custom-sticky__bar {
+    max-width: min(100%, var(--cs-bar-w));
+    width: calc(100% - 24px);
+    margin: 8px auto;
+  }
+
+  /* Keeps a bottom bar clear of the home indicator on a notched phone. */
+  .sugar-custom-sticky-mobile[data-position='bottom'] .custom-sticky__bar {
+    padding-bottom: calc(var(--cs-pad-v) + env(safe-area-inset-bottom));
+  }
+
+  /* A floating pill is inset from the edges already, so the home-indicator room
+     goes under it, not inside it: padding there reads as an empty band in the
+     pill whenever a browser's toolbar slides away (Chrome on iOS). */
+  .sugar-custom-sticky-mobile[data-position='bottom'][data-style='floating'] .custom-sticky__bar {
+    padding-bottom: var(--cs-pad-v);
+    margin-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  @media screen and (min-width: 750px) {
+    .sugar-custom-sticky-mobile {
+      display: none !important;
+    }
+  }

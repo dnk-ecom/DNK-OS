@@ -20,6 +20,9 @@ from services.dnk_shopify.runtime.local_storefront import LocalStorefrontManager
 
 @pytest.fixture
 def theme_dir() -> Path:
+    ecom_dir = Path(__file__).resolve().parent.parent / "DNK_Ecom"
+    if ecom_dir.exists():
+        return ecom_dir
     return Path(__file__).resolve().parent.parent / "DNK_Sovereign_Apex"
 
 

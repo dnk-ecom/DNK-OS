@@ -91,6 +91,12 @@ class ProvenanceSignRequest(BaseModel):
     author_url: Optional[str] = Field(default="https://dnk-e.com", description="Author web portfolio or URI")
     copyright_notice: Optional[str] = Field(default="Copyright (c) 2026 DNK-e.com. All rights reserved.", description="Legal copyright declaration")
     watermark_payload: Optional[str] = Field(default=None, description="Steganographic watermark payload or ID")
+    alt_text_uk: Optional[str] = Field(default=None, description="Accessible SEO Alt Description in Ukrainian (<150 chars)")
+    alt_text_en: Optional[str] = Field(default=None, description="Accessible SEO Alt Description in English (<150 chars)")
+    seo_keywords: Optional[List[str]] = Field(default=None, description="Optional SEO search keywords")
+    price: Optional[str] = Field(default=None, description="Product price for GEO/Schema.org (e.g. '2400')")
+    currency: Optional[str] = Field(default="UAH", description="Currency code (e.g. UAH, USD)")
+    usp: Optional[str] = Field(default=None, description="Unique Selling Proposition / key benefit")
     output_path: Optional[str] = Field(default=None, description="Output destination file")
 
 
@@ -107,6 +113,10 @@ class ProvenanceSignResponse(BaseModel):
     signed_asset_path: str
     manifest_path: Optional[str] = None
     verification_token: str
+    alt_text_uk: Optional[str] = None
+    alt_text_en: Optional[str] = None
+    json_ld: Optional[Dict[str, Any]] = None
+    opengraph_tags: Optional[Dict[str, str]] = None
 
 
 class ProvenanceVerifyRequest(BaseModel):
@@ -120,6 +130,8 @@ class ProvenanceVerifyResponse(BaseModel):
     valid: bool
     asset_sha256: str
     detected_author: Optional[str] = None
+    detected_alt_uk: Optional[str] = None
+    detected_alt_en: Optional[str] = None
     c2pa_mode: str
     embedded_metadata: Dict[str, str] = Field(default_factory=dict)
     message: str
@@ -153,3 +165,27 @@ class VideoCompositionResponse(BaseModel):
     ffmpeg_recipe: str
     output_video_path: Optional[str] = None
     is_rendered: bool = False
+
+
+class SocialCardRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    product_title: str = Field(..., description="Product name")
+    price: str = Field(..., description="Formatted price (e.g. '2 400 ₴' or '85 $')")
+    currency: str = Field(default="UAH", description="Currency code")
+    brand: str = Field(default="DNK", description="Brand name")
+    in_stock: bool = Field(default=True, description="Availability status")
+    usp: Optional[str] = Field(default=None, description="USP badge (e.g. 'Преміальна тринитка')")
+    image_path: Optional[str] = Field(default=None, description="Optional path to background product image")
+    output_path: Optional[str] = Field(default=None, description="Output destination for SVG/HTML/PNG card")
+
+
+class SocialCardResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    svg_content: str
+    output_path: Optional[str] = None
+    width: int = 1200
+    height: int = 630
+    json_ld: Dict[str, Any]
+    opengraph_tags: Dict[str, str]
+    opengraph_html: str

@@ -24,6 +24,10 @@ default:
 audit-sota:
     @~/.dnk_runtime/venv/bin/python3 scripts/system/audit_design_system_sota_2026.py
 
+# Run SVAE v2.0 Autonomous YouTube Video Audit & Cross-Video Memory Synthesis
+audit-video url:
+    @~/.dnk_runtime/venv/bin/python3 scripts/system/audit_youtube_video.py "{{url}}"
+
 # Run all core SOTA unit tests in strict isolation
 test:
     @uv run pytest tests/core -v
@@ -64,7 +68,7 @@ outbox-daemon:
 # 🛍️ SHOPIFY THEME DEV & MOLECULAR GRAFTING
 # -----------------------------------------------------------------------------
 
-# Run 7-Gate Anti-Regression Theme Integrity Gate on DNK Sovereign Apex or donor
+# Run 7-Gate Anti-Regression Theme Integrity Gate on DNK Ecom theme or donor
 shopify-7gate theme="":
     @uv run python3 -c "from services.dnk_shopify.src.service import DNKShopifyService; from pathlib import Path; s = DNKShopifyService(default_theme_path=Path('{{theme}}') if '{{theme}}' else None); r = s.run_7gate_integrity(); print(r['stdout']); exit(r['exit_code'])"
 
@@ -220,4 +224,34 @@ deploy-noku-proposal:
 # Scaffold a new secure, isolated client portal with Edge Password Gate
 create-client-portal client_name:
     @uv run python3 scripts/system/create_client_portal.py --client {{client_name}}
+
+# -----------------------------------------------------------------------------
+# 🛍️ SHOPIFY INTELLIGENCE & CONTINUOUS SCOUT
+# -----------------------------------------------------------------------------
+
+# Fetch daily Shopify developer platform changelog and generate pulse report
+daily-pulse limit="10":
+    @uv run python3 scripts/shopify/shopify_daily_pulse.py --limit {{limit}} --save
+
+# Parse and synthesize Shopify Chrome bookmarks into index & query DB
+parse-bookmarks *args:
+    @uv run python3 scripts/shopify/parse_shopify_bookmarks.py {{args}}
+
+# -----------------------------------------------------------------------------
+# 🌐 GEO, AI-SEARCH & SOCIAL COMMERCE (DEC-159 & DEC-160)
+# -----------------------------------------------------------------------------
+
+# Generate standard e-commerce llms.txt & Google Merchant XML feeds
+geo-bundle out_dir="public":
+    @uv run python3 -m services.dnk_distribution.cli llms-txt {{out_dir}}
+    @uv run python3 -m services.dnk_distribution.cli merchant-feed {{out_dir}}/google_merchant_feed.xml
+
+# Generate luxury 1200x630 social preview card (SVG) for chat apps
+social-card title price currency="UAH" brand="DNK" usp="" out_path="assets/og_preview.svg":
+    @uv run python3 -m services.dnk_media.cli social-card "{{title}}" "{{price}}" "{{currency}}" "{{brand}}" "{{usp}}" "{{out_path}}"
+
+# Sign media asset with C2PA manifest & pure Python PNG metadata steganography
+media-sign image author="DNK-e.com" alt_uk="" alt_en="":
+    @uv run python3 -m services.dnk_media.cli sign "{{image}}" "{{author}}" "{{alt_uk}}" "{{alt_en}}"
+
 

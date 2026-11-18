@@ -1,20 +1,31 @@
 ---
+title: "Shopify Theme Architect Companion Skill"
 name: shopify-theme-craft-companion
-description: Use when auditing, sanitizing, extracting, or validating commercial Shopify themes ($350-$420 MSRP) with Theme Blocks 2.0 and Web Components.
-version: 2.0.0
+description: "Use when auditing, sanitizing, extracting, or validating commercial Shopify themes ($350-$420 MSRP) with Theme Blocks 2.0 and Web Components."
+mrh_id: "services/dnk_shopify/companion/SKILL.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - skill
+  - shopify
+  - companion
 ---
 
-# --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/companion/SKILL.md"
-# purpose: "Comprehensive Skill Definition for Shopify Theme Architect Companion (DNK-ThemeCraft v2.0.0)"
-# canonical_source: true
-# alters_files: ["blocks/dnk-*.liquid", "sections/dnk-*.liquid", "snippets/dnk-*.liquid", "assets/dnk-*.js", "assets/dnk-*.css"]
-# triggers_tasks: ["shopify-ast-audit", "cleanroom-sanitizer", "atomic-component-extractor", "theme-store-validator"]
-# status: "Active"
-# version: "2.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym Kuzmenko & Gerych-root / Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_shopify/companion/SKILL.md"
+> purpose: "Comprehensive Skill Definition for Shopify Theme Architect Companion (DNK-ThemeCraft v2.0.0)"
+> canonical_source: true
+> alters_files: ["blocks/dnk-*.liquid", "sections/dnk-*.liquid", "snippets/dnk-*.liquid", "assets/dnk-*.js", "assets/dnk-*.css"]
+> triggers_tasks: ["shopify-ast-audit", "cleanroom-sanitizer", "atomic-component-extractor", "theme-store-validator"]
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🛠️ Навичка: Shopify Theme Architect Companion (`DNK-ThemeCraft` v2.0.0)
 

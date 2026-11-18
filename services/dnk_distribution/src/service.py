@@ -11,6 +11,7 @@
 # --- END DNK-MRH-HEADER ---
 
 from typing import List, Dict, Any, Optional
+from pathlib import Path
 from services.dnk_distribution.src.brand_compliance import (
     BrandComplianceEngine,
     ComplianceReport,
@@ -28,6 +29,22 @@ from services.dnk_distribution.src.theme_miner import (
     CommentItem,
     ThemeMiningResult,
     audience_theme_miner,
+)
+from services.dnk_distribution.src.llms_txt import (
+    StoreProfile,
+    CatalogItem,
+    PolicyItem,
+    llms_txt_engine,
+)
+from services.dnk_distribution.src.merchant_feed import (
+    generate_google_merchant_xml,
+    export_merchant_feed,
+)
+from services.dnk_distribution.contracts.schemas import (
+    LlmsTxtRequest,
+    LlmsTxtResponse,
+    MerchantFeedRequest,
+    MerchantFeedResponse,
 )
 
 
@@ -60,6 +77,61 @@ def mine_audience_themes(
 ) -> ThemeMiningResult:
     """Mines comments and reviews to extract core customer objections, buying intents, and copy angles."""
     return audience_theme_miner.mine_comments(comments=comments)
+
+
+def generate_llms_bundle(request: LlmsTxtRequest) -> LlmsTxtResponse:
+    """Generates llms.txt and llms-full.txt files according to llmstxt.org e-commerce standards."""
+    txt = llms_txt_engine.generate_llms_txt(
+        profile=request.profile,
+        products=request.products,
+        policies=request.policies,
+    )
+    full_txt = llms_txt_engine.generate_llms_full_txt(
+        profile=request.profile,
+        products=request.products,
+        policies=request.policies,
+    )
+
+    exported = None
+    if request.output_dir:
+        exported = llms_txt_engine.export_bundle(
+            output_dir=Path(request.output_dir),
+            profile=request.profile,
+            products=request.products,
+            policies=request.policies,
+        )
+
+    return LlmsTxtResponse(
+        success=True,
+        llms_txt=txt,
+        llms_full_txt=full_txt,
+        exported_files=exported,
+    )
+
+
+def generate_merchant_feed(request: MerchantFeedRequest) -> MerchantFeedResponse:
+    """Generates Google Merchant Center RSS 2.0 XML product feed."""
+    xml_content = generate_google_merchant_xml(
+        profile=request.profile,
+        products=request.products,
+        image_base_url=request.image_base_url,
+    )
+
+    out_path = None
+    if request.output_path:
+        out_path = export_merchant_feed(
+            output_path=Path(request.output_path),
+            profile=request.profile,
+            products=request.products,
+            image_base_url=request.image_base_url,
+        )
+
+    return MerchantFeedResponse(
+        success=True,
+        xml_content=xml_content,
+        output_path=out_path,
+        total_items=len(request.products),
+    )
 
 
 def process_data(query: str) -> str:

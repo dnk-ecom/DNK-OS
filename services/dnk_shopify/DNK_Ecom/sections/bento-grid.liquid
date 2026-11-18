@@ -1,0 +1,351 @@
+{% comment %}
+  Renders a high-conversion 12-column Bento Grid section for feature highlights, social proof stats, and product storytelling.
+{% endcomment %}
+
+<div
+  class="bento-grid-section section-spacing"
+  style="
+    --color-background: {{ section.settings.background_color.red }} {{ section.settings.background_color.green }} {{ section.settings.background_color.blue }};
+    --color-text: {{ section.settings.text_color.red }} {{ section.settings.text_color.green }} {{ section.settings.text_color.blue }};
+    --pt: {{ section.settings.pt | default: 40 | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ section.settings.pb | default: 40 | divided_by: 16.0 | append: 'em' }};
+  "
+>
+  <div class="container {{ settings.container_width }}">
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="section-header text-center">
+        {% if section.settings.subheading != blank %}
+          <p class="section-subheading fs-xs font-bold uppercase tracking-wider">
+            {{ section.settings.subheading }}
+          </p>
+        {% endif %}
+        {% if section.settings.heading != blank %}
+          <h2 class="section-heading fs-3xl font-bold">
+            {{ section.settings.heading }}
+          </h2>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="bento-grid-container">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'bento_hero' %}
+            <div class="bento-card bento-card--hero" {{ block.shopify_attributes }}>
+              <div class="bento-card-content">
+                {% if block.settings.badge != blank %}
+                  <span class="bento-badge badge-accent fs-xs font-bold">{{ block.settings.badge }}</span>
+                {% endif %}
+                <h3 class="bento-card-title fs-2xl font-bold">{{ block.settings.title }}</h3>
+                {% if block.settings.text != blank %}
+                  <p class="bento-card-text fs-sm">{{ block.settings.text }}</p>
+                {% endif %}
+                {% if block.settings.button_label != blank %}
+                  <a href="{{ block.settings.button_link }}" class="btn btn-primary btn-sm bento-card-btn">
+                    {{ block.settings.button_label }}
+                  </a>
+                {% endif %}
+              </div>
+              {% if block.settings.image %}
+                <div class="bento-card-media">
+                  {{
+                    block.settings.image
+                    | image_url: width: 900
+                    | image_tag:
+                      widths: '450, 900',
+                      sizes: '(min-width: 990px) 60vw, 100vw',
+                      loading: 'lazy',
+                      class: 'bento-media-img',
+                      alt: block.settings.title
+                  }}
+                </div>
+              {% endif %}
+            </div>
+
+          {% when 'bento_stat' %}
+            <div class="bento-card bento-card--stat" {{ block.shopify_attributes }}>
+              <div class="bento-stat-number font-bold fs-5xl">{{ block.settings.stat_number }}</div>
+              <h4 class="bento-stat-label font-bold fs-md">{{ block.settings.stat_label }}</h4>
+              {% if block.settings.stat_desc != blank %}
+                <p class="bento-stat-desc fs-xs">{{ block.settings.stat_desc }}</p>
+              {% endif %}
+            </div>
+
+          {% when 'bento_feature' %}
+            <div class="bento-card bento-card--feature" {{ block.shopify_attributes }}>
+              {% if block.settings.icon != 'none' %}
+                <div class="bento-feature-icon">
+                  {% render 'svg-icons', icon: block.settings.icon, icon_size: 24 %}
+                </div>
+              {% endif %}
+              <h4 class="bento-feature-title font-bold fs-md">{{ block.settings.title }}</h4>
+              {% if block.settings.text != blank %}
+                <p class="bento-feature-text fs-sm">{{ block.settings.text }}</p>
+              {% endif %}
+            </div>
+
+          {% when 'bento_banner' %}
+            <div class="bento-card bento-card--banner" {{ block.shopify_attributes }}>
+              <div class="bento-banner-content">
+                <h3 class="bento-banner-title fs-xl font-bold">{{ block.settings.title }}</h3>
+                {% if block.settings.text != blank %}
+                  <p class="bento-banner-text fs-sm">{{ block.settings.text }}</p>
+                {% endif %}
+              </div>
+              {% if block.settings.button_label != blank %}
+                <a href="{{ block.settings.button_link }}" class="btn btn-primary btn-sm">
+                  {{ block.settings.button_label }}
+                </a>
+              {% endif %}
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bento grid",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Unrivaled Craftsmanship"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Engineered For Peak Performance"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "bento_hero",
+      "name": "Hero card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "default": "Flagship Innovation"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Breakthrough Design & Materials"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Engineered from aerospace-grade composites for unmatched longevity and superior feel."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Featured image"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Explore Collection"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    },
+    {
+      "type": "bento_stat",
+      "name": "Metric stat card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "stat_number",
+          "label": "Metric number",
+          "default": "99.8%"
+        },
+        {
+          "type": "text",
+          "id": "stat_label",
+          "label": "Metric label",
+          "default": "Satisfaction Rating"
+        },
+        {
+          "type": "text",
+          "id": "stat_desc",
+          "label": "Supporting text",
+          "default": "Verified by 12,000+ worldwide customers"
+        }
+      ]
+    },
+    {
+      "type": "bento_feature",
+      "name": "Feature card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "shield",
+              "label": "Shield"
+            },
+            {
+              "value": "award",
+              "label": "Award"
+            },
+            {
+              "value": "refresh",
+              "label": "Refresh"
+            },
+            {
+              "value": "lock",
+              "label": "Lock"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ],
+          "default": "shield"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Lifetime Warranty"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Description",
+          "default": "Full guarantee on all hardware and craftsmanship."
+        }
+      ]
+    },
+    {
+      "type": "bento_banner",
+      "name": "Wide banner card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Try It Risk-Free For 30 Days"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Free shipping and effortless returns worldwide."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Get Started Today"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bento grid",
+      "blocks": [
+        {
+          "type": "bento_hero"
+        },
+        {
+          "type": "bento_stat"
+        },
+        {
+          "type": "bento_feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Military-Grade Durability",
+            "text": "Tested in extreme conditions to ensure seamless operation."
+          }
+        },
+        {
+          "type": "bento_feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Express Dispatch",
+            "text": "Same-day priority fulfillment from our local hubs."
+          }
+        },
+        {
+          "type": "bento_stat",
+          "settings": {
+            "stat_number": "24/7",
+            "stat_label": "VIP Concierge Support",
+            "stat_desc": "Direct line to our technical specialists"
+          }
+        },
+        {
+          "type": "bento_banner"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

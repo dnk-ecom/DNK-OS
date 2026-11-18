@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_shopify/tests/test_brick.py"
+# mrh_id: "services/dnk_shopify/tests/test_shopify_brick.py"
 # purpose: "Senior Test Suite for dnk_shopify Sovereign Brick Contract (executes in < 1s)."
 # canonical_source: true
 # alters_files: []

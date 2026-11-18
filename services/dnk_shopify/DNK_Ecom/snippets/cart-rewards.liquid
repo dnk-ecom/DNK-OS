@@ -1,0 +1,103 @@
+{% doc %}
+  Renders the tiered progress and rewards bar for cart drawer and cart page.
+{% enddoc %}
+
+{% if settings.cart_rewards_enable %}
+  {% liquid
+    assign goal_1_amount = settings.cart_rewards_goal_1_amount | default: 50 | times: 100.0
+    assign goal_1_text = settings.cart_rewards_goal_1_text | default: 'Free Shipping'
+    assign goal_2_amount = settings.cart_rewards_goal_2_amount | default: 100 | times: 100.0
+    assign goal_2_text = settings.cart_rewards_goal_2_text | default: '10% OFF'
+    assign goal_3_amount = settings.cart_rewards_goal_3_amount | default: 150 | times: 100.0
+    assign goal_3_text = settings.cart_rewards_goal_3_text | default: 'Free Mystery Gift'
+
+    assign highest_goal = goal_1_amount
+    if goal_2_amount > highest_goal
+      assign highest_goal = goal_2_amount
+    endif
+    if goal_3_amount > highest_goal
+      assign highest_goal = goal_3_amount
+    endif
+
+    assign current_total = cart.total_price
+    assign progress_pct = current_total | divided_by: highest_goal | times: 100.0
+    if progress_pct > 100.0
+      assign progress_pct = 100.0
+    endif
+
+    assign all_goals_reached = false
+    assign next_goal_text = ''
+    assign remaining_amount = 0
+
+    if current_total >= highest_goal
+      assign all_goals_reached = true
+    elsif current_total < goal_1_amount
+      assign next_goal_text = goal_1_text
+      assign remaining_amount = goal_1_amount | minus: current_total
+    elsif current_total < goal_2_amount
+      assign next_goal_text = goal_2_text
+      assign remaining_amount = goal_2_amount | minus: current_total
+    else
+      assign next_goal_text = goal_3_text
+      assign remaining_amount = goal_3_amount | minus: current_total
+    endif
+
+    assign goal_1_pos = goal_1_amount | divided_by: highest_goal | times: 100.0
+    assign goal_2_pos = goal_2_amount | divided_by: highest_goal | times: 100.0
+    assign remaining_money = remaining_amount | money
+  %}
+
+  <div class="cart-rewards" data-cart-rewards>
+    <div class="cart-rewards-message">
+      {% if all_goals_reached %}
+        <span class="cart-rewards-unlocked-icon">🎉</span>
+        <span class="cart-rewards-text">
+          {{ 'cart.rewards.all_unlocked' | t }}
+        </span>
+      {% else %}
+        <span class="cart-rewards-text">
+          {{ 'cart.rewards.progress_html' | t: amount: remaining_money, goal: next_goal_text }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="cart-rewards-bar-wrapper">
+      <div class="cart-rewards-bar" role="progressbar" aria-valuenow="{{ progress_pct | round }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="cart-rewards-bar-fill" style="width: {{ progress_pct }}%;"></div>
+
+        <div class="cart-rewards-checkpoint {% if current_total >= goal_1_amount %}is-reached{% endif %}" style="left: {{ goal_1_pos }}%;">
+          <div class="cart-rewards-node">
+            {% if current_total >= goal_1_amount %}
+              {% render 'svg-icons', icon: 'check', icon_size: 14 %}
+            {% else %}
+              {% render 'svg-icons', icon: 'truck', icon_size: 14 %}
+            {% endif %}
+          </div>
+          <span class="cart-rewards-label">{{ goal_1_text }}</span>
+        </div>
+
+        <div class="cart-rewards-checkpoint {% if current_total >= goal_2_amount %}is-reached{% endif %}" style="left: {{ goal_2_pos }}%;">
+          <div class="cart-rewards-node">
+            {% if current_total >= goal_2_amount %}
+              {% render 'svg-icons', icon: 'check', icon_size: 14 %}
+            {% else %}
+              {% render 'svg-icons', icon: 'tag', icon_size: 14 %}
+            {% endif %}
+          </div>
+          <span class="cart-rewards-label">{{ goal_2_text }}</span>
+        </div>
+
+        <div class="cart-rewards-checkpoint {% if current_total >= goal_3_amount %}is-reached{% endif %}" style="left: 100%;">
+          <div class="cart-rewards-node">
+            {% if current_total >= goal_3_amount %}
+              {% render 'svg-icons', icon: 'check', icon_size: 14 %}
+            {% else %}
+              {% render 'svg-icons', icon: 'gift', icon_size: 14 %}
+            {% endif %}
+          </div>
+          <span class="cart-rewards-label">{{ goal_3_text }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

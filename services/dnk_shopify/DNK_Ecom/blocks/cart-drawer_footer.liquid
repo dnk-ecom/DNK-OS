@@ -1,0 +1,29 @@
+{%- comment -%}
+  Cart Drawer Footer Block (Static Block: cart-drawer_footer)
+{%- endcomment -%}
+<div class="drawer__footer" {{ block.shopify_attributes }}>
+  <div class="cart__footer-subtotal flex justify-between items-center py-2">
+    <span>{{ 'sections.cart.subtotal' | t }}</span>
+    <span>{{ cart.total_price | money }}</span>
+  </div>
+  <button type="submit" name="checkout" form="CartDrawer-Form" class="button button--primary w-full py-3 cart__checkout-btn">
+    {{ 'sections.cart.checkout' | t }}
+  </button>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart footer",
+  "tag": null,
+  "blocks": [
+    { "type": "@app" },
+    { "type": "heading" },
+    { "type": "text" },
+    { "type": "button" },
+    { "type": "divider" },
+    { "type": "image" }
+  ],
+  "settings": []
+}
+{% endschema %}

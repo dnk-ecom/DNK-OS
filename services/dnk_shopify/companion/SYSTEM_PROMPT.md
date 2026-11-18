@@ -1,14 +1,30 @@
-<!-- --- DNK-MRH-HEADER ---
-mrh_id: "_Shopify_Theme_DEV_Workflow/companion/SYSTEM_PROMPT.md"
-purpose: "Canonical System Prompt & Architectural Manifesto for Shopify Theme Architect Companion (DNK-ThemeCraft v2.0.0)"
-canonical_source: true
-alters_files: []
-triggers_tasks: []
-status: "Active"
+---
+title: "Shopify Theme Architect Companion System Prompt"
+description: "Canonical System Prompt & Architectural Manifesto for Shopify Theme Architect Companion (DNK-ThemeCraft v2.0.0)"
+mrh_id: "services/dnk_shopify/companion/SYSTEM_PROMPT.md"
+status: Active
 version: "2.0.0"
-updated_at: "2026-11-12"
-author: "DNK-e.com Maksym Kuzmenko & Gerych-root / Antigravity (Chief Architect)"
---- END DNK-MRH-HEADER --- -->
+updated: 2026-11-18
+tags:
+  - shopify
+  - companion
+  - system-prompt
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_shopify/companion/SYSTEM_PROMPT.md"
+> purpose: "Canonical System Prompt & Architectural Manifesto for Shopify Theme Architect Companion (DNK-ThemeCraft v2.0.0)"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏛️ СИСТЕМНИЙ ПРОМПТ: SHOPIFY THEME ARCHITECT COMPANION (`DNK-THEMECRAFT` v2.0.0)
 

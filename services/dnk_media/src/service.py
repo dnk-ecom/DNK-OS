@@ -36,12 +36,24 @@ from services.dnk_media.src.sound_design import (
 from services.dnk_media.src.provenance import (
     ProvenanceEngine,
     provenance_engine,
+    synthesize_ecommerce_alt,
+)
+from services.dnk_media.src.social_commerce import (
+    SocialCommerceEngine,
+    social_commerce_engine,
+    generate_schema_org_json_ld,
+    generate_opengraph_tags,
+    generate_breadcrumbs_json_ld,
+    generate_faq_json_ld,
+    generate_serp_dominator_graph,
 )
 from services.dnk_media.contracts.schemas import (
     ProvenanceSignRequest,
     ProvenanceSignResponse,
     ProvenanceVerifyRequest,
     ProvenanceVerifyResponse,
+    SocialCardRequest,
+    SocialCardResponse,
 )
 
 
@@ -118,6 +130,12 @@ def sign_provenance(
     author_url: Optional[str] = "https://dnk-e.com",
     copyright_notice: Optional[str] = None,
     watermark_payload: Optional[str] = None,
+    alt_text_uk: Optional[str] = None,
+    alt_text_en: Optional[str] = None,
+    seo_keywords: Optional[List[str]] = None,
+    price: Optional[str] = None,
+    currency: str = "UAH",
+    usp: Optional[str] = None,
     output_path: Optional[str] = None,
 ) -> ProvenanceSignResponse:
     """Signs media file with C2PA manifest & metadata steganography (DEC-143)."""
@@ -127,9 +145,39 @@ def sign_provenance(
         author_url=author_url,
         copyright_notice=copyright_notice,
         watermark_payload=watermark_payload,
+        alt_text_uk=alt_text_uk,
+        alt_text_en=alt_text_en,
+        seo_keywords=seo_keywords,
+        price=price,
+        currency=currency,
+        usp=usp,
         output_path=output_path,
     )
     return provenance_engine.sign_asset(req)
+
+
+def generate_social_card(
+    product_title: str,
+    price: str,
+    currency: str = "UAH",
+    brand: str = "DNK",
+    in_stock: bool = True,
+    usp: Optional[str] = None,
+    image_path: Optional[str] = None,
+    output_path: Optional[str] = None,
+) -> SocialCardResponse:
+    """Generates 1200x630 social preview card (SVG) with OpenGraph and JSON-LD."""
+    req = SocialCardRequest(
+        product_title=product_title,
+        price=price,
+        currency=currency,
+        brand=brand,
+        in_stock=in_stock,
+        usp=usp,
+        image_path=image_path,
+        output_path=output_path,
+    )
+    return social_commerce_engine.generate_social_card(req)
 
 
 def verify_provenance(

@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from services.dnk_distribution.src.brand_compliance import ComplianceReport, BrandProfile
 from services.dnk_distribution.src.social_feedback import SocialMetrics, ContentFeedbackReport
 from services.dnk_distribution.src.theme_miner import CommentItem, ThemeMiningResult
+from services.dnk_distribution.src.llms_txt import StoreProfile, CatalogItem, PolicyItem
 
 
 class ServiceInput(BaseModel):
@@ -60,3 +61,35 @@ class ThemeMiningResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     success: bool
     result: ThemeMiningResult
+
+
+class LlmsTxtRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    profile: StoreProfile = Field(default_factory=StoreProfile)
+    products: List[CatalogItem] = Field(default_factory=list)
+    policies: Optional[List[PolicyItem]] = None
+    output_dir: Optional[str] = None
+
+
+class LlmsTxtResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    llms_txt: str
+    llms_full_txt: str
+    exported_files: Optional[Dict[str, str]] = None
+
+
+class MerchantFeedRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    profile: StoreProfile = Field(default_factory=StoreProfile)
+    products: List[CatalogItem] = Field(default_factory=list)
+    image_base_url: Optional[str] = None
+    output_path: Optional[str] = None
+
+
+class MerchantFeedResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    xml_content: str
+    output_path: Optional[str] = None
+    total_items: int = 0

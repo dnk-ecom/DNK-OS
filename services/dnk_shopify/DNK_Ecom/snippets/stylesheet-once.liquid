@@ -1,0 +1,64 @@
+{%- comment -%}sugar:snippets/stylesheet-once.liquid@2.3.0{%- endcomment -%}
+{%- comment -%}
+  One link per stylesheet. Every block prints the link to its own stylesheet, so a page with
+  forty Text blocks carries forty identical links. The browser downloads the file once, but each
+  link is a separate stylesheet in the cascade, and every style recalculation walks all of them
+  (measured 2026-10-29: 380 links for 94 files doubled the cost of a full-page recalculation).
+
+  Rendered by the layouts only, never in the theme editor (it re-renders one section at a time,
+  and each section must bring its own links). Prints html back with the first link to each
+  stylesheet kept where it was, so the component it sits above still paints styled, and every
+  later copy removed. A link whose href is in seen ('|href|href|') is removed everywhere: the
+  layout's own head links.
+
+  It ends the page with a small script: when a script later swaps part of the page for fresh
+  markup that no longer holds a component, the link that styled the component's other copies
+  would leave with it, so the script puts it back at the end of the page.
+
+  Accepts: html, seen (optional).
+{%- endcomment -%}
+{%- liquid
+  assign _tail = '" rel="stylesheet" type="text/css" media="all" />'
+  assign _seen = seen | default: '|'
+  assign _parts = html | split: '<link href="'
+  for _p in _parts
+    if forloop.first
+      echo _p
+      continue
+    endif
+    assign _href = _p | split: '"' | first
+    assign _tag = _href | append: _tail
+    assign _tag_size = _tag | size
+    assign _head = _p | slice: 0, _tag_size
+    if _head != _tag
+      echo '<link href="' | append: _p
+      continue
+    endif
+    assign _key = '|' | append: _href | append: '|'
+    if _seen contains _key
+      echo _p | remove_first: _tag
+    else
+      assign _seen = _seen | append: _href | append: '|'
+      echo '<link href="' | append: _p
+    endif
+  endfor
+-%}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    new MutationObserver(function (records) {
+      var gone = [];
+      records.forEach(function (r) {
+        r.removedNodes.forEach(function (n) {
+          if (n.nodeType !== 1) return;
+          if (n.tagName === 'LINK') gone.push(n);
+          else if (n.firstElementChild) gone.push.apply(gone, n.querySelectorAll('link[rel="stylesheet"]'));
+        });
+      });
+      gone.forEach(function (l) {
+        var href = l.getAttribute('href');
+        if (l.isConnected || l.rel !== 'stylesheet' || !href) return;
+        if (!document.querySelector('link[rel="stylesheet"][href="' + CSS.escape(href) + '"]')) document.body.appendChild(l);
+      });
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+</script>

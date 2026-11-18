@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/companion/COMPANION_DISTILLATION_REPORT.md"
-# purpose: "Executive Summary of 14-Donor Ecosystem Distillation & Companion Agent Initialization (v2.0.0)"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym Kuzmenko & Gerych-root / Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Звіт про дистиляцію 14 воркплейсів та ініціалізацію агента-компаньйона"
+description: "Executive Summary of 14-Donor Ecosystem Distillation & Companion Agent Initialization (v2.0.0)"
+mrh_id: "services/dnk_shopify/companion/COMPANION_DISTILLATION_REPORT.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - shopify
+  - companion
+  - distillation
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_shopify/companion/COMPANION_DISTILLATION_REPORT.md"
+> purpose: "Executive Summary of 14-Donor Ecosystem Distillation & Companion Agent Initialization (v2.0.0)"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 📊 ЗВІТ ПРО ДИСТИЛЯЦІЮ 14 ВОРКПЛЕЙСІВ ТА ІНІЦІАЛІЗАЦІЮ АГЕНТА-КОМПАНЬЙОНА (`DNK-ThemeCraft` v2.0.0)
 

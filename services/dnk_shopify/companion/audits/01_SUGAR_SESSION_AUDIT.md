@@ -10,24 +10,24 @@ version: "2.5.0"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/companion/audits/01_SUGAR_SESSION_AUDIT.md"
+> mrh_id: "services/dnk_shopify/companion/audits/01_SUGAR_SESSION_AUDIT.md"
 > purpose: "Канонічний майстер-аудит донора 01: Sugar Theme для бази знань агента-компаньйона DNK-ThemeCraft."
 > canonical_source: false
-> original_source: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
+> original_source: "../DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
 > alters_files: []
 > triggers_tasks: []
 > status: "Approved"
 > version: "2.5.0"
-> updated_at: "2026-11-12"
-> author: "Antigravity & Gerych-root"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
 # 🏛️ ДОНОР 01: SUGAR THEME ECOSYSTEM AUDIT (ШЕЛФ 1)
 
-> **Повний канонічний звіт:** [`SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md)  
-> **Робочий каталог:** [`Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/)  
-> **Кодова база донора:** [`DNK-Ecom_git_mirrow/sugar`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/DNK-Ecom_git_mirrow/sugar) (1195 файлів, v2.3.9 / v2.3.10 DNK)
+> **Повний канонічний звіт:** [`SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md`](../../../../DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md)  
+> **Робочий каталог:** [`Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/`](../../../../DNKEcom/Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/)  
+> **Кодова база донора:** [`DNK-Ecom_git_mirrow/sugar`](../../../../DNKEcom/DNK-Ecom_git_mirrow/sugar) (1195 файлів, v2.3.9 / v2.3.10 DNK)
 
 ## 🔑 КЛЮЧОВІ ДИСТИЛЬОВАНІ ЗНАХІДКИ ТА ФОРМУЛИ:
 1. **Theme Blocks 2.0 (296 блоків)**: 151 контейнер із `content_for 'blocks'` та глибиною рекурсії до 8 рівнів; передача контексту через `closest.product: _product`.

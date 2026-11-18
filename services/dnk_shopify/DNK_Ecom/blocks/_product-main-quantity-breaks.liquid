@@ -1,0 +1,185 @@
+{% doc %}
+  Renders a tiered wholesale / volume discount quantity breaks selector that increases Average Order Value (AOV).
+{% enddoc %}
+
+{% liquid
+  assign product = closest.product | default: product
+  assign selected_variant = product.selected_or_first_available_variant
+  assign base_price = selected_variant.price
+
+  assign tier_1_qty = 1
+  assign tier_2_qty = block.settings.tier_2_qty | default: 2
+  assign tier_2_discount = block.settings.tier_2_discount | default: 10
+  assign tier_3_qty = block.settings.tier_3_qty | default: 3
+  assign tier_3_discount = block.settings.tier_3_discount | default: 20
+
+  # Tier 2 prices
+  assign tier_2_discount_multiplier = 100 | minus: tier_2_discount | divided_by: 100.0
+  assign tier_2_unit_price = base_price | times: tier_2_discount_multiplier | round
+  assign tier_2_total = tier_2_unit_price | times: tier_2_qty
+
+  # Tier 3 prices
+  assign tier_3_discount_multiplier = 100 | minus: tier_3_discount | divided_by: 100.0
+  assign tier_3_unit_price = base_price | times: tier_3_discount_multiplier | round
+  assign tier_3_total = tier_3_unit_price | times: tier_3_qty
+%}
+
+{% if product != blank and product.available %}
+  <quantity-breaks
+    class="quantity-breaks block-spacing"
+    data-quantity-breaks
+    style="
+      --pt: {{ block.settings.pt | default: 10 | divided_by: 16.0 | append: 'em' }};
+      --pb: {{ block.settings.pb | default: 20 | divided_by: 16.0 | append: 'em' }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% if block.settings.heading != blank %}
+      <h3 class="quantity-breaks-heading fs-sm font-bold">{{ block.settings.heading }}</h3>
+    {% endif %}
+
+    <div class="quantity-breaks-cards">
+      <!-- Tier 1 -->
+      <label class="quantity-break-card is-selected" data-qb-tier="1" data-qty="{{ tier_1_qty }}">
+        <input type="radio" name="quantity_breaks_{{ block.id }}" value="{{ tier_1_qty }}" checked class="quantity-break-radio">
+        <div class="quantity-break-body">
+          <div class="quantity-break-top">
+            <span class="quantity-break-title font-bold fs-sm">Buy {{ tier_1_qty }}</span>
+            <span class="quantity-break-price font-bold fs-sm">{{ base_price | money }}</span>
+          </div>
+          <span class="quantity-break-subtext fs-xs">Standard price</span>
+        </div>
+      </label>
+
+      <!-- Tier 2 -->
+      <label class="quantity-break-card" data-qb-tier="2" data-qty="{{ tier_2_qty }}">
+        <input type="radio" name="quantity_breaks_{{ block.id }}" value="{{ tier_2_qty }}" class="quantity-break-radio">
+        {% if block.settings.tier_2_badge != blank %}
+          <span class="quantity-break-badge">{{ block.settings.tier_2_badge }}</span>
+        {% endif %}
+        <div class="quantity-break-body">
+          <div class="quantity-break-top">
+            <span class="quantity-break-title font-bold fs-sm">Buy {{ tier_2_qty }} (Save {{ tier_2_discount }}%)</span>
+            <span class="quantity-break-price font-bold fs-sm">{{ tier_2_unit_price | money }}/ea</span>
+          </div>
+          <div class="quantity-break-subtext fs-xs">
+            <span>Total: {{ tier_2_total | money }}</span>
+            <s class="quantity-break-compare">{{ base_price | times: tier_2_qty | money }}</s>
+          </div>
+        </div>
+      </label>
+
+      <!-- Tier 3 -->
+      <label class="quantity-break-card" data-qb-tier="3" data-qty="{{ tier_3_qty }}">
+        <input type="radio" name="quantity_breaks_{{ block.id }}" value="{{ tier_3_qty }}" class="quantity-break-radio">
+        {% if block.settings.tier_3_badge != blank %}
+          <span class="quantity-break-badge badge-accent">{{ block.settings.tier_3_badge }}</span>
+        {% endif %}
+        <div class="quantity-break-body">
+          <div class="quantity-break-top">
+            <span class="quantity-break-title font-bold fs-sm">Buy {{ tier_3_qty }} (Save {{ tier_3_discount }}%)</span>
+            <span class="quantity-break-price font-bold fs-sm">{{ tier_3_unit_price | money }}/ea</span>
+          </div>
+          <div class="quantity-break-subtext fs-xs">
+            <span>Total: {{ tier_3_total | money }}</span>
+            <s class="quantity-break-compare">{{ base_price | times: tier_3_qty | money }}</s>
+          </div>
+        </div>
+      </label>
+    </div>
+  </quantity-breaks>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Quantity breaks",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Special Volume Pricing"
+    },
+    {
+      "type": "header",
+      "content": "Tier 2"
+    },
+    {
+      "type": "number",
+      "id": "tier_2_qty",
+      "label": "Quantity",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "tier_2_discount",
+      "label": "Discount %",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "tier_2_badge",
+      "label": "Badge text",
+      "default": "Most Popular"
+    },
+    {
+      "type": "header",
+      "content": "Tier 3"
+    },
+    {
+      "type": "number",
+      "id": "tier_3_qty",
+      "label": "Quantity",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "tier_3_discount",
+      "label": "Discount %",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "tier_3_badge",
+      "label": "Badge text",
+      "default": "Best Value"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Quantity breaks",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

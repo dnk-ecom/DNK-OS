@@ -1,0 +1,245 @@
+{% doc %}
+  Renders an Us vs. Them comparison table block highlighting brand superiority against traditional competitors.
+{% enddoc %}
+
+<div
+  class="comparison-table-block block-spacing"
+  style="
+    --pt: {{ block.settings.pt | default: 20 | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | default: 20 | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.heading != blank %}
+    <h3 class="comparison-table-heading text-center fs-lg font-bold">
+      {{ block.settings.heading }}
+    </h3>
+  {% endif %}
+
+  <div class="comparison-table-wrapper">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th class="comparison-col-feature">{{ block.settings.feature_col_title | default: 'Features & Benefits' }}</th>
+          <th class="comparison-col-us is-winner">
+            <span class="comparison-brand-badge font-bold">{{ block.settings.brand_name | default: 'Our Brand' }}</span>
+          </th>
+          <th class="comparison-col-them">
+            <span class="comparison-them-name">{{ block.settings.competitor_name | default: 'Other Brands' }}</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in (1..5) %}
+          {% capture title_key %}feature_{{ i }}_title{% endcapture %}
+          {% capture us_key %}feature_{{ i }}_us{% endcapture %}
+          {% capture them_key %}feature_{{ i }}_them{% endcapture %}
+
+          {% assign title = block.settings[title_key] %}
+          {% assign us_val = block.settings[us_key] %}
+          {% assign them_val = block.settings[them_key] %}
+
+          {% if title != blank %}
+            <tr>
+              <td class="comparison-feature-name">{{ title }}</td>
+              <td class="comparison-val comparison-val-us is-winner">
+                {% if us_val %}
+                  <span class="comparison-icon icon-check" aria-label="Yes">
+                    {% render 'svg-icons', icon: 'check', icon_size: 16 %}
+                  </span>
+                {% else %}
+                  <span class="comparison-icon icon-cross" aria-label="No">
+                    {% render 'svg-icons', icon: 'close', icon_size: 16 %}
+                  </span>
+                {% endif %}
+              </td>
+              <td class="comparison-val comparison-val-them">
+                {% if them_val %}
+                  <span class="comparison-icon icon-check" aria-label="Yes">
+                    {% render 'svg-icons', icon: 'check', icon_size: 16 %}
+                  </span>
+                {% else %}
+                  <span class="comparison-icon icon-cross" aria-label="No">
+                    {% render 'svg-icons', icon: 'close', icon_size: 16 %}
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Comparison table",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Why Choose Our Product"
+    },
+    {
+      "type": "text",
+      "id": "feature_col_title",
+      "label": "Features column label",
+      "default": "Features & Standards"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Your brand name",
+      "default": "Our Brand"
+    },
+    {
+      "type": "text",
+      "id": "competitor_name",
+      "label": "Competitor name",
+      "default": "Other Brands"
+    },
+    {
+      "type": "header",
+      "content": "Row 1"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_title",
+      "label": "Feature title",
+      "default": "100% Organic & Non-Toxic Materials"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_1_us",
+      "label": "Our brand has it",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_1_them",
+      "label": "Competitors have it",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Row 2"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_title",
+      "label": "Feature title",
+      "default": "Lifetime Durability Guarantee"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_2_us",
+      "label": "Our brand has it",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_2_them",
+      "label": "Competitors have it",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Row 3"
+    },
+    {
+      "type": "text",
+      "id": "feature_3_title",
+      "label": "Feature title",
+      "default": "Free Express 2-Day Shipping"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_3_us",
+      "label": "Our brand has it",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_3_them",
+      "label": "Competitors have it",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Row 4"
+    },
+    {
+      "type": "text",
+      "id": "feature_4_title",
+      "label": "Feature title",
+      "default": "Zero Artificial Additives & Preservatives"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_4_us",
+      "label": "Our brand has it",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_4_them",
+      "label": "Competitors have it",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Row 5"
+    },
+    {
+      "type": "text",
+      "id": "feature_5_title",
+      "label": "Feature title",
+      "default": "30-Day Risk-Free Money Back Guarantee"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_5_us",
+      "label": "Our brand has it",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_5_them",
+      "label": "Competitors have it",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison table",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

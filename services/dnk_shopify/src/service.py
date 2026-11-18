@@ -107,8 +107,9 @@ class DNKShopifyService:
         if default_theme_path:
             self.default_theme_path = Path(default_theme_path)
         else:
-            # 1. Local self-contained working copy of DNK Sovereign 1.0.0 Apex
-            local_apex = Path(__file__).resolve().parent.parent / "DNK_Sovereign_Apex"
+            # 1. Local self-contained working copy of DNK Ecom Flagship Theme
+            local_ecom = Path(__file__).resolve().parent.parent / "DNK_Ecom"
+            local_apex_legacy = Path(__file__).resolve().parent.parent / "DNK_Sovereign_Apex"
             # 2. Canonical Git Bare Mirror worktree
             git_mirrow_main = (
                 Path(__file__).resolve().parent.parent.parent.parent.parent
@@ -116,13 +117,15 @@ class DNKShopifyService:
                 / "DNK-Ecom_git_mirrow"
                 / "main"
             )
-            # Prioritize the canonical Git Bare Mirror worktree over local snapshot
-            if git_mirrow_main.exists():
+            # Prioritize local self-contained sovereign copy
+            if local_ecom.exists():
+                self.default_theme_path = local_ecom
+            elif local_apex_legacy.exists():
+                self.default_theme_path = local_apex_legacy
+            elif git_mirrow_main.exists():
                 self.default_theme_path = git_mirrow_main
-            elif local_apex.exists():
-                self.default_theme_path = local_apex
             else:
-                self.default_theme_path = git_mirrow_main
+                self.default_theme_path = local_ecom
 
     def validate_liquid(self, code: str) -> LiquidValidationResult:
         """
@@ -401,10 +404,17 @@ class DNKShopifyService:
         if not script_path.exists():
             script_path = (
                 Path(__file__).resolve().parent.parent
-                / "DNK_Sovereign_Apex"
+                / "DNK_Ecom"
                 / "tools"
                 / "verify_theme_integrity.py"
             )
+            if not script_path.exists():
+                script_path = (
+                    Path(__file__).resolve().parent.parent
+                    / "DNK_Sovereign_Apex"
+                    / "tools"
+                    / "verify_theme_integrity.py"
+                )
 
         if not script_path.exists():
             return {

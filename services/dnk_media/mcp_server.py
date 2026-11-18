@@ -20,6 +20,11 @@ from services.dnk_media.src.service import (
     process_data,
     sign_provenance,
     verify_provenance,
+    synthesize_ecommerce_alt,
+    generate_social_card,
+    generate_schema_org_json_ld,
+    generate_opengraph_tags,
+    generate_serp_dominator_graph,
 )
 from core.adapters.dnk_agentic_video_adapter import (
     DNKAgenticVideoAdapter,
@@ -150,18 +155,132 @@ def media_sign_provenance(
     author_url: str = "https://dnk-e.com",
     copyright_notice: Optional[str] = None,
     watermark_payload: Optional[str] = None,
+    alt_text_uk: Optional[str] = None,
+    alt_text_en: Optional[str] = None,
+    seo_keywords: Optional[List[str]] = None,
+    price: Optional[str] = None,
+    currency: str = "UAH",
+    usp: Optional[str] = None,
     output_path: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Sign media file with C2PA manifest & metadata steganography (DEC-143)."""
+    """Sign media file with C2PA manifest, multilingual Alt text, SEO & rich metadata (DEC-143)."""
     res = sign_provenance(
         image_path=image_path,
         author_name=author_name,
         author_url=author_url,
         copyright_notice=copyright_notice,
         watermark_payload=watermark_payload,
+        alt_text_uk=alt_text_uk,
+        alt_text_en=alt_text_en,
+        seo_keywords=seo_keywords,
+        price=price,
+        currency=currency,
+        usp=usp,
         output_path=output_path,
     )
     return res.model_dump()
+
+
+@mcp.tool()
+def media_generate_social_card(
+    product_title: str,
+    price: str,
+    currency: str = "UAH",
+    brand: str = "DNK",
+    in_stock: bool = True,
+    usp: Optional[str] = None,
+    image_path: Optional[str] = None,
+    output_path: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Generate a luxury 1200x630 social preview card (SVG) with OpenGraph and JSON-LD."""
+    res = generate_social_card(
+        product_title=product_title,
+        price=price,
+        currency=currency,
+        brand=brand,
+        in_stock=in_stock,
+        usp=usp,
+        image_path=image_path,
+        output_path=output_path,
+    )
+    return res.model_dump()
+
+
+@mcp.tool()
+def media_generate_jsonld(
+    product_title: str,
+    price: str,
+    currency: str = "UAH",
+    brand: str = "DNK",
+    in_stock: bool = True,
+    description: Optional[str] = None,
+    image_url: Optional[str] = None,
+    sku: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Generate Schema.org Product+Offer JSON-LD structured data for Google & AI search bots."""
+    return generate_schema_org_json_ld(
+        product_title=product_title,
+        price=price,
+        currency=currency,
+        brand=brand,
+        in_stock=in_stock,
+        description=description,
+        image_url=image_url,
+        sku=sku,
+    )
+
+
+@mcp.tool()
+def media_generate_serp_graph(
+    product_title: str,
+    price: str,
+    currency: str = "UAH",
+    brand: str = "DNK",
+    in_stock: bool = True,
+    description: Optional[str] = None,
+    image_url: Optional[str] = None,
+    sku: Optional[str] = None,
+    breadcrumbs: Optional[List[List[Optional[str]]]] = None,
+    faqs: Optional[List[Dict[str, str]]] = None,
+) -> Dict[str, Any]:
+    """Generate unified Schema.org @graph (Product + BreadcrumbList + FAQPage) for SERP dominance."""
+    bc_tuples = [(b[0], b[1]) for b in (breadcrumbs or []) if len(b) >= 2]
+    return generate_serp_dominator_graph(
+        product_title=product_title,
+        price=price,
+        currency=currency,
+        brand=brand,
+        in_stock=in_stock,
+        description=description,
+        image_url=image_url,
+        sku=sku,
+        breadcrumbs=bc_tuples if bc_tuples else None,
+        faqs=faqs,
+    )
+
+
+@mcp.tool()
+def media_synthesize_alt_text(
+    product_title: str,
+    color: Optional[str] = None,
+    material: Optional[str] = None,
+    brand: str = "DNK",
+    category: Optional[str] = None,
+) -> Dict[str, str]:
+    """Synthesize W3C WCAG 2.2 compliant bilingual Alt text pairs (<125 chars) for UK & EN markets."""
+    uk, en = synthesize_ecommerce_alt(
+        product_title=product_title,
+        color=color,
+        material=material,
+        brand=brand,
+        category=category,
+    )
+    return {
+        "alt_text_uk": uk,
+        "alt_text_en": en,
+        "char_count_uk": len(uk),
+        "char_count_en": len(en),
+    }
 
 
 @mcp.tool()

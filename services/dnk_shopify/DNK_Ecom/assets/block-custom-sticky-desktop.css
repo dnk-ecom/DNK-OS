@@ -1,0 +1,33 @@
+/* sugar:assets/block-custom-sticky-desktop.css@2.0.0 */
+/* A floating docked top bar sits in normal flow, so it centres itself rather than
+     inside a full-bleed fixed shell. */
+  .sugar-custom-sticky-desktop[data-docked='true'][data-position='top'][data-style='floating'] {
+    padding: 12px 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sugar-custom-sticky-desktop[data-style='floating'] .custom-sticky__bar {
+    max-width: var(--cs-bar-w);
+    width: 100%;
+    margin: 12px auto;
+  }
+
+  .sugar-custom-sticky-desktop[data-style='floating'][data-docked='true'][data-position='top'] .custom-sticky__bar {
+    margin: 0 auto;
+  }
+
+  /* Below its content width the row keeps the page's own side margin (5rem, as
+     .page-width), so a bar set to no horizontal padding still lines up with the page
+     instead of running into the screen edges. */
+  .sugar-custom-sticky-desktop[data-style='full_width'] .custom-sticky__content {
+    max-width: min(var(--cs-content-w), 100% - 2 * max(0px, 5rem - var(--cs-pad-h)));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .sugar-custom-sticky-desktop {
+      display: none !important;
+    }
+  }

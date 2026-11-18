@@ -1,0 +1,255 @@
+/* sugar:assets/block-sticky-buy-button.css@2.2.0 */
+.sugar-sticky-buy-button {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .sugar-sticky-buy-button[data-position="bottom"] {
+    bottom: 0;
+    transform: translateY(100%);
+  }
+
+  .sugar-sticky-buy-button[data-position="top"] {
+    top: 0;
+    transform: translateY(-100%);
+  }
+
+  .sugar-sticky-buy-button.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sugar-sticky-buy-button[data-position="top"].is-visible {
+    top: var(--header-sticky-offset, 0);
+    transition: transform 0.3s ease, opacity 0.3s ease, top 0.15s ease-out;
+  }
+
+  /* Docked: renders in place and only goes fixed once scrolled past. */
+  .sugar-sticky-buy-button[data-docked="true"] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  .sugar-sticky-buy-button[data-docked="true"][data-position="top"] {
+    position: relative;
+  }
+
+  .sugar-sticky-buy-button[data-docked="true"][data-position="top"].is-stuck {
+    position: fixed;
+    top: var(--header-sticky-offset, 0);
+    left: 0;
+    right: 0;
+    transition: top 0.15s ease-out;
+  }
+
+  .sugar-sticky-buy-button[data-docked="true"][data-position="bottom"].is-docked {
+    position: relative;
+    bottom: auto;
+  }
+
+  .sugar-sticky-buy-button__container {
+    display: flex;
+    justify-content: center;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 50px;
+  }
+
+  /* Clear the screen edge so the button reads as floating rather than docked. */
+  .sugar-sticky-buy-button[data-position="bottom"] .sugar-sticky-buy-button__container {
+    margin-bottom: 12px;
+  }
+
+  .sugar-sticky-buy-button[data-position="top"] .sugar-sticky-buy-button__container {
+    margin-top: 12px;
+  }
+
+  .sugar-sticky-buy-button__btn {
+    --btn-line-1-size: 20px;
+    --sbb-pad-x: 24px;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 46px;
+    padding: 16px var(--sbb-pad-x);
+    cursor: pointer;
+    pointer-events: auto;
+    font-family: inherit;
+    letter-spacing: var(--button-letter-spacing, 0px);
+    text-decoration: none;
+    white-space: nowrap;
+    background: var(--sbb-surface);
+    color: var(--sbb-fg);
+    border: var(--sbb-bd-w) solid var(--sbb-bd-c);
+    border-radius: var(--sbb-radius);
+    box-shadow: var(--sbb-shadow);
+    transition: opacity 0.2s ease;
+  }
+
+  .sugar-sticky-buy-button__btn:hover {
+    opacity: 0.9;
+  }
+
+  /* On Dark Sections: sticky-product.js sets data-on-dark while the button sits over a dark
+     background. The dark surface fades in on a layer, since a gradient can't transition. */
+  .sugar-sticky-buy-button[data-dark-look] .sugar-sticky-buy-button__btn {
+    isolation: isolate;
+    transition: opacity 0.2s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .sugar-sticky-buy-button[data-dark-look] .sugar-sticky-buy-button__btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--sbb-dk-surface);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .sugar-sticky-buy-button[data-on-dark] .sugar-sticky-buy-button__btn::before {
+    opacity: 1;
+  }
+
+  .sugar-sticky-buy-button[data-on-dark] .sugar-sticky-buy-button__btn {
+    color: var(--sbb-dk-fg, var(--sbb-fg));
+    box-shadow: var(--sbb-dk-shadow, var(--sbb-shadow));
+  }
+
+  .sugar-sticky-buy-button__btn:focus-visible {
+    outline: var(--focused-base-outline);
+    outline-offset: var(--focused-base-outline-offset);
+    box-shadow: var(--focused-base-box-shadow);
+  }
+
+  .sugar-sticky-buy-button__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .sugar-sticky-buy-button__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sbb-line-gap, 0px);
+  }
+
+  .sugar-sticky-buy-button__line-1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--btn-line-1-size);
+    line-height: 1;
+  }
+
+  .sugar-sticky-buy-button__line-2 {
+    font-size: 16px;
+    line-height: 1.2;
+    opacity: 0.85;
+  }
+
+  .sugar-sticky-buy-button__text,
+  .sugar-sticky-buy-button__current-price {
+    line-height: 1;
+  }
+
+  .sugar-sticky-buy-button__price--inline {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.95em;
+    line-height: 1;
+    vertical-align: baseline;
+  }
+
+  .sugar-sticky-buy-button__price--pill {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.22em 0.5em 0.18em 0.45em;
+    border-radius: 1.1em;
+  }
+
+  /* Button Icon children. Inline positions ride Line 1's flex row; edge positions
+     pin to the button's sides. Shopify may wrap each child in a div, so every
+     rule matches the icon root and a wrapper holding it. */
+  .sugar-sticky-buy-button__line-1 > :where(.sugar-buy-button-icon, :has(> .sugar-buy-button-icon)) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sugar-sticky-buy-button__line-1 > :where([data-bbi-pos="before_text"], :has(> [data-bbi-pos="before_text"])) {
+    order: -1;
+  }
+
+  .sugar-sticky-buy-button__line-1 > :where([data-bbi-pos^="edge"], :has(> [data-bbi-pos^="edge"])) {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .sugar-sticky-buy-button__line-1 > :where([data-bbi-pos="edge_left"], :has(> [data-bbi-pos="edge_left"])) {
+    left: var(--sbb-pad-x);
+  }
+
+  .sugar-sticky-buy-button__line-1 > :where([data-bbi-pos="edge_right"], :has(> [data-bbi-pos="edge_right"])) {
+    right: var(--sbb-pad-x);
+  }
+
+  .sugar-sticky-buy-button__btn .loading__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .sugar-sticky-buy-button__btn.loading .sugar-sticky-buy-button__content {
+    visibility: hidden;
+  }
+
+  @media screen and (max-width: 749px) {
+    .sugar-sticky-buy-button[data-device="desktop"] {
+      display: none;
+    }
+
+    .sugar-sticky-buy-button__container {
+      max-width: none;
+      padding: 0;
+      margin: 0 8px;
+    }
+
+    .sugar-sticky-buy-button[data-position="bottom"] .sugar-sticky-buy-button__container {
+      margin: 0 8px 8px;
+    }
+
+    .sugar-sticky-buy-button[data-position="top"] .sugar-sticky-buy-button__container {
+      margin: 8px 8px 0;
+    }
+
+    .sugar-sticky-buy-button__btn {
+      --btn-line-1-size: 17px;
+      --sbb-pad-x: 27px;
+    }
+
+    .sugar-sticky-buy-button__line-2 {
+      font-size: 14px;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .sugar-sticky-buy-button[data-device="mobile"] {
+      display: none;
+    }
+  }

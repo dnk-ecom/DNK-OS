@@ -1,0 +1,21 @@
+{% doc %}
+  Renders the cart reservation countdown timer banner for cart drawer and cart page.
+{% enddoc %}
+
+{% if settings.cart_countdown_enable and cart.item_count > 0 %}
+  {% assign countdown_minutes = settings.cart_countdown_minutes | default: 10 %}
+  <cart-countdown
+    class="cart-countdown"
+    data-minutes="{{ countdown_minutes }}"
+    data-expired-text="{{ 'cart.countdown.expired' | t }}"
+  >
+    <div class="cart-countdown-inner">
+      <span class="cart-countdown-icon">
+        {% render 'svg-icons', icon: 'clock', icon_size: 16 %}
+      </span>
+      <span class="cart-countdown-text">
+        {{ 'cart.countdown.message_html' | t: timer: '<span class="cart-countdown-timer" data-countdown-timer>10:00</span>' }}
+      </span>
+    </div>
+  </cart-countdown>
+{% endif %}

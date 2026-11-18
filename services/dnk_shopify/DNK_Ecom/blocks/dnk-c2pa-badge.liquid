@@ -1,0 +1,135 @@
+{% doc %}
+  mrh_id: "services/dnk_shopify/DNK_Ecom/blocks/dnk-c2pa-badge.liquid"
+  purpose: "C2PA Content Credentials & Product Provenance Verification Badge for Shopify PDP"
+  status: "Active"
+  version: "1.0.0"
+  updated_at: "2026-11-18"
+{% enddoc %}
+
+<div
+  class="dnk-c2pa-badge-wrapper {{ block.settings.alignment }}"
+  {{ block.shopify_attributes }}
+  style="margin-top: {{ block.settings.margin_top }}px; margin-bottom: {{ block.settings.margin_bottom }}px;"
+>
+  <div class="dnk-c2pa-pill" title="Автентичний виріб із криптографічним C2PA сертифікатом">
+    <span class="dnk-c2pa-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7V13C3 18.52 6.84 23.74 12 25C17.16 23.74 21 18.52 21 13V7L12 2Z" fill="#008060" fill-opacity="0.15" stroke="#008060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 12L11 14L15 10" stroke="#008060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="dnk-c2pa-text">
+      <strong>{{ block.settings.badge_label | default: "C2PA Автентичність" }}</strong>
+      {% if block.settings.author_name != blank %}
+        <span class="dnk-c2pa-author">• {{ block.settings.author_name }}</span>
+      {% endif %}
+    </span>
+    <span class="dnk-c2pa-dot" aria-hidden="true"></span>
+  </div>
+</div>
+
+<style>
+  .dnk-c2pa-badge-wrapper {
+    display: flex;
+    width: 100%;
+  }
+  .dnk-c2pa-badge-wrapper.align-left { justify-content: flex-start; }
+  .dnk-c2pa-badge-wrapper.align-center { justify-content: center; }
+  .dnk-c2pa-badge-wrapper.align-right { justify-content: flex-end; }
+
+  .dnk-c2pa-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(0, 128, 96, 0.08);
+    border: 1px solid rgba(0, 128, 96, 0.25);
+    border-radius: 20px;
+    font-size: 13px;
+    color: #111827;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+  }
+  .dnk-c2pa-pill:hover {
+    background: rgba(0, 128, 96, 0.14);
+    border-color: #008060;
+  }
+  .dnk-c2pa-icon {
+    display: flex;
+    align-items: center;
+    color: #008060;
+  }
+  .dnk-c2pa-text {
+    line-height: 1;
+    font-weight: 500;
+  }
+  .dnk-c2pa-author {
+    color: #4b5563;
+    font-size: 12px;
+    margin-left: 2px;
+  }
+  .dnk-c2pa-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #10B981;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "C2PA Trust Badge",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "badge_label",
+      "label": "Badge Label",
+      "default": "C2PA Verified"
+    },
+    {
+      "type": "text",
+      "id": "author_name",
+      "label": "Author / Brand",
+      "default": "DNK Sovereign"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "align-left", "label": "Left" },
+        { "value": "align-center", "label": "Center" },
+        { "value": "align-right", "label": "Right" }
+      ],
+      "default": "align-left"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Margin Top",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Margin Bottom",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "C2PA Trust Badge"
+    }
+  ]
+}
+{% endschema %}

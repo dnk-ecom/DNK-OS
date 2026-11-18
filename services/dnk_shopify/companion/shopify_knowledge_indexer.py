@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/companion/shopify_knowledge_indexer.py"
+# mrh_id: "services/dnk_shopify/companion/shopify_knowledge_indexer.py"
 # purpose: "Shopify Platform Knowledge Ingestion Engine: Liquid Specs, Theme Blocks 2.0, Storefront GraphQL API, and Theme Check Rules"
 # canonical_source: true
 # alters_files: [

@@ -10,24 +10,24 @@ version: "1.0.0"
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/companion/audits/02_LOCAL_STOREFRONT_SESSION_AUDIT.md"
+> mrh_id: "services/dnk_shopify/companion/audits/02_LOCAL_STOREFRONT_SESSION_AUDIT.md"
 > purpose: "Канонічний майстер-аудит донора 02: Shopify Local Theme DEV (local-storefront) для бази знань агента-компаньйона DNK-ThemeCraft."
 > canonical_source: false
-> original_source: "SHOPIFY/DNKShopify/DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
+> original_source: "../DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
 > alters_files: []
 > triggers_tasks: []
 > status: "Approved"
 > version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "Antigravity & Gerych-root"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
 # 🏛️ ДОНОР 02: SHOPIFY LOCAL THEME DEV (LOCAL-STOREFRONT ENGINE)
 
-> **Повний канонічний звіт:** [`SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md)  
-> **Робочий каталог сесії:** [`Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/)  
-> **Локальний репозиторій ядра:** [`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront`](file:///Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_Vibe/local-storefront) (чистий Rust, 6 крейтів)
+> **Повний канонічний звіт:** [`SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md`](../../../../DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md)  
+> **Робочий каталог сесії:** [`Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/`](../../../../DNKEcom/Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/)  
+> **Локальний репозиторій ядра:** [`local-storefront`](../../../../DNK_Vibe/local-storefront) (чистий Rust, 6 крейтів)
 
 ## 🔑 КЛЮЧОВІ ДИСТИЛЬОВАНІ ЗНАХІДКИ ТА АРХІТЕКТУРА:
 1. **Sub-millisecond Rust Runtime (170–300 мкс)**: Заміна хмарного `shopify theme dev` (800–2500 мс) на детермінований локальний Liquid strict2 парсер (Ruby 5.14 порт).

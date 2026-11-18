@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/companion/KNOWLEDGE_BASE_SHOPIFY_STANDARDS.md"
-# purpose: "Exhaustive Reference Knowledge Base: Shopify Theme Blocks 2.0 (Sep-Nov 2026), Platform Limits, Customizer Architecture, closest.product Patterns & 14-Donor Distillation Matrix"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym Kuzmenko & Gerych-root / Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
+---
+title: "База знань стандартів Shopify Theme Store та результатів дистиляції 14 донорів"
+description: "Exhaustive Reference Knowledge Base: Shopify Theme Blocks 2.0, Platform Limits, Customizer Architecture & 14-Donor Distillation Matrix."
+mrh_id: "services/dnk_shopify/companion/KNOWLEDGE_BASE_SHOPIFY_STANDARDS.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - shopify
+  - standards
+  - theme-blocks
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_shopify/companion/KNOWLEDGE_BASE_SHOPIFY_STANDARDS.md"
+> purpose: "Exhaustive Reference Knowledge Base: Shopify Theme Blocks 2.0, Platform Limits, Customizer Architecture & 14-Donor Distillation Matrix."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym Kuzmenko & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 📚 БАЗА ЗНАНЬ СТАНДАРТІВ SHOPIFY THEME STORE ТА РЕЗУЛЬТАТІВ ДИСТИЛЯЦІЇ 14 ДОНОРІВ (2026 LTS)
 

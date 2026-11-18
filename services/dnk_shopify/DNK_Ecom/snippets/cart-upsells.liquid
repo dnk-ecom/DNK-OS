@@ -1,0 +1,101 @@
+{% doc %}
+  Renders in-cart 1-click upsells and complementary product recommendations.
+{% enddoc %}
+
+{% if settings.cart_upsells_enable and cart.item_count > 0 %}
+  {% liquid
+    assign upsell_heading = settings.cart_upsells_heading | default: 'cart.upsells.heading' | t
+    assign upsells_collection = settings.cart_upsells_collection
+    assign upsell_limit = settings.cart_upsells_limit | default: 4
+
+    # Build array of product IDs already in cart to exclude
+    assign cart_product_ids = cart.items | map: 'product_id'
+    assign first_item_product_id = cart.items.first.product_id
+  %}
+
+  <cart-upsells
+    class="cart-upsells"
+    data-cart-upsells
+    data-product-id="{{ first_item_product_id }}"
+    data-limit="{{ upsell_limit }}"
+  >
+    <div class="cart-upsells-header">
+      <h3 class="cart-upsells-title fs-sm">{{ upsell_heading }}</h3>
+    </div>
+
+    <div class="cart-upsells-list" data-upsells-list>
+      {% if upsells_collection != blank and upsells_collection.products.size > 0 %}
+        {% assign shown_count = 0 %}
+        {% for product in upsells_collection.products %}
+          {% if cart_product_ids contains product.id or product.available == false %}
+            {% continue %}
+          {% endif %}
+
+          <div class="cart-upsell-card" data-product-id="{{ product.id }}">
+            <a href="{{ product.url }}" class="cart-upsell-image-link" tabindex="-1" aria-hidden="true">
+              {% if product.featured_image %}
+                {{
+                  product.featured_image
+                  | image_url: width: 140
+                  | image_tag:
+                    widths: '70, 140',
+                    sizes: '70px',
+                    loading: 'lazy',
+                    class: 'cart-upsell-image',
+                    alt: product.title
+                }}
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </a>
+
+            <div class="cart-upsell-details">
+              <a href="{{ product.url }}" class="cart-upsell-title fs-sm font-bold">
+                {{ product.title }}
+              </a>
+
+              <div class="cart-upsell-price fs-xs">
+                {% if product.compare_at_price > product.price %}
+                  <s class="cart-upsell-compare-price">{{ product.compare_at_price | money }}</s>
+                {% endif %}
+                <span class="cart-upsell-current-price">{{ product.price | money }}</span>
+              </div>
+
+              {% if product.variants.size > 1 %}
+                <select class="cart-upsell-variant-select fs-xs" data-variant-select aria-label="{{ 'products.product.variant' | t }}">
+                  {% for variant in product.variants %}
+                    <option
+                      value="{{ variant.id }}"
+                      {% if variant == product.selected_or_first_available_variant %}selected{% endif %}
+                      {% unless variant.available %}disabled{% endunless %}
+                    >
+                      {{ variant.title }} - {{ variant.price | money }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <input type="hidden" data-variant-id value="{{ product.selected_or_first_available_variant.id }}">
+              {% endif %}
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-primary cart-upsell-add-btn"
+              data-add-upsell
+              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              aria-label="{{ 'cart.upsells.add_to_cart' | t: title: product.title }}"
+            >
+              {% render 'svg-icons', icon: 'plus', icon_size: 14 %}
+              <span>{{ 'cart.upsells.add' | t }}</span>
+            </button>
+          </div>
+
+          {% assign shown_count = shown_count | plus: 1 %}
+          {% if shown_count >= upsell_limit %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </cart-upsells>
+{% endif %}

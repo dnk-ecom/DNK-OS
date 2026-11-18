@@ -1,0 +1,64 @@
+/* --- DNK-MRH-HEADER ---
+mrh_id: "assets/dnk-tokens.css"
+purpose: "Shopify Polaris 2.0 Tokens, Fluid Typography, and Motion Variables for DNK Sovereign Apex Theme."
+canonical_source: true
+alters_files: []
+triggers_tasks: []
+status: "Active"
+version: "2.0.0"
+updated_at: "2026-11-17"
+author: "DNK-e.com Maksym & Antigravity"
+--- END DNK-MRH-HEADER --- */
+
+:root {
+  /* Shopify Polaris 2.0 Semantic Palette */
+  --color-surface-primary: #FFFFFF;
+  --color-surface-primary-rgb: 255 255 255;
+  --color-surface-secondary: #F6F6F7;
+  --color-surface-secondary-rgb: 246 246 247;
+  --color-surface-canvas: #F1F2F4;
+  --color-surface-canvas-rgb: 241 242 244;
+
+  --color-text-primary: #202223;
+  --color-text-primary-rgb: 32 34 35;
+  --color-text-secondary: #6D7175;
+  --color-text-secondary-rgb: 109 113 117;
+
+  /* Canonical Shopify Emerald Action Accent (60-30-10 Focal CTA) */
+  --color-action-primary: #008060;
+  --color-action-primary-rgb: 0 128 96;
+  --color-action-primary-hover: #006E52;
+  --color-action-primary-text: #FFFFFF;
+  --color-action-secondary: #F6F6F7;
+
+  /* Polaris Subtle Borders */
+  --color-border-subtle: #E3E5E8;
+  --color-border-base: #C9CCCF;
+  --color-border-strong: #8C9196;
+
+  /* Fluid Typography Scale (LCP & Zero-CLS Optimized) */
+  --dnk-font-size-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.8125rem);
+  --dnk-font-size-sm: clamp(0.8125rem, 0.76rem + 0.25vw, 0.875rem);
+  --dnk-font-size-base: clamp(0.9375rem, 0.88rem + 0.3vw, 1rem);
+  --dnk-font-size-lg: clamp(1.125rem, 1.02rem + 0.5vw, 1.25rem);
+  --dnk-font-size-xl: clamp(1.375rem, 1.22rem + 0.75vw, 1.625rem);
+  --dnk-font-size-2xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.25rem);
+  --dnk-font-size-display: clamp(2.25rem, 1.8rem + 2.25vw, 3.5rem);
+
+  /* Fluid Spacing & Gutters */
+  --dnk-gutter: clamp(1rem, 0.8rem + 1vw, 2.5rem);
+  --dnk-grid-gap: clamp(1rem, 0.9rem + 0.5vw, 2rem);
+  --dnk-space-base: 8px;
+
+  /* Elevation Shadows (Shopify Polaris 2.0 Standard) */
+  --dnk-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --dnk-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 0 0 1px var(--color-border-subtle);
+  --dnk-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --dnk-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+
+  /* GPU-Accelerated Transitions & Animations */
+  --dnk-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dnk-dur-fast: 150ms;
+  --dnk-dur-base: 250ms;
+  --dnk-dur-slow: 400ms;
+}

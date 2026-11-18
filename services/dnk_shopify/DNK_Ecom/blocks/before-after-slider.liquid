@@ -1,0 +1,164 @@
+{% doc %}
+  Renders an interactive Before & After visual comparison slider for product results and transformations.
+{% enddoc %}
+
+{% liquid
+  assign img_before = block.settings.image_before
+  assign img_after = block.settings.image_after
+  assign initial_pos = block.settings.initial_position | default: 50
+%}
+
+<before-after-slider
+  class="before-after-slider block-spacing"
+  data-before-after
+  style="
+    --slider-pos: {{ initial_pos }}%;
+    --pt: {{ block.settings.pt | default: 20 | divided_by: 16.0 | append: 'em' }};
+    --pb: {{ block.settings.pb | default: 20 | divided_by: 16.0 | append: 'em' }};
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.heading != blank %}
+    <h3 class="before-after-heading text-center fs-lg font-bold">
+      {{ block.settings.heading }}
+    </h3>
+  {% endif %}
+
+  <div class="before-after-stage">
+    <!-- After Image (Base) -->
+    <div class="before-after-image-layer is-after">
+      {% if img_after %}
+        {{
+          img_after
+          | image_url: width: 1200
+          | image_tag:
+            widths: '400, 800, 1200',
+            sizes: '(min-width: 990px) 800px, 100vw',
+            loading: 'lazy',
+            class: 'before-after-img',
+            alt: block.settings.label_after | default: 'After'
+        }}
+      {% else %}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg aspect-ratio aspect-ratio-landscape' }}
+      {% endif %}
+      <span class="before-after-pill pill-after font-bold fs-xs">
+        {{ block.settings.label_after | default: 'After' }}
+      </span>
+    </div>
+
+    <!-- Before Image (Clipped overlay) -->
+    <div class="before-after-image-layer is-before">
+      {% if img_before %}
+        {{
+          img_before
+          | image_url: width: 1200
+          | image_tag:
+            widths: '400, 800, 1200',
+            sizes: '(min-width: 990px) 800px, 100vw',
+            loading: 'lazy',
+            class: 'before-after-img',
+            alt: block.settings.label_before | default: 'Before'
+        }}
+      {% else %}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg aspect-ratio aspect-ratio-landscape' }}
+      {% endif %}
+      <span class="before-after-pill pill-before font-bold fs-xs">
+        {{ block.settings.label_before | default: 'Before' }}
+      </span>
+    </div>
+
+    <!-- Draggable Divider Line & Handle -->
+    <div class="before-after-divider">
+      <div class="before-after-handle">
+        <span class="handle-arrow">◀</span>
+        <span class="handle-arrow">▶</span>
+      </div>
+    </div>
+
+    <!-- Accessible Range Input -->
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value="{{ initial_pos }}"
+      class="before-after-range-input"
+      aria-label="{{ block.settings.heading | default: 'Before and after comparison' }}"
+      data-before-after-range
+    >
+  </div>
+</before-after-slider>
+
+{% schema %}
+{
+  "name": "Before & after slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Proven Transformation"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_before",
+      "label": "Before image"
+    },
+    {
+      "type": "text",
+      "id": "label_before",
+      "label": "Before label",
+      "default": "Before"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_after",
+      "label": "After image"
+    },
+    {
+      "type": "text",
+      "id": "label_after",
+      "label": "After label",
+      "default": "After"
+    },
+    {
+      "type": "range",
+      "id": "initial_position",
+      "label": "Initial divider position %",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Before & after slider",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}

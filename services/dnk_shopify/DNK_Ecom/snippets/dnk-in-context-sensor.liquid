@@ -1,0 +1,37 @@
+{%- comment -%}
+# --- DNK-MRH-HEADER ---
+# mrh_id: "snippets/dnk-in-context-sensor.liquid"
+# purpose: "DNK Sovereign In-Context Client Review Sensor for Shopify Storefronts (Ring 3)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-18"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+{%- endcomment -%}
+
+{%- liquid
+  assign dnk_deal_id = deal_id | default: settings.dnk_deal_id | default: 'deal_noku_2026'
+  assign dnk_api_endpoint = endpoint | default: settings.dnk_api_endpoint | default: 'https://noku-proposal.pages.dev/api/v1/cockpit'
+  assign is_authorized = false
+
+  if request.design_mode
+    assign is_authorized = true
+  elsif content_for_header contains 'preview_theme_id'
+    assign is_authorized = true
+  elsif settings.enable_client_sensor
+    assign is_authorized = true
+  elsif request.host contains 'myshopify.com'
+    assign is_authorized = true
+  endif
+-%}
+
+{%- if is_authorized -%}
+  <script>
+    window.DNK_DEAL_ID = {{ dnk_deal_id | json }};
+    window.DNK_API_URL = {{ dnk_api_endpoint | json }};
+  </script>
+  <script src="{{ 'dnk-sensor.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}

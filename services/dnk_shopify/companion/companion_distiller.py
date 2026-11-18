@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # --- DNK-MRH-HEADER ---
-# mrh_id: "_Shopify_Theme_DEV_Workflow/companion/companion_distiller.py"
+# mrh_id: "services/dnk_shopify/companion/companion_distiller.py"
 # purpose: "Recursive Donor Distiller, Apex Taxonomy Graph Builder & Molecular Grafter for DNK Sovereign Theme"
 # canonical_source: true
 # alters_files: [
@@ -434,7 +434,7 @@ class CompanionDistiller:
 
     def _synthesize_dnk_tokens(self) -> None:
         css = """/* --- DNK-MRH-HEADER ---
-mrh_id: "assets/dnk-tokens.css"
+mrh_id: "services/dnk_shopify/companion/companion_distiller.py"
 purpose: "Fluid Typography, Design Tokens and Dynamic Color Schemes for DNK Sovereign Theme"
 canonical_source: true
 --- END DNK-MRH-HEADER --- */

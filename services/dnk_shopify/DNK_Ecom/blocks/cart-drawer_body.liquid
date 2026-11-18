@@ -1,0 +1,22 @@
+{%- comment -%}
+  Cart Drawer Body Block (Static Block: cart-drawer_body)
+{%- endcomment -%}
+<div class="cart-drawer__body" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart body",
+  "tag": null,
+  "blocks": [
+    { "type": "@app" },
+    { "type": "heading" },
+    { "type": "text" },
+    { "type": "button" },
+    { "type": "divider" },
+    { "type": "image" }
+  ],
+  "settings": []
+}
+{% endschema %}

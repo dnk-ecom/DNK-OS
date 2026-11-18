@@ -1,0 +1,165 @@
+{% doc %}
+  Renders a high-conversion sticky Add to Cart bar that floats into view when the main buy button scrolls out of the viewport.
+{% enddoc %}
+
+{% liquid
+  assign product = closest.product | default: product
+  assign selected_variant = product.selected_or_first_available_variant
+  assign image = selected_variant.featured_image | default: product.featured_image
+%}
+
+{% if product != blank and product.available %}
+  <sticky-atc
+    class="sticky-atc sticky-atc--{{ block.settings.position | default: 'bottom' }} block-spacing"
+    data-sticky-atc
+    data-product-id="{{ product.id }}"
+    style="
+      --pt: {{ block.settings.pt | default: 0 | divided_by: 16.0 | append: 'em' }};
+      --pb: {{ block.settings.pb | default: 0 | divided_by: 16.0 | append: 'em' }};
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="sticky-atc-container container">
+      <div class="sticky-atc-product">
+        <div class="sticky-atc-media">
+          {% if image %}
+            {{
+              image
+              | image_url: width: 96
+              | image_tag:
+                widths: '48, 96',
+                sizes: '48px',
+                loading: 'lazy',
+                class: 'sticky-atc-image',
+                alt: product.title
+            }}
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg aspect-ratio aspect-ratio-square' }}
+          {% endif %}
+        </div>
+
+        <div class="sticky-atc-info">
+          <span class="sticky-atc-title fs-sm font-bold">{{ product.title }}</span>
+          <div class="sticky-atc-price fs-xs" data-sticky-price>
+            {% if selected_variant.compare_at_price > selected_variant.price %}
+              <s class="sticky-atc-compare-price">{{ selected_variant.compare_at_price | money }}</s>
+            {% endif %}
+            <span class="sticky-atc-current-price">{{ selected_variant.price | money }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky-atc-actions">
+        {% if product.variants.size > 1 %}
+          <select
+            class="sticky-atc-variant-select fs-xs"
+            data-sticky-variant-select
+            aria-label="{{ 'products.product.variant' | t }}"
+          >
+            {% for variant in product.variants %}
+              <option
+                value="{{ variant.id }}"
+                data-price="{{ variant.price | money }}"
+                data-compare-price="{% if variant.compare_at_price > variant.price %}{{ variant.compare_at_price | money }}{% endif %}"
+                {% if variant == selected_variant %}selected{% endif %}
+                {% unless variant.available %}disabled{% endunless %}
+              >
+                {{ variant.title }} - {{ variant.price | money }}{% unless variant.available %} ({{ 'products.form.sold_out' | t }}){% endunless %}
+              </option>
+            {% endfor %}
+          </select>
+        {% endif %}
+
+        <button
+          type="button"
+          class="btn {{ block.settings.button_style | default: 'btn-primary' }} btn-sm sticky-atc-button"
+          data-sticky-submit
+          {% unless selected_variant.available %}disabled{% endunless %}
+        >
+          {% render 'svg-icons', icon: 'bag', icon_size: 16 %}
+          <span data-sticky-button-text>
+            {% if selected_variant.available %}
+              {{ 'products.form.add_to_cart' | t }}
+            {% else %}
+              {{ 'products.form.sold_out' | t }}
+            {% endif %}
+          </span>
+        </button>
+      </div>
+    </div>
+  </sticky-atc>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sticky Add to Cart",
+  "settings": [
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Screen position",
+      "options": [
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "btn-primary",
+          "label": "Primary"
+        },
+        {
+          "value": "btn-accent-solid",
+          "label": "Accent"
+        },
+        {
+          "value": "btn-text-outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "btn-accent-solid"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "pt",
+      "label": "Top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "pb",
+      "label": "Bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sticky Add to Cart",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

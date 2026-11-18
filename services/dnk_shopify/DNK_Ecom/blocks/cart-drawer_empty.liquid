@@ -1,0 +1,26 @@
+{%- comment -%}
+  Empty Cart Drawer Block (Static Block: cart-drawer_empty)
+{%- endcomment -%}
+<div class="cart-drawer__empty-state" {{ block.shopify_attributes }}>
+  <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
+  <a href="{{ routes.all_products_collection_url }}" class="button button--primary">
+    {{ 'general.continue_shopping' | t | default: 'Continue shopping' }}
+  </a>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "Cart empty state",
+  "tag": null,
+  "blocks": [
+    { "type": "@app" },
+    { "type": "heading" },
+    { "type": "text" },
+    { "type": "button" },
+    { "type": "divider" },
+    { "type": "image" }
+  ],
+  "settings": []
+}
+{% endschema %}
