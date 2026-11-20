@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_plugins_plugin_manager"
+# mrh_id: "core/plugins/plugin_manager.py"
 # purpose: "Manage registration, lifecycle states, health checking, and error-isolated event triggering for plugins"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

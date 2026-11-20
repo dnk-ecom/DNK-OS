@@ -44,7 +44,6 @@ except ImportError:
                 pass
 
 from services.dnk_shopify.src.service import DNKShopifyService
-from services.dnk_shopify.runtime.local_storefront import LocalStorefrontManager
 from services.dnk_shopify.contracts.schemas import (
     CartMutation,
     CartMutationQueueSpec,
@@ -118,7 +117,7 @@ def shopify_calculate_cart(
 
 @mcp.tool()
 def shopify_verify_7gates(theme_path: Optional[str] = None) -> Dict[str, Any]:
-    """Executes the mandatory 7-Gate Anti-Regression Theme Integrity Gate on DNK Sovereign Apex."""
+    """Executes the mandatory 7-Gate Anti-Regression Theme Integrity Gate on DNK-Ecom-Zerno-v.0.1.0."""
     target = Path(theme_path) if theme_path else None
     return _service.run_7gate_integrity(target)
 
@@ -166,11 +165,11 @@ def shopify_triage_client_ticket(
     used_revisions_count: int = 0,
     max_free_revisions: int = 3,
     preferred_node_id: Optional[str] = None,
-    persist_to_canvas_session: bool = False,
+    persist: bool = False,
 ) -> Dict[str, Any]:
     """
     Classifies a client revision or question via Scope Guard (question, in_scope_revision,
-    or out_of_scope_upsell) and routes it to the target Spatial Canvas node and DNK OS agent.
+    or out_of_scope_upsell) and routes it to the target Spatial Canvas node and DNK OS Taskboard.
     """
     req = ClientTicketRequest(
         deal_id=deal_id,
@@ -180,46 +179,12 @@ def shopify_triage_client_ticket(
         used_revisions_count=used_revisions_count,
         max_free_revisions=max_free_revisions,
     )
-    res = _service.triage_client_ticket(req, persist_to_canvas_session=persist_to_canvas_session)
+    res = _service.triage_client_ticket(
+        req,
+        persist_to_canvas_session=persist,
+        persist_to_taskboard=persist,
+    )
     return res.model_dump()
-
-
-@mcp.tool()
-def shopify_lsf_status(port: int = 9292) -> Dict[str, Any]:
-    """Queries the local-storefront headless daemon status, active templates, and diagnostics."""
-    manager = LocalStorefrontManager(default_port=port)
-    return manager.get_status()
-
-
-@mcp.tool()
-def shopify_lsf_check(theme_path: Optional[str] = None, fix: bool = False) -> Dict[str, Any]:
-    """Runs strict Liquid compatibility check on the Shopify theme via local-storefront."""
-    target = theme_path or str(_service.default_theme_path)
-    manager = LocalStorefrontManager()
-    return manager.run_check(target, fix=fix)
-
-
-@mcp.tool()
-def shopify_lsf_profile(path: str = "/", theme_path: Optional[str] = None) -> Dict[str, Any]:
-    """Profiles microsecond render times for sections and Theme Blocks 2.0 via local-storefront."""
-    target = theme_path or str(_service.default_theme_path)
-    manager = LocalStorefrontManager()
-    return manager.run_profile(target, path=path)
-
-
-@mcp.tool()
-def shopify_lsf_render(path: str = "/", theme_path: Optional[str] = None) -> Dict[str, Any]:
-    """Renders a single storefront route directly to HTML string in < 3 ms."""
-    target = theme_path or str(_service.default_theme_path)
-    manager = LocalStorefrontManager()
-    return manager.run_render(target, path=path)
-
-
-@mcp.tool()
-def shopify_lsf_reload(port: int = 9292) -> Dict[str, Any]:
-    """Triggers hot reload of shopify-local/ data fixtures in the running daemon."""
-    manager = LocalStorefrontManager(default_port=port)
-    return manager.reload_data()
 
 
 if __name__ == "__main__":

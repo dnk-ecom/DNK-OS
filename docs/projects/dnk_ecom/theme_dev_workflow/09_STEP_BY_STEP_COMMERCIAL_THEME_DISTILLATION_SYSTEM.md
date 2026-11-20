@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_STEP_BY_STEP_COMMERCIAL_THEME_DISTILLATION_SYSTEM.md"
-# purpose: "Complete Technical Blueprint & Step-by-Step Production Pipeline for Building a World-Class Commercial Shopify Theme ($350-$420 MSRP)."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "СИСТЕМА ДИСТИЛЯЦІЇ ЗНАНЬ ТА ПОКРОКОВОГО СТВОРЕННЯ ВЛАСНОЇ ТЕМИ"
+description: "Complete Technical Blueprint & Step-by-Step Production Pipeline for Building a World-Class Commercial Shopify Theme ($350-$420 MSRP)."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_STEP_BY_STEP_COMMERCIAL_THEME_DISTILLATION_SYSTEM.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_STEP_BY_STEP_COMMERCIAL_THEME_DISTILLATION_SYSTEM.md"
+> purpose: "Complete Technical Blueprint & Step-by-Step Production Pipeline for Building a World-Class Commercial Shopify Theme ($350-$420 MSRP)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏆 СИСТЕМА ДИСТИЛЯЦІЇ ЗНАНЬ ТА ПОКРОКОВОГО СТВОРЕННЯ ВЛАСНОЇ ТЕМИ
 ## DNK Sovereign Theme — Apex Commercial D2C Standard ($350–$420 MSRP)

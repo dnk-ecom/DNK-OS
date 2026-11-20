@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md"
-# purpose: "Exhaustive Architectural Specification & Governance Standard for DNK Sovereign Commercial Theme (Shopify Theme Store Submission Grade)."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "ОФІЦІЙНА ТЕХНІЧНА СПЕЦИФІКАЦІЯ ТЕМИ СВІТОВОГО РІВНЯ ДЛЯ SHOPIFY THEME STORE"
+description: "Exhaustive Architectural Specification & Governance Standard for DNK Sovereign Commercial Theme (Shopify Theme Store Submission Grade)."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md"
+> purpose: "Exhaustive Architectural Specification & Governance Standard for DNK Sovereign Commercial Theme (Shopify Theme Store Submission Grade)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏛️ ОФІЦІЙНА ТЕХНІЧНА СПЕЦИФІКАЦІЯ ТЕМИ СВІТОВОГО РІВНЯ ДЛЯ SHOPIFY THEME STORE
 ## DNK Sovereign Theme (Apex D2C Architecture)

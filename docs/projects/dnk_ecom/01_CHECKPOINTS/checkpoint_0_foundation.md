@@ -1,28 +1,27 @@
 ---
-title: "Checkpoint 0: Foundation — Design Tokens, CSSOM Reset & 12-Column Subgrid"
+title: "Checkpoint 0: Foundation (Design Tokens & CSSOM Reset)"
 description: "Живий лог верифікації Checkpoint 0: дизайн-токени W3C, CSSOM Reset та Subgrid."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_0_foundation.md"
-status: passed
-type: checkpoint_log
-gate_id: 0
-theme_branch: mvp
-date: 2026-11-17
-verified_by: "just shopify-checkpoint 0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_0_foundation.md"
 > purpose: "Живий лог верифікації Checkpoint 0: дизайн-токени W3C, CSSOM Reset та Subgrid."
 > canonical_source: true
-> alters_files:
->   - "mvp/assets/dnk-tokens.css"
->   - "mvp/assets/dnk-base.css"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.0.0"
-> updated_at: "2026-11-17"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```

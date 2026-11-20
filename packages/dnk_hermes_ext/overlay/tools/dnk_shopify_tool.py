@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_shopify_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_shopify_tool.py"
 # purpose: "Native Hermes tool for Shopify theme inspection, Liquid AST parsing, and section decomposition."
 # canonical_source: true
 # alters_files: []

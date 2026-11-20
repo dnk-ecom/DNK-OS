@@ -1,0 +1,31 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/dnk_macos_ui/agent_card.yaml"
+# purpose: "Agent Card & Capability Manifest for dnk_macos_ui."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-18"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+name: dnk_macos_ui
+display_name: "Sovereign macOS UI/UX & Human Interface Architect"
+role: "Apple HIG & Native Swift Designer"
+version: "1.0.0"
+domain: "native_desktop_ui"
+benchmarks:
+  - "Apple Human Interface Guidelines 2026"
+  - "Raycast & Wispr Flow Desktop Patterns"
+  - "Shopify Open Design & Astryx Tokens"
+capabilities:
+  - "NSPopover & Menubar Extra Modern Architecture"
+  - "AppKit / SwiftUI Hybrid Integration"
+  - "Tactile Audio Waveforms & State Transitions"
+  - "Keyboard-First Ergonomics & Accessibility"
+  - "Zero-AI-Slop & Anti-Franken-Menu Cleansing"
+rules:
+  - "No raw NSMenu Franken-views"
+  - "Unified Dark Obsidian Glass (#0C0D11) & Electric Mint (#36F4A4)"
+  - "Sub-millisecond UI transitions without CPU/RAM bloat"

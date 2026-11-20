@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_assimilate_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_assimilate_tool.py"
 # purpose: "Native Hermes tool executing Two-Track SOTA Repository Assimilation Pipeline (DNAAssimilationEngine) with live GitHub API and Swarm routing."
 # canonical_source: true
 # alters_files: []
@@ -320,7 +320,7 @@ def dnk_assimilate_repo(
         audit_notes_md = "\n".join(f"- {n}" for n in audit_notes)
 
         report_content = f"""# --- DNK-MRH-HEADER ---
-# mrh_id: "docs_tech_sota_{repo_short.lower()}"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_assimilate_tool.py"
 # purpose: "SOTA Knowledge Assimilation Report for {clean_name}"
 # author: "DNK-e.com Maksym"
 # status: "Active"

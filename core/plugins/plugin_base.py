@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_plugins_plugin_base"
+# mrh_id: "core/plugins/plugin_base.py"
 # purpose: "Base abstract class for all system plugins to enforce unified interface"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

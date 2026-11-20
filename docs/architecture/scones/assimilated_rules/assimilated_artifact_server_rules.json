@@ -1,0 +1,6 @@
+{
+  "source_repository": "plannotator/artifact-server",
+  "activated_at_slice": 1,
+  "target_worker": "gerych_researcher",
+  "status": "ready"
+}

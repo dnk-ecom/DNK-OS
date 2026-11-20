@@ -1,0 +1,181 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "packages/plugins/dnk_aperisolve_forensics/service_manifest.yaml"
+# purpose: "SaaP ServicePluginCard specification v1alpha2 for AperiSolve Image Forensics & Steganalysis"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-16"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+apiVersion: dnk.os/v1alpha2
+kind: ServicePluginCard
+metadata:
+  service_id: dnk_aperisolve_forensics
+  name: AperiSolve Image Forensics & Steganalysis Suite
+  version: 1.0.0
+  domain: security-forensics
+  author: Zeecka & DNK Swarm
+  description: JIT image forensic analysis, bit-plane LSB layer inspection, metadata/EXIF scrubbing, invisible digital watermark verification, and file payload extraction for Shopify assets.
+  tags:
+    - steganography
+    - forensics
+    - image-analysis
+    - exif
+    - watermarking
+    - shopify-security
+    - fastmcp
+spec:
+  lifecycle: Active
+  domain: security-forensics
+  entrypoint: packages.plugins.dnk_aperisolve_forensics.adapter:AperiSolveAdapter
+  quarantine:
+    service_name: "AperiSolve"
+    license: "GPL-3.0"
+    repo_url: "https://github.com/Zeecka/AperiSolve.git"
+    target_dir: "../DNK_Vibe/AperiSolve"
+    bootstrap_command: "uv sync --extra mcp"
+    verify_command: "uv run --extra mcp python -m aperisolve_mcp --help"
+    documentation_url: "https://www.aperisolve.com"
+  transport:
+    protocol: fastmcp
+    mode: stdio
+    command: uv
+    args:
+      - run
+      - --directory
+      - ../DNK_Vibe/AperiSolve
+      - --extra
+      - mcp
+      - python
+      - -m
+      - aperisolve_mcp
+      - --stdio
+    env_passthrough:
+      - PATH
+      - PYTHONPATH
+      - MCP_PORT
+      - MCP_PUBLIC_BASE_URL
+  fastmcp_tools:
+    - name: analyze
+      description: Upload an image/file (base64) and trigger deep steganalysis, returning its submission hash.
+      input_schema:
+        type: object
+        properties:
+          file_base64:
+            type: string
+            description: Base64-encoded binary content of the file
+          filename:
+            type: string
+            description: Original filename (e.g. hero-banner.png)
+          password:
+            type: string
+            description: Optional passphrase for steghide, outguess, or openstego
+          deep:
+            type: boolean
+            description: Whether to execute computationally heavy analyzers
+        required:
+          - file_base64
+    - name: get_status
+      description: Return the processing status of a submission (pending, running, completed, error).
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+        required:
+          - hash
+    - name: wait_until_done
+      description: Block until steganalysis reaches completed or error, or time out (up to 120s).
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+          timeout_s:
+            type: integer
+            description: Timeout budget in seconds (default 120)
+        required:
+          - hash
+    - name: get_info
+      description: Return file metadata (detected MIME, size, filenames, upload count, timestamps).
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+        required:
+          - hash
+    - name: list_results
+      description: Index analyzers that ran with output status, size, download availability, and image count without payload bloat.
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+        required:
+          - hash
+    - name: get_tool_output
+      description: Read one analyzer output page by page (lines or fields) with total count and derived image URLs.
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+          tool:
+            type: string
+            description: Analyzer name (e.g. exiftool, binwalk, steghide, zsteg, strings)
+          offset:
+            type: integer
+            description: Starting item/line offset
+          limit:
+            type: integer
+            description: Max items per page
+        required:
+          - hash
+          - tool
+    - name: download_extracted
+      description: Fetch 7z archive of extracted files from an analyzer as base64 (capped at 2MB).
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+          tool:
+            type: string
+            description: Analyzer name that has extracted files
+        required:
+          - hash
+          - tool
+    - name: get_layer_image
+      description: Fetch one derived bit-plane or remap image (PNG) downscaled to max_side to save multimodal tokens.
+      input_schema:
+        type: object
+        properties:
+          hash:
+            type: string
+            description: Submission hash
+          name:
+            type: string
+            description: Layer image filename (e.g. Red_bit_0.png)
+          max_side:
+            type: integer
+            description: Max dimension constraint (default 1024)
+        required:
+          - hash
+          - name
+  governance:
+    spend_guard:
+      max_cost_per_invocation_usd: 0.01
+      monthly_budget_usd: 10.0
+    circuit_breaker:
+      failure_threshold: 3
+      timeout_seconds: 120

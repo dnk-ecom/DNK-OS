@@ -54,7 +54,7 @@ export const WORKHORSE_CLUSTER_NODES: Node<any>[] = [
   {
     id: 'cluster-shopify',
     type: 'macroCluster',
-    position: { x: 60, y: 100 },
+    position: { x: 80, y: 60 },
     data: {
       hubId: 'shopify',
       title: 'Shopify Apex Hub',
@@ -70,7 +70,7 @@ export const WORKHORSE_CLUSTER_NODES: Node<any>[] = [
   {
     id: 'cluster-media',
     type: 'macroCluster',
-    position: { x: 440, y: 100 },
+    position: { x: 500, y: 60 },
     data: {
       hubId: 'media',
       title: 'Media Studio Hub',
@@ -86,7 +86,7 @@ export const WORKHORSE_CLUSTER_NODES: Node<any>[] = [
   {
     id: 'cluster-distribution',
     type: 'macroCluster',
-    position: { x: 820, y: 100 },
+    position: { x: 80, y: 380 },
     data: {
       hubId: 'distribution',
       title: 'Growth & Distribution Hub',
@@ -102,7 +102,7 @@ export const WORKHORSE_CLUSTER_NODES: Node<any>[] = [
   {
     id: 'cluster-core',
     type: 'macroCluster',
-    position: { x: 440, y: 440 },
+    position: { x: 500, y: 380 },
     data: {
       hubId: 'core',
       title: 'Microkernel Host & Memory',
@@ -121,30 +121,47 @@ export const WORKHORSE_CLUSTER_EDGES: Edge[] = [
   {
     id: 'edge-core-shopify',
     source: 'cluster-core',
+    sourceHandle: 'top',
     target: 'cluster-shopify',
+    targetHandle: 'bottom',
     animated: true,
-    style: { stroke: '#10b981', strokeWidth: 2 },
+    style: { stroke: '#10b981', strokeWidth: 1.5, opacity: 0.8 },
   },
   {
     id: 'edge-core-media',
     source: 'cluster-core',
+    sourceHandle: 'top',
     target: 'cluster-media',
+    targetHandle: 'bottom',
     animated: true,
-    style: { stroke: '#f43f5e', strokeWidth: 2 },
+    style: { stroke: '#f43f5e', strokeWidth: 1.5, opacity: 0.8 },
+  },
+  {
+    id: 'edge-shopify-distribution',
+    source: 'cluster-shopify',
+    sourceHandle: 'bottom',
+    target: 'cluster-distribution',
+    targetHandle: 'top',
+    animated: true,
+    style: { stroke: '#10b981', strokeWidth: 1.5, opacity: 0.6 },
   },
   {
     id: 'edge-core-distribution',
     source: 'cluster-core',
+    sourceHandle: 'left',
     target: 'cluster-distribution',
+    targetHandle: 'right',
     animated: true,
-    style: { stroke: '#3b82f6', strokeWidth: 2 },
+    style: { stroke: '#3b82f6', strokeWidth: 1.5, opacity: 0.8 },
   },
   {
-    id: 'edge-media-distribution',
+    id: 'edge-media-shopify',
     source: 'cluster-media',
-    target: 'cluster-distribution',
+    sourceHandle: 'left',
+    target: 'cluster-shopify',
+    targetHandle: 'right',
     animated: true,
-    style: { stroke: '#8b5cf6', strokeWidth: 2, strokeDasharray: '5,5' },
+    style: { stroke: '#8b5cf6', strokeWidth: 1.5, strokeDasharray: '4,4', opacity: 0.6 },
   },
 ];
 
@@ -379,6 +396,7 @@ export function MultiAgentSwarmCanvas() {
           data: {
             ...node.data,
             onToggleExpand: (hubId: string) => handleDrilldownCluster(hubId),
+            onActionClick: (hubId: string) => handleDrilldownCluster(hubId),
           },
         }))
       );
@@ -401,6 +419,7 @@ export function MultiAgentSwarmCanvas() {
         data: {
           ...node.data,
           onToggleExpand: (hubId: string) => handleDrilldownCluster(hubId),
+          onActionClick: (hubId: string) => handleDrilldownCluster(hubId),
         },
       }))
     );
@@ -694,67 +713,8 @@ export function MultiAgentSwarmCanvas() {
     );
   }, [nodes, edges, setNodes]);
 
-  const handleNodeDragStop = useCallback(async (_: React.MouseEvent, node: Node) => {
-    try {
-      await fetch('/api/v1/actions/dispatch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action_id: 'canvas.move_node',
-          payload: {
-            node_id: node.id,
-            x: Math.round(node.position.x),
-            y: Math.round(node.position.y),
-          },
-          actor: 'Astryx Canvas Operator',
-        }),
-      });
-    } catch (err) {
-      console.error('Failed to sync node drag to Dual-Surface registry:', err);
-    }
-  }, []);
-
   return (
-    <div className="w-full h-screen bg-[#1e2022] text-[#d4d8db] relative flex flex-col font-sans">
-      {/* Assimilated Sticky Status Banner from open-multi-agent-canvas */}
-      {activeRunningAgent ? (
-        <div className="h-10 bg-[#112224] border-b border-[#35d5d5]/40 px-6 flex items-center justify-between text-xs z-10 transition-all">
-          <div className="flex items-center space-x-2">
-            <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#35d5d5] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#35d5d5]"></span>
-            </span>
-            <span className="text-slate-300">
-              Active Agent:{' '}
-              <strong className="text-[#35d5d5] font-semibold">{activeRunningAgent.name}</strong>
-            </span>
-            <span className="text-slate-500">•</span>
-            <span className="text-slate-300">
-              Executing Step:{' '}
-              <strong className="text-emerald-400 font-mono">
-                {activeRunningAgent.nodeName}
-              </strong>
-            </span>
-          </div>
-          <div className="flex items-center space-x-1 text-slate-400 font-mono text-[11px]">
-            <Loader2 className="w-3.5 h-3.5 text-[#35d5d5] animate-spin" />
-            <span>Real-time Swarm Streaming</span>
-          </div>
-        </div>
-      ) : (
-        <div className="h-10 bg-[#112224] border-b border-[#224447] px-6 flex items-center justify-between text-xs z-10">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span>Swarm State: Ready</span>
-            <span className="text-slate-600">|</span>
-            <span>4 Agents Loaded</span>
-          </div>
-          <span className="text-[11px] font-mono text-slate-500">
-            DNK OS Swarm Canvas • Zero-Cloud Architecture
-          </span>
-        </div>
-      )}
-
+    <div className="w-full h-full bg-[#090a0f] text-slate-100 relative flex flex-col font-sans overflow-hidden">
       {/* Main ReactFlow Canvas */}
       <div className="flex-1 w-full h-full relative">
         <ReactFlow
@@ -762,158 +722,141 @@ export function MultiAgentSwarmCanvas() {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onNodeDragStop={handleNodeDragStop}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           fitView
-          className="bg-[#1e2022]"
+          className="bg-[#090a0f]"
         >
-          {/* SOTA Dark Teal / Slate-Cyan Background Grid */}
+          {/* Deep Obsidian Background Dots */}
           <Background
             variant={BackgroundVariant.Dots}
-            gap={20}
-            size={1.5}
-            color="#2a6368"
+            gap={24}
+            size={1}
+            color="#212433"
           />
-          <Controls className="!bg-[#162c2f] !border-[#224447] !text-slate-300 fill-slate-300" />
+          <Controls className="!bg-zinc-950/80 !border-white/10 !text-zinc-400 fill-zinc-400 backdrop-blur-md rounded-xl shadow-2xl" />
           <MiniMap
-            nodeColor="#35d5d5"
-            maskColor="rgba(30, 32, 34, 0.8)"
-            className="!bg-[#162c2f] !border-[#224447] rounded-lg overflow-hidden"
+            nodeColor="rgba(255, 255, 255, 0.12)"
+            maskColor="rgba(9, 10, 15, 0.85)"
+            className="!bg-zinc-950/70 !border-white/10 backdrop-blur-md rounded-xl overflow-hidden shadow-2xl opacity-40 hover:opacity-100 transition-opacity"
           />
 
-          {/* Top Floating Command Panel */}
-          <Panel position="top-right" className="flex items-center space-x-2">
-            {/* View Mode Segmented Switcher */}
-            <div className="flex items-center p-1 rounded-xl bg-[#112224]/90 border border-[#224447] shadow-xl backdrop-blur-md">
+          {/* Centered Raycast / Dynamic Island Floating Command Dock */}
+          <Panel position="top-center" className="flex items-center justify-center mt-3 z-30">
+            <div className="flex items-center gap-1 p-1 rounded-full bg-zinc-950/85 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+              {/* Segmented view switcher */}
               <button
                 type="button"
                 onClick={() => handleSwitchViewMode('clusters')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   viewMode === 'clusters'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white/15 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <Layers className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Хаби Рою (4 Хаби)</span>
+                <span>Хаби Рою (4)</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => handleSwitchViewMode('swarm')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   viewMode === 'swarm'
-                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/50 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white/15 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <Bot className="w-3.5 h-3.5 text-purple-400" />
-                <span>ThoughtDAG Swarm</span>
+                <span>ThoughtDAG</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => handleSwitchViewMode('taskboard')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   viewMode === 'taskboard'
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white/15 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncingTaskboard ? 'animate-spin' : ''}`} />
-                <span>Taskboard ({selectedHubFilter ? `Фільтр: ${selectedHubFilter}` : 'Всі 61'})</span>
+                <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isSyncingTaskboard ? 'animate-spin' : ''}`} />
+                <span>Таски ({selectedHubFilter ? `${selectedHubFilter}` : '61'})</span>
               </button>
-            </div>
 
-            {selectedHubFilter && (
+              {selectedHubFilter && (
+                <button
+                  type="button"
+                  onClick={() => handleSwitchViewMode('clusters')}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-medium hover:bg-emerald-500/30 transition-all ml-0.5"
+                >
+                  <span>↩ До Хабів</span>
+                </button>
+              )}
+
+              <div className="h-4 w-px bg-white/10 mx-1" />
+
+              {/* Quick actions */}
               <button
                 type="button"
-                onClick={() => handleSwitchViewMode('clusters')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 text-xs font-medium hover:bg-emerald-900 transition-colors shadow-lg"
+                onClick={handleAutoLayout}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                title="Topological Auto-Layout"
               >
-                <span>↩ До Хабів Рою</span>
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
               </button>
-            )}
 
-            <button
-              onClick={handleToggleClustering}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shadow-lg transition-colors ${
-                isClusteringEnabled
-                  ? 'bg-[#35d5d5]/20 text-[#35d5d5] border-[#35d5d5]'
-                  : 'bg-[#162c2f] hover:bg-[#112224] text-slate-300 border-[#224447]'
-              }`}
-              title="Toggle Community Clustering"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Clusters: {isClusteringEnabled ? 'ON' : 'OFF'}</span>
-            </button>
-            <button
-              onClick={activeTourStep === null ? handleStartTour : handleCloseTour}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shadow-lg transition-colors ${
-                activeTourStep !== null
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500'
-                  : 'bg-[#162c2f] hover:bg-[#112224] text-teal-300 border-[#224447]'
-              }`}
-              title="Start Guided Architecture Tour"
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>{activeTourStep !== null ? 'Exit Tour' : 'Guided Tour'}</span>
-            </button>
-            <button
-              onClick={handleAutoLayout}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#162c2f] hover:bg-[#112224] text-purple-300 border border-[#224447] text-xs font-medium shadow-lg transition-colors"
-              title="Topological Kahn Auto-Layout"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>Auto Layout</span>
-            </button>
-            <button
-              onClick={() => handleSyncTaskboard()}
-              disabled={isSyncingTaskboard}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shadow-lg transition-colors ${
-                isTaskboardMode
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500'
-                  : 'bg-[#162c2f] hover:bg-[#112224] text-emerald-300 border-[#224447]'
-              }`}
-              title="Synchronize Living Canvas with SQLite Taskboard"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingTaskboard ? 'animate-spin' : ''}`} />
-              <span>{isTaskboardMode ? 'Taskboard (Synced)' : 'Sync Taskboard'}</span>
-            </button>
-            <button
-              onClick={() => setIsMCPModalOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#162c2f] hover:bg-[#112224] text-teal-300 border border-[#224447] text-xs font-medium shadow-lg transition-colors"
-            >
-              <Server className="w-3.5 h-3.5" />
-              <span>MCP Servers</span>
-            </button>
-            <button
-              onClick={handleReset}
-              className="p-1.5 rounded-lg bg-[#162c2f] hover:bg-[#112224] text-slate-400 hover:text-white border border-[#224447] shadow-lg transition-colors"
-              title="Reset Canvas"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={handleDispatchSwarm}
-              disabled={!!activeRunningAgent}
-              className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold shadow-lg transition-colors ${
-                activeRunningAgent
-                  ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                  : 'bg-[#35d5d5] hover:bg-[#35d5d5]/80 text-[#112224]'
-              }`}
-            >
-              {activeRunningAgent ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Swarm Running...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Dispatch Swarm</span>
-                </>
-              )}
-            </button>
+              <button
+                type="button"
+                onClick={() => handleSyncTaskboard()}
+                disabled={isSyncingTaskboard}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                title="Синхронізувати Taskboard SQLite"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${isSyncingTaskboard ? 'animate-spin' : ''}`} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsMCPModalOpen(true)}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                title="MCP Сервери"
+              >
+                <Server className="w-3.5 h-3.5 text-teal-400" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                title="Скинути полотно"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDispatchSwarm}
+                disabled={!!activeRunningAgent}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg transition-all ml-1 ${
+                  activeRunningAgent
+                    ? 'bg-zinc-800 text-zinc-400 cursor-not-allowed'
+                    : 'bg-emerald-500 hover:bg-emerald-400 text-black font-semibold'
+                }`}
+              >
+                {activeRunningAgent ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Рій працює</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Запустити рій</span>
+                  </>
+                )}
+              </button>
+            </div>
           </Panel>
         </ReactFlow>
 

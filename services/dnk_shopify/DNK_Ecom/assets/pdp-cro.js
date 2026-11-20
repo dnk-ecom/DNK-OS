@@ -1,5 +1,5 @@
 /*
-  DNK Sovereign Apex - PDP CRO Suite
+  DNK-Ecom-Zerno-v.0.1.0 - PDP CRO Suite
   Custom elements for: StickyATC, QuantityBreaks, BundleBuilder, SizeChart
 */
 

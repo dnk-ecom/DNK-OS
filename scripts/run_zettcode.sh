@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # --- DNK-MRH-HEADER ---
-# mrh_id: "DNK_OS/scripts/run_zettcode.sh"
+# mrh_id: "scripts/run_zettcode.sh"
 # purpose: "Launch ZettCode with automatic Google Cloud OAuth2 token validation & refresh."
 # canonical_source: true
 # alters_files: []

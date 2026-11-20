@@ -1,0 +1,102 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/documentation_contract.schema.yaml"
+# purpose: "JSON Schema Draft-07 specification for DNK OS Tri-Archetype Documentation Contracts (Dev, User, Agent)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-23"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "DNKDocumentationContract"
+description: "Deterministic machine contract validating metadata and structural rules for DNK OS documentation archetypes."
+type: "object"
+required:
+  - "mrh"
+  - "archetype"
+  - "spec"
+properties:
+  mrh:
+    type: "object"
+    description: "Mandatory Machine-Readable Header (MRH) per DNK-STD-0075."
+    required:
+      - "mrh_id"
+      - "purpose"
+      - "status"
+      - "version"
+      - "updated_at"
+      - "author"
+    properties:
+      mrh_id:"docs/architecture/schemas/documentation_contract.schema.yaml"
+        type: "string"
+        pattern: "^[a-zA-Z0-9_\\-\\.\\/\\ ]+\\.(md|yaml|py)$"
+      purpose:
+        type: "string"
+        minLength: 15
+      canonical_source:
+        type: "boolean"
+        default: true
+      status:
+        type: "string"
+        enum: ["Draft", "Active", "Approved", "Deprecated", "Superseded"]
+      version:
+        type: "string"
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+      updated_at:
+        type: "string"
+        pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+      author:
+        type: "string"
+        minLength: 3
+
+  archetype:
+    type: "string"
+    description: "The structural archetype classifying this document."
+    enum:
+      - "DEV_SPEC"
+      - "API_CONTRACT"
+      - "USER_GUIDE"
+      - "SOP_RUNBOOK"
+      - "AGENT_DIRECTIVE"
+      - "SKILL_SPEC"
+      - "ADR"
+      - "SOTA_AUDIT"
+      - "TASK_SPEC"
+      - "GENERAL_DOC"
+
+  spec:
+    type: "object"
+    description: "Structural payload requirements depending on archetype."
+    required:
+      - "title"
+      - "summary"
+      - "sections"
+    properties:
+      title:
+        type: "string"
+        minLength: 5
+      summary:
+        type: "string"
+        minLength: 20
+      target_audience:
+        type: "string"
+        enum: ["human_developer", "human_user", "ai_agent", "dual_human_agent"]
+      sections:
+        type: "array"
+        items:
+          type: "object"
+          required:
+            - "heading"
+            - "required"
+          properties:
+            heading:
+              type: "string"
+            required:
+              type: "boolean"
+            aliases:
+              type: "array"
+              items:
+                type: "string"

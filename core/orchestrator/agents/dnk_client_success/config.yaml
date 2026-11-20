@@ -1,0 +1,22 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/dnk_client_success/config.yaml"
+# purpose: "Runtime configuration for DNK Client Success Agent"
+# author: "DNK-e.com Maksym & Antigravity"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-18"
+# --- END DNK-MRH-HEADER ---
+
+model: "inherit"
+temperature: 0.2
+system_language: "uk"
+acknowledgment_tone: "professional_empathetic"
+default_revision_quota: 3
+scope_guard_auto_triage: true
+sync_with_cockpit_db: true
+notification_channels:
+  - "client_cockpit_ui"
+  - "action_bus_event"

@@ -1,0 +1,38 @@
+[
+  {
+    "pattern": "(socket|network|egress|getaddrinfo|connection refused|block_network)",
+    "category": "NETWORK_SOCKET_EGRESS",
+    "root_cause": "Outbound socket call during isolated test environment violating zero egress invariant.",
+    "solution": "Set FIXTURE_MODE=true or implement mock transport override in service constructor (_is_test_mode)."
+  },
+  {
+    "pattern": "(ModuleNotFoundError|No module named 'apps\\.)",
+    "category": "MODULE_IMPORT_PATH",
+    "root_cause": "Module exists in apps/ but was not synced to root apps/ or PYTHONPATH.",
+    "solution": "Sync the service/router from apps to root apps/ using cp, or ensure rootdir pytest config includes both."
+  },
+  {
+    "pattern": "(404|Not Found.*router|router.*404)",
+    "category": "FASTAPI_ROUTER_UNMOUNTED",
+    "root_cause": "FastAPI router was created but not registered via app.include_router() in apps/api/main.py.",
+    "solution": "Import the router in apps/api/main.py and add app.include_router(module.router, prefix='/api/...')."
+  },
+  {
+    "pattern": "(Redis.*connection|ConnectionRefusedError.*6379|redis\\.exceptions)",
+    "category": "REDIS_FALLBACK_MISCONFIGURATION",
+    "root_cause": "Redis live client attempted connection to localhost:6379 during unit tests.",
+    "solution": "Use InMemoryRedisFallback when _is_test_mode() is True, and ensure is_connected returns True in fallback."
+  },
+  {
+    "pattern": "(Vault.*8200|is_authenticated.*live)",
+    "category": "VAULT_HEALTHCHECK_LIVE_HTTP",
+    "root_cause": "VaultClient is_healthy() made a live network call to port 8200 instead of checking cached status.",
+    "solution": "Return self._is_vault_connected cached boolean rather than calling self._client.is_authenticated()."
+  },
+  {
+    "pattern": "(AttributeError:.*model_dump|\\.dict\\(\\))",
+    "category": "PYDANTIC_V2_MIGRATION",
+    "root_cause": "Using legacy Pydantic v1 .dict() method instead of v2 .model_dump().",
+    "solution": "Replace .dict() with .model_dump() across all domain model calls."
+  }
+]

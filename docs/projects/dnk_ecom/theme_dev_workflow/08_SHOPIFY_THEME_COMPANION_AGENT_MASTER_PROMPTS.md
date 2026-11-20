@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md"
-# purpose: "Master Briefing Prompts: New Session Kickoff & Gerych-root Autonomous Terminal Mission for Shopify Theme Companion Agent."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "ДВОКОМПОНЕНТНИЙ МАЙСТЕР-ПРОМПТ ДЛЯ СТВОРЕННЯ АГЕНТА-КОМПАНЬЙОНА РОЗРОБНИКА ТЕМ SHOPIFY"
+description: "Master Briefing Prompts: New Session Kickoff & Gerych-root Autonomous Terminal Mission for Shopify Theme Companion Agent."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_SHOPIFY_THEME_COMPANION_AGENT_MASTER_PROMPTS.md"
+> purpose: "Master Briefing Prompts: New Session Kickoff & Gerych-root Autonomous Terminal Mission for Shopify Theme Companion Agent."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧠 ДВОКОМПОНЕНТНИЙ МАЙСТЕР-ПРОМПТ ДЛЯ СТВОРЕННЯ АГЕНТА-КОМПАНЬЙОНА РОЗРОБНИКА ТЕМ SHOPIFY
 

@@ -15,12 +15,15 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from core.kernel import (
+from core.kernel import FastMCPKernel
+from core.orchestrator.thought_companion import (
     CANONICAL_ROLE_CAPSULES,
-    FastMCPKernel,
+    FirstThoughtCompanionAgent,
+    get_thought_companion,
+)
+from core.domain.companion_contracts import (
     ThoughtCompanionRequest,
     ThoughtCompanionResponse,
-    get_thought_companion,
 )
 from core.domain.thought_dsl import parse_thought_dsl
 from core.obsidian.json_canvas_builder import (

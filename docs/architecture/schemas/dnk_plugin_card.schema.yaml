@@ -1,0 +1,205 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/dnk_plugin_card.schema.yaml"
+# purpose: "Formal JSON/YAML Schema for DNK OS Plugin Card v1.0 Sandbox-First Governance"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "DNK Plugin Card Schema"
+description: "Declarative validation schema for DNK OS Sandbox-First Plugin Cards"
+type: "object"
+required:
+  - "schema_version"
+  - "id"
+  - "name"
+  - "version"
+  - "kind"
+  - "lifecycle"
+  - "origin"
+  - "entrypoint"
+  - "capabilities"
+  - "permissions"
+  - "governance"
+  - "compatibility"
+additionalProperties: false
+properties:
+  schema_version:
+    type: "string"
+    enum: ["dnk-plugin/v1.0"]
+  id:
+    type: "string"
+    pattern: "^plugin-[a-z0-9_-]+$"
+  name:
+    type: "string"
+    minLength: 1
+  version:
+    type: "string"
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$"
+  kind:
+    type: "string"
+    enum:
+      - "tool"
+      - "memory"
+      - "agent"
+      - "service_adapter"
+      - "ui_node"
+      - "workflow"
+  lifecycle:
+    type: "string"
+    enum:
+      - "draft"
+      - "sandbox"
+      - "evaluated"
+      - "active"
+      - "deprecated"
+  origin:
+    type: "object"
+    required:
+      - "type"
+      - "license_spdx"
+    additionalProperties: false
+    properties:
+      type:
+        type: "string"
+        enum:
+          - "internal"
+          - "open_source"
+          - "vendor"
+          - "generated"
+      repository_url:
+        type: ["string", "null"]
+      commit_sha:
+        type: ["string", "null"]
+      license_spdx:
+        type: "string"
+      assimilation_track:
+        type: ["string", "null"]
+      provenance_note:
+        type: ["string", "null"]
+  entrypoint:
+    type: "object"
+    required:
+      - "type"
+      - "reference"
+    additionalProperties: false
+    properties:
+      type:
+        type: "string"
+        enum:
+          - "python"
+          - "mcp"
+          - "http"
+          - "container"
+          - "frontend"
+      reference:
+        type: "string"
+        minLength: 1
+  capabilities:
+    type: "object"
+    required:
+      - "provides"
+      - "requires"
+    additionalProperties: false
+    properties:
+      provides:
+        type: "array"
+        items:
+          type: "string"
+      requires:
+        type: "array"
+        items:
+          type: "string"
+  permissions:
+    type: "object"
+    required:
+      - "filesystem"
+      - "network"
+      - "secrets"
+      - "git"
+      - "database"
+      - "external_write"
+    additionalProperties: false
+    properties:
+      filesystem:
+        type: "string"
+        enum: ["none", "workspace_readonly", "allowlist"]
+      network:
+        type: "string"
+        enum: ["none", "allowlist"]
+      secrets:
+        type: "string"
+        enum: ["none", "allowlist"]
+      git:
+        type: "string"
+        enum: ["none", "allowlist"]
+      database:
+        type: "string"
+        enum: ["none", "allowlist"]
+      external_write:
+        type: "string"
+        enum: ["none", "allowlist"]
+  governance:
+    type: "object"
+    required:
+      - "owner"
+      - "risk_level"
+      - "approval_required_for_activation"
+      - "sandbox_profile"
+      - "evidence_paths"
+    additionalProperties: false
+    properties:
+      owner:
+        type: "string"
+        minLength: 1
+      risk_level:
+        type: "string"
+        enum: ["low", "medium", "high", "critical"]
+      approval_required_for_activation:
+        type: "boolean"
+      sandbox_profile:
+        type: "string"
+      evidence_paths:
+        type: "array"
+        items:
+          type: "string"
+      contract_test_path:
+        type: ["string", "null"]
+      security_review_path:
+        type: ["string", "null"]
+      approval_record:
+        type: ["object", "null"]
+        properties:
+          approved_by:
+            type: "string"
+          approval_date:
+            type: "string"
+          notes:
+            type: "string"
+        required: ["approved_by"]
+        additionalProperties: true
+      deprecation_reason:
+        type: ["string", "null"]
+  compatibility:
+    type: "object"
+    required:
+      - "harness_api_version"
+      - "required_core_capabilities"
+      - "conflicts_with"
+    additionalProperties: false
+    properties:
+      harness_api_version:
+        type: "string"
+      required_core_capabilities:
+        type: "array"
+        items:
+          type: "string"
+      conflicts_with:
+        type: "array"
+        items:
+          type: "string"

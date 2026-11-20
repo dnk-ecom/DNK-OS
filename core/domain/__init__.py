@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_domain_init"
+# mrh_id: "core/domain/__init__.py"
 # purpose: "Unified export of domain entities: TaskDAG, ThoughtNode, Identity, BrandDNA, and Proposals."
 # canonical_source: true
 # alters_files: ["core/domain/__init__.py"]

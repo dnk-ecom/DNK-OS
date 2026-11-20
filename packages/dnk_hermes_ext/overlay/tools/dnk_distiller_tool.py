@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_distiller_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_distiller_tool.py"
 # purpose: "Native Hermes tool for querying and recording Error Distillation solutions and self-healing fixes."
 # canonical_source: true
 # alters_files: []

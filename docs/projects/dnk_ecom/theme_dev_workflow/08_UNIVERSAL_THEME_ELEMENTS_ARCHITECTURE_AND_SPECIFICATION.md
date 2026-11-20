@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md"
-# purpose: "Exhaustive Technical Specification & Architectural Blueprint of ALL Elements for Building a World-Class Shopify Theme (Theme Store Commercial Grade $350-$420 MSRP)"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "ПОВНИЙ ТЕХНІЧНИЙ ОПИС УСІХ ЕЛЕМЕНТІВ ТЕМИ ТА СИСТЕМА ДИСТИЛЯЦІЇ"
+description: "Exhaustive Technical Specification & Architectural Blueprint of ALL Elements for Building a World-Class Shopify Theme (Theme Store Commercial Grade $350-$420 MSRP)"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md"
+> purpose: "Exhaustive Technical Specification & Architectural Blueprint of ALL Elements for Building a World-Class Shopify Theme (Theme Store Commercial Grade $350-$420 MSRP)"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏛️ ПОВНИЙ ТЕХНІЧНИЙ ОПИС УСІХ ЕЛЕМЕНТІВ ТЕМИ ТА СИСТЕМА ДИСТИЛЯЦІЇ
 ## DNK Sovereign Commercial Theme (Shopify Theme Store Submission Standard)

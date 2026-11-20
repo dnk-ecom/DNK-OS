@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_domain_agent_mesh_models"
+# mrh_id: "core/domain/agent_mesh_models.py"
 # purpose: "Pydantic domain contracts and typed schemas for Agent-Native Enterprise Mesh, Approval Chains, and Ingress Security"
 # author: "DNK-e.com Maksym & Denchik"
 # license: "DNK-INTERNAL"

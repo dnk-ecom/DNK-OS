@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/05_CANONICAL_GIT_MIRROR_AND_DONOR_BRANCHES.md"
-# purpose: "Canonical Guide to DNK-Ecom_git_mirrow and Cleanroom Donor Branches on GitHub"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Канонічний репозиторій тем-донорів: `DNK-Ecom_git_mirrow` та гілки GitHub"
+description: "Canonical Guide to DNK-Ecom_git_mirrow and Cleanroom Donor Branches on GitHub"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/05_CANONICAL_GIT_MIRROR_AND_DONOR_BRANCHES.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/05_CANONICAL_GIT_MIRROR_AND_DONOR_BRANCHES.md"
+> purpose: "Canonical Guide to DNK-Ecom_git_mirrow and Cleanroom Donor Branches on GitHub"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏛️ Канонічний репозиторій тем-донорів: `DNK-Ecom_git_mirrow` та гілки GitHub
 

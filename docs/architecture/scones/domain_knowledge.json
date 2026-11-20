@@ -1,0 +1,19 @@
+[
+  {
+    "task_id": "TASK-DNK-FULL-AUDIT-20261030-001",
+    "title": "Full 8-Zone Deterministic Repository Audit and Test Harmonization",
+    "summary": "Deterministic Zero-Trust audit, test stabilization, and quality gate sealing across all 8 canonical root zones of DNK_HUB",
+    "components": [
+      "core",
+      "services",
+      "apps",
+      "tests",
+      "scripts",
+      "packages",
+      "infra",
+      "docs"
+    ],
+    "indexed_at": "2026-10-30T10:09:14.503784+00:00",
+    "status": "Verified SSOT"
+  }
+]

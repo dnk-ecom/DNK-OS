@@ -1,0 +1,55 @@
+{
+  "nodes": [
+    {
+      "id": "dec-034",
+      "type": "text",
+      "text": "[ 🟢 COMPLETED ] DEC-034: Sovereign Microkernel",
+      "x": 0,
+      "y": 0,
+      "width": 250,
+      "height": 140,
+      "color": "4",
+      "status": "Completed"
+    },
+    {
+      "id": "dec-036",
+      "type": "text",
+      "text": "[ 🟢 COMPLETED ] DEC-036: FastMCP Code Mode",
+      "x": 350,
+      "y": 0,
+      "width": 250,
+      "height": 140,
+      "color": "4",
+      "status": "Completed"
+    },
+    {
+      "id": "visual-shell",
+      "type": "text",
+      "text": "[ 🟡 IN PROGRESS ] DNK Visual Shell Integration",
+      "x": 700,
+      "y": 0,
+      "width": 250,
+      "height": 140,
+      "color": "3",
+      "status": "In_Progress"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-07d345b9",
+      "fromNode": "dec-034",
+      "toNode": "dec-036",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "enables"
+    },
+    {
+      "id": "edge-8047bcb7",
+      "fromNode": "dec-036",
+      "toNode": "visual-shell",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "orchestrates"
+    }
+  ]
+}

@@ -1,12 +1,14 @@
 ---
-title: "Канонічна майстер-специфікація побудови теми DNK-Ecom для Shopify Theme Store ($350–$420 MSRP)"
+title: "КАНОНІЧНА МАЙСТЕР-СПЕЦИФІКАЦІЯ ПОБУДОВИ ТЕМИ DNK-ECOM"
 description: "Вичерпна інженерна специфікація побудови флагманської теми DNK-Ecom у DNK OS: повний синтез 10 донорів, відповідність офіційним стандартам Shopify Theme Store ($350-$420 MSRP), Zero-Framework Web Components, 100% Theme Blocks 2.0 та Core Web Vitals 90+ Green."
 mrh_id: "docs/projects/dnk_ecom/MASTER_SPECIFICATION_DNK_ECOM_THEME_STORE.md"
-status: approved
-type: specification
-domain: shopify
-author: "Antigravity (Chief Architect) & Gerych-root (Auditor) & DNK-e.com Maksym"
-version: "3.0.0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -15,13 +17,12 @@ version: "3.0.0"
 > mrh_id: "docs/projects/dnk_ecom/MASTER_SPECIFICATION_DNK_ECOM_THEME_STORE.md"
 > purpose: "Вичерпна інженерна специфікація побудови флагманської теми DNK-Ecom у DNK OS: повний синтез 10 донорів, відповідність офіційним стандартам Shopify Theme Store ($350-$420 MSRP), Zero-Framework Web Components, 100% Theme Blocks 2.0 та Core Web Vitals 90+ Green."
 > canonical_source: true
-> alters_files:
->   - "docs/projects/dnk_ecom/MASTER_SPECIFICATION_DNK_ECOM_THEME_STORE.md"
+> alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "3.0.0"
-> updated_at: "2026-11-16"
-> author: "Antigravity (Chief Architect) & Gerych-root & DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -57,7 +58,7 @@ flowchart TD
         G7["Zero DRM / Zero Telemetry (100% Cleanroom)"]
     end
 
-    subgraph DNKOSCore ["3. Цільовий продукт: DNK Sovereign 1.0.0 Apex"]
+    subgraph DNKOSCore ["3. Цільовий продукт: DNK-Ecom-Zerno-v.0.1.0"]
         C1["services/dnk_shopify/DNK_Sovereign_Apex/"]
         C2["LocalStorefrontManager (0.2 ms офлайн-тести)"]
         C3["DNK-ThemeCraft Companion (AI-агент розробки)"]

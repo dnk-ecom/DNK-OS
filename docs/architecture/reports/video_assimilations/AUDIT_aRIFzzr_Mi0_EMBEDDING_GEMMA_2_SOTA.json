@@ -1,0 +1,77 @@
+{
+  "transcript_meta": {
+    "video_id": "aRIFzzr_Mi0",
+    "language": "en",
+    "segments_count": 130,
+    "total_characters": 4285
+  },
+  "insights": {
+    "video_id": "aRIFzzr_Mi0",
+    "video_uri": "https://www.youtube.com/watch?v=aRIFzzr_Mi0",
+    "title": "EmbeddingGemma 2: Unified Multimodal Embeddings (Text, Code, Images, Videos, Audio)",
+    "publisher": "Google DeepMind",
+    "license": "Apache 2.0",
+    "core_thesis": "Maps text, code, images, video frames, and audio into a single 768-dimensional vector space using modular encoders, bidirectional transformer with per-layer residual inputs, same-tower negatives to eliminate modality bias, spread-out loss for quantization robustness, and Matryoshka Representation Learning (MRL).",
+    "key_ideas": [
+      {
+        "title": "Same-Tower Negatives for Zero-Modality Gap",
+        "description": "Dense negative pairs between elements of the same modality disperse intra-modal clustering, ensuring text queries treat visual/audio assets fairly.",
+        "timestamp": "03:15"
+      },
+      {
+        "title": "Per-Layer Residual Context Injection",
+        "description": "Injecting tailored input representations at every attention layer stops high-frequency modal feature decay across deep networks.",
+        "timestamp": "02:15"
+      },
+      {
+        "title": "Spread-Out Loss for Vector DB Quantization Robustness",
+        "description": "Maximizes entropy across the unit hypersphere, making vectors immune to rounding errors under INT8/INT4 quantization in vector DBs.",
+        "timestamp": "03:35"
+      },
+      {
+        "title": "Matryoshka Representation Learning (MRL)",
+        "description": "Prefix dimension truncation (768 -> 512 -> 256 -> 128) unlocks two-phase search: 128 dims for 0.2ms candidate culling (-83% RAM) + 768 dims for rerank.",
+        "timestamp": "03:55"
+      },
+      {
+        "title": "Modular Modality Encoders with Shared Latent Projection",
+        "description": "Modular breakdown (~270M text, ~170M vision, ~300M audio) allows loading only required encoders. Audio waveforms converted to 40ms spectrogram slices.",
+        "timestamp": "01:25"
+      }
+    ],
+    "actionable_takeaways": [
+      "Implement zero-dependency MRL Vector Truncator & Normalizer in core/memory.",
+      "Enable prefix-slicing (128/256/768 dims) in vector database schemas.",
+      "Integrate intra-modality negative penalties in media search to prevent text-only retrieval bias."
+    ]
+  },
+  "sota_benchmark": {
+    "anchor_date": "2026-11-17",
+    "topic": "Omnimodal Multimodal Embeddings, MRL & Quantization Robustness",
+    "corporate_leaders": [
+      {
+        "company": "Google DeepMind",
+        "model": "EmbeddingGemma 2",
+        "architecture": "740M modular, 768 dims, Gemma 4 decoder pre-finetune, Gemini Embedding 2 distillation, Apache 2.0"
+      },
+      {
+        "company": "Anthropic / Voyage AI",
+        "model": "Voyage Multimodal 3",
+        "architecture": "Cloud SaaS, 1024 dims, Text + Image only"
+      },
+      {
+        "company": "OpenAI",
+        "model": "text-embedding-3-large",
+        "architecture": "Cloud SaaS, 3072/1536/256 dims, Text only"
+      },
+      {
+        "company": "Qdrant / LanceDB",
+        "model": "MRL Vector Engine",
+        "architecture": "Native Matryoshka & Binary/Scalar Quantization"
+      }
+    ],
+    "dnk_adaptation": "REJECT PHYSICAL MODEL IMPLEMENTATION (DEC-145). Zero auxiliary neural models in core. Rely 100% on native SQLite FTS5 BM25 + AST-locus indexing + two-level progressive LOD Markdown index.",
+    "triage_verdict": "REJECT_CORE_DEGRADATION"
+  },
+  "task_dag": []
+}

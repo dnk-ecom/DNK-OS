@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<!--
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/projects/dnk_ecom/proposal_client_portal.html"
+# purpose: "Interactive Personalized Shopify Proposal, ROI Configurator, 6-Stage Execution Dashboard & Client Task Manager wired to DNK OS Spatial Canvas."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-16"
+# author: "DNK-e.com Maksym & Gerych"
+# --- END DNK-MRH-HEADER ---
+-->
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DNK-Ecom | Інтелектуальна Комерційна Пропозиція та Клієнтський Кокпіт</title>
+  <style>
+    :root {
+      --dnk-bg: #0B0F17;
+      --dnk-surface: #161B26;
+      --dnk-surface-elevated: #1E2534;
+      --dnk-text: #F3F4F6;
+      --dnk-muted: #9CA3AF;
+      --dnk-accent: #10B981;
+      --dnk-accent-dim: rgba(16, 185, 129, 0.14);
+      --dnk-warning: #F59E0B;
+      --dnk-danger: #EF4444;
+      --dnk-info: #3B82F6;
+      --dnk-border: #2D3748;
+      --dnk-radius: 8px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--dnk-bg);
+      color: var(--dnk-text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding-bottom: 64px;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--dnk-border);
+      background: rgba(22, 27, 38, 0.92);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--dnk-radius);
+      background: var(--dnk-accent);
+      color: #052e16;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--dnk-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--dnk-bg);
+      padding: 4px;
+      border-radius: var(--dnk-radius);
+      border: 1px solid var(--dnk-border);
+    }
+
+    .nav-tab {
+      background: transparent;
+      color: var(--dnk-muted);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .nav-tab.active {
+      background: var(--dnk-accent);
+      color: #052e16;
+    }
+
+    .deal-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--dnk-accent-dim);
+      color: var(--dnk-accent);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .personalization-bar {
+      background: var(--dnk-surface);
+      border: 1px solid var(--dnk-border);
+      border-radius: var(--dnk-radius);
+      padding: 16px;
+      margin: 20px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--dnk-muted);
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .field-group input,
+    .field-group select,
+    textarea {
+      width: 100%;
+      background: var(--dnk-bg);
+      border: 1px solid var(--dnk-border);
+      color: var(--dnk-text);
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: var(--font-sans);
+    }
+
+    .field-group input:focus,
+    .field-group select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--dnk-accent);
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #161B26 0%, #0F172A 100%);
+      border: 1px solid var(--dnk-border);
+      border-radius: var(--dnk-radius);
+      padding: 28px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-card,
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    .hero-card h1 {
+      font-size: 26px;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+
+    .hero-card p {
+      color: var(--dnk-muted);
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+
+    .roi-box {
+      background: var(--dnk-bg);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--dnk-radius);
+      padding: 20px;
+    }
+
+    .roi-metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--dnk-border);
+      font-size: 13px;
+    }
+
+    .roi-metric:last-child {
+      border-bottom: none;
+    }
+
+    .roi-highlight {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--dnk-accent);
+      font-family: var(--font-mono);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--dnk-surface);
+      border: 1px solid var(--dnk-border);
+      border-radius: var(--dnk-radius);
+      padding: 22px;
+    }
+
+    .card.selected {
+      border: 2px solid var(--dnk-accent);
+      box-shadow: 0 0 0 4px var(--dnk-accent-dim);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .price-tag {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--dnk-accent);
+    }
+
+    .feature-list {
+      list-style: none;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+
+    .feature-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(45, 55, 72, 0.5);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--dnk-accent);
+      color: #052e16;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-secondary {
+      background: var(--dnk-surface-elevated);
+      color: var(--dnk-text);
+      border-color: var(--dnk-border);
+    }
+
+    .addon-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: var(--dnk-bg);
+      border: 1px solid var(--dnk-border);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid var(--dnk-border);
+    }
+
+    .matrix-table th {
+      color: var(--dnk-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .stage-card {
+      background: var(--dnk-surface);
+      border: 1px solid var(--dnk-border);
+      border-radius: var(--dnk-radius);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .stage-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .status-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-completed {
+      background: rgba(16, 185, 129, 0.16);
+      color: var(--dnk-accent);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-in_progress {
+      background: rgba(59, 130, 246, 0.16);
+      color: #60A5FA;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .status-waiting_client_assets {
+      background: rgba(245, 158, 11, 0.16);
+      color: var(--dnk-warning);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .status-pending {
+      background: rgba(156, 163, 175, 0.12);
+      color: var(--dnk-muted);
+      border: 1px solid var(--dnk-border);
+    }
+
+    .artifact-box {
+      background: var(--dnk-bg);
+      border: 1px solid var(--dnk-border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .mono-hash {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--dnk-muted);
+      word-break: break-all;
+    }
+
+    .ticket-item {
+      background: var(--dnk-bg);
+      border: 1px solid var(--dnk-border);
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .preset-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px 0;
+    }
+
+    .chip {
+      background: var(--dnk-surface-elevated);
+      border: 1px solid var(--dnk-border);
+      color: var(--dnk-text);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      border-color: var(--dnk-accent);
+    }
+
+    .portfolio-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .portfolio-links a {
+      color: var(--dnk-accent);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid var(--dnk-border);
+      border-radius: 6px;
+      background: var(--dnk-bg);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="brand-badge">
+        <div class="brand-logo">DNK</div>
+        <div>
+          <div class="brand-title">DNK-Ecom Sovereign Shopify Studio</div>
+          <div class="brand-sub">Horizon Tinker 4.4.0 • 3,732 CRO Molecules • Spatial Canvas OS</div>
+        </div>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('proposal')" id="tab-btn-proposal">
+          1. Інтелектуальна КП та Конфігуратор
+        </button>
+        <button class="nav-tab" onclick="switchTab('cockpit')" id="tab-btn-cockpit">
+          2. Дашборд Виконання (6 Етапів)
+        </button>
+        <button class="nav-tab" onclick="switchTab('tasks')" id="tab-btn-tasks">
+          3. Таск-Менеджер &amp; Шлюз DNK OS
+        </button>
+      </div>
+
+      <div class="deal-pill" id="header-deal-status">
+        DEAL: DRAFT • КВОТА ПРАВОК: 3/3
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Персоналізація під ліда / клієнта -->
+    <section class="personalization-bar">
+      <div class="field-group">
+        <label for="inp-client">Ім'я замовника</label>
+        <input id="inp-client" type="text" value="Олександр Коваль" oninput="recalculateAll()" />
+      </div>
+      <div class="field-group">
+        <label for="inp-brand">Бренд / Магазин</label>
+        <input id="inp-brand" type="text" value="Lumiere Studio" oninput="recalculateAll()" />
+      </div>
+      <div class="field-group">
+        <label for="inp-niche">Ніша бізнесу (підбір молекул)</label>
+        <select id="inp-niche" onchange="recalculateAll()">
+          <option value="beauty_cosmetics">Beauty &amp; Cosmetics (Догляд / Косметика)</option>
+          <option value="fashion_apparel">Fashion &amp; Apparel (Одяг / Взуття / Аксесуари)</option>
+          <option value="home_decor_lighting" selected>Home Decor &amp; Lighting (Декор / Освітлення)</option>
+          <option value="electronics_accessories">Electronics &amp; Gadgets (Електроніка)</option>
+          <option value="kids_educational">Kids &amp; Educational (Дитячі товари)</option>
+          <option value="custom_dtc">Custom DTC Brand (Універсальний DTC)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="inp-orders">Очікувані замовлення / міс</label>
+        <input id="inp-orders" type="number" min="10" max="10000" value="180" oninput="recalculateAll()" />
+      </div>
+      <div class="field-group">
+        <label for="inp-aov">Середній чек (AOV, USD)</label>
+        <input id="inp-aov" type="number" min="10" max="5000" value="75" oninput="recalculateAll()" />
+      </div>
+    </section>
+
+    <!-- VIEW 1: ІНТЕЛЕКТУАЛЬНА КП ТА КОНФІГУРАТОР -->
+    <div id="view-proposal" class="view-panel active">
+      <div class="hero-card">
+        <div>
+          <div class="deal-pill" style="display:inline-block; margin-bottom:10px;" id="hero-badge">
+            Персоналізована пропозиція для Lumiere Studio
+          </div>
+          <h1 id="hero-headline">
+            Розробка висококонверсійного Shopify-магазину на ядрі DNK-Ecom-Zerno-v.0.1.0 за 14 робочих днів
+          </h1>
+          <p>
+            Замість шаблонної теми з ThemeForest та десятка платних додатків, які сповільнюють мобільну версію і ламають кошик, ми розгортаємо чисту модульну архітектуру <strong>Shopify Theme Blocks 2.0 (Horizon Tinker 4.4.0)</strong> із вбудованими CRO-механіками збільшення середнього чеку.
+          </p>
+          <div class="portfolio-links">
+            <a href="https://vibe-light.com/" target="_blank" rel="noopener">vibe-light.com</a>
+            <a href="https://flamecase.com/" target="_blank" rel="noopener">flamecase.com</a>
+            <a href="https://customfelt.shop/" target="_blank" rel="noopener">customfelt.shop</a>
+            <a href="https://velvetcomfort.co.uk/" target="_blank" rel="noopener">velvetcomfort.co.uk</a>
+            <a href="https://busyboardland.com/" target="_blank" rel="noopener">busyboardland.com</a>
+          </div>
+        </div>
+
+        <div class="roi-box">
+          <div style="font-size:12px; font-family:var(--font-mono); color:var(--dnk-muted); text-transform:uppercase; margin-bottom:8px;">
+            Калькулятор прямої економії на Shopify-додатках
+          </div>
+          <div class="roi-metric">
+            <span>Бандл-аппка (Quantity Breaks / Kaching):</span>
+            <span style="font-family:var(--font-mono);">$39/міс → $0/міс</span>
+          </div>
+          <div class="roi-metric">
+            <span>In-Cart Upsell &amp; Free Shipping Bar:</span>
+            <span style="font-family:var(--font-mono);">$54/міс → $0/міс</span>
+          </div>
+          <div class="roi-metric">
+            <span>Sticky ATC, Trust Badges &amp; Geo Estimator:</span>
+            <span style="font-family:var(--font-mono);">$43/міс → $0/міс</span>
+          </div>
+          <div class="roi-metric">
+            <span>Multi-Currency, Reviews &amp; Email Flows:</span>
+            <span style="font-family:var(--font-mono);" id="roi-extra-apps">$103/міс → $0/міс</span>
+          </div>
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--dnk-border); display:flex; justify-content:space-between; align-items:baseline;">
+            <span>Річна економія на підписках:</span>
+            <span class="roi-highlight" id="roi-annual-savings">$2,868 / рік</span>
+          </div>
+          <div style="margin-top:6px; display:flex; justify-content:space-between; font-size:13px; color:var(--dnk-muted);">
+            <span>Розрахункова окупність інвестиції:</span>
+            <span id="roi-payback" style="color:var(--dnk-text); font-weight:700;">1.2 міс.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Матриця Персоналізації під нішу -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <div class="card-title">Матриця конверсії під вашу нішу (Insight → Молекула DNK-Ecom → KPI)</div>
+          <span class="deal-pill" id="niche-pill">home_decor_lighting</span>
+        </div>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Ключовий бар'єр покупця у ніші</th>
+              <th>Інтегрована молекула DNK-Ecom-Zerno-v.0.1.0</th>
+              <th>Очікуваний вплив на метрики</th>
+            </tr>
+          </thead>
+          <tbody id="niche-matrix-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Вибір тарифного пакету: $1200 vs $1500 -->
+      <div class="grid-2">
+        <div class="card" id="card-launch_1200" onclick="selectTier('launch_1200')" style="cursor:pointer;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Пакет Launch Core</div>
+              <div style="font-size:13px; color:var(--dnk-muted);">Швидкий старт моно-бренду на 1 ринок</div>
+            </div>
+            <div class="price-tag">$1,200</div>
+          </div>
+          <ul class="feature-list">
+            <li><span>Термін реалізації</span><strong>14 робочих днів</strong></li>
+            <li><span>Наповнення каталогу</span><strong>до 15 товарів</strong></li>
+            <li><span>Мови та валюти</span><strong>1 мова + базова валюта</strong></li>
+            <li><span>Ядро теми</span><strong>DNK-Ecom-Zerno-v.0.1.0 (6 CRO-блоків)</strong></li>
+            <li><span>Платіжні системи</span><strong>Shopify Payments / Stripe / PayPal</strong></li>
+            <li><span>Юридичні політики</span><strong>4 обов'язкові сторінки політик</strong></li>
+            <li><span>Включені ітерації правок</span><strong>2 раунди правок у скоупі</strong></li>
+            <li><span>Навчання та підтримка</span><strong>Відеоінструкції + 1 міс. підтримки</strong></li>
+          </ul>
+          <button class="btn btn-secondary" style="width:100%;">Обрати Launch Core ($1,200)</button>
+        </div>
+
+        <div class="card selected" id="card-scale_1500" onclick="selectTier('scale_1500')" style="cursor:pointer;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Пакет Scale CRO (Рекомендовано)</div>
+              <div style="font-size:13px; color:var(--dnk-accent);">Повний CRO-стек, мульти-ринок та Email-воронки</div>
+            </div>
+            <div class="price-tag">$1,500</div>
+          </div>
+          <ul class="feature-list">
+            <li><span>Термін реалізації</span><strong>14 робочих днів</strong></li>
+            <li><span>Наповнення каталогу</span><strong>до 20 товарів з SEO-описами</strong></li>
+            <li><span>Мови та мульти-валюта</span><strong>2 мови + до 5 валют</strong></li>
+            <li><span>Кастомний продаючий PDP</span><strong>Quantity Breaks v2 (1x / 2+1 / 3+2), Відео, Розміри</strong></li>
+            <li><span>Платіжки + Консультація UK/US</span><strong>Stripe / PayPal / Shopify Payments + B2B</strong></li>
+            <li><span>Email-маркетинг автоматизація</span><strong>Покинутий кошик, Welcome-серія, Поп-ап знижки</strong></li>
+            <li><span>Включені ітерації правок</span><strong>3 раунди правок у скоупі</strong></li>
+            <li><span>Навчання та підтримка</span><strong>Відеоінструкції + 1 міс. підтримки</strong></li>
+          </ul>
+          <button class="btn btn-primary" style="width:100%;">Обрано Scale CRO ($1,500)</button>
+        </div>
+      </div>
+
+      <!-- Додаткові опції та Фінальний Кошторис + Підписання -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">Додаткові модулі розширення (Add-ons)</div>
+          <div class="addon-row">
+            <div>
+              <div style="font-weight:600;">Google Merchant Center &amp; Shopping Feed</div>
+              <div style="font-size:12px; color:var(--dnk-muted);">Налаштування фіда, модерація політик та проходження перевірки Google</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-family:var(--font-mono); font-weight:700;">+$300</span>
+              <input type="checkbox" id="chk-gmc" onchange="recalculateAll()" style="width:18px; height:18px;" />
+            </div>
+          </div>
+
+          <div class="addon-row">
+            <div>
+              <div style="font-weight:600;">SEO-структура каталогу під семантику</div>
+              <div style="font-size:12px; color:var(--dnk-muted);">Семантична карта колекцій, мета-шаблони, JSON-LD мікророзмітка</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-family:var(--font-mono); font-weight:700;">+$200</span>
+              <input type="checkbox" id="chk-seo" onchange="recalculateAll()" style="width:18px; height:18px;" />
+            </div>
+          </div>
+
+          <div class="addon-row">
+            <div>
+              <div style="font-weight:600;">Додаткові пакети товарів (+10 шт / пакет)</div>
+              <div style="font-size:12px; color:var(--dnk-muted);">Імпорт, варіації, фото та продаюча структура ($50 за 10 товарів)</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-family:var(--font-mono); font-weight:700;">+$50/пакет</span>
+              <input type="number" id="inp-extra-batches" min="0" max="30" value="0" oninput="recalculateAll()" style="width:70px; background:var(--dnk-surface); color:var(--dnk-text); border:1px solid var(--dnk-border); padding:6px; border-radius:4px;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(16, 185, 129, 0.5);">
+          <div class="card-header">
+            <div class="card-title">Фіксація Договору та Запуск Конвеєра</div>
+            <span class="status-badge status-completed">30% / 70% SLA</span>
+          </div>
+          <div class="roi-metric">
+            <span>Базовий пакет:</span>
+            <strong id="sum-base">$1,500</strong>
+          </div>
+          <div class="roi-metric">
+            <span>Додаткові опції:</span>
+            <strong id="sum-addons">$0</strong>
+          </div>
+          <div class="roi-metric">
+            <span>Кількість товарів у скоупі:</span>
+            <strong id="sum-products">20 товарів</strong>
+          </div>
+          <div class="roi-metric">
+            <span>Загальна сума договору:</span>
+            <strong id="sum-total" style="font-size:18px; color:var(--dnk-accent);">$1,500</strong>
+          </div>
+          <div class="roi-metric">
+            <span>Передоплата 30% для старту Етапу 1:</span>
+            <strong id="sum-prepay" style="color:var(--dnk-accent);">$450.00</strong>
+          </div>
+          <div class="roi-metric">
+            <span>Фінальний платіж 70% після демо та QA:</span>
+            <strong id="sum-final">$1,050.00</strong>
+          </div>
+
+          <div style="margin:12px 0; padding:10px; background:var(--dnk-bg); border-radius:6px; border:1px solid var(--dnk-border);">
+            <div style="font-size:11px; color:var(--dnk-muted); font-family:var(--font-mono);">КАНОНІЧНИЙ SHA-256 ЗЛІПОК СКОУПУ ДОГОВОРУ:</div>
+            <div class="mono-hash" id="scope-hash-display">розрахунок...</div>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; font-size:15px; padding:14px;" onclick="signContractAndOpenCockpit()">
+            Затвердити конфігурацію та відкрити Персональний Дашборд →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: ДАШБОРД ВИКОНАННЯ (6 ЕТАПІВ) ТА АРТЕФАКТИ -->
+    <div id="view-cockpit" class="view-panel">
+      <div class="card" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div>
+          <div class="card-title" id="cockpit-title">Персональний Дашборд Проєкту: Lumiere Studio</div>
+          <div style="font-size:13px; color:var(--dnk-muted);">
+            Жива синхронізація з графом <span style="font-family:var(--font-mono); color:var(--dnk-text);">./docs/canvas/shopify_vibe_pipeline.canvas</span> • Дедлайн: 14 робочих днів
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <label style="font-size:13px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" id="chk-assets-ready" checked onchange="renderStages()" />
+            Вхідні матеріали клієнта (фото, ціни, доступи) надано
+          </label>
+        </div>
+      </div>
+
+      <div id="stages-container"></div>
+    </div>
+
+    <!-- VIEW 3: ТАСК-МЕНЕДЖЕР КЛІЄНТА ТА ШЛЮЗ ПРАВОК У DNK OS -->
+    <div id="view-tasks" class="view-panel">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Поставити питання або надіслати правку</div>
+            <span class="deal-pill" id="revisions-counter-pill">Доступно правок: 3 з 3</span>
+          </div>
+          <p style="font-size:13px; color:var(--dnk-muted); margin-bottom:12px;">
+            Інтелектуальний шлюз <strong>Scope Guard</strong> автоматично відрізняє консультаційні питання (без списання квоти) від правок у межах договору та додаткових доробок, маршрутизуючи задачу у відповідну ноду DNK OS.
+          </p>
+
+          <div style="font-size:12px; color:var(--dnk-muted); margin-bottom:6px;">Швидкі приклади запитів для перевірки класифікатора:</div>
+          <div class="preset-chips">
+            <button class="chip" onclick="fillPreset('Змініть колір акцентних кнопок на смарагдовий та збільшіть шрифт заголовків на мобільному')">
+              Правка дизайну (В межах ТЗ)
+            </button>
+            <button class="chip" onclick="fillPreset('Налаштуйте бандли Quantity Breaks 1x / 2+1 / 3+2 та поріг безкоштовної доставки $120 у кошику')">
+              Правка блоків кошика (В межах ТЗ)
+            </button>
+            <button class="chip" onclick="fillPreset('Підкажіть, коли буде готовий другий етап CRO-воронки та де переглянути превʼю?')">
+              Питання клієнта (0 списань квоти)
+            </button>
+            <button class="chip" onclick="fillPreset('Нам потрібна двостороння інтеграція з 1С ERP та кастомний мобільний додаток iOS')">
+              Поза скоупом (Авто-оцінка Upsell)
+            </button>
+          </div>
+
+          <div class="field-group" style="margin-bottom:12px;">
+            <label for="inp-ticket-text">Опис запиту або правки клієнта</label>
+            <textarea id="inp-ticket-text" rows="4" placeholder="Опишіть правку або питання..."></textarea>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%;" onclick="submitClientTicket()">
+            Надіслати у шлюз DNK OS Spatial Canvas
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Живий Журнал Тріажу та Команд DNK OS</div>
+            <span class="status-badge status-in_progress">SpatialCanvasSessionRouter</span>
+          </div>
+          <div id="tickets-log"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const NICHE_MATRICES = {
+      beauty_cosmetics: [
+        {
+          insight: "Сумніви у складі та реальному ефекті засобу до/після",
+          molecule: "Before/After Slider + Verified Video Reviews (_product-main-rating.liquid)",
+          lift: "+19% конверсії з холодного трафіку Meta Ads"
+        },
+        {
+          insight: "Висока вартість залучення клієнта (CAC) при покупці 1 флакона",
+          molecule: "Routine Bundle Builder + Free Gift Tier in Cart Drawer (cart-progress-bar.liquid)",
+          lift: "+34% AOV та повторні замовлення"
+        }
+      ],
+      fashion_apparel: [
+        {
+          insight: "Страх не вгадати з розміром та складність повернення",
+          molecule: "Size Guide Drawer + Trust Guarantee Badges (_product-main-trust-badges.liquid)",
+          lift: "-22% відмов на PDP, +14% Add-to-Cart"
+        },
+        {
+          insight: "Низький середній чек при покупці базової речі",
+          molecule: "Dual-Level Quantity Breaks v2 (product_quantity-breaks-v2.liquid: 1x / 2+1 / 3+2)",
+          lift: "+28% AOV без платних бандл-аппок"
+        }
+      ],
+      home_decor_lighting: [
+        {
+          insight: "Побоювання пошкодження при доставці та невідомі терміни",
+          molecule: "Dynamic Geo Delivery Estimator (tinker-dnk-delivery-estimator.liquid)",
+          lift: "+16% завершених чекаутів"
+        },
+        {
+          insight: "Покупка комплекту світильників/декору в кілька кімнат",
+          molecule: "Tiered Room Multipack (product_quantity-breaks-v2.liquid)",
+          lift: "+31% середнього чеку"
+        }
+      ],
+      electronics_accessories: [
+        {
+          insight: "Питання сумісності пристроїв та гарантійної заміни",
+          molecule: "Spec Comparison Matrix + Instant Warranty Seal (_product-main-trust-badges.liquid)",
+          lift: "+18% конверсії карток товару"
+        },
+        {
+          insight: "Втрата супутніх аксесуарів (кабелі, чохли, захист)",
+          molecule: "1-Click In-Cart Upsell Queue (cart-drawer.liquid + CartMutationQueue)",
+          lift: "+24% доходу з кожного кошика"
+        }
+      ],
+      kids_educational: [
+        {
+          insight: "Безпека матеріалів (еко-сертифікація) та відповідність віку дитини",
+          molecule: "Age-Filter Badges + Eco Certification Block (_product-main-trust-badges.liquid)",
+          lift: "+21% довіри батьків на першому екрані"
+        },
+        {
+          insight: "Покупка на подарунок із фіксованою датою доставки",
+          molecule: "Gift Wrap Toggle + Exact Delivery Date Estimator (tinker-dnk-delivery-estimator.liquid)",
+          lift: "+25% AOV у подарунковий сезон"
+        }
+      ],
+      custom_dtc: [
+        {
+          insight: "Повільне завантаження шаблонів та конфлікти сторонніх аппок у кошику",
+          molecule: "DNK-Ecom-Zerno-v.0.1.0 Core + CartMutationQueue (AsyncMutex FIFO)",
+          lift: "95+ Mobile PageSpeed, 0% втрачених транзакцій"
+        },
+        {
+          insight: "Низька окупність платного трафіку на стандартній картці товару",
+          molecule: "Full CRO Buy-Box Stack (product_quantity-breaks-v2.liquid + cart-progress-bar.liquid)",
+          lift: "+25% AOV та економія до $2,868/рік на підписках"
+        }
+      ]
+    };
+
+    let state = {
+      selectedTier: 'scale_1500',
+      contractSigned: false,
+      usedRevisions: 0,
+      maxRevisions: 3,
+      approvedStages: { 1: true },
+      tickets: []
+    };
+
+    async function sha256Hex(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function switchTab(tabName) {
+      ['proposal', 'cockpit', 'tasks'].forEach(t => {
+        document.getElementById('view-' + t).classList.toggle('active', t === tabName);
+        document.getElementById('tab-btn-' + t).classList.toggle('active', t === tabName);
+      });
+    }
+
+    function selectTier(tier) {
+      state.selectedTier = tier;
+      state.maxRevisions = tier === 'launch_1200' ? 2 : 3;
+      document.getElementById('card-launch_1200').classList.toggle('selected', tier === 'launch_1200');
+      document.getElementById('card-scale_1500').classList.toggle('selected', tier === 'scale_1500');
+      recalculateAll();
+    }
+
+    async function recalculateAll() {
+      const client = document.getElementById('inp-client').value.trim() || 'Клієнт';
+      const brand = document.getElementById('inp-brand').value.trim() || 'Brand';
+      const niche = document.getElementById('inp-niche').value;
+      const orders = Math.max(1, parseInt(document.getElementById('inp-orders').value || '150', 10));
+      const aov = Math.max(1, parseFloat(document.getElementById('inp-aov').value || '65'));
+      const extraBatches = Math.max(0, parseInt(document.getElementById('inp-extra-batches').value || '0', 10));
+      const gmc = document.getElementById('chk-gmc').checked;
+      const seo = document.getElementById('chk-seo').checked;
+
+      const basePrice = state.selectedTier === 'launch_1200' ? 1200 : 1500;
+      const baseProducts = state.selectedTier === 'launch_1200' ? 15 : 20;
+      const addonsTotal = (extraBatches * 50) + (gmc ? 300 : 0) + (seo ? 200 : 0);
+      const total = basePrice + addonsTotal;
+      const prepay = (total * 0.30).toFixed(2);
+      const finalPay = (total - parseFloat(prepay)).toFixed(2);
+
+      const monthlyAppSavings = state.selectedTier === 'launch_1200' ? 126 : 239;
+      const annualSavings = monthlyAppSavings * 12;
+      const monthlyCroLift = orders * aov * 0.08;
+      const paybackMonths = Math.max(0.4, (total / (monthlyAppSavings + monthlyCroLift))).toFixed(1);
+
+      document.getElementById('hero-badge').textContent = `Персоналізована пропозиція для ${brand} (${client})`;
+      document.getElementById('cockpit-title').textContent = `Персональний Дашборд Проєкту: ${brand} (${client})`;
+      document.getElementById('roi-extra-apps').textContent = state.selectedTier === 'launch_1200' ? '$0/міс (Базовий стек)' : '$103/міс → $0/міс';
+      document.getElementById('roi-annual-savings').textContent = `$${annualSavings.toLocaleString()} / рік`;
+      document.getElementById('roi-payback').textContent = `${paybackMonths} міс. (економія аппок + CRO приріст)`;
+
+      document.getElementById('niche-pill').textContent = niche;
+      const tbody = document.getElementById('niche-matrix-body');
+      tbody.innerHTML = '';
+      (NICHE_MATRICES[niche] || NICHE_MATRICES.custom_dtc).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.insight}</td>
+          <td style="font-family:var(--font-mono); color:var(--dnk-accent); font-size:13px;">${row.molecule}</td>
+          <td><strong>${row.lift}</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('sum-base').textContent = `$${basePrice.toLocaleString()}`;
+      document.getElementById('sum-addons').textContent = `$${addonsTotal.toLocaleString()}`;
+      document.getElementById('sum-products').textContent = `${baseProducts + extraBatches * 10} товарів`;
+      document.getElementById('sum-total').textContent = `$${total.toLocaleString()}`;
+      document.getElementById('sum-prepay').textContent = `$${prepay}`;
+      document.getElementById('sum-final').textContent = `$${finalPay}`;
+
+      const canonicalPayload = JSON.stringify({
+        brand,
+        client,
+        extraBatches,
+        gmc,
+        niche,
+        seo,
+        tier: state.selectedTier,
+        total
+      });
+      const scopeHash = await sha256Hex(canonicalPayload);
+      document.getElementById('scope-hash-display').textContent = scopeHash;
+
+      updateHeaderStatus(brand);
+      await renderStages(scopeHash);
+    }
+
+    function updateHeaderStatus(brand) {
+      const slug = (brand || 'client').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const dealId = `deal-${slug}-${state.selectedTier}`;
+      const left = Math.max(0, state.maxRevisions - state.usedRevisions);
+      const statusText = state.contractSigned ? 'CONTRACT ACTIVE (30% PAID)' : 'PROPOSAL MODE';
+      document.getElementById('header-deal-status').textContent = `${dealId} • ${statusText} • ПРАВКИ: ${left}/${state.maxRevisions}`;
+      document.getElementById('revisions-counter-pill').textContent = `Доступно правок у пакеті: ${left} з ${state.maxRevisions}`;
+    }
+
+    function signContractAndOpenCockpit() {
+      state.contractSigned = true;
+      recalculateAll();
+      switchTab('cockpit');
+    }
+
+    async function renderStages(scopeHashInput) {
+      const scopeHash = scopeHashInput || document.getElementById('scope-hash-display').textContent;
+      const assetsReady = document.getElementById('chk-assets-ready').checked;
+      const extraBatches = Math.max(0, parseInt(document.getElementById('inp-extra-batches').value || '0', 10));
+      const baseProducts = state.selectedTier === 'launch_1200' ? 15 : 20;
+      const totalProducts = baseProducts + extraBatches * 10;
+      const langs = state.selectedTier === 'launch_1200' ? 1 : 2;
+
+      const stagesData = [
+        {
+          num: 1,
+          title: "Етап 1. Онбординг, ДНК бренду та аналіз 7 конкурентів",
+          node: "node_competitors",
+          agent: "strategist_prime",
+          sla: "Дні 1-2",
+          status: !assetsReady ? "waiting_client_assets" : (state.approvedStages[1] ? "completed" : "in_progress"),
+          deliverables: [
+            "Матриця 7 DTC-конкурентів ніші (оффери, AOV, бандли)",
+            "Зафіксований бриф та доступи до Shopify Collaborator"
+          ],
+          artifactTitle: "Матриця конкурентів та оферів",
+          artifactPath: "./artifacts/shopify/competitor_matrix.json"
+        },
+        {
+          num: 2,
+          title: "Етап 2. CRO-архітектура воронки та прототип головних сторінок",
+          node: "node_cro_audit",
+          agent: "dnk_shopify",
+          sla: "Дні 3-4",
+          status: !assetsReady ? "pending" : (state.approvedStages[2] ? "completed" : "in_progress"),
+          deliverables: [
+            "Специфікація конверсійної воронки (PDP, Cart Drawer, Upsell Tiers)",
+            "2 варіанти структури Theme Blocks 2.0 на погодження"
+          ],
+          artifactTitle: "Специфікація CRO-воронки та Buy-Box",
+          artifactPath: "./artifacts/shopify/cro_funnel_spec.md"
+        },
+        {
+          num: 3,
+          title: "Етап 3. Дизайн-система, фірмові кольори та типографіка",
+          node: "node_brand_dna",
+          agent: "denchik",
+          sla: "Дні 5-6",
+          status: state.approvedStages[3] ? "completed" : (state.approvedStages[2] ? "in_progress" : "pending"),
+          deliverables: [
+            "Ін'єкція палітри, шрифтів та дизайн-токенів (--dnk-*)",
+            "Адаптивна мобільна сітка (Mobile-First UX)"
+          ],
+          artifactTitle: "Паспорт дизайн-токенів теми",
+          artifactPath: "./artifacts/shopify/brand_tokens.json"
+        },
+        {
+          num: 4,
+          title: "Етап 4. Збірка блоків DNK-Ecom-Zerno-v.0.1.0 та каталогу товарів",
+          node: "node_liquid_blocks",
+          agent: "dnk_shopify",
+          sla: "Дні 7-10",
+          status: state.approvedStages[4] ? "completed" : (state.approvedStages[3] ? "in_progress" : "pending"),
+          deliverables: [
+            `Імпорт та оформлення до ${totalProducts} товарів і колекцій`,
+            "Монтаж CRO-молекул (Quantity Breaks v2, AJAX Cart Drawer, Trust Badges)"
+          ],
+          artifactTitle: "Сертифікат 7-Gate Theme Integrity (0 помилок)",
+          artifactPath: "./artifacts/shopify/theme_7gate_receipt.json"
+        },
+        {
+          num: 5,
+          title: "Етап 5. Продаючий PDP-копірайтинг, платіжки та юридичні політики",
+          node: "node_pdp_copywriting",
+          agent: "strategist_prime",
+          sla: "Дні 11-12",
+          status: state.approvedStages[5] ? "completed" : (state.approvedStages[4] ? "in_progress" : "pending"),
+          deliverables: [
+            `Локалізація (${langs} мови) та вичитка текстів без AI-slop`,
+            "Налаштування Shopify Payments / Stripe / PayPal та політик (Refund, Privacy, Shipping, ToS)"
+          ],
+          artifactTitle: "Пакет текстів PDP та юридичних сторінок",
+          artifactPath: "./artifacts/shopify/pdp_copy_verified.md"
+        },
+        {
+          num: 6,
+          title: "Етап 6. Фінальний QA-аудит, відеоінструкції та запуск у продакшн",
+          node: "node_liquid_blocks",
+          agent: "gerych_prime",
+          sla: "Дні 13-14",
+          status: state.approvedStages[6] ? "completed" : (state.approvedStages[5] ? "in_progress" : "pending"),
+          deliverables: [
+            "Передача доступів власника, відеоуроки керування замовленнями та Customizer",
+            "1 місяць гарантійної технічної підтримки після релізу"
+          ],
+          artifactTitle: "Відеоінструкції та чекліст запуску магазину",
+          artifactPath: "./artifacts/shopify/store_handover_bundle.json"
+        }
+      ];
+
+      const container = document.getElementById('stages-container');
+      container.innerHTML = '';
+
+      for (const st of stagesData) {
+        const artHash = await sha256Hex(`${scopeHash}:stage${st.num}:${st.artifactPath}`);
+        const div = document.createElement('div');
+        div.className = 'stage-card';
+        const approveBtnHtml = st.status === 'completed'
+          ? `<span class="status-badge status-completed">Етап прийнято клієнтом ✓</span>`
+          : `<button class="btn btn-secondary" onclick="approveStage(${st.num})">Погодити етап #${st.num} (Approve Gate)</button>`;
+
+        div.innerHTML = `
+          <div class="stage-top">
+            <div>
+              <strong>${st.title}</strong>
+              <div style="font-size:12px; color:var(--dnk-muted); font-family:var(--font-mono); margin-top:2px;">
+                Canvas Node: ${st.node} • Agent: ${st.agent} • SLA: ${st.sla}
+              </div>
+            </div>
+            <span class="status-badge status-${st.status}">${st.status}</span>
+          </div>
+          <div style="font-size:14px; color:var(--dnk-muted); margin-bottom:8px;">
+            • ${st.deliverables.join('<br>• ')}
+          </div>
+          <div class="artifact-box">
+            <div>
+              <div><strong>Артефакт:</strong> ${st.artifactTitle} (<span style="font-family:var(--font-mono);">${st.artifactPath}</span>)</div>
+              <div class="mono-hash">SHA-256 Receipt: ${artHash}</div>
+            </div>
+            <div>${approveBtnHtml}</div>
+          </div>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    function approveStage(stageNum) {
+      state.approvedStages[stageNum] = true;
+      renderStages();
+    }
+
+    function fillPreset(text) {
+      document.getElementById('inp-ticket-text').value = text;
+    }
+
+    async function submitClientTicket() {
+      const text = document.getElementById('inp-ticket-text').value.trim();
+      if (!text) return;
+
+      const client = document.getElementById('inp-client').value.trim() || 'Клієнт';
+      const brand = document.getElementById('inp-brand').value.trim() || 'Brand';
+      const slug = brand.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const dealId = `deal-${slug}-${state.selectedTier}`;
+      const lower = text.toLowerCase();
+
+      const oosKeywords = ['1c', '1с', 'erp', 'кастомний додаток', 'custom app', 'мобільний додаток', 'ios', '3d', 'ar ', 'magento', 'crm'];
+      const qMarkers = ['?', 'як ', 'коли ', 'підкажіть', 'чи можна', 'де переглянути'];
+
+      const isOos = oosKeywords.some(k => lower.includes(k));
+      const quotaExhausted = state.usedRevisions >= state.maxRevisions;
+      const isQuestion = qMarkers.some(m => lower.includes(m)) && !isOos;
+
+      let targetNode = 'node_liquid_blocks';
+      if (['колір', 'шрифт', 'лого', 'стиль', 'відступ', 'банер'].some(k => lower.includes(k))) {
+        targetNode = 'node_brand_dna';
+      } else if (['текст', 'опис', 'заголовок', 'переклад', 'політик', 'faq'].some(k => lower.includes(k))) {
+        targetNode = 'node_pdp_copywriting';
+      } else if (['конкурент', 'ніш', 'позиціонуван', 'ринок'].some(k => lower.includes(k))) {
+        targetNode = 'node_competitors';
+      } else if (['воронк', 'конверс', 'бейдж', 'довір', 'гарант', 'cro'].some(k => lower.includes(k))) {
+        targetNode = 'node_cro_audit';
+      }
+
+      const agentMap = {
+        node_competitors: 'strategist_prime',
+        node_cro_audit: 'dnk_shopify',
+        node_brand_dna: 'denchik',
+        node_liquid_blocks: 'dnk_shopify',
+        node_pdp_copywriting: 'strategist_prime'
+      };
+      const agent = agentMap[targetNode];
+      const sessionId = `node:shopify_vibe_pipeline:${targetNode}`;
+
+      let classification = 'in_scope_revision';
+      let gateState = 'awaiting_founder_triage';
+      let upsellUsd = 0;
+      let summary = '';
+
+      if (isOos || (quotaExhausted && !isQuestion)) {
+        classification = 'out_of_scope_upsell';
+        gateState = 'upsell_quote_required';
+        upsellUsd = isOos ? 250 : 75;
+        summary = `Scope Guard: Запит виходить за межі пакету або ліміту правок. Сформовано опційний Upsell (+$${upsellUsd}) перед запуском ${agent}.`;
+      } else if (isQuestion) {
+        classification = 'question';
+        gateState = 'auto_answered';
+        summary = `Консультаційний запит скеровано до ${agent} (${sessionId}). Квота правок не списується.`;
+      } else {
+        state.usedRevisions += 1;
+        const left = Math.max(0, state.maxRevisions - state.usedRevisions);
+        summary = `Правка в межах ТЗ поставлена у чергу вузла ${targetNode} (${agent}). Залишок правок: ${left}.`;
+      }
+
+      const auditHash = await sha256Hex(`${dealId}:${client}:${text}:${classification}:${targetNode}`);
+      const ticketId = 'TKT-' + auditHash.substring(0, 8).toUpperCase();
+
+      state.tickets.unshift({
+        ticketId,
+        text,
+        classification,
+        targetNode,
+        agent,
+        sessionId,
+        gateState,
+        upsellUsd,
+        summary,
+        auditHash
+      });
+
+      document.getElementById('inp-ticket-text').value = '';
+      updateHeaderStatus(brand);
+      renderTickets(dealId, client);
+    }
+
+    function renderTickets(dealId, client) {
+      const container = document.getElementById('tickets-log');
+      if (state.tickets.length === 0) {
+        container.innerHTML = `<div style="font-size:13px; color:var(--dnk-muted);">Поки немає створених запитів. Оберіть швидкий пресет ліворуч або введіть текст правки.</div>`;
+        return;
+      }
+
+      container.innerHTML = state.tickets.map(t => {
+        const badgeClass = t.classification === 'out_of_scope_upsell'
+          ? 'status-waiting_client_assets'
+          : (t.classification === 'question' ? 'status-in_progress' : 'status-completed');
+        const safeText = t.text.replace(/"/g, '\\"');
+        const cliCmd = `uv run python3 services/dnk_shopify/cli.py triage-ticket --deal-id "${dealId}" --client "${client}" --text "${safeText}" --persist --json`;
+
+        return `
+          <div class="ticket-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <strong style="font-family:var(--font-mono); font-size:13px;">${t.ticketId} • ${t.sessionId}</strong>
+              <span class="status-badge ${badgeClass}">${t.classification}</span>
+            </div>
+            <div style="font-size:14px; margin-bottom:8px;">"${t.text}"</div>
+            <div style="font-size:13px; color:var(--dnk-accent); margin-bottom:8px;">${t.summary}</div>
+            <div class="mono-hash" style="margin-bottom:6px;">Audit SHA-256: ${t.auditHash}</div>
+            <div style="background:var(--dnk-surface); padding:8px; border-radius:4px; font-family:var(--font-mono); font-size:11px; color:var(--dnk-text); overflow-x:auto;">
+              ${cliCmd}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      recalculateAll();
+      renderTickets('deal-lumiere-studio-scale_1500', 'Олександр Коваль');
+    });
+  </script>
+</body>
+</html>

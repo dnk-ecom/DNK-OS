@@ -1,0 +1,64 @@
+/* --- DNK-MRH-HEADER ---
+ * mrh_id: "apps_web_styles_astryx_tokens"
+ * purpose: "Meta Astryx Agent-Native design system tokens and WAI-ARIA surface theme layers."
+ * canonical_source: true
+ * alters_files: []
+ * triggers_tasks: []
+ * status: "Active"
+ * version: "1.0.0"
+ * updated_at: "2026-11-17"
+ * author: "DNK-e.com Maksym & Antigravity"
+ * --- END DNK-MRH-HEADER ---
+ */
+
+@layer astryx-theme {
+  :root {
+    /* Astryx Agent Surface Tokens (Bound to Polaris Core Theme) */
+    --astryx-surface-canvas: var(--bg-app, #0d0e10);
+    --astryx-surface-panel: var(--bg-surface-secondary, #16181b);
+    --astryx-surface-card: var(--bg-surface, #16181b);
+    --astryx-surface-elevated: var(--bg-surface-hover, #1e2128);
+    --astryx-surface-overlay: rgba(13, 14, 16, 0.85);
+
+    /* Astryx Border & Stroke */
+    --astryx-border-subtle: var(--border-subtle, rgba(255, 255, 255, 0.08));
+    --astryx-border-default: var(--border-base, rgba(255, 255, 255, 0.14));
+    --astryx-border-strong: var(--border-strong, rgba(255, 255, 255, 0.24));
+
+    /* Agent Roster Accents */
+    --astryx-agent-architect: #10b981; /* Emerald: Antigravity Mentor */
+    --astryx-agent-builder: #3b82f6;   /* Blue: Denchik Chief Builder */
+    --astryx-agent-auditor: #a855f7;   /* Purple: Gerych Prime */
+    --astryx-agent-goldfish: #f59e0b;  /* Amber: EGM Reviewer */
+    --astryx-agent-shopify: var(--color-accent, #008060); /* Cyan/Emerald: Workhorse Shopify */
+
+    /* Execution State Tokens */
+    --astryx-status-idle: #71717a;
+    --astryx-status-thinking: #a855f7;
+    --astryx-status-running: #3b82f6;
+    --astryx-status-hitl: #f59e0b;
+    --astryx-status-success: #10b981;
+    --astryx-status-failure: #ef4444;
+
+    /* Living Canvas Typed Wires */
+    --astryx-wire-context: #10b981;
+    --astryx-wire-diff: #38bdf8;
+    --astryx-wire-output: #fbbf24;
+  }
+
+  /* Astryx Accessible Focus Trap & Outline */
+  [data-agent-target]:focus-visible {
+    outline: 2px solid var(--astryx-agent-architect);
+    outline-offset: 2px;
+  }
+
+  /* Subtle pulsing for running tools */
+  @keyframes astryx-pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
+
+  .animate-pulse-subtle {
+    animation: astryx-pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}

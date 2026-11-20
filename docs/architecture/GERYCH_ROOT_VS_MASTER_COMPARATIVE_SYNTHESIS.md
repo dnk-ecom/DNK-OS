@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/architecture/GERYCH_ROOT_VS_MASTER_COMPARATIVE_SYNTHESIS.md"
-# purpose: "Comparative Synthesis of Terminal Agent Research vs Gerych-root Report on Agent Harnesses, MacBook Topology, and Sovereign DNK Core Architecture."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-15"
-# author: "Gerych (Hermes Prime) & DNK-e.com Maksym"
-# --- END DNK-MRH-HEADER ---
+---
+title: "ПОРІВНЯЛЬНИЙ СИНТЕЗ ЗВІТІВ: Як світові команди будують Agent Harnesses та як побудувати DNK Core на MacBook"
+description: "Comparative Synthesis of Terminal Agent Research vs Gerych-root Report on Agent Harnesses, MacBook Topology, and Sovereign DNK Core Architecture."
+mrh_id: "docs/architecture/GERYCH_ROOT_VS_MASTER_COMPARATIVE_SYNTHESIS.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/architecture/GERYCH_ROOT_VS_MASTER_COMPARATIVE_SYNTHESIS.md"
+> purpose: "Comparative Synthesis of Terminal Agent Research vs Gerych-root Report on Agent Harnesses, MacBook Topology, and Sovereign DNK Core Architecture."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # ⚖️ ПОРІВНЯЛЬНИЙ СИНТЕЗ ЗВІТІВ: Як світові команди будують Agent Harnesses та як побудувати DNK Core на MacBook
 

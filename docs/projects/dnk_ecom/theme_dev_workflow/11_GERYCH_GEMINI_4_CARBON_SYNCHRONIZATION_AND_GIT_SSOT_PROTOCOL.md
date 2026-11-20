@@ -1,27 +1,28 @@
 ---
-title: "Gerych (Gemini 4 Carbon) Synchronization & Git SSOT Protocol"
-description: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK Sovereign 1.0.0 Apex into https://github.com/DNKShopify/DNK-e.com."
+title: "ГЕРИЧ (GOOGLE GEMINI 4 CARBON): ІНЖЕНЕРНИЙ ПРОТОКОЛ СИНХРОНІЗАЦІЇ ЕКОСИСТЕМИ ТЕМ ТА ВОРОНОК У ЄДИНИЙ РЕПОЗИТОРІЙ"
+description: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK-Ecom-Zerno-v.0.1.0 into https://github.com/DNKShopify/DNK-e.com."
 mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md"
-status: active
-type: protocol
-domain: shopify_ecosystem
-author: "Gerych (Google Gemini 4 Carbon via Vertex AI) & Antigravity"
-version: "1.0.0"
-date: "2026-11-12"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md"
-> purpose: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK Sovereign 1.0.0 Apex into https://github.com/DNKShopify/DNK-e.com."
+> purpose: "Definitive Synchronization Protocol & Git SSOT Topology by Gerych (Gemini 4 Carbon) for Consolidating All Theme Ecosystem Audits, Distillation Pipelines, and DNK-Ecom-Zerno-v.0.1.0 into https://github.com/DNKShopify/DNK-e.com."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-12"
-> author: "Gerych (Gemini 4 Carbon) & Antigravity (Chief Architect)"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -36,7 +37,7 @@ date: "2026-11-12"
 ## 🎯 ВЕРДИКТ ТА СТРАТЕГІЧНИЙ ПЛАН
 
 Завершено детермінований аудит стану фізичних директорій `Audit_Shopify_Themes_Sell_WF` та `DNK-Ecom_git_mirrow`.  
-Сформовано єдиний архітектурний стандарт для синхронізації 14 донорів, дистиляційних воркфлоу та теми `DNK Sovereign 1.0.0 Apex` у віддалений репозиторій `https://github.com/DNKShopify/DNK-e.com`.
+Сформовано єдиний архітектурний стандарт для синхронізації 14 донорів, дистиляційних воркфлоу та теми `DNK-Ecom-Zerno-v.0.1.0` у віддалений репозиторій `https://github.com/DNKShopify/DNK-e.com`.
 
 ---
 
@@ -59,12 +60,12 @@ date: "2026-11-12"
 - **`DNK-Ecom_git_mirrow` (15 worktrees під `.bare`):**  
   `main`, `ks-origin`, `sugar`, `story`, `shrine-pro`, `casaio`, `ella`, `tinker`, `ascendify`, `sections-vault`, `donor-lab`, `staging`, `staging-lab`, `dnk-ecom-sections`, `dnk-sections`.
 - **`themes/dnk-sovereign`:**  
-  Синтезована флагманська тема `DNK Sovereign 1.0.0 Apex` (151 файл, 0 помилок у `shopify theme check`, 12 категорій `settings_schema.json`, 3 пресети, 32 нативні Web Components).
+  Синтезована флагманська тема `DNK-Ecom-Zerno-v.0.1.0` (151 файл, 0 помилок у `shopify theme check`, 12 категорій `settings_schema.json`, 3 пресети, 32 нативні Web Components).
 
 ### 2. Ключові прогалини, що вимагають усунення:
 - Відсутність гілки **`elixir`** на GitHub (є повний аудит та скрипт `cleanroom_elixir_1_6_2.py`, але немає гілки у репозиторії).
 - Відсутність виділеної гілки **`audit-workflows`** для збереження R&D-інфраструктури та дистильованого сховища.
-- Гілка `main` містить старе ядро Tinker 4.4.0 замість флагманської теми `DNK Sovereign 1.0.0 Apex`.
+- Гілка `main` містить старе ядро Tinker 4.4.0 замість флагманської теми `DNK-Ecom-Zerno-v.0.1.0`.
 - Гілка `ks-origin` локально відстає від віддалених мерчант-правок на 2 коміти.
 - У 11 з 15 worktrees відсутній стандартизований маніфест `AGENTS.md`.
 
@@ -75,7 +76,7 @@ date: "2026-11-12"
 ```mermaid
 flowchart TD
     subgraph RemoteRepo ["https://github.com/DNKShopify/DNK-e.com"]
-        Main["🌟 main (Флагманська тема DNK Sovereign 1.0.0 Apex)<br>151 файл, 0 Theme Check помилок, Theme Store Grade"]
+        Main["🌟 main (Флагманська тема DNK-Ecom-Zerno-v.0.1.0)<br>151 файл, 0 Theme Check помилок, Theme Store Grade"]
         
         subgraph Donors ["Ізольовані Cleanroom гілки-донори"]
             D1["ks-origin (KS Origin 1.1.0 + AUDIT + Passport)"]
@@ -142,13 +143,13 @@ git commit -m "feat(elixir): add cleanroom sanitized Elixir 1.6.2 donor theme wi
 git push -u origin elixir
 ```
 
-### Крок 3. Оновлення гілки `main` до DNK Sovereign 1.0.0 Apex
+### Крок 3. Оновлення гілки `main` до DNK-Ecom-Zerno-v.0.1.0
 ```bash
 cd ../DNKEcom/DNK-Ecom_git_mirrow/main
 find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
 cp -R ../themes/dnk-sovereign/* ./
 git add -A
-git commit -m "feat(main): promote DNK Sovereign 1.0.0 Apex as the sovereign flagship theme core"
+git commit -m "feat(main): promote DNK-Ecom-Zerno-v.0.1.0 as the sovereign flagship theme core"
 git push origin main
 ```
 

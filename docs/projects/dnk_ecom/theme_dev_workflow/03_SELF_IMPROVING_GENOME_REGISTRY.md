@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/03_SELF_IMPROVING_GENOME_REGISTRY.md"
-# purpose: "Living Central Genome Registry of Shopify Theme Architectural Innovations & Patterns"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.1.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Центральний Геном-Реєстр інновацій тем Shopify (Genome Registry)"
+description: "Living Central Genome Registry of Shopify Theme Architectural Innovations & Patterns"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/03_SELF_IMPROVING_GENOME_REGISTRY.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/03_SELF_IMPROVING_GENOME_REGISTRY.md"
+> purpose: "Living Central Genome Registry of Shopify Theme Architectural Innovations & Patterns"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧬 Центральний Геном-Реєстр інновацій тем Shopify (Genome Registry)
 

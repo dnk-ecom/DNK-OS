@@ -1,0 +1,38 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/orchestrator/agents/dnk_client_success/agent_card.yaml"
+# purpose: "A2A Agent Card for DNK Client Success Agent"
+# author: "DNK-e.com Maksym & Antigravity"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-18"
+# --- END DNK-MRH-HEADER ---
+
+agent_id: "dnk_client_success"
+name: "Агент Клієнтського Супроводження (Client Success Concierge)"
+description: "In-Context Visual Review Concierge, Scope Guard Triager, and Client-to-Builder Orchestrator"
+version: "1.0.0"
+domain: "client_interaction_and_success"
+owner: "Head of Client Relations & E-commerce Delivery"
+
+capabilities:
+  - "in_context_area_review_ingestion"
+  - "empathetic_client_acknowledgment"
+  - "scope_guard_triage"
+  - "builder_task_synthesis"
+  - "cockpit_roadmap_synchronization"
+  - "preview_link_orchestration"
+
+tool_whitelist:
+  - "get_client_tickets"
+  - "resolve_client_ticket"
+  - "get_cockpit_status"
+  - "client_success_get_inbox"
+  - "client_success_respond_ticket"
+  - "client_success_dispatch_to_builder"
+
+auth:
+  type: "system_concierge"
+  scope: "client_facing_and_action_bus"

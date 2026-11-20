@@ -1,0 +1,79 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_node_tasks/service_manifest.yaml"
+# purpose: "SaaP ServicePluginCard specification v1alpha2 for dnk_node_tasks"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.2.0"
+# updated_at: "2026-09-14"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+apiVersion: dnk.os/v1alpha2
+kind: ServicePluginCard
+metadata:
+  service_id: dnk_node_tasks
+  name: DNK Node Tasks - Conversational DAG Task Engine
+  version: 1.0.0
+  domain: workflow
+  author: DNK-e.com Maksym & Gerych Prime
+  description: Autonomous task management engine providing conversational intake,
+    DAG dependency resolution, cycle detection, and real-time execution tracking.
+  tags:
+  - workflow
+  - node_tasks
+spec:
+  lifecycle: Active
+  domain: workflow
+  entrypoint: services.dnk_node_tasks.graph_engine:NodeTaskGraphEngine
+  transport:
+    protocol: fastmcp
+    mode: stdio
+    command: python3
+    args:
+    - -m
+    - services.dnk_node_tasks.main
+    env_passthrough:
+    - PYTHONPATH
+    - DNK_ENV
+  fastmcp_tools:
+  - name: node_tasks_parse_intake
+    description: Parses conversational user intake into structured node task ideas
+    input_schema:
+      type: object
+      properties: {}
+  - name: node_tasks_detect_cycle
+    description: Validates DAG dependency graph to prevent cycles and deadlocks
+    input_schema:
+      type: object
+      properties: {}
+  - name: node_tasks_compute_rollup
+    description: Recalculates bottom-up progress rollup across stage-gated nodes
+    input_schema:
+      type: object
+      properties: {}
+  canvas_widgets:
+  - node_type: NodeTasksNode
+    display_name: Node Tasks Studio Node
+    category: workflow
+    icon: Layers
+    component_path: components/canvas/nodes/NodeTasksNode.tsx
+    inputs:
+    - socket_id: trigger_in
+      label: Trigger In
+      data_type: JSON
+    outputs:
+    - socket_id: result_out
+      label: Result Out
+      data_type: JSON
+  governance:
+    spend_guard:
+      max_cost_per_invocation_usd: 0.05
+      monthly_budget_usd: 50.0
+      max_tokens_per_task: 16000
+    circuit_breaker:
+      failure_threshold: 3
+      timeout_seconds: 30
+    health:
+      health_check_endpoint: /health

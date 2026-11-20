@@ -1,16 +1,17 @@
 ---
-title: "Методологія Прийняття Рішень, Анатомія Елементів та Першочергова Архітектура DNK Ecom"
+title: "Методологія Прийняття Рішень, Анатомія Елементів та Першочергова Архітектура Теми DNK Ecom"
 description: "Канонічний фреймворк прийняття рішень, 5-рівнева драбина валідації та першочергова структура теми."
 mrh_id: "docs/projects/dnk_ecom/00_THEME_ARCHITECTURE_AND_DECISION_FRAMEWORK.md"
-status: approved
-type: architectural_framework
-domain: shopify_theme_architecture
-author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-version: "1.0.0"
-date: 2026-11-18
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/00_THEME_ARCHITECTURE_AND_DECISION_FRAMEWORK.md"
@@ -18,8 +19,8 @@ date: 2026-11-18
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

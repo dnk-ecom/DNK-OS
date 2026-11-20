@@ -2,19 +2,13 @@
 title: "SOTA Audit: Design System Repository Catalog & World-Class Engineering Benchmark"
 description: "Comprehensive audit of 1,663-repo local catalog algorithms and global leaders (Polaris 2.0, Geist, Linear, BUCK) for DNK OS Design System workflow."
 mrh_id: "docs/projects/dnk_ecom/audits/AUDIT_DESIGN_SYSTEM_REPO_ALGORITHMS.md"
-archetype: "SOTA_AUDIT"
-status: "Active"
-version: "1.0.0"
-updated_at: "2026-11-18"
-author: "DNK-e.com Maksym & Antigravity Swarm (Denchik Builder, Gerych Auditor)"
+status: Active
+archetype: SOTA_AUDIT
+version: "2.0.0"
+updated: 2026-11-18
 tags:
-  - design-system
-  - sota-audit
-  - tokens
-  - polaris
-  - figma
-  - remotion
   - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -23,15 +17,12 @@ tags:
 > mrh_id: "docs/projects/dnk_ecom/audits/AUDIT_DESIGN_SYSTEM_REPO_ALGORITHMS.md"
 > purpose: "Comprehensive audit of 1,663-repo local catalog algorithms and global leaders (Polaris 2.0, Geist, Linear, BUCK) for DNK OS Design System workflow."
 > canonical_source: true
-> alters_files:
->   - "core/design_system/compiler.py"
->   - "core/design_system/extractor.py"
->   - "docs/architecture/DECISION_REGISTRY_ADHD.md"
+> alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
-> author: "DNK-e.com Maksym & Antigravity Swarm (Denchik Builder, Gerych Auditor)"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

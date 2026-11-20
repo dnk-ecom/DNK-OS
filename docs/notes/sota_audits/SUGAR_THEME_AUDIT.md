@@ -1,10 +1,14 @@
 ---
 title: "Sugar Theme SOTA Reverse-Engineering Dossier"
-status: "Active"
-type: "audit"
-domain: "shopify"
-author: "Gerych (Cold Knowledge Archivist) & Maxim"
-version: "1.0.0"
+description: "SOTA Competitor Reverse-Engineering Dossier: Sugar Theme 2.2.3/2.3.6 (Cart Drawer, Sticky Product, Vendor Loader, Product Form) for Apex CRO."
+mrh_id: "docs/notes/sota_audits/SUGAR_THEME_AUDIT.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -14,11 +18,11 @@ version: "1.0.0"
 > purpose: "SOTA Competitor Reverse-Engineering Dossier: Sugar Theme 2.2.3/2.3.6 (Cart Drawer, Sticky Product, Vendor Loader, Product Form) for Apex CRO."
 > canonical_source: true
 > alters_files: []
-> triggers_tasks: ["node_t1_dual_ready_blocks"]
+> triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "Gerych & Maxim"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

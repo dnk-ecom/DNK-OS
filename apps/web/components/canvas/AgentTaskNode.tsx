@@ -111,27 +111,23 @@ export const AgentTaskNode = memo(({ id, data, selected }: NodeProps<any>) => {
     setExecutingActionId(action.action_id);
     setActionFeedback(null);
     try {
-      const res = await fetch('/api/v1/actions/dispatch', {
+      const res = await fetch('/api/v1/kernel/actions/dispatch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action_id: action.action_id,
+          action_type: action.action_id,
           payload: {
             node_id: id,
             task_id: nodeData.taskId || id,
             target_agent: nodeData.targetAgent,
           },
-          actor: 'Astryx UI Operator',
+          requester: 'vibe_coder',
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        if (data.requires_approval) {
-          setActionFeedback(`⏳ Очікує підтвердження оператора (квиток: ${data.ticket_id})`);
-        } else {
-          setActionFeedback(`✓ ${action.label_uk || action.action_id}: Виконано`);
-        }
-        setTimeout(() => setActionFeedback(null), 5000);
+        setActionFeedback(`✓ ${action.label_uk || action.action_id}: Виконано`);
+        setTimeout(() => setActionFeedback(null), 4000);
       } else {
         setActionFeedback(`Помилка: ${data.detail || 'Не вдалося виконати'}`);
       }

@@ -14,6 +14,7 @@ from services.dnk_distribution.src.brand_compliance import ComplianceReport, Bra
 from services.dnk_distribution.src.social_feedback import SocialMetrics, ContentFeedbackReport
 from services.dnk_distribution.src.theme_miner import CommentItem, ThemeMiningResult
 from services.dnk_distribution.src.llms_txt import StoreProfile, CatalogItem, PolicyItem
+from services.dnk_distribution.src.social_scanner import SocialScanResult
 
 
 class ServiceInput(BaseModel):
@@ -93,3 +94,14 @@ class MerchantFeedResponse(BaseModel):
     xml_content: str
     output_path: Optional[str] = None
     total_items: int = 0
+
+
+class SocialScanRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    url: str = Field(..., min_length=5, description="Social media post URL to scan")
+
+
+class SocialScanResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    success: bool
+    data: SocialScanResult

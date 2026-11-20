@@ -1,0 +1,17 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/product.yaml"
+# purpose: "Product requirements and description tree schema."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-01"
+# author: "Denchik (Master Developer)"
+# --- END DNK-MRH-HEADER ---
+
+id: root
+title: DNK_HUB
+description: Project requirements and description tree
+createdAt: 2026-11-01T15:16:15.118Z
+children: []

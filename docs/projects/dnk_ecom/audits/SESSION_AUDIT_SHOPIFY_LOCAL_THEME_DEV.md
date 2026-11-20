@@ -1,12 +1,14 @@
 ---
-title: "Канонічний майстер-аудит сесії Shopify Local Theme DEV (Local Storefront Core)"
+title: "КАНОНІЧНИЙ МАЙСТЕР-АУДИТ СЕСІЇ SHOPIFY LOCAL THEME DEV"
 description: "Повний майстер-аудит та архів корисних знахідок сесії Shopify Local Theme DEV: деконструкція 0xtlt/local-storefront (lsf), архітектура офлайн-рантайму Rust, інтеграція з DNK Agentic Store OS та прототипування за секунди."
 mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
-status: approved
-type: report
-domain: shopify
-author: "Antigravity (Mentor & Chief Architect) & Gerych-root & DNK-e.com Maksym"
-version: "1.0.0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -15,15 +17,12 @@ version: "1.0.0"
 > mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
 > purpose: "Повний майстер-аудит та архів корисних знахідок сесії Shopify Local Theme DEV: деконструкція 0xtlt/local-storefront (lsf), архітектура офлайн-рантайму Rust, інтеграція з DNK Agentic Store OS та прототипування за секунди."
 > canonical_source: true
-> alters_files:
->   - "Audit_Shopify_Themes_Sell_WF/Local_Storefront_DEV_Audit/SESSION_AUDIT_SHOPIFY_LOCAL_THEME_DEV.md"
->   - "_Shopify_Theme_DEV_Workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md"
->   - "_Shopify_Theme_DEV_Workflow/companion/audits/02_LOCAL_STOREFRONT_SESSION_AUDIT.md"
+> alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "Antigravity (Mentor) & Gerych-root & DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

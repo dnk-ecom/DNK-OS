@@ -1,3 +1,31 @@
+---
+title: "PSOD DELEGATION CONTRACT: SOTA In-Context Visual Feedback & Client Success Assimilation (DEC-154)"
+description: "Canonical PSOD Task: Assimilation of SOTA Visual Feedback & Area Commenting Architecture (DEC-154)"
+mrh_id: "docs/tasks/TASK_2026_11_18_SOTA_VISUAL_REVIEW_ASSIMILATION.md"
+status: Active
+archetype: TASK_SPEC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - task
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/tasks/TASK_2026_11_18_SOTA_VISUAL_REVIEW_ASSIMILATION.md"
+> purpose: "Canonical PSOD Task: Assimilation of SOTA Visual Feedback & Area Commenting Architecture (DEC-154)"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 <!-- --- DNK-MRH-HEADER ---
 mrh_id: "docs/tasks/TASK_2026_11_18_SOTA_VISUAL_REVIEW_ASSIMILATION.md"
 purpose: "Canonical PSOD Task: Assimilation of SOTA Visual Feedback & Area Commenting Architecture (DEC-154)"

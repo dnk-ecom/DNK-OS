@@ -1,5 +1,7 @@
 ---
 title: "Специфікація 09: Repo Intelligence & SOTA Pattern Assimilation Engine (JIT Reuse Gate, FTS5 Bilingual Search, Zero-Clone AST Mining)"
+description: "Master Architecture Specification for the DNK Repo Intelligence & SOTA Pattern Assimilation Engine (services/dnk_git_research, core/registry/repo_catalog.py, catalog.db), defining zero-clone AST mining, bilingual FTS5 search, JIT reuse gating, and automated translation of open-source engineering into Shopify and Media agency deliverables."
+mrh_id: "docs/architecture/specs/09_REPO_INTELLIGENCE_AND_SOTA_ASSIMILATION_SPEC.md"
 aliases:
   - "09_REPO_INTELLIGENCE_AND_SOTA_ASSIMILATION_SPEC"
   - "Repo Intelligence Spec"
@@ -45,7 +47,7 @@ version: "1.0.0"
 
 ---
 
-## 🎯 1. Стратегічна Цінність для Агенції (Why This Service Exists)
+## 🎯 1. Призначення, Bounded Context та Стратегічна Цінність (Purpose & Scope)
 
 ### 1.1. Проблема стандартних LLM
 Сучасні великі мовні моделі (GPT-4, Claude 3.5, Gemini 2.5) тренуються на масивах коду з усього інтернету. Їхня внутрішня оптимізація веде до **усереднення патернів**:
@@ -175,3 +177,11 @@ version: "1.0.0"
 1. **Zero Raw Copy-Paste from GPL/AGPL**: Заборонено пряме копіювання коду з репозиторіїв з вірусними ліцензіями. Тільки **Clean-Room Реінжиніринг** (екстракція формул ➔ специфікація ➔ власний синтаксис).
 2. **Zero Disk Bloat**: Заборонено клонувати репозиторії через `git clone` у корінь або робочі простори. Дозволено лише shallow-read окремих файлів через GitHub API blobs.
 3. **Pristine Catalog Invariant**: База підтримується в очищеному стані (1 663 перевірені репозиторії). Усі мертві, порожні або заблоковані репозиторії підлягають автоматичному вилученню через `PURGE_FINAL_EXECUTION_LIST.json`.
+
+---
+
+## 🧪 6. Детермінований План Верифікації (Deterministic Verification Plan)
+
+- [x] **Unit & Contract Tests**: `python3 -m pytest tests/unit/test_repo_catalog.py -v` (перевірка FTS5 пошуку, фільтрації ліцензій та генерації reuse briefs).
+- [x] **Zero-Clone AST Isolation Gate**: Перевірка відсутності несанкціонованих клонів у робочому просторі `DNK_HUB` та `DNK_OS`.
+- [x] **Markdown Schema & Invariant Gate**: `python3 scripts/system/markdown_schema_gate.py docs/architecture/specs/09_REPO_INTELLIGENCE_AND_SOTA_ASSIMILATION_SPEC.md` повертає exit code 0.

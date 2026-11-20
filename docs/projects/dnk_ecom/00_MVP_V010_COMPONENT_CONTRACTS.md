@@ -2,15 +2,16 @@
 title: "Контрактна Специфікація Компонентів та Шини Даних MVP v0.1.0"
 description: "Точна контрактна специфікація подій, селекторів, Section Rendering API та мапінгу 32 файлів MVP."
 mrh_id: "docs/projects/dnk_ecom/00_MVP_V010_COMPONENT_CONTRACTS.md"
-status: approved
-type: component_contracts
-domain: shopify_theme_architecture
-author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-version: "1.0.0"
-date: 2026-11-18
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/00_MVP_V010_COMPONENT_CONTRACTS.md"
@@ -18,8 +19,8 @@ date: 2026-11-18
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

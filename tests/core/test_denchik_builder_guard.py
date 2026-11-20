@@ -47,8 +47,9 @@ def test_builder_guard_allows_scoped_mutation(clean_guard, sample_mandate, tmp_p
     # Use relative path representation
     rel_path = "services/dnk_media/test_module.py"
 
-    # Validate does not raise
+    # Validate does not raise and active mandate remains bound
     DenchikMandateGuard.validate_mutation(rel_path, tool_name="write_file")
+    assert DenchikMandateGuard.get_active_mandate() == sample_mandate
 
 
 def test_builder_guard_blocks_unscoped_mutation(clean_guard, sample_mandate):

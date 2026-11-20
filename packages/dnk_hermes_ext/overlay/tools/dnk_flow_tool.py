@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_flow_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_flow_tool.py"
 # purpose: "Native Hermes tool for executing autonomous LangGraph workflows (Research-Write-Validate flow)."
 # canonical_source: true
 # alters_files: []

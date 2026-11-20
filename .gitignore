@@ -52,6 +52,10 @@ config/config.toml
 .DS_Store
 Thumbs.db
 
+# Obsidian Vault Local State & Workspace Cache (DEC-027 / DEC-070)
+.obsidian/
+docs/.obsidian/
+
 # Agent runtime artifacts (DEC-122)
 core/orchestrator/agents/**/cache/
 core/orchestrator/agents/**/logs/
@@ -69,3 +73,12 @@ core/orchestrator/agents/**/processes.json*
 core/orchestrator/agents/**/cron/admissions/
 core/orchestrator/agents/**/cron/catch_up_occurrences
 core/orchestrator/agents/**/cron/ticker_*
+
+# Temporary curator backups
+**/.curator_backups/
+core/orchestrator/agents/**/.curator_backups/
+
+# Local stray files
+.wrangler/
+*.textClipping
+

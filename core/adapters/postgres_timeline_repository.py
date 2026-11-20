@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_postgres_timeline_repository"
+# mrh_id: "core/adapters/postgres_timeline_repository.py"
 # purpose: "PostgreSQL implementation of ITimelineRepository using asyncpg with timeline schema isolation, recursive sanitization, and strict concurrency safety"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

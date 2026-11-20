@@ -1,19 +1,33 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_CANONICAL_DONOR_MAP_AND_GRAFTING_ALGORITHM.md"
-# purpose: "Canonical Active Donor Themes Genome Map & Complete 6-Stage Cleanroom Molecular Grafting Algorithm for Shopify Theme Store ($350-$420 MSRP)."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-16"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "КАРТА АКТИВНИХ ТЕМ-ДОНОРІВ ТА ПОВНИЙ АЛГОРИТМ СТРУКТУРИЗАЦІЇ І ГРАФТИНГУ"
+description: "Canonical Active Donor Themes Genome Map & Complete 6-Stage Cleanroom Molecular Grafting Algorithm for Shopify Theme Store ($350-$420 MSRP)."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_CANONICAL_DONOR_MAP_AND_GRAFTING_ALGORITHM.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_CANONICAL_DONOR_MAP_AND_GRAFTING_ALGORITHM.md"
+> purpose: "Canonical Active Donor Themes Genome Map & Complete 6-Stage Cleanroom Molecular Grafting Algorithm for Shopify Theme Store ($350-$420 MSRP)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧬 КАРТА АКТИВНИХ ТЕМ-ДОНОРІВ ТА ПОВНИЙ АЛГОРИТМ СТРУКТУРИЗАЦІЇ І ГРАФТИНГУ
-## DNK Sovereign Apex Theme Architecture ($350–$420 MSRP)
+## DNK-Ecom-Zerno-v.0.1.0 Theme Architecture ($350–$420 MSRP)
 
 > **Єдине джерело істини (SSOT):**  
 > Репозиторій: [`https://github.com/DNKShopify/DNK-e.com`](https://github.com/DNKShopify/DNK-e.com)  
@@ -87,7 +101,7 @@ flowchart TD
         AscendifyApps["ascendify<br>(28 In-Theme CRO Widgets)"]
     end
 
-    Core --> Apex["🏛️ DNK Sovereign Apex Core ($350–$420 MSRP)"]
+    Core --> Apex["🏛️ DNK-Ecom-Zerno-v.0.1.0 Core ($350–$420 MSRP)"]
     Navigation --> Apex
     PDP --> Apex
     Cart --> Apex

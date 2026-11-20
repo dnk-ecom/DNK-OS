@@ -11,9 +11,12 @@
 # --- END DNK-MRH-HEADER ---
 
 from core.action_bus.actions.canvas_actions import register_canvas_actions
+from core.action_bus.actions.client_cockpit_actions import register_client_cockpit_actions
 
 def register_all_standard_actions() -> None:
     """Bootstrap and register all standard domain actions into the shared registry."""
     register_canvas_actions()
+    register_client_cockpit_actions()
 
-__all__ = ["register_all_standard_actions", "register_canvas_actions"]
+__all__ = ["register_all_standard_actions", "register_canvas_actions", "register_client_cockpit_actions"]
+

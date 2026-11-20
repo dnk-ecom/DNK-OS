@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_orchestrator_zero_waste_slicer"
+# mrh_id: "core/orchestrator/zero_waste_slicer.py"
 # purpose: "Zero-Waste Task Slicing & Autonomous Atomic Execution DAG Engine (Phase 3 Mentor Protocol)"
 # author: "DNK-e.com Maksym & Antigravity Mentor"
 # license: "DNK-INTERNAL"

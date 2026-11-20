@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_domain_identity_models"
+# mrh_id: "core/domain/identity_models.py"
 # purpose: "Pydantic v2 models for User Identity, Project Workspaces, Brand DNA, and Canvas Proposals."
 # canonical_source: true
 # alters_files: ["core/domain/identity_models.py"]

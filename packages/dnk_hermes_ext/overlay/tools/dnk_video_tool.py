@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_video_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_video_tool.py"
 # purpose: "Native Hermes tool for programmatic video generation, Remotion composition synthesis, and media rendering."
 # canonical_source: true
 # alters_files: []

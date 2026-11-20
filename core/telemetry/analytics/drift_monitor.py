@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_analytics/drift_monitor.py"
+# mrh_id: "core/telemetry/analytics/drift_monitor.py"
 # purpose: "Statistical & Entropy Drift Alarm Monitor for Google Gemini LLM responses, assimilated from Soup drift-alarm."
 # canonical_source: true
 # alters_files: []

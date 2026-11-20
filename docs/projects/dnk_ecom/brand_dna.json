@@ -32,7 +32,7 @@
       "App clashes that break cart checkout and hurt conversion",
       "Rigid sections without atomic nested blocks flexibility"
     ],
-    "value_proposition": "Sovereign ultra-fast modular Shopify theme DNK Sovereign 1.0.0 Apex built for Shopify Theme Store ($350–$420 MSRP) with 100% W3C Web Components, native CRO organs, and zero external app dependencies",
+    "value_proposition": "Sovereign ultra-fast modular Shopify theme DNK-Ecom-Zerno-v.0.1.0 built for Shopify Theme Store ($350–$420 MSRP) with 100% W3C Web Components, native CRO organs, and zero external app dependencies",
     "brand_voice_rules": [
       "Direct response copy with crisp clarity",
       "Assertive, technical precision, zero AI slop",
@@ -64,7 +64,7 @@
       "project_id": "proj-shopify-dnk-ecom",
       "kind": "core_rnd",
       "title": "Track 1: R&D & Theme Core Foundry",
-      "mission": "Develop and maintain immutable SemVer master theme engine on DNK Sovereign 1.0.0 Apex with Theme Blocks 2.0 and High-CRO Cart Drawer",
+      "mission": "Develop and maintain immutable SemVer master theme engine on DNK-Ecom-Zerno-v.0.1.0 with Theme Blocks 2.0 and High-CRO Cart Drawer",
       "assigned_workhorse": "dnk_shopify",
       "repo_root_rel": "../DNKEcom/DNK-Ecom_git_mirrow/main",
       "root_canvas_path": "./docs/canvas/projects/dnk_ecom/track_theme_core.canvas",
@@ -81,7 +81,11 @@
           "ui_tone": "primary",
           "requires_human_confirmation": false,
           "idempotent": true,
-          "allowed_states": ["decomposed", "running", "awaiting_approval"]
+          "allowed_states": [
+            "decomposed",
+            "running",
+            "awaiting_approval"
+          ]
         }
       ],
       "deterministic_gates": [
@@ -110,7 +114,10 @@
           "ui_tone": "secondary",
           "requires_human_confirmation": false,
           "idempotent": true,
-          "allowed_states": ["decomposed", "running"]
+          "allowed_states": [
+            "decomposed",
+            "running"
+          ]
         }
       ],
       "deterministic_gates": [
@@ -139,7 +146,9 @@
           "ui_tone": "approve",
           "requires_human_confirmation": true,
           "idempotent": true,
-          "allowed_states": ["awaiting_approval"]
+          "allowed_states": [
+            "awaiting_approval"
+          ]
         }
       ],
       "deterministic_gates": [

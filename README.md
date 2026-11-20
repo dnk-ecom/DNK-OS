@@ -1,14 +1,31 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "README.md"
-# purpose: "Unified Sovereign Cockpit & Microkernel Documentation for DNK OS."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
+---
+title: "DNK OS — Єдине Суверенне Ядро та Кабінет Розробки"
+description: "Unified Sovereign Cockpit & Microkernel Documentation for DNK OS."
+mrh_id: "README.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+  - cockpit
+  - microkernel
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "README.md"
+> purpose: "Unified Sovereign Cockpit & Microkernel Documentation for DNK OS."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧬 DNK OS — Єдине Суверенне Ядро та Кабінет Розробки
 

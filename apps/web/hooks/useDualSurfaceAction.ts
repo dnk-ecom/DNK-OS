@@ -1,5 +1,5 @@
 // --- DNK-MRH-HEADER ---
-// mrh_id: "apps_web_hooks_useDualSurfaceAction"
+// mrh_id: "apps/web/hooks/useDualSurfaceAction.ts"
 // purpose: "React Hook for invoking Dual-Surface actions from Astryx UI with optimistic UI updates and HITL approval states."
 // canonical_source: true
 // alters_files: []

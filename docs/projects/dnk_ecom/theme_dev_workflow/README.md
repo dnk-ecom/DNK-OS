@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/README.md"
-# purpose: "Master Engine & Self-Improving Recursive Molecular Theme Audit & Distillation Framework"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.1.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Самопокращуваний воркфлоу молекулярного аудиту та дистиляції тем Shopify (Shopify Theme DEV Workflow)"
+description: "Master Engine & Self-Improving Recursive Molecular Theme Audit & Distillation Framework"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/README.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/README.md"
+> purpose: "Master Engine & Self-Improving Recursive Molecular Theme Audit & Distillation Framework"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧬 Самопокращуваний воркфлоу молекулярного аудиту та дистиляції тем Shopify (Shopify Theme DEV Workflow)
 
@@ -68,10 +82,10 @@ flowchart TD
 | **06** | [`06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md`](./06_SHOPIFY_THEME_STORE_COMMERCIAL_SPECIFICATION.md) | **Офіційна технічна специфікація теми для Shopify Theme Store**: жорсткі інваріанти, Theme Blocks 2.0, Web Components, zero-DRM, Core Web Vitals ($350–$420 MSRP). |
 | **07** | [`07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md`](./07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md) | **Пайплайн фабрики дистиляції та складання теми**: протокол роботи в тандемі з Gerych-root (Gemini 4 Carbon), синтез органів Sugar, Shrine, Story, Elixir. |
 | **08** | [`08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md`](./08_UNIVERSAL_THEME_ELEMENTS_ARCHITECTURE_AND_SPECIFICATION.md) | **Повний технічний опис усіх елементів теми та система дистиляції**: вичерпна декомпозиція файлової ієрархії, Theme Blocks 2.0, токенів, Custom Elements та i18n для проходження модерації. |
-| **09** | [`09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md`](./09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md) | **Генеральний інженерний стандарт: Система дистиляції знань та повний технічний опис усіх елементів теми**: архітектура 12 категорій `settings_schema.json`, шаблонів, 32 Web Components та покроковий синтез `DNK Sovereign 1.0.0` ($350–$420 MSRP). |
+| **09** | [`09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md`](./09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md) | **Генеральний інженерний стандарт: Система дистиляції знань та повний технічний опис усіх елементів теми**: архітектура 12 категорій `settings_schema.json`, шаблонів, 32 Web Components та покроковий синтез `DNK-Ecom-Zerno-v.0.1.0` ($350–$420 MSRP). |
 | **10** | [`10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md`](./10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md) | **Вердикт аудитора Герича (Google Gemini 4 Carbon via Vertex AI)**: системний протокол дистиляції знань, 3 критичні ризики (Mandatory Dissent), 5 етапів Clean-Room деконструкції та сертифікаційні гейти Theme Store. |
-| **11** | [`11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md`](./11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md) | **Інженерний протокол синхронізації та топологія Git SSOT (Gerych Gemini 4 Carbon)**: консолідація 14 донорів, створення гілки `elixir`, переведення `main` на `DNK Sovereign 1.0.0 Apex` та виділення гілки `audit-workflows`. |
-| **Synthesis** | [`scripts/synthesize_dnk_sovereign_1_0_0.py`](../../../DNK_HUB/scripts/synthesize_dnk_sovereign_1_0_0.py) | **Автоматизований синтезатор теми DNK Sovereign 1.0.0**: 151 файл, 0 offenses у `shopify theme check`, генерація пресетів та збірка релізного ZIP. |
+| **11** | [`11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md`](./11_GERYCH_GEMINI_4_CARBON_SYNCHRONIZATION_AND_GIT_SSOT_PROTOCOL.md) | **Інженерний протокол синхронізації та топологія Git SSOT (Gerych Gemini 4 Carbon)**: консолідація 14 донорів, створення гілки `elixir`, переведення `main` на `DNK-Ecom-Zerno-v.0.1.0` та виділення гілки `audit-workflows`. |
+| **Synthesis** | [`scripts/synthesize_dnk_sovereign_1_0_0.py`](../../../DNK_HUB/scripts/synthesize_dnk_sovereign_1_0_0.py) | **Автоматизований синтезатор теми DNK-Ecom-Zerno-v.0.1.0**: 151 файл, 0 offenses у `shopify theme check`, генерація пресетів та збірка релізного ZIP. |
 | **Tools** | [`tools/dnk_theme_distillation_factory.py`](./tools/dnk_theme_distillation_factory.py) | **Автоматизована фабрика дистиляції**: вилучення, неймспейсінг `dnk-`, валідація схем RFC 8259 та збірка комерційної теми. |
 | **Tools** | [`tools/theme_auditor.py`](./tools/theme_auditor.py) | **Універсальний CLI-сканер**: проводить глибокий аудит теми, будує графи вкладеності, оцінює ризики блокування лімітів Shopify. |
 | **Tools** | [`tools/distill_molecules.py`](./tools/distill_molecules.py) | **Автоматичний екстрактор компонентів**: витягує чисті блоки в `distilled_vault/`. |

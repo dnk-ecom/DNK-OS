@@ -1,3 +1,31 @@
+---
+title: "Специфікація архітектури документації DNK Ecom Theme та стандарту Agent-Native"
+description: "Головна специфікація архітектури документації DNK Ecom, стандарту Agent-Native (llms.txt, skill.md) та інженерного хайвею онбордингу."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_DNK_ECOM_DOCUMENTATION_ARCHITECTURE_AND_AGENT_HARNESS.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_DNK_ECOM_DOCUMENTATION_ARCHITECTURE_AND_AGENT_HARNESS.md"
+> purpose: "Головна специфікація архітектури документації DNK Ecom, стандарту Agent-Native (llms.txt, skill.md) та інженерного хайвею онбордингу."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 <!-- --- DNK-MRH-HEADER ---
 mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/11_DNK_ECOM_DOCUMENTATION_ARCHITECTURE_AND_AGENT_HARNESS.md"
 purpose: "Головна специфікація архітектури документації DNK Ecom, стандарту Agent-Native (llms.txt, skill.md) та інженерного хайвею онбордингу."

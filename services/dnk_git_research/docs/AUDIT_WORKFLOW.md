@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_git_research/docs/AUDIT_WORKFLOW.md"
-# purpose: "Architecture of the model-agnostic repository audit workflow and how its quality is guaranteed"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-08"
-# author: "DNK-e.com Maksym & Claude"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Воркфлоу аудиту репозиторіїв"
+description: "Architecture of the model-agnostic repository audit workflow and how its quality is guaranteed."
+mrh_id: "services/dnk_git_research/docs/AUDIT_WORKFLOW.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
+tags:
+  - git-research
+  - workflow
+  - audit
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_git_research/docs/AUDIT_WORKFLOW.md"
+> purpose: "Architecture of the model-agnostic repository audit workflow and how its quality is guaranteed"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # Воркфлоу аудиту репозиторіїв
 

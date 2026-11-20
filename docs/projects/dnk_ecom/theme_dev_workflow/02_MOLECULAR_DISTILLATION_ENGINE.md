@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/02_MOLECULAR_DISTILLATION_ENGINE.md"
-# purpose: "Technical Engineering Specification for Theme Component Distillation and Cleanroom Sanitization"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Двигун молекулярної дистиляції та Cleanroom-санації тем"
+description: "Technical Engineering Specification for Theme Component Distillation and Cleanroom Sanitization"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/02_MOLECULAR_DISTILLATION_ENGINE.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/02_MOLECULAR_DISTILLATION_ENGINE.md"
+> purpose: "Technical Engineering Specification for Theme Component Distillation and Cleanroom Sanitization"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧪 Двигун молекулярної дистиляції та Cleanroom-санації тем
 

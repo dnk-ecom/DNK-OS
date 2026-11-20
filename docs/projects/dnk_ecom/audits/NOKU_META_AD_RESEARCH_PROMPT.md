@@ -1,12 +1,14 @@
 ---
-title: "NOKU Meta Ad Library Research & Ads Swipe File Prompt"
+title: "TASK: Meta Ad Library research and ads swipe file for NOKU"
 description: "Canonical transcribed and adapted Meta Ad Library research prompt for NOKU (https://noku.store/)"
 mrh_id: "docs/projects/dnk_ecom/audits/NOKU_META_AD_RESEARCH_PROMPT.md"
-status: active
-type: prompt_spec
-domain: ecom_growth
-author: "DNK-e.com Maksym & Antigravity"
-version: "1.0.0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -18,8 +20,8 @@ version: "1.0.0"
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-17"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```

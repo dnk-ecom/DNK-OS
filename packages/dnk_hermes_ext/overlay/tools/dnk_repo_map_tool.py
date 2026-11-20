@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_repo_map_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_repo_map_tool.py"
 # purpose: "Native Hermes tool for ultra-fast symbol resolution, file location, and monorepo architecture mapping."
 # canonical_source: true
 # alters_files: []

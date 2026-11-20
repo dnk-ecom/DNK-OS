@@ -1,0 +1,6 @@
+{
+  "source_repository": "TestOrg/AutoCanvas",
+  "activated_at_slice": 1,
+  "target_worker": "gerych_builder",
+  "status": "ready"
+}

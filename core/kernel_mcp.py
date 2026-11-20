@@ -353,6 +353,40 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
             )
 
     @mcp.tool()
+    def audit_shopify_platform_pulse(limit: int = 10) -> str:
+        """
+        Polls the live official Shopify Developer Changelog (shopify.dev/changelog) in < 0.6s.
+        Returns the latest architectural changes affecting themes, Liquid, Theme Blocks, and Storefront APIs.
+        Zero-RAM (< 10MB), zero browser/GPU overhead.
+        """
+        from scripts.shopify.shopify_daily_pulse import fetch_shopify_changelog, parse_and_filter_updates
+        raw_xml = fetch_shopify_changelog()
+        updates = parse_and_filter_updates(raw_xml, limit=limit)
+        return json.dumps({
+            "success": True,
+            "updates_count": len(updates),
+            "updates": updates
+        }, indent=2, ensure_ascii=False)
+
+    @mcp.tool()
+    def query_shopify_bookmarks(query: str = "", category: str = "", limit: int = 15) -> str:
+        """
+        Queries the synthesized Shopify & E-commerce Bookmarks Database (531+ high-value tools, repos, CRO patterns).
+        Categories:
+          - shopify_core_and_themes
+          - cro_funnels_and_ux
+          - ai_agents_mcp_and_automation
+          - store_audits_spies_and_intel
+          - marketing_ads_and_tracking
+          - apps_apis_and_backend_ops
+          - official_portals_and_community
+        Zero-RAM, reads local cached JSON index in < 5ms.
+        """
+        from scripts.shopify.parse_shopify_bookmarks import query_bookmarks
+        res = query_bookmarks(query=query, category=category, limit=limit)
+        return json.dumps(res, indent=2, ensure_ascii=False)
+
+    @mcp.tool()
     def compile_brand_design_tokens(spec_json_or_yaml: str) -> str:
         """
         Compiles a W3C DTCG Design Token specification into multi-target outputs:
@@ -532,6 +566,55 @@ def create_fastmcp_server(kernel: Optional[FastMCPKernel] = None, name: str = "d
             return json.dumps({"success": True, "task_dna": task_dna}, ensure_ascii=False, indent=2)
         except Exception as e:
             logger.exception("client_success_dispatch_to_builder failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def client_success_generate_remediation(
+        deal_id: str,
+        ticket_id: str,
+        target_file: str,
+        new_content: str,
+        explanation_uk: str = ""
+    ) -> str:
+        """
+        Denchik generates a unified git diff remediation proposal for an in-context visual review ticket,
+        ready for Maxim's 1-click Human-in-the-Loop approval.
+        """
+        from core.client_success.remediation_engine import RemediationEngine
+        try:
+            rem_engine = RemediationEngine()
+            proposal = rem_engine.synthesize_remediation(
+                deal_id=deal_id,
+                ticket_id=ticket_id,
+                target_file=target_file,
+                new_content=new_content,
+                explanation_uk=explanation_uk,
+            )
+            return json.dumps({"success": True, "proposal": proposal.model_dump()}, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("client_success_generate_remediation failed")
+            return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+
+    @mcp.tool()
+    def client_success_apply_remediation(
+        proposal_id: str,
+        new_content: str,
+        approver: str = "maksym"
+    ) -> str:
+        """
+        Applies an approved visual review remediation patch to disk and resolves the ticket in Cockpit DB.
+        """
+        from core.client_success.remediation_engine import RemediationEngine
+        try:
+            rem_engine = RemediationEngine()
+            res = rem_engine.apply_remediation(
+                proposal_id=proposal_id,
+                new_content=new_content,
+                approver=approver,
+            )
+            return json.dumps(res, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.exception("client_success_apply_remediation failed")
             return json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
 
     @mcp.tool()

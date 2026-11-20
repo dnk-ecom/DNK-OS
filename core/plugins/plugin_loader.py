@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_plugins_plugin_loader"
+# mrh_id: "core/plugins/plugin_loader.py"
 # purpose: "Dynamically scan the plugins directory and load valid Plugin modules using importlib"
 # author: "DNK-e.com Maksym"
 # license: "MIT"

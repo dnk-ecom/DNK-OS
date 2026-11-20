@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Технічний аудит | DNK Ecom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style id="dnk-critical-css">
+/* --- DNK-MRH-HEADER ---
+ * mrh_id: "packages/client_portal_template/assets/portal.css"
+ * purpose: "High-Craft Sovereign Theme: Fumadocs Documentation Engine + Meta Astryx Interactive Workspace"
+ * canonical_source: true
+ * alters_files: []
+ * triggers_tasks: []
+ * status: "Active"
+ * version: "5.0.0"
+ * updated_at: "2026-11-18"
+ * author: "DNK-e.com Maksym & Antigravity"
+ * --- END DNK-MRH-HEADER ---
+ */
+
+:root {
+  /* Surface & Backgrounds */
+  --bg-page: #080c14;
+  --dnk-bg-page: #080c14;
+  --bg-surface: #0e1526;
+  --dnk-bg-surface: #0e1526;
+  --bg-card: #111a2e;
+  --dnk-bg-card: #111a2e;
+  --bg-card-hover: #17233d;
+  --dnk-bg-card-hover: #17233d;
+  --bg-header: rgba(8, 12, 20, 0.88);
+  --dnk-bg-overlay: rgba(8, 12, 20, 0.88);
+
+  /* Borders & Hairlines */
+  --border-subtle: #1e293b;
+  --dnk-border-hairline: #1e293b;
+  --border-hover: #334155;
+  --dnk-border-hover: #334155;
+  --border-focus: #3b82f6;
+  --dnk-border-active: #3b82f6;
+
+  /* Typography Colors */
+  --text-primary: #f8fafc;
+  --dnk-text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --dnk-text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --dnk-text-muted: #64748b;
+  --text-subtle: #475569;
+  --dnk-text-subtle: #475569;
+
+  /* Accents & Signals */
+  --accent-blue: #3b82f6;
+  --dnk-accent-blue: #3b82f6;
+  --accent-emerald: #10b981;
+  --dnk-accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --dnk-accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --dnk-accent-rose: #f43f5e;
+  --accent-violet: #8b5cf6;
+  --dnk-accent-violet: #8b5cf6;
+
+  /* Fonts */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --dnk-font-sans: var(--font-sans);
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --dnk-font-mono: var(--font-mono);
+
+  /* Sizing */
+  --header-height: 56px;
+  --sidebar-width: 250px;
+  --toc-width: 220px;
+}
+
+/* Reset & Base Setup */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  background-color: var(--bg-page);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hyperlink Hard-Reset to eliminate browser blue/purple links */
+a, a:visited, a:hover, a:active, a:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ==========================================================================
+   Header Navigation (Fumadocs Layout)
+   ========================================================================== */
+.fuma-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-height);
+  background: var(--bg-header);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.fuma-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-decoration: none !important;
+}
+
+.fuma-brand-badge {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.fuma-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fuma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  text-decoration: none !important;
+}
+
+.fuma-btn-ghost {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.fuma-btn-ghost:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.fuma-btn-review {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+  font-weight: 600;
+}
+
+.fuma-btn-review:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.fuma-search-kbd {
+  background: #1e293b;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Layout (Sidebar + Main + ToC)
+   ========================================================================== */
+.fuma-layout {
+  display: flex;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  flex: 1;
+}
+
+.fuma-sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  border-right: 1px solid var(--border-subtle);
+  padding: 24px 14px;
+  background: var(--bg-page);
+}
+
+.fuma-nav-group {
+  margin-bottom: 24px;
+}
+
+.fuma-nav-heading {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  padding-left: 8px;
+}
+
+.fuma-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: all 0.12s ease;
+  margin-bottom: 2px;
+}
+
+.fuma-nav-item svg {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+  flex-shrink: 0 !important;
+  color: var(--text-muted);
+  stroke-width: 2;
+  display: inline-block !important;
+}
+
+.fuma-nav-item:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  text-decoration: none !important;
+}
+
+.fuma-nav-item:hover svg {
+  color: var(--text-primary);
+}
+
+.fuma-nav-item.active {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa !important;
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  text-decoration: none !important;
+}
+
+.fuma-nav-item.active svg {
+  color: #60a5fa !important;
+}
+
+.fuma-main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 48px 96px;
+  max-width: 880px;
+}
+
+.fuma-toc {
+  width: var(--toc-width);
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  padding: 40px 16px;
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-page);
+}
+
+.fuma-toc-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.fuma-toc-link {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 5px 0;
+  line-height: 1.4;
+  text-decoration: none !important;
+  transition: color 0.12s;
+}
+
+.fuma-toc-link:hover, .fuma-toc-link.active {
+  color: var(--text-primary);
+}
+
+@media (max-width: 1200px) {
+  .fuma-toc { display: none; }
+}
+
+@media (max-width: 850px) {
+  .fuma-sidebar { display: none; }
+  .fuma-main { padding: 24px 16px; }
+}
+
+/* ==========================================================================
+   Documentation Elements (Fumadocs Engine)
+   ========================================================================== */
+.fuma-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.fuma-breadcrumbs a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.fuma-breadcrumbs a:hover {
+  color: var(--text-primary);
+}
+
+.fuma-callout {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  margin: 22px 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.fuma-callout-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fuma-callout-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fuma-callout-info {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-left: 4px solid var(--accent-blue);
+}
+.fuma-callout-info .fuma-callout-icon svg { color: var(--accent-blue); }
+
+.fuma-callout-warning {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-left: 4px solid var(--accent-amber);
+}
+.fuma-callout-warning .fuma-callout-icon svg { color: var(--accent-amber); }
+
+.fuma-callout-success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-left: 4px solid var(--accent-emerald);
+}
+.fuma-callout-success .fuma-callout-icon svg { color: var(--accent-emerald); }
+
+.fuma-codeblock {
+  background: #050811;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.fuma-codeblock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.fuma-codeblock pre {
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  overflow-x: auto;
+}
+
+/* ==========================================================================
+   Interactive Workspace Elements (Meta Astryx UI)
+   ========================================================================== */
+.astryx-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: border-color 0.15s ease;
+}
+
+.astryx-panel:hover {
+  border-color: var(--border-hover);
+}
+
+.astryx-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.astryx-kpi-tile {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.astryx-kpi-tile:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+}
+
+.astryx-kpi-tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.astryx-kpi-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.astryx-kpi-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.astryx-kpi-delta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.astryx-delta-positive {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.astryx-delta-negative {
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--accent-rose);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.astryx-delta-neutral {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Two-Zone Cards: Fumadocs vs Astryx */
+.astryx-zone-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .astryx-zone-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.astryx-zone-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.15s ease;
+}
+
+.astryx-zone-card:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-card-hover);
+}
+
+.astryx-zone-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.astryx-zone-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.astryx-zone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  text-decoration: none !important;
+}
+
+.astryx-zone-link:hover {
+  text-decoration: underline !important;
+}
+
+/* Astryx Interactive ROI Calculator Box */
+.astryx-calc-box {
+  background: linear-gradient(180deg, #111a2e 0%, #0c1322 100%);
+  border: 1px solid #1e2e4a;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.astryx-control-row {
+  margin-bottom: 20px;
+}
+
+.astryx-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.astryx-control-value {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+.astryx-calc-result {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.astryx-calc-gain {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-emerald);
+  letter-spacing: -0.02em;
+}
+
+/* Astryx Scope Checklist */
+.astryx-checklist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.astryx-checklist-item:hover {
+  border-color: var(--border-hover);
+}
+
+.astryx-checklist-item.checked {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+/* Astryx Clean Data Table */
+.astryx-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.astryx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.astryx-table th {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.astryx-table td {
+  padding: 14px 16px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.astryx-table tr:last-child td {
+  border-bottom: none;
+}
+
+  </style>
+  <link rel="stylesheet" href="/assets/portal.css?v=5.0.0">
+</head>
+<body>
+  <!-- Fumadocs Header -->
+  <header class="fuma-header">
+    <a href="index.html" class="fuma-brand">
+      <span style="color:#3b82f6;">DNK</span><span>.ecom</span>
+      <span class="fuma-brand-badge">Sovereign Extranet</span>
+    </a>
+    <div class="fuma-header-actions">
+      <button class="fuma-btn fuma-btn-ghost fuma-search-btn" title="Пошук по системі (⌘K)">
+        <svg width="14" height="14" style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Пошук</span>
+        <span class="fuma-search-kbd">⌘K</span>
+      </button>
+      <button id="toggle-review-mode" class="fuma-btn fuma-btn-review">
+        <svg width="14" height="14" style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Режим правок</span>
+      </button>
+      <a href="/_auth_logout" class="fuma-btn fuma-btn-ghost" style="color:var(--dnk-text-muted);">
+        Вийти
+      </a>
+    </div>
+  </header>
+
+  <!-- Layout: Sidebar + Main + ToC -->
+  <div class="fuma-layout">
+    <aside class="fuma-sidebar">
+      <div class="fuma-nav-group">
+        <div class="fuma-nav-heading">Документація (Fumadocs)</div>
+        <a href="index.html" class="fuma-nav-item">
+          <svg width="16" height="16" style="width:16px; height:16px; min-width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          Огляд системи
+        </a>
+        <a href="audit.html" class="fuma-nav-item active">
+          <svg width="16" height="16" style="width:16px; height:16px; min-width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Технічний аудит
+        </a>
+      </div>
+
+      <div class="fuma-nav-group">
+        <div class="fuma-nav-heading">Робочий Простір (Astryx UI)</div>
+        <a href="proposal.html" class="fuma-nav-item">
+          <svg width="16" height="16" style="width:16px; height:16px; min-width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Кошторис & Матриця
+        </a>
+        <a href="demo.html" class="fuma-nav-item">
+          <svg width="16" height="16" style="width:16px; height:16px; min-width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Демо & ROI Симулятор
+        </a>
+      </div>
+
+      <div class="fuma-nav-group">
+        <div class="fuma-nav-heading">Контекст Агентів</div>
+        <a href="/llms.txt" class="fuma-nav-item" target="_blank">
+          <svg width="16" height="16" style="width:16px; height:16px; min-width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 22v-4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M22 12h-4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+          llms.txt (Machine Spec)
+        </a>
+      </div>
+    </aside>
+
+    <!-- Center Main Content -->
+    <main class="fuma-main">
+      <div class="fuma-breadcrumbs">
+        <a href="index.html">Документація</a>
+        <span>/</span>
+        <span style="color:var(--dnk-text-primary);">Технічний аудит продуктивності</span>
+      </div>
+
+      <h1 style="font-size:2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:8px;">
+        Звіт Технічного Аудиту Магазину
+      </h1>
+      <p style="color:var(--dnk-text-secondary); font-size:0.95rem; line-height:1.6; margin-bottom:28px;">
+        Специфікація вузьких місць рендерингу, аналіз сторонніх скриптів та верифікація показників Google Core Web Vitals за методологією W3C DTCG-2025.10.
+      </p>
+
+      <!-- Section: Core Web Vitals Benchmarks -->
+      <section id="cwv-benchmarks">
+        <h2 style="font-size:1.2rem; font-weight:700; margin-bottom:14px;">1. Показники Core Web Vitals (CrUX + Lighthouse)</h2>
+        
+        <div class="astryx-kpi-grid">
+          <div class="astryx-kpi-tile">
+            <div class="astryx-kpi-tile-header">
+              <span class="astryx-kpi-title">LCP (Largest Contentful Paint)</span>
+              <span class="astryx-kpi-delta astryx-delta-negative">4.6s</span>
+            </div>
+            <div class="astryx-kpi-value" style="color:#ef4444;">Повільно</div>
+            <div style="font-size:0.75rem; color:var(--dnk-text-muted);">Норматив DNK OS: ≤ 1.2s</div>
+          </div>
+
+          <div class="astryx-kpi-tile">
+            <div class="astryx-kpi-tile-header">
+              <span class="astryx-kpi-title">INP (Interaction to Next Paint)</span>
+              <span class="astryx-kpi-delta astryx-delta-negative">280ms</span>
+            </div>
+            <div class="astryx-kpi-value" style="color:#f59e0b;">Увага</div>
+            <div style="font-size:0.75rem; color:var(--dnk-text-muted);">Норматив DNK OS: ≤ 50ms</div>
+          </div>
+
+          <div class="astryx-kpi-tile">
+            <div class="astryx-kpi-tile-header">
+              <span class="astryx-kpi-title">CLS (Cumulative Layout Shift)</span>
+              <span class="astryx-kpi-delta astryx-delta-negative">0.28</span>
+            </div>
+            <div class="astryx-kpi-value" style="color:#ef4444;">Зсуви</div>
+            <div style="font-size:0.75rem; color:var(--dnk-text-muted);">Норматив DNK OS: 0.00</div>
+          </div>
+        </div>
+
+        <div class="fuma-callout fuma-callout-warning">
+          <div class="fuma-callout-icon">
+            <svg width="18" height="18" style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:600; color:var(--dnk-text-primary); margin-bottom:2px;">Критична втрата мобільної конверсії</div>
+            <div style="color:var(--dnk-text-secondary); font-size:0.82rem;">
+              Кожні додаткові 100мс затримки LCP вище 2.5с знижують показник завершення замовлень на 1.2% (за даними Google Core Web Vitals Benchmark).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: App Weight & Bloat Audit -->
+      <section id="app-weight" style="margin-top:36px;">
+        <h2 style="font-size:1.2rem; font-weight:700; margin-bottom:14px;">2. Аудит Сторонніх Додатків та Навантаження DOM</h2>
+        
+        <div class="astryx-table-wrap">
+          <table class="astryx-table">
+            <thead>
+              <tr>
+                <th>Модуль</th>
+                <th>Поточний Додаток</th>
+                <th>Вартість / міс</th>
+                <th>JS Payload</th>
+                <th>Рішення DNK OS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600; color:var(--dnk-text-primary);">Відгуки покупців</td>
+                <td>Loox / Judge.me</td>
+                <td style="font-family:var(--dnk-font-mono);">$29</td>
+                <td style="color:#ef4444; font-family:var(--dnk-font-mono);">380 KB</td>
+                <td style="color:#10b981;">Нативний Liquid Reviews AST (0 KB JS)</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600; color:var(--dnk-text-primary);">Кошик & Upsell</td>
+                <td>ReConvert / SlideCart</td>
+                <td style="font-family:var(--dnk-font-mono);">$39</td>
+                <td style="color:#ef4444; font-family:var(--dnk-font-mono);">450 KB</td>
+                <td style="color:#10b981;">Native Micro-Cart + Shopify Functions</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600; color:var(--dnk-text-primary);">Instagram Галерея</td>
+                <td>Instafeed Pro</td>
+                <td style="font-family:var(--dnk-font-mono);">$19</td>
+                <td style="color:#ef4444; font-family:var(--dnk-font-mono);">620 KB</td>
+                <td style="color:#10b981;">Cloudflare Edge Cached CDN Grid</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600; color:var(--dnk-text-primary);">Таймери та бейджі</td>
+                <td>Hextom / Essential</td>
+                <td style="font-family:var(--dnk-font-mono);">$15</td>
+                <td style="color:#f59e0b; font-family:var(--dnk-font-mono);">190 KB</td>
+                <td style="color:#10b981;">Векторний SVG Countdown Block</td>
+              </tr>
+              <tr style="background:rgba(255,255,255,0.02); font-weight:600;">
+                <td style="color:var(--dnk-text-primary);">Разом</td>
+                <td>4 додатки</td>
+                <td style="color:#38bdf8; font-family:var(--dnk-font-mono);">$102/міс</td>
+                <td style="color:#10b981; font-family:var(--dnk-font-mono);">-1.64 MB</td>
+                <td style="color:#10b981;">100% заміна без сторонніх залежностей</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Engineering Implementation Spec -->
+      <section id="engineering-spec" style="margin-top:36px;">
+        <h2 style="font-size:1.2rem; font-weight:700; margin-bottom:14px;">3. Приклад Нативної Архітектури (Shopify 2.0 Liquid AST)</h2>
+        <p style="font-size:0.85rem; color:var(--dnk-text-secondary); margin-bottom:12px;">
+          Замість сторонніх віджетів, код відгуків компілюється безпосередньо в HTML на серверах Shopify:
+        </p>
+
+        <div class="fuma-codeblock">
+          <div class="fuma-codeblock-header">
+            <span>snippets/dnk-reviews-native.liquid</span>
+            <span>Liquid</span>
+          </div>
+          <pre><code>{%- comment -%}
+  DNK OS Sovereign Native Reviews AST Engine
+  0 KB External JS, 0 tracking pixels, 100% Core Web Vitals Compliance
+{%- endcomment -%}
+&lt;div class="dnk-reviews-grid" data-dnk-aggregate="{{ product.metafields.reviews.rating.value }}"&gt;
+  {% for review in product.metafields.dnk.reviews.value limit: 4 %}
+    &lt;article class="dnk-review-card"&gt;
+      &lt;div class="dnk-review-stars" aria-label="{{ review.rating }} з 5 зірок"&gt;
+        {{ review.rating | times: 20 }}%
+      &lt;/div&gt;
+      &lt;p class="dnk-review-text"&gt;{{ review.body | escape }}&lt;/p&gt;
+    &lt;/article&gt;
+  {% endfor %}
+&lt;/div&gt;</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <!-- Table of Contents -->
+    <aside class="fuma-toc">
+      <div class="fuma-toc-title">Зміст документа</div>
+      <a href="#cwv-benchmarks" class="fuma-toc-link">1. Core Web Vitals</a>
+      <a href="#app-weight" class="fuma-toc-link">2. Аудит додатків</a>
+      <a href="#engineering-spec" class="fuma-toc-link">3. Нативна архітектура</a>
+    </aside>
+  </div>
+
+  <script src="/assets/portal.js"></script>
+  <script src="/assets/dnk-sensor.js"></script>
+</body>
+</html>

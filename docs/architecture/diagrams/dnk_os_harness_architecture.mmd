@@ -1,0 +1,32 @@
+%% --- DNK-MRH-HEADER ---
+%% mrh_id: "docs/architecture/dnk_os_harness_architecture.mmd"
+%% purpose: "Canonical Mermaid source for DNK OS Harness Integration Architecture (INTEGRATION-001)"
+%% canonical_source: true
+%% alters_files: []
+%% triggers_tasks: []
+%% status: "Active"
+%% version: "1.0.0"
+%% updated_at: "2026-09-10"
+%% author: "DNK-e.com Maksym & Gerych Prime"
+%% --- END DNK-MRH-HEADER ---
+
+flowchart TD
+    subgraph Plugin Governance
+        A[GitHub Intake] --> B[Sandbox Runner]
+        B --> C[Certification]
+        C --> D[Registry]
+        D --> E[Capability Graph]
+        E --> F[Execution Plan]
+        F --> G[Execution Engine]
+        G --> H[Audit Log]
+        H --> I[Health Metrics]
+    end
+
+    subgraph Canvas Control
+        J[Control Plane] --> K[OCC 3-Way Merge]
+        K --> L[WebSocket/SSE Protocol]
+        L --> M[Human-in-the-Loop Approval]
+    end
+
+    Plugin Governance --> Canvas Control
+    Canvas Control --> Plugin Governance

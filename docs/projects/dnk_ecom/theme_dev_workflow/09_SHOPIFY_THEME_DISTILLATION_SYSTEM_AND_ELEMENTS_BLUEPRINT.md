@@ -1,13 +1,14 @@
 ---
-title: "Shopify Theme Distillation System & Universal Elements Architecture Blueprint"
+title: "СИСТЕМА ДИСТИЛЯЦІЇ ЗНАНЬ ТА ПОВНИЙ ТЕХНІЧНИЙ ОПИС УСІХ ЕЛЕМЕНТІВ ТЕМИ"
 description: "Master Engineering Blueprint: End-to-End Recursive Knowledge & Solutions Distillation System, Exhaustive Technical Description of ALL Theme Elements, and Construction Guide for World-Class Shopify Theme Store Submission ($350-$420 MSRP Grade)."
 mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/09_SHOPIFY_THEME_DISTILLATION_SYSTEM_AND_ELEMENTS_BLUEPRINT.md"
-status: active
-type: blueprint
-domain: shopify_ecosystem
-author: "DNK OS Architecture & Antigravity"
-version: "1.0.0"
-date: "2026-11-12"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -19,16 +20,16 @@ date: "2026-11-12"
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-12"
-> author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
 # 🏛️ СИСТЕМА ДИСТИЛЯЦІЇ ЗНАНЬ ТА ПОВНИЙ ТЕХНІЧНИЙ ОПИС УСІХ ЕЛЕМЕНТІВ ТЕМИ
 ## Створення флагманської теми світового рівня для Shopify Theme Store (`$350–$420 MSRP`)
 
-> **Призначення:** Цей документ є генеральним архітектурним стандартом DNK OS для покрокової побудови суверенної флагманської комерційної теми найвищого ґатунку (`DNK Sovereign 1.0.0 Apex`), яка гарантовано проходить офіційну модерацію та публікується у **Shopify Theme Store**.
+> **Призначення:** Цей документ є генеральним архітектурним стандартом DNK OS для покрокової побудови суверенної флагманської комерційної теми найвищого ґатунку (`DNK-Ecom-Zerno-v.0.1.0`), яка гарантовано проходить офіційну модерацію та публікується у **Shopify Theme Store**.
 > **Ключовий принцип:** Рекурсивна Cleanroom-дистиляція найкращих рішень із 6 донорів (`KS Origin 1.0.0`, `Sugar 2.3.10`, `Shrine Pro 2.0.0`, `Elixir 1.6.2/2.0`, `Story 4.0.8`, `Tinker 4.4.0`) у єдине чисте ядро на базі **100% Theme Blocks 2.0** та **нативних W3C Web Components**.
 
 ---
@@ -55,7 +56,7 @@ flowchart TD
         P4["🧬 Етап 4: Рекомпозиція в Theme Blocks 2.0<br>(Контекст closest.product, рекурсивний flexbox)"]
     end
 
-    subgraph TargetTheme ["Флагманська тема DNK Sovereign 1.0.0"]
+    subgraph TargetTheme ["Флагманська тема DNK-Ecom-Zerno-v.0.1.0"]
         Target["💎 Готова комерційна тема<br>(Shopify Theme Store Grade | 0 Theme Check Errors)"]
     end
 

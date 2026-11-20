@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_mixar_tool.py"
+# mrh_id: "core/hermes_agent/tools/dnk_mixar_tool.py"
 # purpose: "Native Hermes & DNK OS Dual-Surface tool for Mixar 3D & Blender Cinematography orchestration."
 # canonical_source: true
 # alters_files: []

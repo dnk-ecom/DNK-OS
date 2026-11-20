@@ -1,29 +1,42 @@
 #!/usr/bin/env bash
 # --- DNK-MRH-HEADER ---
 # mrh_id: "scripts/system/run_sota_leaders_audit.sh"
-# purpose: "Launch autonomous Gerych-root deep audit of world leaders in Agentic Core systems and architectural adjustments for DNK OS."
+# purpose: "Launch autonomous Hermes-core deep audit of world leaders in Agentic Core systems and architectural adjustments for DNK OS."
 # canonical_source: true
 # alters_files: ["docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md"]
 # triggers_tasks: []
 # status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-16"
-# author: "DNK-e.com"
+# version: "2.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym & Antigravity"
 # --- END DNK-MRH-HEADER ---
 
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DNK_OS_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-REPORT_FILE="${DNK_OS_ROOT}/docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md"
-QUERY_FILE="/tmp/gerych_sota_audit_query.txt"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPORT_FILE="${REPO_ROOT}/docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md"
+QUERY_FILE="/tmp/hermes_sota_audit_query.txt"
 
-mkdir -p "${DNK_OS_ROOT}/docs/architecture/reports"
+HERMES_DIR="${DNK_GERYCH_DIR:-$(cd "$REPO_ROOT/.." && pwd)/Gerych-Agent}"
+HERMES_PYTHON="${HERMES_DIR}/.venv/bin/python"
+HERMES_EXEC="${HERMES_DIR}/cli.py"
 
-cat << 'EOF' > "$QUERY_FILE"
+if [ ! -x "$HERMES_PYTHON" ]; then
+    HERMES_PYTHON="$HOME/.dnk_runtime/venvs/hermes-agent/bin/python"
+fi
+
+if [ ! -f "$HERMES_EXEC" ]; then
+    echo "❌ Error: Hermes CLI not found at $HERMES_EXEC"
+    exit 1
+fi
+
+mkdir -p "${REPO_ROOT}/docs/architecture/reports"
+
+cat << EOF > "$QUERY_FILE"
 ЗАДАЧА ВІД МАКСИМА (DNK-e.com):
 Здійснити ґрунтовний автономний інженерний аудит світових лідерів у розробці Agentic Core, Agent Execution Harnesses та Multi-Agent Operating Systems (SOTA 2026).
-Порівняти їхні архітектурні рішення з поточною реалізацією ядра DNK OS (FastMCP Microkernel v2.5.0, Spatial Canvas Session Router, 3 Core Workhorses, SCONES FTS5 Memory, Fan-In 4-Gate, TC-10 Quarantine, Skills Curator) та надати конкретні рекомендації: «ЩО НАМ СЛІД ПІДКОРИГУВАТИ».
+Порівняти їхні архітектурні рішення з поточною реалізацією ядра DNK OS (FastMCP Microkernel v2.5.0, Spatial Canvas Session Router, 3 Core Workhorses, SCONES FTS5 Memory, Fan-In 4-Gate, TC-10 Quarantine, Skills Curator, Google EGM Dual-System Review, Harness² Blind Tournament, Canonical PSOD Delegation, Universal Pre-Tool Sentinel) та надати конкретні рекомендації: «ЩО НАМ СЛІД ПІДКОРИГУВАТИ».
 
 ОБ'ЄКТИ АУДИТУ (СВІТОВІ ЛІДЕРИ):
 1. Anthropic (Claude Code, Subagent Execution Loops, Tool Protocols, MCP Specification).
@@ -32,6 +45,7 @@ cat << 'EOF' > "$QUERY_FILE"
 4. AutoGen / AG2 & CrewAI (Multi-agent conversational DAGs, hierarchical supervisor architectures, code sandboxing).
 5. Builder.io (Agent-Native) & SmythOS / CopilotKit (Visual Canvas integration, Dual-Surface Actions, node execution).
 6. Cognition (Devin) & Cursor (Anysphere) (Shadow workspace execution, per-task context surgery, git worktrees, AST indexing, deterministic quality gates).
+7. Google Research (Harness² / arXiv:2610.14224 & Elephant-Goldfish Model / EGM dual-system review).
 
 5 ВЕКТОРІВ ПОРІВНЯННЯ ТА КОРЕКЦІЇ ДЛЯ DNK OS:
 1. Бібліотека знань проєкту (Project Knowledge & Context Architecture):
@@ -45,16 +59,16 @@ cat << 'EOF' > "$QUERY_FILE"
    - Що підкоригувати для standing context diet (<= 6000 токенів).
 4. Оркестрація завдань і мультиагентна взаємодія (Task Orchestration & Workflows):
    - Spatial Canvas (.canvas) + Session Router + 4-Gate Fan-In Aggregator + TC-10 Quarantine Circuit Breaker проти JSON-RPC / LangGraph State.
-   - Що підкоригувати для підтримки циклів зворотного зв'язку (revision loops) та живого Human-in-the-Loop.
+   - Підтримка циклів зворотного зв'язку (revision loops) та живого Human-in-the-Loop через PSOD та EGM Review.
 5. Відбір і селекція навичок, гачків та скриптів (Skill Curation & Invariants):
    - 4-Vector Generalisability Test, Skill Core-Size Ratchet (<= 750 рядків + LOD), Second Violation Invariant (Pre-tool hooks) проти статичних каталогів навичок.
-   - Що підкоригувати для автоматичного депрекейту та прунінгу застарілих навичок.
+   - Автоматичний депрекейт та прунінг застарілих навичок.
 
 СТРУКТУРА ТА ВИМОГИ ДО ЗВІТУ:
 1. Збережи повний звіт у файл:
-   /Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS/docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md
+   ${REPORT_FILE}
 2. Формат:
-   - Повний MRH-хедер стандарту DNK-STD-0075 (author: "DNK-e.com", status: "Active", version: "1.0.0").
+   - Повний MRH-хедер стандарту DNK-STD-0075 (author: "DNK-e.com Maksym & Antigravity", status: "Active", version: "2.0.0").
    - Резюме для Максима (Executive Summary / ADHD Cards).
    - Детальний аналіз кожного з 5 векторів із порівняльними таблицями:
      [Компонент / Патерн світового лідера / Як реалізовано в DNK OS / Рекомендація та корекція].
@@ -62,7 +76,8 @@ cat << 'EOF' > "$QUERY_FILE"
 3. Мова: Українська, професійний інженерний стиль, конкретні схеми та конфігурації.
 EOF
 
-echo "🚀 [DNK OS] Запуск автономного дослідження Gerych-root (Hermes Agent)..."
+echo "🚀 [DNK OS] Запуск автономного дослідження Hermes Agent..."
 echo "📄 Цільовий файл: $REPORT_FILE"
 
-exec /Users/kuzmenko.top/.local/bin/gerych root -q "$(cat "$QUERY_FILE")" --oneshot
+cd "$REPO_ROOT"
+exec "$HERMES_PYTHON" "$HERMES_EXEC" --provider vertex --model gemini-4-argon -q "$(cat "$QUERY_FILE")" --oneshot

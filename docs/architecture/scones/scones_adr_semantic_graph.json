@@ -1,0 +1,261 @@
+{
+  "timestamp": "2026-09-21T11:06:02.867488+00:00",
+  "total_rules": 0,
+  "total_adrs": 42,
+  "total_links": 0,
+  "links": [],
+  "nodes": {
+    "ADR-008-REVERSE-ENGINEERING-SOTA-ASSIMILATION": {
+      "id": "ADR-008-REVERSE-ENGINEERING-SOTA-ASSIMILATION",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/architecture/adr/ADR-008-REVERSE-ENGINEERING-SOTA-ASSIMILATION.md"
+    },
+    "ADR-0045-excalidraw-dnk-canvas": {
+      "id": "ADR-0045-excalidraw-dnk-canvas",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/architecture/adr/ADR-0045-excalidraw-dnk-canvas.md"
+    },
+    "ADR-007-JIT-TOOLING-ZERO-STANDING-BLOAT": {
+      "id": "ADR-007-JIT-TOOLING-ZERO-STANDING-BLOAT",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/architecture/adr/ADR-007-JIT-TOOLING-ZERO-STANDING-BLOAT.md"
+    },
+    "ADR-002-ASSIMILATION-BOUNDARIES": {
+      "id": "ADR-002-ASSIMILATION-BOUNDARIES",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/architecture/adr/ADR-002-ASSIMILATION-BOUNDARIES.md"
+    },
+    "ADR-007_SYSTEM_ONE_JEV_ARCHITECTURE": {
+      "id": "ADR-007_SYSTEM_ONE_JEV_ARCHITECTURE",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/architecture/ADR-007_SYSTEM_ONE_JEV_ARCHITECTURE.md"
+    },
+    "ADR-012-B_Zero-Bloat_Assimilation_&_Strict_Security_Guardrails": {
+      "id": "ADR-012-B_Zero-Bloat_Assimilation_&_Strict_Security_Guardrails",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/12. Безпека системи та користувачів/ADR/ADR-012-B Zero-Bloat Assimilation & Strict Security Guardrails.md"
+    },
+    "ADR-012_Трирівнева_Імунна_Система_та_Split-Route_Security": {
+      "id": "ADR-012_Трирівнева_Імунна_Система_та_Split-Route_Security",
+      "type": "adr",
+      "title": "⚖️ ADR-012: Трирівнева Імунна Система та Split-Route Security",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/12. Безпека системи та користувачів/ADR/ADR-012 Трирівнева Імунна Система та Split-Route Security.md"
+    },
+    "ADR-003_Стандарт_Документування_та_Подвійна_Оптика": {
+      "id": "ADR-003_Стандарт_Документування_та_Подвійна_Оптика",
+      "type": "adr",
+      "title": "ADR-003: Стандарт Документування та Принцип Подвійної Оптики (Dual-Reader)",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/03. Технічні рішення/ADR/ADR-003 Стандарт Документування та Подвійна Оптика.md"
+    },
+    "ADR-015_Детерміновані_Гейти_Доказовості_та_Anti-Tautology_AST": {
+      "id": "ADR-015_Детерміновані_Гейти_Доказовості_та_Anti-Tautology_AST",
+      "type": "adr",
+      "title": "⚖️ ADR-015: Детерміновані Гейти Доказовості та Anti-Tautology AST",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/15. Контроль якості та Самозцілення/ADR/ADR-015 Детерміновані Гейти Доказовості та Anti-Tautology AST.md"
+    },
+    "ADR-015-B_Gemini_Drift_Self-Healing_&_Telemetry_Architecture": {
+      "id": "ADR-015-B_Gemini_Drift_Self-Healing_&_Telemetry_Architecture",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/15. Контроль якості та Самозцілення/ADR/ADR-015-B Gemini Drift Self-Healing & Telemetry Architecture.md"
+    },
+    "ADR-015-C_Adversarial_Proposal_Review_Policy_(AAB_Gate)": {
+      "id": "ADR-015-C_Adversarial_Proposal_Review_Policy_(AAB_Gate)",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/15. Контроль якості та Самозцілення/ADR/ADR-015-C Adversarial Proposal Review Policy (AAB Gate).md"
+    },
+    "ADR-014-B_Canvas_Runtime_Bridge_&_WebSocket_Integration": {
+      "id": "ADR-014-B_Canvas_Runtime_Bridge_&_WebSocket_Integration",
+      "type": "adr",
+      "title": "🏛️ ADR-014-B: Canvas Runtime Bridge & WebSocket Integration Architecture",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/14. Просторовий інтерфейс та Visual Shell/ADR/ADR-014-B Canvas Runtime Bridge & WebSocket Integration.md"
+    },
+    "ADR-014_Тріада_Visual_Shell": {
+      "id": "ADR-014_Тріада_Visual_Shell",
+      "type": "adr",
+      "title": "ADR-014: Тріада Visual Shell (ThoughtDAG Canvas + CapCut Kinetic Timeline + Google Stitch Drawers)",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/14. Просторовий інтерфейс та Visual Shell/ADR/ADR-014 Тріада Visual Shell.md"
+    },
+    "ADR-014-C_Canvas_OCC_&_3-Way_Merge_Conflict_Resolution": {
+      "id": "ADR-014-C_Canvas_OCC_&_3-Way_Merge_Conflict_Resolution",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/14. Просторовий інтерфейс та Visual Shell/ADR/ADR-014-C Canvas OCC & 3-Way Merge Conflict Resolution.md"
+    },
+    "ADR-014-D_Visual_Shell_Web_Consolidation_&_Blast_Radius": {
+      "id": "ADR-014-D_Visual_Shell_Web_Consolidation_&_Blast_Radius",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/14. Просторовий інтерфейс та Visual Shell/ADR/ADR-014-D Visual Shell Web Consolidation & Blast Radius.md"
+    },
+    "ADR-016-B_Headless_Open_Source_Assimilation_&_Unified_UI_Gateway": {
+      "id": "ADR-016-B_Headless_Open_Source_Assimilation_&_Unified_UI_Gateway",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/16. Розгортання та Клієнтська дистрибуція/ADR/ADR-016-B Headless Open Source Assimilation & Unified UI Gateway.md"
+    },
+    "ADR-007-B_Automated_Workspace_Hygiene_&_Event-Driven_Triggers": {
+      "id": "ADR-007-B_Automated_Workspace_Hygiene_&_Event-Driven_Triggers",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/07. Workflows та автоматизація/ADR/ADR-007-B Automated Workspace Hygiene & Event-Driven Triggers.md"
+    },
+    "ADR-009-D_Execution_Task_Adapter_&_Dynamic_DAG_Resolution": {
+      "id": "ADR-009-D_Execution_Task_Adapter_&_Dynamic_DAG_Resolution",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/09. Task Manager системи/ADR/ADR-009-D Execution Task Adapter & Dynamic DAG Resolution.md"
+    },
+    "ADR-009-B_Task_Forest_5-Scale_LOD_Navigation_&_Time-Travel_Engine": {
+      "id": "ADR-009-B_Task_Forest_5-Scale_LOD_Navigation_&_Time-Travel_Engine",
+      "type": "adr",
+      "title": "🌲 ADR-009-B: Task Forest Spatial HQ — 5-Scale LOD Navigation & Time-Travel Engine",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/09. Task Manager системи/ADR/ADR-009-B Task Forest 5-Scale LOD Navigation & Time-Travel Engine.md"
+    },
+    "ADR-009_Графовий_Task_Manager_та_Bottom-Up_Rollup": {
+      "id": "ADR-009_Графовий_Task_Manager_та_Bottom-Up_Rollup",
+      "type": "adr",
+      "title": "ADR-009: Графовий Task Manager (Node DAG Decomposition & Bottom-Up Rollup)",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/09. Task Manager системи/ADR/ADR-009 Графовий Task Manager та Bottom-Up Rollup.md"
+    },
+    "ADR-009-C_Bulletproof_Task_Formulation_Standard_&_ADHD_Protocol": {
+      "id": "ADR-009-C_Bulletproof_Task_Formulation_Standard_&_ADHD_Protocol",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/09. Task Manager системи/ADR/ADR-009-C Bulletproof Task Formulation Standard & ADHD Protocol.md"
+    },
+    "ADR-002_Ультра-тонке_Ядро_та_Цикл_Розробки_DNK_OS": {
+      "id": "ADR-002_Ультра-тонке_Ядро_та_Цикл_Розробки_DNK_OS",
+      "type": "adr",
+      "title": "ADR-002: Ультра-тонке Ядро та Цикл Розробки DNK OS (Zero-Memory-Loss)",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/02. Архітектура DNK OS/ADR/ADR-002 Ультра-тонке Ядро та Цикл Розробки DNK OS.md"
+    },
+    "ADR-002-B_DNK_OS_Canonical_Foundation_&_Swarm_Synthesis": {
+      "id": "ADR-002-B_DNK_OS_Canonical_Foundation_&_Swarm_Synthesis",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/02. Архітектура DNK OS/ADR/ADR-002-B DNK OS Canonical Foundation & Swarm Synthesis.md"
+    },
+    "ADR-002-D_Core_Domain_4-Layer_Modular_Restructuring": {
+      "id": "ADR-002-D_Core_Domain_4-Layer_Modular_Restructuring",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/02. Архітектура DNK OS/ADR/ADR-002-D Core Domain 4-Layer Modular Restructuring.md"
+    },
+    "ADR-002-C_Agent_Harness_Sandbox_Isolation_Policy": {
+      "id": "ADR-002-C_Agent_Harness_Sandbox_Isolation_Policy",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/02. Архітектура DNK OS/ADR/ADR-002-C Agent Harness Sandbox Isolation Policy.md"
+    },
+    "ADR-010_Епізодична_Памʼять_SCONES_та_SQLite_Decision_Ledger": {
+      "id": "ADR-010_Епізодична_Памʼять_SCONES_та_SQLite_Decision_Ledger",
+      "type": "adr",
+      "title": "⚖️ ADR-010: Епізодична Памʼять SCONES та SQLite Decision Ledger",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/10. Проєкти та Памʼять/ADR/ADR-010 Епізодична Памʼять SCONES та SQLite Decision Ledger.md"
+    },
+    "ADR-010-B_Unified_Lakehouse_Storage_&_Memory_Architecture": {
+      "id": "ADR-010-B_Unified_Lakehouse_Storage_&_Memory_Architecture",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/10. Проєкти та Памʼять/ADR/ADR-010-B Unified Lakehouse Storage & Memory Architecture.md"
+    },
+    "ADR-005-C_Antigravity_Mentor_Architecture_&_Dual-Agent_Protocol": {
+      "id": "ADR-005-C_Antigravity_Mentor_Architecture_&_Dual-Agent_Protocol",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/05. Агенти та ієрархія/ADR/ADR-005-C Antigravity Mentor Architecture & Dual-Agent Protocol.md"
+    },
+    "ADR-005-D_Gerych_Prime_Identity_&_14_Swarm_Roles": {
+      "id": "ADR-005-D_Gerych_Prime_Identity_&_14_Swarm_Roles",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/05. Агенти та ієрархія/ADR/ADR-005-D Gerych Prime Identity & 14 Swarm Roles.md"
+    },
+    "ADR-006_Когнітивна_Архітектура_та_Захист_від_Деградації_Flash-Моделей": {
+      "id": "ADR-006_Когнітивна_Архітектура_та_Захист_від_Деградації_Flash-Моделей",
+      "type": "adr",
+      "title": "🧠 ADR-006: Когнітивна Архітектура, Контекстна Гігієна та Захист від Деградації Flash-Моделей",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/05. Агенти та ієрархія/ADR/ADR-006 Когнітивна Архітектура та Захист від Деградації Flash-Моделей.md"
+    },
+    "ADR-005_Декомпозиційна_Ройова_Економіка": {
+      "id": "ADR-005_Декомпозиційна_Ройова_Економіка",
+      "type": "adr",
+      "title": "ADR-005: Декомпозиційна Ройова Економіка (Small Nodes, Specialized Agents, 10x Token Savings)",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/05. Агенти та ієрархія/ADR/ADR-005 Декомпозиційна Ройова Економіка.md"
+    },
+    "ADR-005-B_Curing_the_Solo_Agent_Syndrome_with_Swarm_Workers": {
+      "id": "ADR-005-B_Curing_the_Solo_Agent_Syndrome_with_Swarm_Workers",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/05. Агенти та ієрархія/ADR/ADR-005-B Curing the Solo Agent Syndrome with Swarm Workers.md"
+    },
+    "ADR-001_Two-Track_Repository_Assimilation": {
+      "id": "ADR-001_Two-Track_Repository_Assimilation",
+      "type": "adr",
+      "title": "ADR-001: Двоколійний конвеєр асиміляції відкритих репозиторіїв",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/01. Аудит репозиторіїв та інʼєкція логіки/ADR/ADR-001 Two-Track Repository Assimilation.md"
+    },
+    "ADR_0043_DeepSeek_Harness_Audit_and_Assimilation": {
+      "id": "ADR_0043_DeepSeek_Harness_Audit_and_Assimilation",
+      "type": "adr",
+      "title": "ADR 0043: DeepSeek Harness (`dsh`) SOTA Audit & Assimilation Blueprint",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/13. Апаратна інфраструктура та Моделі/ADR/ADR_0043_DeepSeek_Harness_Audit_and_Assimilation.md"
+    },
+    "ADR-013-B_macOS_Apple_Metal_vs_Omarchy_vs_Cloud_Hardware_Strategy": {
+      "id": "ADR-013-B_macOS_Apple_Metal_vs_Omarchy_vs_Cloud_Hardware_Strategy",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/13. Апаратна інфраструктура та Моделі/ADR/ADR-013-B macOS Apple Metal vs Omarchy vs Cloud Hardware Strategy.md"
+    },
+    "ADR-006-B_Hermes_Runtime_Hardening_&_Skill_LOD_Pruning": {
+      "id": "ADR-006-B_Hermes_Runtime_Hardening_&_Skill_LOD_Pruning",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/06. Навички та їх архітектура/ADR/ADR-006-B Hermes Runtime Hardening & Skill LOD Pruning.md"
+    },
+    "ADR-006-B_Стандарт_Навичок_Antigravity_та_Skills_Immutability": {
+      "id": "ADR-006-B_Стандарт_Навичок_Antigravity_та_Skills_Immutability",
+      "type": "adr",
+      "title": "⚖️ ADR-006-B: Стандарт Навичок Antigravity та Skills Immutability",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/06. Навички та їх архітектура/ADR/ADR-006-B Стандарт Навичок Antigravity та Skills Immutability.md"
+    },
+    "ADR-004-F_Consolidation_of_3_Core_Workhorses_(dnk_shopify,_dnk_media,_dnk_distribution)": {
+      "id": "ADR-004-F_Consolidation_of_3_Core_Workhorses_(dnk_shopify,_dnk_media,_dnk_distribution)",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/04. Сервіси як Плагіни/ADR/ADR-004-F Consolidation of 3 Core Workhorses (dnk_shopify, dnk_media, dnk_distribution).md"
+    },
+    "ADR-004-D_Plugin_Certification_&_Activation_Review_Gate": {
+      "id": "ADR-004-D_Plugin_Certification_&_Activation_Review_Gate",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/04. Сервіси як Плагіни/ADR/ADR-004-D Plugin Certification & Activation Review Gate.md"
+    },
+    "ADR-004-E_Architectural_Split_of_dnk_shopify_and_dnk_store_studio": {
+      "id": "ADR-004-E_Architectural_Split_of_dnk_shopify_and_dnk_store_studio",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/04. Сервіси як Плагіни/ADR/ADR-004-E Architectural Split of dnk_shopify and dnk_store_studio.md"
+    },
+    "ADR-004-B_Master_Service-as-a-Plugin_(SaaP)_Architecture": {
+      "id": "ADR-004-B_Master_Service-as-a-Plugin_(SaaP)_Architecture",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/04. Сервіси як Плагіни/ADR/ADR-004-B Master Service-as-a-Plugin (SaaP) Architecture.md"
+    },
+    "ADR-004-C_Plugin_Sandbox-First_Governance_&_Process_Isolation": {
+      "id": "ADR-004-C_Plugin_Sandbox-First_Governance_&_Process_Isolation",
+      "type": "adr",
+      "title": "--- DNK-MRH-HEADER ---",
+      "file": "docs/notes/MY TASKS/1. АРХІТЕКТУРА/04. Сервіси як Плагіни/ADR/ADR-004-C Plugin Sandbox-First Governance & Process Isolation.md"
+    }
+  }
+}

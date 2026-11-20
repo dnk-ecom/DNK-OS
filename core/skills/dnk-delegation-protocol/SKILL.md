@@ -1,10 +1,29 @@
 ---
+title: "Canonical PSOD Delegation Protocol"
 name: "dnk-delegation-protocol"
 description: "Canonical SOTA 2026 PSOD (Problem, Substrate, Oracle, Deliverable) Delegation Protocol for 100% first-pass execution rate across Antigravity, Gerych, and Denchik subagents."
+mrh_id: "core/skills/dnk-delegation-protocol/SKILL.md"
+status: Active
 version: "1.0.0"
+updated: 2026-11-18
 category: "orchestration"
 assimilated_at: "2026-11-16"
 ---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "core/skills/dnk-delegation-protocol/SKILL.md"
+> purpose: "Canonical SOTA 2026 PSOD (Problem, Substrate, Oracle, Deliverable) Delegation Protocol for 100% first-pass execution rate across Antigravity, Gerych, and Denchik subagents."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 📋 Canonical PSOD Delegation Protocol (100% First-Pass Yield)
 

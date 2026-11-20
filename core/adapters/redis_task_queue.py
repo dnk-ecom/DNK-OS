@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_redis_task_queue"
+# mrh_id: "core/adapters/redis_task_queue.py"
 # purpose: "Redis-based Task Queue implementation with prioritization and FIFO within same priority"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

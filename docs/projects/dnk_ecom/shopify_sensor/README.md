@@ -1,3 +1,31 @@
+---
+title: "Shopify In-Context Agentic Review Sensor"
+description: "Drop-in Shopify In-Context Review Sensor for Instant Agent Dispatch via FastMCP & REST."
+mrh_id: "docs/projects/dnk_ecom/shopify_sensor/README.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/shopify_sensor/README.md"
+> purpose: "Drop-in Shopify In-Context Review Sensor for Instant Agent Dispatch via FastMCP & REST."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 <!-- --- DNK-MRH-HEADER ---
 mrh_id: "docs/projects/dnk_ecom/shopify_sensor/README.md"
 purpose: "Drop-in Shopify In-Context Review Sensor for Instant Agent Dispatch via FastMCP & REST."

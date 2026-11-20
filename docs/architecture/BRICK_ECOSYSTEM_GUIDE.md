@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/architecture/BRICK_ECOSYSTEM_GUIDE.md"
-# purpose: "Architecture Guide for Composable LEGO Bricks in DNK OS (DEC-072, DEC-073)."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Керівництво по Екосистемі Цеглин DNK OS (Composable Bricks Guide)"
+description: "Architecture Guide for Composable LEGO Bricks in DNK OS (DEC-072, DEC-073)."
+mrh_id: "docs/architecture/BRICK_ECOSYSTEM_GUIDE.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/architecture/BRICK_ECOSYSTEM_GUIDE.md"
+> purpose: "Architecture Guide for Composable LEGO Bricks in DNK OS (DEC-072, DEC-073)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧱 Керівництво по Екосистемі Цеглин DNK OS (Composable Bricks Guide)
 

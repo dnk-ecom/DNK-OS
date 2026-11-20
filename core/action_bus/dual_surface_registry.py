@@ -50,6 +50,22 @@ class ActionDispatchResult(BaseModel):
     timestamp_epoch: float = Field(default_factory=time.time)
 
 
+class ActionExecutionContext(BaseModel):
+    """Execution context passed to Dual-Surface action handlers."""
+    action_id: str = Field(default="", description="ID of action being executed")
+    actor: str = Field(default="system", description="User or agent actor identity")
+    origin: str = Field(default="ui", description="'ui' or 'agent'")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="Input parameters")
+
+
+class ActionExecutionResult(BaseModel):
+    """Execution result returned by action handlers."""
+    success: bool = Field(default=True, description="Whether execution succeeded")
+    result: Any = Field(default=None, description="Payload returned by handler")
+    error: Optional[str] = Field(default=None, description="Error message if failed")
+    broadcast_events: List[Dict[str, Any]] = Field(default_factory=list, description="Events to broadcast")
+
+
 class DualSurfaceActionRegistry:
     """
     Central registry and execution controller for Dual-Surface actions.

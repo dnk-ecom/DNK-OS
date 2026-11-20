@@ -222,7 +222,7 @@ def test_pilot_project_dna_auto_injection(tmp_path: Path):
     # Verify L2 DNA sections are auto-injected into the prompt string
     assert "## 🧬 L2 Project DNA: Shopify Theme DNK-Ecom" in ctx.system_prompt
     assert "High-converting Shopify 2.0 Merchants & DTC Brands" in ctx.system_prompt
-    assert "DNK Sovereign 1.0.0 Apex built for Shopify Theme Store" in ctx.system_prompt
+    assert "DNK-Ecom-Zerno-v.0.1.0 built for Shopify Theme Store" in ctx.system_prompt
     assert "Shopify Theme Store submission standards" in ctx.system_prompt
 
 

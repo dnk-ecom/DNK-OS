@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_git_research/docs/LEDGER_ARCHITECTURE.md"
-# purpose: "Architecture of the assimilation ledger: what DNK OS runs on, where logic came from, what is still missing"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-06"
-# author: "DNK-e.com Maksym & Claude"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Реєстр асиміляцій DNK OS"
+description: "Architecture of the assimilation ledger: what DNK OS runs on, where logic came from, what is still missing."
+mrh_id: "services/dnk_git_research/docs/LEDGER_ARCHITECTURE.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
+tags:
+  - git-research
+  - ledger
+  - assimilation
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_git_research/docs/LEDGER_ARCHITECTURE.md"
+> purpose: "Architecture of the assimilation ledger: what DNK OS runs on, where logic came from, what is still missing"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # Реєстр асиміляцій DNK OS
 

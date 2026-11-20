@@ -1,0 +1,17 @@
+{
+  "name": "dnk-seamless-injection",
+  "version": "1.0.0",
+  "description": "Zero-trace photorealistic visual content injection for images and videos using SOTA open-source vision models.",
+  "author": "DNK System Architecture",
+  "engines": {
+    "python": ">=3.10",
+    "node": ">=18.0.0"
+  },
+  "capabilities": [
+    "subpixel_segmentation",
+    "texture_preserving_inpaint",
+    "deformable_surface_tracking",
+    "photometric_grain_harmonization",
+    "shopify_admin_cloud_sync"
+  ]
+}

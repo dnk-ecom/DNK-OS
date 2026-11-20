@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/architecture/specs/DNK_DISTRIBUTION_SOVEREIGN_BRICK_SPEC.md"
-# purpose: "Architecture Specification for dnk_distribution Sovereign Brick (Workhorse #3) via Elephant-Goldfish Model (EGM) & Harness2."
-# canonical_source: true
-# alters_files: ["services/dnk_distribution/**"]
-# triggers_tasks: ["TASK-DNK-DISTRIBUTION-DISTILLATION-001"]
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-18"
-# author: "DNK Swarm (Antigravity Mentor & Gerych Prime)"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Architecture Specification: `services/dnk_distribution` (Workhorse #3)"
+description: "Architecture Specification for dnk_distribution Sovereign Brick (Workhorse #3) via Elephant-Goldfish Model (EGM) & Harness2."
+mrh_id: "docs/architecture/specs/DNK_DISTRIBUTION_SOVEREIGN_BRICK_SPEC.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/architecture/specs/DNK_DISTRIBUTION_SOVEREIGN_BRICK_SPEC.md"
+> purpose: "Architecture Specification for dnk_distribution Sovereign Brick (Workhorse #3) via Elephant-Goldfish Model (EGM) & Harness2."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 📢 Architecture Specification: `services/dnk_distribution` (Workhorse #3)
 

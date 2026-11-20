@@ -964,3 +964,191 @@ def search_sota_repositories(query: Optional[str] = None, limit: int = 10) -> Li
     """Helper for instant SOTA search."""
     catalog = SOTARepoCatalog()
     return catalog.search(query=query, limit=limit)
+
+
+PROGRESSIVE_SOVEREIGN_DOMAINS: Dict[str, Dict[str, Any]] = {
+    "shopify": {
+        "title": "Shopify & High-Conversion E-Commerce",
+        "workhorse": "services/dnk_shopify",
+        "description": "Theme Blocks 2.0, Liquid AST, No-App CRO Suite, Sidekick AI Prompt Schemas, Cart Mutation Queue.",
+        "categories": [
+            "Shopify & E-Commerce Engineering",
+            "E-Commerce & Headless Storefronts",
+            "shopify_app_ecommerce",
+            "shopify_ai_storefront",
+            "shopify_cro_audit_engine",
+            "Shopify, E-Commerce & Liquid Themes",
+        ],
+        "top_golden_blueprints": [
+            "movictor99/shopify-theme-builder",
+            "Saabbir/shopify-theme-handbook",
+            "Omar92953/the-ultimate-cro-app",
+            "NikoCartin/shopify-dynamic-pdp-playbook",
+            "api-evangelist/intelligems",
+        ],
+    },
+    "media": {
+        "title": "Media Studio, Video AI & Kinetic Motion",
+        "workhorse": "services/dnk_media",
+        "description": "Gemini 3.8 Agentic Video, SVAE 1% Signal Extraction, Kinetic Subtitles, Remotion Studio, HyperFrames.",
+        "categories": [
+            "Video, Audio & Generative Media",
+            "Media, Creative & Generative Video",
+            "Media, Video & Remotion Studio",
+            "remotion_broll_graphics",
+            "viral_video_editing_kit",
+            "viral_reel_motion_cloning",
+            "video_publishing_distribution",
+            "screenplay_video_scripting",
+            "3d_animation_rigging",
+            "3d_procedural_clay_ui",
+            "generative_texture_material_ai",
+        ],
+        "top_golden_blueprints": [
+            "zhouxiaoka/supoclip",
+            "agiwhitelist/auteur",
+            "agiwhitelist/hypokiln",
+            "remotion-dev/remotion",
+            "brijr/iris",
+        ],
+    },
+    "core": {
+        "title": "Core Microkernel, Swarms & Agentic Infrastructure",
+        "workhorse": "core/ and apps/",
+        "description": "FastMCP Microkernel (< 400 LOC), SCONES FTS5 WAL, Git Worktrees, RLM Compactor, Epistemic Armor.",
+        "categories": [
+            "AI Agents & Multi-Agent Swarms",
+            "Developer Tooling, MCP & Infrastructure",
+            "General AI, Research & Foundation",
+            "Canvas, UI & Generative Frontend",
+            "RAG, Vector DB & Cognitive Memory",
+            "Security, Hardening & Auditor",
+            "Backend, APIs & Distributed Systems",
+            "Growth, Launch & Social Distribution",
+            "Telegram Apps & Mobile",
+            "Autonomous AI Agents & Swarm Intelligence",
+            "Autonomous Agents & SOTA Systems",
+            "Interactive Visual Canvases",
+            "Knowledge Bases, Graph & SOTA Research",
+            "Security & Governance",
+            "adversarial_critique_roast_engine",
+            "agent_sandbox_container",
+            "agent_skill_security_auditor",
+            "agentic_coding_harness",
+            "agentic_crm_automation",
+            "ai_text_humanizer",
+            "design_system_extraction",
+            "google_eval_benchmark_harness",
+            "intelligent_file_workspace",
+            "multi_agent_swarm_orchestration",
+            "natural_voice_copywriting",
+            "parametric_cad_3d_agents",
+            "parametric_cad_3d_web",
+            "prompt_dag_canvas",
+            "security_reverse_engineering",
+            "ui_reverse_engineering",
+            "webauthn_passkeys_agent_skills",
+        ],
+        "top_golden_blueprints": [
+            "affaan-m/ECC",
+            "alibaba/open-code-review",
+            "Agent-Field/pr-af",
+            "herdrdev/herdr",
+            "pinkpixel-dev/notification-mcp",
+        ],
+    },
+}
+
+
+def get_repo_progressive_index(
+    domain: Optional[str] = None,
+    db_path: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """
+    Two-Level Progressive Disclosure Index (LOD Navigation Standard) for 1,663 repositories:
+    - Level 0 (domain=None): Returns concise overview of 3 sovereign pillars (Shopify, Media, Core) <= 1,000 tokens.
+    - Level 1 (domain='shopify'|'media'|'core'): Returns detailed category slice with Tier 1/2 blueprints <= 1,500 tokens.
+    Eliminates context rot and protects prompt diet.
+    """
+    conn = _get_connection(db_path)
+    cursor = conn.cursor()
+
+    if not domain or str(domain).strip().lower() in ("all", "root", "overview", "none", ""):
+        # Level 0 Root LOD
+        pillars: Dict[str, Any] = {}
+        total_repos = 0
+        for d_key, d_meta in PROGRESSIVE_SOVEREIGN_DOMAINS.items():
+            placeholders = ",".join("?" for _ in d_meta["categories"])
+            cursor.execute(
+                f"SELECT count(*) FROM repositories WHERE category IN ({placeholders})",
+                d_meta["categories"],
+            )
+            count = cursor.fetchone()[0]
+            total_repos += count
+            pillars[d_key] = {
+                "title": d_meta["title"],
+                "workhorse": d_meta["workhorse"],
+                "description": d_meta["description"],
+                "repo_count": count,
+                "golden_core_sample": d_meta["top_golden_blueprints"][:3],
+            }
+        return {
+            "level": "L0_Root_Overview",
+            "total_catalog_repos": total_repos,
+            "sovereign_pillars": pillars,
+            "navigation_hint": "Call get_repo_progressive_index(domain='shopify'|'media'|'core') for detailed Level 1 slice.",
+        }
+
+    d_norm = domain.lower().strip()
+    # Support aliases
+    if d_norm in ("ecom", "store", "storefront", "liquid"):
+        d_norm = "shopify"
+    elif d_norm in ("video", "audio", "remotion"):
+        d_norm = "media"
+    elif d_norm in ("kernel", "agent", "agents", "swarm", "infra"):
+        d_norm = "core"
+
+    if d_norm not in PROGRESSIVE_SOVEREIGN_DOMAINS:
+        return {
+            "error": f"Unknown domain '{domain}'. Valid domains: 'shopify', 'media', 'core'",
+            "valid_domains": list(PROGRESSIVE_SOVEREIGN_DOMAINS.keys()),
+        }
+
+    d_meta = PROGRESSIVE_SOVEREIGN_DOMAINS[d_norm]
+    placeholders = ",".join("?" for _ in d_meta["categories"])
+    cursor.execute(
+        f"""
+        SELECT name, title, maturity_tier, category, what_it_gives, tech_stack
+        FROM repositories
+        WHERE category IN ({placeholders}) AND maturity_tier LIKE 'Tier 1%'
+        ORDER BY name ASC
+        LIMIT 10
+        """,
+        d_meta["categories"],
+    )
+    tier1_repos = [
+        {
+            "name": r["name"],
+            "title": r["title"] or r["name"],
+            "tier": r["maturity_tier"],
+            "what_it_gives": (r["what_it_gives"] or "")[:120],
+        }
+        for r in cursor.fetchall()
+    ]
+
+    cursor.execute(
+        f"SELECT count(*) FROM repositories WHERE category IN ({placeholders})",
+        d_meta["categories"],
+    )
+    total_in_domain = cursor.fetchone()[0]
+
+    return {
+        "level": f"L1_Domain_Slice_{d_norm}",
+        "domain": d_norm,
+        "title": d_meta["title"],
+        "workhorse": d_meta["workhorse"],
+        "total_repositories": total_in_domain,
+        "golden_core_blueprints": tier1_repos,
+        "search_hint": f"Use search_repo_catalog(query='...', domain='{d_norm}') for targeted FTS5 lookups.",
+    }
+

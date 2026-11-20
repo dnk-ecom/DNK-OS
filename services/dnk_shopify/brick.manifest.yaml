@@ -15,7 +15,7 @@ name: "Shopify Theme Blocks 2.0 & Molecular Engine"
 version: "1.0.0"
 mrh_id: "services/dnk_shopify/brick.manifest.yaml"
 category: "ecommerce_engine"
-description: "Sovereign Workhorse #1: Pure Python & Node Theme Blocks 2.0 operations, DNK Ecom flagship core (https://github.com/DNKShopify/DNK-e.com), 7-Gate Anti-Regression Theme Integrity, and CartMutationQueue."
+description: "Sovereign Workhorse #1: Pure Python & Node Theme Blocks 2.0 operations, DNK-Ecom-Zerno-v.0.1.0 flagship core (https://github.com/DNKShopify/DNK-e.com), 7-Gate Anti-Regression Theme Integrity, and CartMutationQueue."
 
 paths:
   - "services/dnk_shopify/contracts/**"
@@ -23,7 +23,7 @@ paths:
   - "services/dnk_shopify/cli.py"
   - "services/dnk_shopify/mcp_server.py"
   - "services/dnk_shopify/tests/**"
-  - "services/dnk_shopify/DNK_Ecom/**"
+  - "services/dnk_shopify/engine/**"
 
 entrypoints:
   in_ram_facade: "services.dnk_shopify.src.service"

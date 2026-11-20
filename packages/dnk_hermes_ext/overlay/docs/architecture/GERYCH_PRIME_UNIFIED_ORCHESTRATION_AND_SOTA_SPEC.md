@@ -1,24 +1,29 @@
 ---
-title: "Gerych Prime Unified Orchestration And Sota Spec"
-status: draft
-type: note
-domain: core
-author: "DNK-e.com Maksym"
-version: "1.0.0"
+title: "Gerych Prime Unified Orchestration And SOTA Spec"
+description: "Master architecture specification for Gerych Prime Unified Orchestration and SOTA assimilation."
+mrh_id: "packages/dnk_hermes_ext/overlay/docs/architecture/GERYCH_PRIME_UNIFIED_ORCHESTRATION_AND_SOTA_SPEC.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - gerych-prime
+  - orchestration
+  - sota
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "core/hermes_agent/docs/architecture/GERYCH_PRIME_UNIFIED_ORCHESTRATION_AND_SOTA_SPEC.md"
-> purpose: "Document: Gerych Prime Unified Orchestration And Sota Spec"
+> mrh_id: "packages/dnk_hermes_ext/overlay/docs/architecture/GERYCH_PRIME_UNIFIED_ORCHESTRATION_AND_SOTA_SPEC.md"
+> purpose: "Master architecture specification for Gerych Prime Unified Orchestration and SOTA assimilation."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Draft"
-> version: "1.0.0"
-> updated_at: "2026-09-24"
-> author: "DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

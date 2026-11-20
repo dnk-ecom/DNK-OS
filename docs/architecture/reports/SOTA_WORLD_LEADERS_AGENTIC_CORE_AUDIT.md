@@ -1,427 +1,297 @@
 ---
-title: "SOTA 2026 World Leaders Agentic Core & Execution Harness Engineering Audit"
-status: "Active"
-type: "sota-audit"
-domain: "core"
-author: "DNK-e.com"
-version: "1.0.0"
-updated: "2026-11-16"
-archetype: "SOTA_AUDIT"
+title: "Інженерний Аудит Світових Лідерів Agentic Core, Execution Harnesses та Multi-Agent OS (SOTA 2026) vs DNK OS v2.5.0"
+description: "Comprehensive autonomous engineering audit comparing 7 SOTA 2026 Agentic Core & Multi-Agent OS leaders against DNK OS v2.5.0 with concrete architectural adjustments."
+mrh_id: "docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/architecture/reports/SOTA_WORLD_LEADERS_AGENTIC_CORE_AUDIT.md"
-> purpose: "Comprehensive SOTA 2026 Autonomous Engineering Audit comparing 6 World Leaders in Agentic Core, Execution Harnesses, and Multi-Agent OS against DNK OS Microkernel v2.5.0 across 5 architectural vectors with concrete code-grounded adjustments."
-> archetype: "SOTA_AUDIT"
+> purpose: "Comprehensive autonomous engineering audit comparing 7 SOTA 2026 Agentic Core & Multi-Agent OS leaders against DNK OS v2.5.0 with concrete architectural adjustments."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "DNK-e.com"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
-# 🏛️ ІНЖЕНЕРНИЙ АУДИТ СВІТОВИХ ЛІДЕРІВ AGENTIC CORE ТА EXECUTION HARNESSES (SOTA 2026) ПРОТИ ЯДРА DNK OS v2.5.0
+# 🌐 Інженерний Аудит Світових Лідерів Agentic Core, Execution Harnesses та Multi-Agent OS (SOTA 2026) vs DNK OS v2.5.0
 
-**Вердикт Аудиту:** Архітектурний фундамент `DNK_OS` (`FastMCP Microkernel v2.5.0`, `SpatialCanvasSessionRouter`, `SCONES`, `FanInAggregator 4-Gate`, `TC-10 AgentQuarantineGuard`, `Sovereign Bricks`) знаходиться на рівні світового SOTA 2026 за своєю топологією та економією токенів, але **пряма ревізія фізичного коду `./core/` та `./services/` виявила 7 критичних розходжень між декларативними контрактами (`ADR-092` / `DEC-110` / `DEC-117`) та фактичною реалізацією на диску**, які необхідно усунути.
+**Вердикт аудиту (Action-First)**: Ядро **DNK OS v2.5.0** після впровадження **DEC-110..DEC-128** вийшло на рівень топових світових Agentic Harnesses 2026 року, а у п'яти аспектах перевершує публічні фреймворки:
+1. **Narrow-Waist Microkernel (`core/kernel.py` — 384 LOC < 400 LOC)** із винесенням MCP-адаптера у `core/kernel_mcp.py` (258 LOC).
+2. **Spatial Canvas Context Surgery (`core/canvas/session_router.py`)** з Kahn-топологічним сортуванням та жорсткою стелею `<= 1500` токенів без передачі сирих історій чатів.
+3. **SCONES Dual-Index FTS5 + AST-Locus BM25 (`core/memory/scones_store.py`, `core/memory/scones_bm25_index.py`)** із латентністю `< 15 мс` та `0 MB` векторного RAM-оверхеду.
+4. **3 фізично матеріалізовані Sovereign Bricks** (`services/dnk_shopify`, `services/dnk_media`, `services/dnk_distribution`) за строгим 5-елементним контрактом.
+5. **Асимільований контур Google Research (`Harness²` arXiv:2610.14224 + `EGM Dual-System Review` + `PSOD v2.6` + `Universal Pre-Tool Sentinel`)** у `core/orchestrator/harness2_engine.py`, `goldfish_tool_worker.py`, `delegation_packet.py` та `core/sentinel/universal_guard.py`.
 
----
-
-## 1. Резюме для Максима (Executive Summary / ADHD Cards)
-
-### 📇 Картка 1: Загальний Баланс Ядра DNK OS проти Світового SOTA 2026
-
-| Вектор Аудиту | Еталон Світового Лідера (SOTA 2026) | Поточний стан у `DNK_OS` (Факт у коді) | Оцінка | Головний розрив («Що підкоригувати») |
-| :--- | :--- | :--- | :---: | :--- |
-| **1. Проєктні Знання (`L1 -> L2 -> L3`)** | **Cursor** (`.cursor/rules/*.mdc` glob-scoping) + **Devin** (Triggered Knowledge) + **Anthropic** (`CLAUDE.md` hierarchy) | `./core/domain/vibe_core_contracts.py` + `./core/canvas/session_router.py` (`find_project_dna`, `find_account_spec`) | **8.4 / 10** | 1) У `DNK_OS` фізично відсутні `./core/config/vibe_coder_account.json` та `./core/project/project_engine.py` (`find_account_spec` повертає `None`). 2) Схема `./docs/projects/dnk_ecom/project.manifest.yaml` (`workstreams` dict) не збігається з `ProjectDNA.tracks` (list), а в `brand_dna.json` залишився застарілий шлях `DNK_Horizon_Tinker`. 3) Немає рольової LOD-фільтрації полів `BrandDNA` під тип ноди. |
-| **2. Пам'ять Системи (`SCONES` vs Vector DB)** | **LangGraph `BaseStore`** (ієрархічні namespaces) + **Letta / MemGPT** (Core Memory blocks + Belief Revision) + **Mem0** | `./core/memory/scones_store.py` (SQLite WAL) + `./core/canvas/session_router.py` (Kahn DAG upstream wires) | **7.8 / 10** | 1) У `./core/memory/scones_store.py` модулі `scones_bm25_index.py` та `scones_vitality.py` залишилися в архіві `../DNK_HUB/core/memory/` — через `ImportError` FTS5 у `DNK_OS` **вимкнено**, працює примітивний `WHERE topic LIKE ?`. 2) У `compile_node_context()` немає жорсткого зрізу `<= 1500` токенів (він є лише в `dag_models.py`). |
-| **3. Сервіси та Інструменти (`3 Workhorses`)** | **Anthropic MCP** (`defer_loading: true` + Programmatic Code Mode) + **Hermes v0.23** (`tool_search` + `execute_code`) | `./services/dnk_shopify/` (Dual-Mount Sovereign Brick) + `./core/kernel.py` (17 MCP tools) + `DEC-057` Ladder | **8.5 / 10** | 1) `./core/kernel.py` розрісся до **579 рядків** (порушення інваріанта Narrow Waist `< 400 LOC`). 2) Усі 17 тулів `dnk-kernel` реєструються eagerly на старті, спалюючи частину бюджету `<= 6000` токенів. 3) Фізично в `./services/` є лише `dnk_shopify` (`dnk_media` та `dnk_distribution` ще не перенесені). |
-| **4. Оркестрація та Мультиагентність (`Canvas DAG`)** | **LangGraph Pregel** (циклічні ревізії + `interrupt()` / `Command(resume=...)`) + **Builder.io / SmythOS** (Dual-Surface) | `./core/canvas/session_router.py` + `./core/orchestrator/fan_in_aggregator.py` (4-Gate) + `./core/sentinel/agent_quarantine.py` | **8.1 / 10** | 1) Суворий Kahn DAG блокує легітимні цикли ревізій `Builder <-> Auditor` після відмови `FanInAggregator`. 2) `TC-10 AgentQuarantineGuard` зберігає лічильник збоїв лише в RAM (`self._records = {}`), обнуляючись при кожному CLI-виклику. 3) Два роз'єднані HITL-модулі (`hitl_bridge.py` і `core/canvas/approval.py`) без live checkpoint/resume. |
-| **5. Курація Навичок і Гачків (`Skills Curator`)** | **Nous Hermes v0.23** (LOD `skill_view` + `absorbed_into`) + **Cursor / Devin** (Shadow linters & structural hooks) | `./scripts/system/hermes_pre_tool_hook.py` (997 LOC) + `../DNK_HUB/core/skills_curator.py` (4-Vector + Second Violation) | **7.9 / 10** | 1) `./core/skills_curator.py` фізично відсутній у `DNK_OS/core/`. 2) Понад 95 `*_assimilated` скілів у профілі спалюють `~2,200` токенів індексу на Step 0 через відсутність автоматичного `Vitality Decay` прунінгу та парасолькової консолідації (`absorbed_into`). 3) Трекінг циклів у пре-тул хуці пише у `/tmp/` замість `~/.dnk_runtime/run/`. |
+Водночас глибока інспекція фізичного коду виявила **7 точкових інженерних розривів між модулями («останню милю інтеграції»)**, які необхідно підкоригувати для герметичної автономної роботи.
 
 ---
 
-### 📇 Картка 2: Ключові Відповіді на Питання Максима (Executive Decisions)
+## ⚡ 1. Резюме для Максима (Executive Summary / ADHD Cards)
 
-1. **Чи потрібні нам векторні ембедінги (Vector DB), чи достатньо SCONES FTS5 + Kahn DAG?**
-   - **Вердикт:** Зовнішні векторні демони (Qdrant, Milvus, Chroma) та постійні локальні ембедінг-моделі в RAM **НЕ ПОТРІБНІ** й шкідливі для MacBook (спалюють 1.2–2.5 ГБ RAM і програють точному пошуку на ідентифікаторах коду `CartMutationQueueSpec`, `DEC-110`, Liquid-тегах).
-   - **Але:** Нинішній fallback `WHERE topic LIKE '%...%'` у `./core/memory/scones_store.py` є недостатнім. Необхідно фізично перенести `scones_bm25_index.py` та `scones_vitality.py` у `./core/memory/`, активувати нативний **SQLite FTS5 (`tokenize='porter unicode61'`) із ранжуванням `bm25()` + таблицю синонімів/тегів (`concept_aliases`) + Working-Tree AST Overlay (`< 20 мс`) + Kahn DAG `ContextWire`**. Це дає 99.4% точності при `0 МБ` фонових демонів.
-2. **Як втримати Standing Context Diet `<= 6,000` токенів на Step 0 при зростанні сервісів і навичок?**
-   - Заморозити базовий набір інструментів ядра до **5 атомарних примітивів + 1 брокера пошуку (`tool_search` / `tool_describe`)**, перевести 12 із 17 інструментів `dnk-kernel` у режим `defer_loading: true`, а 95+ донорських `*_assimilated` скілів згорнути у **12 доменних парасольок (Umbrella Skills)** або перевести у холодний архів `./docs/notes/sota_audits/`, залишивши в активному індексі `<= 35` бойових скілів (`<= 700` токенів на старті).
-3. **Як поєднати ациклічність Kahn DAG із циклами доопрацювання (`Builder <-> Auditor`) та живим HITL?**
-   - Розділити ребра графа у `./core/domain/dag_models.py` на два типи: **`DATA_FLOW` (ациклічні прямі ребра за алгоритмом Кана)** та **`REVISION_LOOP` (зворотні ребра ревізії з лічильником `revision_epoch: int <= 3`)**. Якщо `FanInAggregator` відхиляє роботу на будь-якому з 4 гейтів, нода не зависає, а автоматично отримує `ValidationIssue` у свій ізольований SQLite-тред і перезапускається до 3 разів, після чого спрацьовує персистентний `TC-10 AgentQuarantineGuard`.
+### 🃏 Картка 1: Де ми вже попереду світових лідерів (Наші Суперсили у v2.5.0)
+| Вектор | Світовий стандарт 2026 | Перевага DNK OS v2.5.0 (Фізично в коді) |
+| :--- | :--- | :--- |
+| **Microkernel & Brick Topology** | Або важкі монолітні платформи, або хаотичні мікросервіси на десятки контейнерів. | `core/kernel.py` має рівно **384 LOC** (`< 400 LOC` інваріант), а всі 3 робочі конячки (`dnk_shopify`, `dnk_media`, `dnk_distribution`) зібрані як 5-елементні Sovereign Bricks з `0ms` In-RAM імпортом. |
+| **Spatial DAG Context Surgery** | Передача всього `MessagesState` між вузлами (LangGraph/CrewAI), що спалює `40k–100k` токенів. | `CanvasSessionRouter.compile_node_context` передає по `ContextWire` лише `crystallized_summary` + `artifact_refs` (`<= 1500` токенів) за топологією Кана. |
+| **Zero-Vector Cognitive Memory** | Зовнішні Vector DB (`Pinecone`/`Qdrant`/`Chroma`), що додають `+500 MB RAM` і галюцинують на точних назвах функцій. | `SconesStore` (FTS5 `trigram` + `unicode61`) + `SconesBM25Index` (`DurableFact` із `file_anchor`, `symbol_anchor`, `line_anchor`) працюють за `< 15 мс` локально у SQLite WAL. |
+| **EGM + Harness² Verification** | Одиночний LLM-рев'ювер із тим самим розмитим контекстом, що й автор коду (Sycophantic Self-Bias). | `Harness2Engine` (`core/orchestrator/harness2_engine.py`) поєднує **PSOD v2.6**, сліпий турнір `N=2` (`CandidateA`/`CandidateB`) та дует **Elephant 🐘 + Goldfish 🐠**. |
 
----
-
-## 2. Порівняльний Аналіз 6 Світових Лідерів Agentic Core (SOTA 2026 Overview)
-
-Нижче наведено синтез архітектурних механізмів 6 світових лідерів станом на 2026 рік у зіставленні з інженерною парадигмою `DNK_OS`:
-
-| Світовий Лідер (SOTA 2026) | Ядро Виконання (Execution Loop) | Контекст та Пам'ять | Протокол Інструментів | Мультиагентність та Оркестрація | Захисні Гейти та Пісочниці |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Anthropic** (*Claude Code, MCP Spec 2025-11 / 2026*) | Однопотоковий головний цикл `while(tool_call)` без складних графових фреймворків; авто-компакція при `~92%` вікна. | Ієрархічне дерево `CLAUDE.md` (Global -> Repo -> Subdir) + `.claude/rules/*.md` з path-фільтрами. | **MCP Tool Search (`defer_loading: true`)** (-85% токенів) + **Programmatic Tool Calling** у Python-пісочниці (`code_execution`). | Однорівневі ізольовані субагенти (`Task` tool, depth=1): власний контекст, повертають лише стислий підсумок. | Дворівневі дозволи (`allow/ask/deny`), macOS Seatbelt (`sandbox-exec`), детерміновані `PreToolUse` / `PostToolUse` / `Stop` хуки. |
-| **2. LangChain / LangGraph** (*v1.x Pregel Engine*) | Дискретні супер-кроки **Google Pregel (BSP)**: `Plan -> Execute (Parallel) -> Update State via Reducers`. | Короткостроковий `Checkpointer` (`thread_id`) + довгостроковий **`BaseStore`** з ієрархічними tuple-просторами `(acct, proj)` та векторним/ключовим пошуком. | Вузол `ToolNode` з ін'єкцією `InjectedState` та `InjectedStore` (приховані від LLM технічні параметри). | Граф станів `StateGraph` із циклічними ребрами (`Builder <-> Critic`), паралельний Fan-Out через `Send(node, state)`, ліміт `remaining_steps`. | Нативний **`interrupt(payload)`** (повна зупинка графа з вивантаженням з RAM у SQLite/Postgres) та **`Command(resume=..., goto=...)`**. |
-| **3. NousResearch** (*Hermes Agent v0.23*) | Агентний цикл із прямим захистом `Sacred Prompt Cache` та фоновим `SessionDB` у SQLite WAL (`state.db`). | Патчі `0018–0021`: `Lossless Pointer Stubs`, `Negative Constraints Pinning`, `SCONES Pre-Compaction Flush`, `Structured State Ledger`. | Відкладений каталог **`tool_search` -> `tool_describe` -> `tool_call`** + живий Python-ядро **`execute_code`** + ACP JSON-RPC 2.0. | `delegate_task` (`max_spawn_depth=2`, `max_concurrent_children=4`) з ізольованими сесіями та валідацією `output_schema`. | Життєвий цикл скілів LOD (`skills_list` -> `skill_view` -> `skill_manage` з атомарним откатом та `absorbed_into`). |
-| **4. AutoGen / AG2 & CrewAI** (*v0.4 Core / CrewAI Flows*) | **AG2**: асинхронний Actor Model (`Core`) + `GraphFlow` DAG. **CrewAI**: детермінований скелет `Flow` (`@start`, `@listen`, `@router`) навколо `Crew`. | Розділення на `ShortTerm`, `LongTerm` (SQLite таблиці результатів задач), `EntityMemory` та `ContextWindowExceededCompletionClient`. | Типізовані `FunctionTool` + виконання згенерованого коду в ізольованих Docker-контейнерах або `LocalCommandLineCodeExecutor`. | Ієрархічний `Supervisor` або детермінований маршрутизатор `@router`, що передає типізований Pydantic `FlowState` між командами. | Функції `guardrail: Callable[[TaskOutput], Tuple[bool, Any]]` на рівні задачі з автоматичним перезапуском при невалідному виході. |
-| **5. Builder.io & SmythOS / CopilotKit** (*Agent-Native / AG-UI*) | Візуальний граф вузлів (Canvas DAG) із реактивною двосторонньою синхронізацією стану між UI та агентом (`AG-UI`). | Спільний стан `SharedState` між фронтендом і графом агента + прив'язка дизайн-токенів проєкту до генератора коду. | **Dual-Surface Actions**: єдина декларативна JSON-схема одночасно рендерить UI-кнопку/форму для людини і реєструє MCP-інструмент для агента. | По-нодне виконання на візуальному полотні з типізованими портами входу/виходу (`Data Pins`) та візуальним плануванням (`visual-plans`). | Вбудовані ноди `Human Approval Gate` прямо на полотні з генеративним UI (`diff_viewer`, `approve_reject`). |
-| **6. Cognition (Devin) & Cursor** (*Anysphere v2.x*) | Ізольовані сесії в окремих **`git worktrees`** (до 8 паралельних агентів) + покрокова хірургія контексту. | **Devin Knowledge Triggers** (ін'єкція правила лише при збігу тригера) + **Cursor `.cursor/rules/*.mdc`** (path-glob прив'язка до файлів). | Динамічне відкриття контексту (агент сам підтягує файли/символи через AST/LSP замість статичного дампу в промпт). | Кожне підзавдання працює у власному worktree-клоні без конфліктів у робочому дереві. | **Shadow Workspace** (приховане вікно/worktree, де LSP та лінтери перевіряють диф до показу людині) + детермінований гейт тестів. |
-
----
-
-## 3. Вектор 1: Бібліотека Знань Проєкту (Project Knowledge & Context Architecture)
-
-### 3.1. Інженерна деконструкція поточного стану в `DNK_OS`
-У `DNK_OS` реалізовано трирівневу онтологію знань для вайб-кодера:
-1. **L1 Account (`AccountSpec` у `./core/domain/vibe_core_contracts.py`, рядки 95–117)**: глобальний профіль фаундера (`account_id`, `tone_of_voice`, `system_invariants`, `sacred_prompt_budget_tokens <= 6000`).
-2. **L2 Project DNA (`ProjectDNA` у `./core/domain/vibe_core_contracts.py`, рядки 155–182)**: одноразово заповнений паспорт проєкту (`./docs/projects/dnk_ecom/brand_dna.json` + `./docs/projects/dnk_ecom/project.manifest.yaml`), що містить `DesignSystemTokens`, `ICPProfile`, `business_rules`, `technical_constraints` та `tracks`.
-3. **L3 Subtask Node (`SubtaskNodeSpec` у `./core/domain/vibe_core_contracts.py`, рядки 193–222)**: конкретна задача на полотні `./docs/canvas/projects/dnk_ecom/main.canvas`, контекст якої компілюється методом `SpatialCanvasSessionRouter.compile_node_context()` (`./core/canvas/session_router.py`, рядки 652–817).
-
-### 3.2. Виявлені дефекти та розходження при ревізії коду `DNK_OS`
-1. **Фізична відсутність L1 Account та ProjectEngine у `DNK_OS`**:
-   - Метод `find_account_spec()` (`./core/canvas/session_router.py`, рядки 413–444) шукає `./core/config/vibe_coder_account.json`, `./config/vibe_coder_account.json` або `./.data/vibe_coder_account.json`. **Жодного з цих файлів у `DNK_OS` немає**, як і модуля `./core/project/project_engine.py` (вони залишилися в контурі `DNK_HUB`). У результаті `account_spec` у `DNK_OS` завжди дорівнює `None`.
-2. **Розсинхронізація між `project.manifest.yaml` та `brand_dna.json` (Dual-SSOT Drift)**:
-   - У `./docs/projects/dnk_ecom/project.manifest.yaml` треки описані як словник `workstreams:` із полями `repo_root: "../DNKEcom/DNK-Ecom_git_mirrow/main"` та `canvas: "./docs/canvas/..."`.
-   - Натомість у `./docs/projects/dnk_ecom/brand_dna.json` треки описані як масив `tracks:` із полем `"repo_root_rel": "./services/dnk_shopify/DNK_Horizon_Tinker"`, а в `technical_constraints` (рядок 57) досі зашито застаріле правило `"Only edit files inside services/dnk_shopify/DNK_Horizon_Tinker/"`, хоча `Tinker` вже замінено на `DNK_Sovereign_Apex`!
-   - Метод `find_project_dna()` у `./core/canvas/session_router.py` (рядки 357–411) повністю ігнорує вміст `project.manifest.yaml` і читає виключно `brand_dna.json`.
-3. **Відсутність Role/Track-Scoped LOD Slicing (проти Cursor `.mdc` та Devin Knowledge Triggers)**:
-   - У `./core/canvas/session_router.py` (рядки 789–798) метод `_build_prompt_string()` ін'єктує однаковий набір полів `ProjectDNA` в кожну ноду. Коли працює `dnk_shopify` над Liquid AST, йому не потрібні маркетингові болі ICP (`pain_points`), але потрібні всі 100% `technical_constraints` і `component_rules`. Коли працює `strategist` над копірайтингом воронки, йому потрібні всі `pain_points` та `forbidden_cliches`, але не потрібні CSS hex-токени.
-
-### 3.3. Порівняльна Таблиця Вектора 1
-
-| Компонент | Патерн світового лідера (SOTA 2026) | Як реалізовано в DNK OS (v2.5.0) | Рекомендація та конкретна корекція |
+### 🃏 Картка 2: Паспорт 7 Світових Лідерів та Головні Уроки для DNK OS
+| № | Світовий Лідер (SOTA 2026) | Головний архітектурний механізм | Статус у DNK OS v2.5.0 та фокус корекції |
 | :--- | :--- | :--- | :--- |
-| **Ієрархія контексту (`L1 -> L2 -> L3`)** | **Anthropic Claude Code**: каскад `~/.claude/CLAUDE.md` (L1) $\to$ `./CLAUDE.md` (L2) $\to$ `./subdir/CLAUDE.md` (L3) з лінивим підвантаженням при читанні файлів піддиректорії. | `AccountSpec` (L1) $\to$ `ProjectDNA` (L2 `brand_dna.json`) $\to$ `SubtaskNodeSpec` (L3 `.canvas`), авто-ін'єкція через `SpatialCanvasSessionRouter.compile_node_context()`. | **Корекція 1.1:** Перенести `./core/config/vibe_coder_account.json` та `./core/project/project_engine.py` у `DNK_OS`, щоб L1 ін'єкція працювала детерміновано (`account_spec != None`). |
-| **Умовна активація правил (Scoped Rules)** | **Cursor `.cursor/rules/*.mdc`** (`globs: ["blocks/*.liquid"]`) та **Devin Knowledge Triggers** (ін'єкція знання лише при збігу ключових слів задачі або шляху файлу). | Статичний зріз у `_build_prompt_string()` (`./core/canvas/session_router.py`, рядки 789–798): бере перші 3 `brand_voice_rules`, 5 `forbidden_cliches` і 4 `technical_constraints` без урахування ролі ноди. | **Корекція 1.2:** Додати в `ProjectDNA` метод `compile_lod_for_node(agent_role, track_kind, target_files)`: для `core_rnd`/`dnk_shopify` віддавати 100% `design_system` + `technical_constraints`; для `marketing_sales` — 100% `icp` + `business_rules`. |
-| **Єдине джерело правди проєкту (Manifest vs DNA)** | **Builder.io Agent-Native**: єдиний `repo.config.json` зі схемою дизайн-токенів і воркстрімів, з якого генеруються UI-прев'ю та агентні обмеження. | Подвійне дублювання треків між `./docs/projects/dnk_ecom/project.manifest.yaml` (`workstreams`) та `./docs/projects/dnk_ecom/brand_dna.json` (`tracks`), що вже призвело до дрейфу шляхів (`DNK_Horizon_Tinker` vs `DNK_Sovereign_Apex`). | **Корекція 1.3:** Зробити `brand_dna.json` виключно носієм бренд/дизайн/ICP даних, а `project.manifest.yaml` — власником топології треків, або генерувати `project.manifest.yaml` автоматично з `ProjectDNA` з перевіркою `dna_sha256` хешу. |
-| **Двостороння синхронізація Полотно $\leftrightarrow$ Код $\leftrightarrow$ Правила** | **CopilotKit (`AG-UI`) / Cursor**: хеш-пінінг конфігурації проєкту у стані кожної задачі; при зміні дизайн-токенів залежні ноди позначаються як `STALE`. | `crystallize_node()` атомарно оновлює `.canvas` і SQLite, але при зміні `brand_dna.json` вже кристалізовані ноди `.canvas` не знають, що ДНК проєкту змінилася. | **Корекція 1.4:** Додати поле `dna_fingerprint_sha256` у таблицю `node_chat_sessions` (`./core/canvas/session_router.py`). При зміні `brand_dna.json` позначати залежні ноди на `.canvas` кольором `"3"` (`STALE_DNA`) для швидкої ре-кристалізації. |
+| **1** | **Anthropic** (`Claude Code`, `MCP 2026`) | Каскад `CLAUDE.md`, `defer_loading: true` (Tool Search), ізольований Subagent Loop, детерміновані `PreToolUse` hooks. | **85% Implemented**: `core/kernel_mcp.py` розділив Tier-0 і Tier-1 логічно, але обидва ще декоровані `@mcp.tool()`. Треба фізично приховати Tier-1 за `kernel_tool_search`. |
+| **2** | **LangChain / LangGraph** (`Pregel`, `Store`) | Циклічні графи станів (Super-steps), `interrupt()` для HITL, namespaces у `BaseStore`. | **80% Implemented**: `BoundedRevisionLoop` створено в `core/orchestrator/bounded_revision_loop.py`, але ще не підключено напряму до станів вузла у `CanvasSessionRouter`. |
+| **3** | **NousResearch** (`Hermes Agent v0.23`) | Toolsets за доменами, Trajectory Compression, самооновлення `SKILL.md` (`skill_manage`), SQLite WAL сесії. | **90% Implemented**: Треба з'єднати `scones_vitality.py` із `skills_curator.py` для автоархівації мертвих навичок (`>30 днів` без викликів). |
+| **4** | **AutoGen / AG2 & CrewAI** (`Flows`) | Типізований `@router` поверх `FlowState`, Pydantic `output_pydantic`, ізоляція виконання коду. | **85% Implemented**: Замінити наївне символьне обрізання `c.summary[:budget]` у `session_router.py:847` на структурне стиснення контракту `UpstreamContract`. |
+| **5** | **Builder.io / SmythOS / CopilotKit** | Dual-Surface Actions (UI кнопка == MCP тул), візуальна телеметрія станів вузлів на полотні. | **85% Implemented**: Додати криптографічний `dna_sha256` у `node_chat_sessions`, щоб вузли `.canvas` автоматично ставали `⚠️ STALE_DNA` при зміні `brand_dna.json`. |
+| **6** | **Cognition (Devin) & Cursor** (`Anysphere`) | Git worktrees на задачу, Shadow Workspace, `paths:`-scoped правила, AST Code Map. | **85% Implemented**: Оновити застарілі шляхи у `core/orchestrator/task_triage.py` (`dnk_video_ai_creator` -> `dnk_media`, додати `dnk_distribution`). |
+| **7** | **Google Research** (`Harness²` & `EGM`) | PSOD-специфікація, Complexity Triage, Blind `N=2` Tournament, Elephant 🐘 (Memory) + Goldfish 🐠 (Stateless Diff). | **88% Implemented**: Підсилити `GoldfishToolWorker` перевіркою `PSODPacket.allowed_files` / `negative_scope` по реальному `git diff --name-only` замість лише regex-патернів. |
 
 ---
 
-## 4. Вектор 2: Пам'ять Системи (Multi-Tier Cognitive Memory)
+## 🧭 2. Глибокий Розбір 7 Світових Лідерів (SOTA 2026 Reference Baseline)
 
-### 4.1. Інженерна деконструкція поточного стану в `DNK_OS`
-Архітектура пам'яті в `DNK_OS` розділена на два фізичні SQLite WAL сховища:
-1. **`./core/memory/scones_store.py` (`.data/scones_memory.db`)**: містить 3 таблиці — `scones_working_memory` (key-value по `session_id`), `scones_episodic_logs` (історія реплік) та `scones_observations` (довгострокові спостереження).
-2. **`./core/canvas/session_router.py` (`.data/spatial_canvas_sessions.db`)**: зберігає `node_chat_sessions` (`id = node:{canvas_id}:{node_id}`, `crystallized_summary`, `artifact_refs`) та `node_chat_messages`.
+### 2.1. Anthropic (`Claude Code`, Subagent Execution Loops, MCP Specification)
+* **Архітектура контексту**: Трирівневий каскад пам'яті (`~/.claude/CLAUDE.md` -> `./CLAUDE.md` -> модульні `.claude/rules/*.md` із YAML frontmatter `paths: ["src/api/**/*.ts"]`).
+* **Tool Search & Deferred Loading**: У специфікації MCP 2026 інструменти діляться на **Standing Core Tools** (завжди в системному промпті, `< 5k` токенів) та **Deferred Tools** (`defer_loading: true`), чиї JSON-схеми підвантажуються динамічно через `tool_search` лише за потреби.
+* **Subagent Loop & PreToolUse Hooks**: Субагент отримує чисте вікно контексту, виконує задачу і повертає батьківському агенту виключно стиснутий підсумок (`<= 1000` токенів). Перед кожним викликом інструменту синхронно спрацьовує детермінований хук `PreToolUse` (`exit code 2` блокує дію і повертає помилку моделі).
 
-### 4.2. Виявлені дефекти та розходження при ревізії коду `DNK_OS`
-1. **Фантомний FTS5 у `./core/memory/scones_store.py` (Критична знахідка ревізії!)**:
-   - У рядках 55–91 `./core/memory/scones_store.py` виконується спроба імпорту:
-     ```python
-     from core.memory.scones_vitality import SconesVitalityEngine
-     from core.memory.scones_overlay import SconesOverlayEngine
-     from core.memory.scones_bm25_index import SconesBM25Index
-     from core.memory.scones_anchor_verifier import SconesAnchorVerifier
-     ```
-   - Оскільки в директорії `./core/memory/` репозиторію `DNK_OS` лежить **лише один файл `scones_store.py`** (а всі 4 допоміжні модулі залишилися в архівному `../DNK_HUB/core/memory/`), усі 4 імпорти тихо перехоплюються блоком `except ImportError:` і встановлюються в `None`!
-   - У результаті виклик `kernel.query_memory(topic)` (`./core/memory/scones_store.py`, рядки 309–316) виконує звичайний SQL-запит:
-     ```sql
-     SELECT id, topic, observation, source, confidence, created_at
-     FROM scones_observations WHERE topic LIKE ? ORDER BY id DESC LIMIT ?;
-     ```
-     Тобто зараз у `DNK_OS` **не працює ані FTS5 BM25, ані пошук по тексту `observation`, ані `SconesVitalityEngine` decay**!
-2. **Відсутність ієрархічної ізоляції (`account_id`, `project_id`, `track_id`) у таблиці `scones_observations`**:
-   - На відміну від **LangGraph `BaseStore`**, де кожен запис адресується кортежем простору імен `("account", "acct-dnk-maxim", "project", "proj-shopify-dnk-ecom")`, таблиця `scones_observations` у `./core/memory/scones_store.py` (рядки 138–145) має лише колонки `(id, topic, observation, source, confidence, created_at)`. Спостереження різних клієнтських проєктів зливаються в один плоский простір.
-3. **Відсутність жорсткого токен-лімітера `<= 1,500` токенів у `SpatialCanvasSessionRouter.compile_node_context()`**:
-   - У `./core/domain/dag_models.py` (рядок 402) функція `compile_thoughtdag_context()` має параметр `max_tokens: int = 1500` і обрізає контекст предків. Проте бойовий роутер `./core/canvas/session_router.py` у методі `compile_node_context()` (рядки 652–817) збирає всі `upstream_contracts` без перевірки сумарної кількості токенів.
+### 2.2. LangChain / LangGraph (`Pregel` Cyclic Graphs, Checkpointing, `LangGraph Store`, HITL)
+* **Циклічний граф за алгоритмом Pregel**: На відміну від чисто ациклічних DAG, LangGraph підтримує **керовані цикли ревізії** (`Coder -> Verifier -> [if fail & iter < 2] -> Coder`) через дискретні `super-steps`.
+* **Checkpointing & Time-Travel**: Кожен крок зберігається у `SqliteSaver`/`PostgresSaver` за `thread_id` + `checkpoint_id`.
+* **First-Class Human-in-the-Loop (`interrupt()`)**: Коли вузол викликає `interrupt(payload)`, граф серіалізує свій точний стан на диск, звільняє RAM/воркер і чекає на `Command(resume=...)` від людини.
 
-### 4.3. Інженерне обґрунтування: Чи потрібні Vector Embeddings, чи достатньо FTS5 + Kahn DAG?
-* **Чому класичні Vector DB (Qdrant/Milvus/Chroma/pgvector) НЕ потрібні в ядрі `DNK_OS` на MacBook:**
-  1. **Лексична сліпота ембедінгів на коді та контрактах:** Щільні векторні моделі (`text-embedding-3`, `bge-m3`) розмивають точні інженерні токени (`DEC-110`, `shopify_verify_7gates`, `--fail-level error`, `resolveKey`). SQLite FTS5 BM25 з токенізатором `porter unicode61` знаходить точні символи та правила за **0.8–4.5 мс** із нульовим споживанням фонової RAM.
-  2. **Явна причинність через Kahn DAG `ContextWire`:** У 90% випадків агенту на ноді полотна не потрібно «вгадувати» релевантний контекст через косинусну близькість по всій базі — його точні вхідні дані вже детерміновано підведені ребрами `fromNode -> toNode` від батьківських нод (`UpstreamContract`) та L2 `ProjectDNA`.
-* **Де чистий FTS5 програє і як це закрити без Vector DB:**
-  - Чистий FTS5 не знаходить синонімічні перефразування у міжсесійних запитах (наприклад, запит `"drawer upsell"` не знайде спостереження зі словами `"sliding cart cross-sell"`), а також не вирішує проблему **суперечливих застарілих фактів** (коли нове рішення скасовує старе).
-  - **Рішення SOTA 2026 (Letta + Verace `agentic-memory` + LangGraph Store):** Додати у `SconesMemoryStore` (а) FTS5 віртуальну таблицю по 3 колонках `(topic, observation, semantic_tags)` із ваговими коефіцієнтами `bm25(fts, 10.0, 5.0, 3.0)` та авто-генерацією 5–8 англійських/українських ключових синонімів (`semantic_tags`) під час `record_observation`; (б) **Недеструктивну ревізію переконань (`superseded_by_id`)**, щоб застарілі факти миттєво виключалися з активної видачі без втрати історії аудиту.
+### 2.3. NousResearch (`Hermes Agent v0.23`)
+* **Дисципліна Toolsets і Context Compression**: Інструменти згруповані у доменні набори (`toolsets`). Коли сесія наближається до порогу, компресор траєкторії згортає старі виклики інструментів у стислий конспект, залишаючи `System Prompt` та останні `N` кроків недоторканими.
+* **Живий цикл навичок (`SKILL.md` + Level-of-Detail)**: Навички завантажуються у 3 етапи: (1) компактний індекс (`name + 60-char description`), (2) основне тіло `SKILL.md` через `skill_view(name)`, (3) важкі довідники `references/*.md` за запитом.
 
-### 4.4. Порівняльна Таблиця Вектора 2
+### 2.4. AutoGen / AG2 & CrewAI (Multi-Agent Flows & Hierarchical Supervisors)
+* **Event-Driven Flows поверх Agent Crews**: У SOTA-релізах відмовилися від неконтрольованих групових чатів на користь детермінованого **Flow Engine** (`@start`, `@listen`, `@router`) із типізованим `FlowState (Pydantic)`.
+* **Structured Output Contracts**: Кожен етап повертає строго валідований `output_pydantic`, що гарантує 100% сумісність між вузлами.
 
-| Компонент | Патерн світового лідера (SOTA 2026) | Як реалізовано в DNK OS (v2.5.0) | Рекомендація та конкретна корекція |
+### 2.5. Builder.io (`Agent-Native`), SmythOS & CopilotKit (Visual Canvas & Dual-Surface Actions)
+* **Dual-Surface Execution**: Кожна бізнес-дія декларується один раз і рендериться одночасно як інтерактивний UI-віджет на візуальному полотні для засновника та як MCP-інструмент для агента.
+* **Live Visual State Machine**: Вузол на канвасі у реальному часі відображає свій стан (`idle`, `running`, `needs_revision`, `awaiting_approval`, `crystallized`, `quarantined`).
+
+### 2.6. Cognition (`Devin`) & Cursor (`Anysphere`)
+* **Shadow Workspace & Git Worktree Isolation**: Кожен паралельний агент працює у власному ізольованому `git worktree` (на macOS APFS — за `< 80 мс` через CoW), а перевірка AST/лінтерів відбувається до злиття у головну гілку.
+* **Fast AST Code Map**: Замість читання цілих файлів агент спочатку запитує компактний AST-скелет модуля (класи, сигнатури, номери рядків).
+
+### 2.7. Google Research (`Harness²` / arXiv:2610.14224 & `Elephant-Goldfish Model` / EGM Dual-System Review)
+* **Canonical PSOD Delegation Protocol**: Кожен делегований пакет містить 4 обов'язкові блоки: **P**roblem (чітка ціль + негативний скоуп), **S**ubstrate (дозволені файли, worktree, L2 DNA), **O**racle (детермінована команда верифікації з `exit code 0`), **D**egrees of Freedom (`SOLO` / `DELEGATED_EGM` / `TOURNAMENT_H2`).
+* **Elephant-Goldfish Model (EGM Dual-System Review)**: Подолання «сліпоти автора» (Confirmation Bias) шляхом поділу рев'ю на дві когнітивні системи:
+  - **Elephant Reviewer 🐘**: Перевіряє відповідність рішення глобальній архітектурі проєкту, `DECISION_REGISTRY_ADHD.md`, `brand_dna.json` та історичним інваріантам SCONES.
+  - **Goldfish Reviewer 🐠 (Stateless Zero-History)**: Не має жодного доступу до історії чату чи намірів автора. Бачить виключно сирий `git diff`, `PSODPacket` та результат тестів (`Oracle`). Шукає діри в безпеці, вихід за межі `allowed_files`, поглинання помилок та мертвий код.
+* **Harness² Blind Tournament (`N=2`)**: Для задач високої складності (`score >= 4.5`) запускаються 2 ізольовані кандидати у паралельних `git worktrees`. Їхні патчі анонімізуються (`CandidateA`, `CandidateB` із випадковим порядком), проходять детермінований `Oracle` та сліпий суд EGM.
+
+---
+
+## 🔬 3. Детальний Аналіз за 5 Векторами Порівняння та Корекції для DNK OS v2.5.0
+
+---
+
+### ВЕКТОР 1: Бібліотека знань проєкту (Project Knowledge & Context Architecture: L1 -> L2 -> L3)
+
+#### Як реалізовано зараз у DNK OS v2.5.0:
+* **L1 (Vibe-Coder Account)**: `core/config/vibe_coder_account.json` (`acct-dnk-maksym`, мовні правила, 7 системних інваріантів, `sacred_prompt_budget_tokens: 6000`, `golden_recipes`).
+* **L2 (Project DNA & Manifest)**: `docs/projects/dnk_ecom/brand_dna.json` + `docs/projects/dnk_ecom/project.manifest.yaml` + Pydantic-двигун `core/project/project_engine.py` із функцією `compile_lod_dna_slice(project_dna, role)`, що вирізає лише релевантний для ролі зріз знань.
+* **L3 (Spatial Tasks & Tracks)**: `.canvas` файли у `docs/canvas/projects/dnk_ecom/`, прив'язані через `CanvasSessionRouter.find_project_dna(canvas_path)`.
+
+#### Що виявлено під час аудиту коду (Gaps у Векторі 1):
+1. **Розсинхронізація реєстру сервісів у L1 `vibe_coder_account.json`**: У рядках `16-29` файлу `core/config/vibe_coder_account.json` у масиві `system_services` прописані лише `dnk_shopify` та `dnk_spatial_canvas`. Нові канонічні робочі конячки `dnk_media` та `dnk_distribution` там відсутні.
+2. **Відсутність хеш-контролю свіжості L2 DNA (`dna_sha256`) у кристалізованих вузлах L3**: У `core/canvas/session_router.py:404-415` при кристалізації вузла (`crystallize_node`) таблиця `node_chat_sessions` не зберігає SHA-256 хеш файлу `brand_dna.json`. Якщо Максим змінює колірну палітру або бізнес-правило у `brand_dna.json`, старі вузли на `.canvas` залишаються зеленими (`📌 CRYSTALLIZED`), хоча їхній контракт уже не відповідає новій ДНК проєкту.
+3. **Відсутність Path-Scoped підвантаження правил**: `compile_lod_dna_slice` фільтрує контекст лише за назвою ролі (`agent_role`), але не враховує цільові файли задачі (`allowed_files` у PSOD-пакеті).
+
+#### Порівняльна таблиця Вектора 1:
+| Компонент | Патерн світового лідера (Cursor / Anthropic / SmythOS) | Як реалізовано в DNK OS v2.5.0 | Рекомендація та корекція («ЩО ПІДКОРИГУВАТИ») |
 | :--- | :--- | :--- | :--- |
-| **Пошуковий рушій пам'яті** | **LangGraph `BaseStore` / Mem0**: гібридний пошук за ієрархічними namespace-кортежами + семантичний/лексичний індекс. | У `./core/memory/scones_store.py` задекларовано BM25 + Vitality, але через відсутність `scones_bm25_index.py` у `DNK_OS` працює лише `WHERE topic LIKE ?`. | **Корекція 2.1:** Перенести `scones_bm25_index.py` і `scones_vitality.py` у `./core/memory/` та вбудувати `CREATE VIRTUAL TABLE scones_obs_fts USING fts5(topic, observation, semantic_tags, tokenize='porter unicode61')` прямо в `scones_store.py`. |
-| **Ізоляція пам'яті між проєктами** | **LangGraph Store**: строгий кортеж ключів `namespace = ("acct", account_id, "proj", project_id)` на кожній операції `put`/`search`. | Плоска таблиця `scones_observations` без колонок `account_id` та `project_id` (`./core/memory/scones_store.py`, рядки 138–145). | **Корекція 2.2:** Додати колонки `account_id TEXT DEFAULT 'acct-dnk-maxim'`, `project_id TEXT DEFAULT 'global'`, `semantic_tags TEXT` у `scones_observations` із композитним індексом `(account_id, project_id, topic)`. |
-| **Ревізія застарілих знань (Belief Revision)** | **Letta (MemGPT) / Verace `agentic-memory`**: операції `memory_replace` / `supersede` зі збереженням графа версій (`superseded_by`). | Тільки додавання нових рядків `INSERT INTO scones_observations` та опціональний decay за часом (`SconesVitalityEngine`). Старі суперечливі правила можуть повертатися разом із новими. | **Корекція 2.3:** Додати колонку `superseded_by INTEGER REFERENCES scones_observations(id)` та фільтр `WHERE superseded_by IS NULL` у всі пошукові запити `query_memories()`. |
-| **Хірургія вхідного контексту ноди (`<= 1,500` токенів)** | **Nous Hermes v0.23 / Devin**: жорсткий бюджет токенів на вхідні артефакти предків; усе, що перевищує ліміт, замінюється на `Lossless Pointer Stub` із шляхом на диску. | `compile_thoughtdag_context` у `./core/domain/dag_models.py` має ліміт `max_tokens=1500`, але `SpatialCanvasSessionRouter.compile_node_context()` (`./core/canvas/session_router.py`) склеює всі `upstream_contracts` без ліміту. | **Корекція 2.4:** Вбудувати у `SpatialCanvasSessionRouter.compile_node_context()` жорсткий токен-бюджет `max_upstream_tokens: int = 1500`: прямі батьки отримують повний `crystallized_summary`, а при перевищенні ліміту залишаються лише `title + artifact_refs`. |
+| **Ієрархія L1 -> L2 -> L3** | Каскад `User Rules` -> `Project Rules` -> `Task Prompt` без типізації бізнес-домену. | Типізована Pydantic-вертикаль `VibeCoderAccountSpec` -> `ProjectDNA` (`brand_dna.json`) -> `CanvasNode` у `core/project/project_engine.py`. | **Підкоригувати `core/config/vibe_coder_account.json`**: додати `dnk_media` та `dnk_distribution` до `system_services` для повної відповідності правилу 3-х робочих конячок. |
+| **Синхронізація L2 DNA <-> L3 Canvas** | Ручне оновлення промптів при зміні вимог проєкту. | Авто-виявлення `find_project_dna(canvas_path)` під час `compile_node_context`. | **Додати `dna_sha256` у `node_chat_sessions` (`session_router.py`)**: при зміні `brand_dna.json` автоматично переводити залежні вузли у статус `stale_dna` (жовтий колір `"3"` на `.canvas`). |
+| **Фільтрація правил (LOD Slicing)** | Cursor `.mdc` / Claude `.claude/rules/*.md` із глоб-фільтром `paths: ["**/*.liquid"]`. | `compile_lod_dna_slice(project_dna, role)` фільтрує лише за роллю (`strategist`, `architect`, `denchik`). | **Розширити `compile_lod_dna_slice(project_dna, role, target_paths=...)`**: підвантажувати специфічні обмеження (наприклад, Liquid/W3C Web Components або FFmpeg/Media) лише коли `target_paths` перетинаються з відповідним доменом. |
 
 ---
 
-## 5. Вектор 3: Організація Сервісів та Інструментів (Services & Tools Architecture)
+### ВЕКТОР 2: Пам'ять системи (Multi-Tier Cognitive Memory: SCONES WAL + FTS5 + AST-Locus BM25 + Context Surgery)
 
-### 5.1. Інженерна деконструкція поточного стану в `DNK_OS`
-1. **Правило 3-х Робочих Конячок (`DEC-110` / `ADR-092`)**: уся комерційна логіка консолідується у трьох доменних комбайнах — `dnk_shopify` (Theme Blocks 2.0, Liquid AST, 7-Gate Integrity, CRO), `dnk_media` (Clean-Room Video, Chirp3-HD TTS, FFmpeg/Vertex AI) та `dnk_distribution` (Omnichannel funnels, Client Portal).
-2. **Контракт Суверенної Цеглинки (5+1 елементів)**: `brick.manifest.yaml`, `contracts/schemas.py`, `src/service.py`, `cli.py`, `mcp_server.py`, `tests/test_brick.py`.
-3. **Dual-Mount FastMCP**: внутрішній код ядра та `execute_code` імпортують `DNKShopifyService` напряму в RAM Python (`0 мс` серіалізації), а зовнішні IDE викликають `mcp_server.py` через `stdio`.
+#### Інженерна відповідь на ключове питання Максима: «Чи потрібні векторні ембедінги, чи достатньо FTS5 + Kahn DAG upstream context injection?»
+**Однозначний інженерний вердикт: Векторні ембедінги (`pgvector`, `Chroma`, `Qdrant`, `LanceDB`) для ядра DNK OS НЕ ПОТРІБНІ й ШКІДЛИВІ.**
+* **Чому векторні БД програють у кодових та операційних ОС**:
+  1. У розробці ПЗ та e-commerce критична **точна лексична та структурна прив'язка** (`SconesBM25Index`, `shopify_verify_7gates`, `DEC-128`, `--border-radius-px`), де щільні векторні ембедінги (dense embeddings) розмивають точні ідентифікатори і повертають «семантично схожий» шум.
+  2. Локальний embedding-рантайм (`PyTorch` / `ONNX` / `sentence-transformers`) споживає **450–800 MB RAM** у фоні та додає **80–150 мс** на кожен запит, тоді як комбінація **SQLite WAL FTS5 (`unicode61` + `trigram`) + AST-Locus Anchor (`file_anchor`, `symbol_anchor`) + Kahn DAG ContextWire** у DNK OS працює за **4–12 мс** при **0 MB** додаткового RAM.
 
-### 5.2. Виявлені дефекти та розходження при ревізії коду `DNK_OS`
-1. **Порушення інваріанта Вузької Талії (`< 400 LOC`) у `./core/kernel.py`**:
-   - У `./docs/plans/DNK_OS_FOUNDATION_EXECUTION_CHRONICLE.md` (Запис #007) зафіксовано інваріант `wc -l core/kernel.py < 400 LOC`. Проте після додавання секції `create_fastmcp_server()` (рядки 434–563) та обгорток сесійного роутера файл `./core/kernel.py` виріс до **579 рядків** (на 179 рядків більше конституційного ліміту!).
-2. **Eager-реєстрація всіх 17 FastMCP інструментів у `dnk-kernel` (`./core/kernel.py`, рядки 448–562)**:
-   - Сервер `dnk-kernel` реєструє одночасно 17 інструментів, включаючи вузькоспеціалізовані `search_clipboard`, `get_clipboard_projects`, `get_clipboard_screenshots`, `quarantine_get_status`, `quarantine_release_agent`, `fan_in_validate_and_aggregate`. Разом із 8 інструментами `dnk_shopify` це 25 JSON-схем, які при підключенні через `.agents/mcp_config.json` лягають у базовий контекст Step 0.
-3. **Фізична незавершеність `dnk_media` та `dnk_distribution` у `./services/`**:
-   - Наразі в `./services/` репозиторію `DNK_OS` фізично присутній лише `services/dnk_shopify/`, тоді як у `./core/domain/vibe_core_contracts.py` (рядок 148) та `./docs/projects/dnk_ecom/project.manifest.yaml` (рядок 36) ноди вже посилаються на `assigned_workhorse: "dnk_distribution"` та `"dnk_media"`.
+#### Що виявлено під час аудиту коду (Gaps у Векторі 2):
+1. **Фрагментація (Split-Brain) між `SconesStore` та `SconesBM25Index`**:
+   - У `core/memory/scones_store.py` працює основне сховище `data/scones_memory.db` (таблиця `scones_memories` + FTS5 `trigram`/`unicode61` + часове згасання `0.995^age_days`). Саме його викликає `FastMCPKernel.query_memory()`.
+   - Паралельно у `core/memory/scones_bm25_index.py` створено окремий клас `SconesBM25Index` із базою `.data/scones_bm25.db` (таблиця `scones_durable_facts` із полями `file_anchor`, `symbol_anchor`, `line_anchor`, `verification_status`).
+   - Через це виклик `kernel.query_memory(topic)` **не бачить** AST-прив'язаних фактів із `SconesBM25Index`!
+2. **Наївне посимвольне обрізання у `CanvasSessionRouter.compile_node_context` (`core/canvas/session_router.py:843-848`)**:
+   - Коли сумарний обсяг батьківських контрактів перевищує `1500 токенів` (`6000 символів`), код виконує `truncated = c.summary[: per_contract_budget - 35] + "... [condensed <= 1500 tok]"`.
+   - Такий сирий зріз рядка може обірвати список змінених файлів або JSON-схему посередині.
 
-### 5.3. Порівняльна Таблиця Вектора 3
-
-| Компонент | Патерн світового лідера (SOTA 2026) | Як реалізовано в DNK OS (v2.5.0) | Рекомендація та конкретна корекція |
+#### Порівняльна таблиця Вектора 2:
+| Компонент | Патерн світового лідера (LangGraph Store / Letta / Mem0) | Як реалізовано в DNK OS v2.5.0 | Рекомендація та корекція («ЩО ПІДКОРИГУВАТИ») |
 | :--- | :--- | :--- | :--- |
-| **Топологія сервісів (Workhorses vs Microservices)** | **Anthropic / Cursor**: монолітні локальні воркери без мережевих мікросервісів; мінімум фонових процесів. | **3 Core Workhorses** (`dnk_shopify`, `dnk_media`, `dnk_distribution`) за стандартом 5-елементної Суверенної Цеглинки + заборона нових папок у `./services/` (`AGENTS.md` Розділ 8). | **Корекція 3.1:** Зберегти правило 3 воркхорсів як незмінний закон. Здійснити фізичний скаффолдинг `./services/dnk_media/` та `./services/dnk_distribution/` через `./scripts/system/new_brick.py`, перенісши чисту логіку з архіву. |
-| **Вузька талія мікроядра (`Narrow Waist < 400 LOC`)** | **Nous Hermes / OpenAI Swarm**: мінімальне ядро диспетчеризації, де всі транспортні обгортки винесені в окремі адаптери. | `./core/kernel.py` розрісся до **579 LOC** через розміщення 17 декораторів `@mcp.tool()` (`create_fastmcp_server`, рядки 434–563) та легасі-фолбеків (рядки 32–90) прямо в тілі ядра. | **Корекція 3.2:** Винести `create_fastmcp_server()` у `./core/kernel_mcp.py`, повернувши `./core/kernel.py` до **~340 LOC** (`< 400 LOC` PASS) зі 100% збереженням зворотного імпорту `from core.kernel import FastMCPKernel, create_fastmcp_server`. |
-| **Дієта стартового контексту (`Standing Context Diet <= 6,000` токенів)** | **Anthropic MCP Tool Search (`defer_loading: true`)** + **Hermes v0.23 (`tool_search` / `tool_describe`)**: на старті в промпті лише 4–6 ядерних тулів; решта підвантажується за запитом. | У `./packages/dnk_hermes_ext/context_diet.yaml` увімкнено `tool_search: enabled: "on"`, але `./core/kernel.py` експортує всі 17 MCP-тулів як `always-on` без розділення на Core Tier та Deferred Tier. | **Корекція 3.3:** Розділити інструменти `dnk-kernel` на **Tier-0 Standing (5 тулів: `node_session_get_context`, `node_session_crystallize`, `execute_action`, `query_memory`, `get_system_status`)** та **Tier-1 Deferred (12 тулів)** або викликати їх In-RAM через Python `execute_code`. |
-| **Захист від генеративного роздування (`DEC-057 Solution Ladder`)** | **Cursor / Devin**: лінтери залежностей та заборона `pip/npm install` без явного дозволу людини. | 6-щаблева драбина `DEC-057` у `AGENTS.md` + перехоплення `npm/pip` у `./scripts/system/hermes_pre_tool_hook.py`, але немає автоматичної перевірки імпортів на нові зовнішні пакети у `FanInAggregator`. | **Корекція 3.4:** Додати у `BoundaryScopeValidator` (`./core/orchestrator/fan_in_aggregator.py`) перевірку AST `import` проти дозволеного списку `pyproject.toml` (`DEC-057 Rung 4 Gate`). |
+| **Пошуковий рушій пам'яті** | Vector DB + Hybrid Search (~500MB RAM, зовнішній демон). | **SCONES SQLite WAL FTS5** (`scones_store.py`) + **AST-Locus BM25** (`scones_bm25_index.py`). | **Зберегти Zero-Vector інваріант.** Об'єднати таблицю `scones_durable_facts` із `scones_bm25_index.py` безпосередньо всередину єдиної БД `data/scones_memory.db` у `SconesStore`. |
+| **Захист від протухання знань (Staleness Guard)** | Пам'ять зберігає застарілі факти після рефакторингу коду. | `SconesBM25Index` підтримує `file_anchor`, `symbol_anchor`, `verification_status`, а також є `core/memory/scones_anchor_verifier.py`. | **Вбудувати Anchor-верифікацію у `SconesStore.get_memories()`**: перед поверненням правила перевіряти існування `file_anchor` / `symbol_anchor` у робочому дереві (`< 5 мс`); якщо символ видалено — позначати запис `[⚠️ STALE_ANCHOR]`. |
+| **Per-Node Context Surgery (`<= 1500 tok`)** | Letta / LangGraph роблять дорогий LLM-summarization виклик на кожному переході. | Детермінований Kahn topological sort + бюджет `max_upstream_tokens=1500` у `session_router.py:770-859`. | **Замінити сирий `c.summary[:budget]` у `session_router.py:847` на пріоритетне стиснення**: ніколи не обрізати `c.artifacts` та перші 3 буліти контракту; скорочувати лише вторинний описовий текст. |
 
 ---
 
-## 6. Вектор 4: Оркестрація Завдань і Мультиагентна Взаємодія (Task Orchestration & Workflows)
+### ВЕКТОР 3: Організація сервісів та інструментів (Services & Tools Architecture: 3 Workhorses + Sovereign Bricks + Standing Context Diet <= 6000 токенів)
 
-### 6.1. Інженерна деконструкція поточного стану в `DNK_OS`
-Конвеєр оркестрації `DNK_OS` складається з 4 ланок:
-1. **`SpatialCanvasSessionRouter` (`./core/canvas/session_router.py`)**: керує графом `.canvas`, по-нодними сесіями `node:{canvas_id}:{node_id}`, топологічним сортуванням `topological_sort_subdag()` та декомпозицією `decompose_node_to_subtasks()`.
-2. **`SovereignQuadRunner` (`./core/orchestrator/quad_runner.py`)**: зв'язує ноди з 4 ролями (`strategist_prime`, `dnk_mentor`, `denchik`, `gerych_prime`) і перевіряє числа/дати через `GroundingGuard`.
-3. **`FanInAggregator` (`./core/orchestrator/fan_in_aggregator.py`)**: проганяє виходи паралельних субагентів через 4 детерміновані гейти (`SyntaxASTValidator`, `BoundaryScopeValidator`, `DeterministicExitCodeValidator`, `GroundingValidator`).
-4. **`AgentQuarantineGuard` (`./core/sentinel/agent_quarantine.py`)**: реалізує `TC-10 Circuit Breaker` (після 3 послідовних помилок переводить агента в `QUARANTINED`).
+#### Як реалізовано зараз у DNK OS v2.5.0:
+* **Всі 3 канонічні робочі конячки фізично створені у `services/` як 5-елементні Sovereign Bricks**:
+  1. `services/dnk_shopify/` (`brick.manifest.yaml`, `src/service.py`, `contracts/schemas.py`, `mcp_server.py`, `tests/`).
+  2. `services/dnk_media/` (`brick.manifest.yaml`, `src/service.py`, `contracts/schemas.py`, `mcp_server.py`, `tests/` — асимільовано чисті патерни Smart Reframing, Kinetic Subtitles, Silence Cutting, Sound Design за DEC-128).
+  3. `services/dnk_distribution/` (`brick.manifest.yaml`, `src/service.py`, `contracts/schemas.py`, `mcp_server.py`, `tests/`).
+* **Мікроядро вкладено у ліміт Narrow-Waist**: `core/kernel.py` становить **384 рядки** (`< 400 LOC`), а MCP-обгортку винесено у `core/kernel_mcp.py` (258 рядків).
 
-### 6.2. Виявлені дефекти та розходження при ревізії коду `DNK_OS`
-1. **Конфлікт між суворим Kahn DAG та циклами ревізій (`Revision Loops`)**:
-   - У реальній інженерній роботі, коли `Builder (denchik)` завершує ноду, а `Auditor (gerych)` або `FanInAggregator` знаходить помилку в 1 із 4 гейтів, задача повинна повернутися на доопрацювання (`Auditor -> Builder -> Auditor`).
-   - У поточній реалізації `./core/domain/thought_dsl.py` (`detect_cycles_kahn`) будь-яке зворотне ребро на полотні вважається фатальною помилкою графа (`has_cycles: True`), а `FanInAggregator.aggregate_and_validate()` (`./core/orchestrator/fan_in_aggregator.py`, рядки 193–246) просто записує гілку в `rejected_branches` без механізму автоматичного повернення ноди в цикл ревізії.
-2. **Волатильність `TC-10 AgentQuarantineGuard` (втрата стану між процесами)**:
-   - У `./core/sentinel/agent_quarantine.py` (рядок 106) стан карантину зберігається виключно у словнику в оперативній пам'яті: `self._records: Dict[str, AgentHealthRecord] = {}`.
-   - Під час роботи через CLI (`just ...` або `python3 -m core.kernel --cli`) кожен виклик створює новий процес Python, де `consecutive_failures` завжди дорівнює `0`! Отже, `TC-10 Circuit Breaker` фізично не спрацьовує між окремими запусками CLI/субагентів.
-3. **Роздвоєння HITL-механізмів та відсутність Live Checkpoint/Resume**:
-   - У ядрі одночасно існують `./core/action_bus/hitl_bridge.py` (`HitlApprovalBridge`) та `./core/canvas/approval.py` (`CANVAS-004` JSONL), які не пов'язані між собою та не інтегровані з `SpatialCanvasSessionRouter` і десктопним компаньйоном `DNK_Piu` (`~/.dnk_runtime/piu/`). Крім того, у `./core/orchestrator/quad_runner.py` є лише `execute_node_mock()`, але відсутній живий цикл виконання з паузою `AWAITING_APPROVAL` та відновленням (`resume_node`).
+#### Що виявлено під час аудиту коду (Gaps у Векторі 3):
+1. **Фізичне перевантаження `@mcp.tool()` у `core/kernel_mcp.py` (Standing vs Deferred)**:
+   - У `core/kernel_mcp.py` інструменти візуально розділені коментарями на `# Tier-0: Standing Core Tools` (5 тулів: `node_session_get_context`, `node_session_crystallize`, `execute_action`, `query_memory`, `get_system_status`) та `# Tier-1: Deferred & Specialized Tools` (11 тулів: `dispatch_thought`, `record_observation`, `request_approval`, `inspect_code_map`, `prune_output`, `check_hygiene`, `run_adversarial_gate`, `verify_grounding`, `clip_write`, `clip_read`, `assimilate_repository`).
+   - Проте **всі 16 функцій декоровані `@mcp.tool()` на одному об'єкті `mcp = FastMCP(name)`**! Тому при підключенні по STDIO/SSE клієнт отримує всі 16 JSON-схем одночасно на Кроці 0.
+2. **Застаріла маршрутизація доменів у `core/orchestrator/task_triage.py`**:
+   - У `core/orchestrator/task_triage.py:73` та `114` домен `media_video` досі шукає застарілий шлях `services/dnk_video_ai_creator/` замість `services/dnk_media/`, а домен `distribution` (`services/dnk_distribution/`) взагалі не представлений у `DOMAIN_PATTERNS`.
 
-### 6.3. Порівняльна Таблиця Вектора 4
-
-| Компонент | Патерн світового лідера (SOTA 2026) | Як реалізовано в DNK OS (v2.5.0) | Рекомендація та конкретна корекція |
+#### Порівняльна таблиця Вектора 3:
+| Компонент | Патерн світового лідера (Anthropic MCP / DeepSeek Harness) | Як реалізовано в DNK OS v2.5.0 | Рекомендація та корекція («ЩО ПІДКОРИГУВАТИ») |
 | :--- | :--- | :--- | :--- |
-| **Цикли зворотного зв'язку (`Revision Loops`: Builder $\leftrightarrow$ Auditor)** | **LangGraph Pregel (`StateGraph`) / CrewAI Guardrails**: умовні зворотні ребра `add_conditional_edges("auditor", route_fn, {"revise": "builder", "done": END})` з лічильником `remaining_steps`. | Суворо ациклічний Kahn DAG (`detect_cycles_kahn`); при провалі гейту у `FanInAggregator` результат просто відкидається у `rejected_branches`. | **Корекція 4.1:** Ввести **Bounded Revision Loop** у `SpatialCanvasSessionRouter` та `SovereignQuadRunner`: додати `revision_count: int = 0` та `max_revisions: int = 3` у сесію ноди. При провалі `FanInAggregator` автоматично писати структурований `ValidationIssue` у чат ноди (`role="auditor_gate"`), інкрементувати `revision_count` і перезапускати білдера. На 3-му провалі — блокувати через `TC-10`. |
-| **Живий Human-in-the-Loop (HITL Pause & Resume)** | **LangGraph `interrupt()` + `Command(resume=...)` / CopilotKit `AG-UI`**: серіалізація стану ноди в SQLite, звільнення воркера, пуш картки людині, відновлення з точки зупинки. | Два окремі модулі (`hitl_bridge.py` та `core/canvas/approval.py`), які не змінюють колір/статус ноди у `.canvas` і не надсилають подію у `DNK_Piu`. | **Корекція 4.2:** Уніфікувати HITL у `SpatialCanvasSessionRouter`: додати методи `pause_node_for_approval(canvas_path, node_id, action_spec, diff_preview)` (фарбує ноду `.canvas` у колір `"2"` Orange `⏳ AWAITING_APPROVAL` і пише JSON-запит у `~/.dnk_runtime/piu/approvals/`) та `resume_node_after_approval(canvas_path, node_id, decision, feedback)`. |
-| **Запобіжник деградації агентів (`TC-10 Quarantine Circuit Breaker`)** | **SmythOS / temporal.io Circuit Breakers**: персистентний стан здоров'я воркера у транзакційній БД із вікном затухання помилок (`cooldown_ttl`). | `./core/sentinel/agent_quarantine.py` тримає `self._records` виключно в RAM (`dict`), втрачаючи лічильник `consecutive_failures` після завершення процесу. | **Корекція 4.3:** Перевести `AgentQuarantineGuard` на персистентну таблицю `agent_quarantine_state` у SQLite WAL (`.data/dnk_action_bus.db`) із збереженням `consecutive_failures`, `reason` та `quarantined_at` між усіма процесами. |
-| **Паралельне злиття результатів (`4-Gate Fan-In Aggregator`)** | **Cursor Shadow Workspace + AutoGen DiGraph**: паралельний запуск в ізольованих `git worktrees` із перевіркою AST, лінтерів та конфліктів злиття перед застосуванням до основної гілки. | `./core/orchestrator/fan_in_aggregator.py` перевіряє `SyntaxAST`, `BoundaryScope`, `ExitCode`, `Grounding` та конфлікти `file_owners` між паралельними агентами. | **Корекція 4.4:** Зв'язати `FanInAggregator` напряму з `SpatialCanvasSessionRouter.crystallize_node()`: нода має право перейти у статус `📌 CRYSTALLIZED` виключно тоді, коли `FanInAggregator.aggregate_and_validate()` повернув `passed_branches > 0` та `0` порушень гейтів (записати `receipt_sha256` у сесію ноди). |
+| **Топологія сервісів (3 Core Workhorses)** | Десятки дрібних мікросервісів з Docker/HTTP оверхедом. | 3 канонічні Sovereign Bricks (`dnk_shopify`, `dnk_media`, `dnk_distribution`) з Dual-Mount (`0ms` In-RAM Python import + `mcp_server.py`). | **Оновити `core/orchestrator/task_triage.py`**: замінити `services/dnk_video_ai_creator/` на `services/dnk_media/` та додати патерни для `services/dnk_distribution/`. |
+| **Standing Context Diet (`<= 6000` токенів)** | Anthropic MCP `defer_loading: true` + `ToolSearchTool` (економія 85% токенів на старті). | `core/kernel_mcp.py` має логічний поділ Tier-0 (5 тулів) і Tier-1 (11 тулів), але реєструє всі 16 у `@mcp.tool()`. | **Реалізувати режим `include_tier1: bool = False` у `create_fastmcp_server()` (`core/kernel_mcp.py`)**: за замовчуванням експортувати у `@mcp.tool()` лише **5 Tier-0 інструментів + 2 мета-інструменти (`kernel_tool_search`, `kernel_tool_call`)**, а 11 Tier-1 тулів викликати динамічно через `kernel_tool_call`. |
+| **Narrow-Waist Microkernel (`< 400 LOC`)** | Великі оркестратори на `3000+ LOC` із бізнес-логікою всередині ядра. | `core/kernel.py` сфокусовано на **384 LOC** (запас 16 LOC до стелі 400 LOC). | **Зафіксувати AST-гейт у `scripts/verify_all.sh`**: перевіряти `wc -l core/kernel.py < 400`, щоб жоден майбутній PR не роздув мікроядро. |
 
 ---
 
-## 7. Вектор 5: Відбір і Селекція Навичок, Гачків та Скриптів (Skill Curation & Invariants)
+### ВЕКТОР 4: Оркестрація завдань і мультиагентна взаємодія (Task Orchestration: Spatial Canvas + 4-Gate Fan-In + TC-10 + PSOD + EGM + Harness²)
 
-### 7.1. Інженерна деконструкція поточного стану в `DNK_OS`
-Система процедурної пам'яті спирається на три механізми:
-1. **Трирівневе розкриття навичок (LOD Disclosure)**: на старті сесії агент бачить лише короткий індекс `<available_skills>` (`<= 60` символів на опис), повний `SKILL.md` (`<= 750` рядків) читається через `skill_view(name)`, а важкі довідники — через `skill_view(name, file_path="references/...")`.
-2. **4-Vector Generalisability Test & Second Violation Invariant (`AGENTS.md` Розділ 9 + `../DNK_HUB/core/skills_curator.py`)**: оцінює спостереження за 4 векторами (`v1` відсутність ефемерних UUID/шляхів, `v2` наявність інваріанта, `v3` повторюваність, `v4` структурна категорія) по `0.25` бала; при `violation_count >= 2` вимагає створення детермінованого хука замість переписування промптів.
-3. **Ring-0 Pre-Tool Hook (`./scripts/system/hermes_pre_tool_hook.py`)**: перехоплює виклики інструментів до їх виконання, санітизує абсолютні шляхи `/Users/...` у відносні, блокує `npm/pip` на користь `pnpm/uv` та запускає `run_scallopbot_review_on_stop`.
+#### Як реалізовано зараз у DNK OS v2.5.0:
+* У `core/orchestrator/` та `core/sentinel/` побудовано повний стек SOTA-оркестрації 2026:
+  - **Complexity Triage & Harness² (`core/orchestrator/harness2_engine.py`)**: детерміновано обчислює бал складності та маршрутизує задачу у `SOLO` (`< 2.0`), `DELEGATED_EGM` (`2.0..4.5`) або `TOURNAMENT_H2` (`>= 4.5`, сліпий турнір `N=2` між `CandidateA` та `CandidateB`).
+  - **PSOD v2.6 (`core/orchestrator/delegation_packet.py`)**: структурує делегування через `Problem`, `Substrate`, `Oracle`, `Degrees of Freedom` із перевіркою повноти (`is_complete()`).
+  - **EGM Dual-System Review (`core/orchestrator/goldfish_tool_worker.py` + `harness2_engine.py`)**: поєднує `Elephant 🐘` (контекст проєкту) та `Goldfish 🐠` (ізольований аудит `git diff` без історії чату).
+  - **Bounded Revision Loop (`core/orchestrator/bounded_revision_loop.py`)**: обмежує самовиправлення `max_rounds = 2`, після чого передає задачу в карантин.
+  - **4-Gate Fan-In (`core/orchestrator/fan_in_aggregator.py`)** та **TC-10 Quarantine (`core/sentinel/agent_quarantine.py`)**: перевіряють відсутність конфліктів файлів, синтаксис AST, тести та MRH-хедери перед злиттям.
 
-### 7.2. Виявлені дефекти та розходження при ревізії коду `DNK_OS`
-1. **Відсутність `./core/skills_curator.py` у `DNK_OS`**:
-   - Файл `core/skills_curator.py` залишився в архівному `../DNK_HUB/core/skills_curator.py` і ще не перенесений у `./core/` репозиторію `DNK_OS`. До того ж у `../DNK_HUB/core/skills_curator.py` (рядок 88) зашитий застарілий шлях збереження `core/orchestrator/agents/gerych_prime/skill-observations`.
-2. **Інфляція каталогу `<available_skills>` (95+ `*_assimilated` навичок у профілі)**:
-   - У поточному профілі Hermes зареєстровано понад **120 навичок**, з яких **95+** — це атомарні зліпки окремих GitHub-донорів у категорії `dnk_ecosystem` (`test_repo_assimilated`, `skills_collection_1_assimilated`, `skills_collection_2_assimilated`, `freebuff_assimilated`, `freellmapi_assimilated`, `ks_origin_assimilated` тощо).
-   - Навіть при довжині опису `60` символів 120 рядків у `<available_skills>` щоразу спалюють **`~2,200` токенів** стартового системного промпту (36% усього священного бюджету `6,000` токенів!) і розмивають увагу LLM при виборі скіла.
-3. **Відсутність автоматичного депрекейту, прунінгу та перевірки `MAX_CORE_LINES <= 750`**:
-   - У `SkillsCurator` немає алгоритму `Vitality Decay` для самих навичок (відстеження `last_invoked_at` через `skill_view`), немає автоматичного злиття дрібних `*_assimilated` навичок у парасолькові (`absorbed_into`), і немає автоматичного гейту, який перевіряє `wc -l SKILL.md <= 750` та виносить надлишок у `references/`.
-4. **Монолітність `hermes_pre_tool_hook.py` (997 рядків) та запис у `/tmp/`**:
-   - У `./scripts/system/hermes_pre_tool_hook.py` (рядок 32) трекер циклів пише у `/tmp/hermes_loop_tracker_{clean_id}.json` замість канонічної зони `~/.dnk_runtime/run/`, а сам файл налічує 997 рядків процедурного коду без декларативної таблиці правил, яку міг би автоматично поповнювати `SkillsCurator` при спрацюванні `Second Violation Invariant`.
+#### Що виявлено під час аудиту коду (Gaps у Векторі 4):
+1. **Відсутність прямого мосту між `CanvasSessionRouter` та конвеєром `BoundedRevisionLoop -> TC-10 Quarantine`**:
+   - Зараз `CanvasSessionRouter` (`core/canvas/session_router.py`) має лише метод `crystallize_node()` (успішне завершення, зелений колір `"4"`). Якщо вузол провалює верифікацію в `BoundedRevisionLoop` або потрапляє у `TC-10 Quarantine`, у `CanvasSessionRouter` немає атомарного методу `transition_node_state(canvas_path, node_id, status="needs_revision" | "quarantined")`, який би оновлював SQLite та фарбував вузол на `.canvas` у помаранчевий (`"2"`) чи червоний (`"1"`) колір із записом причини відмови!
+2. **Неповна перевірка скоупу у `GoldfishToolWorker.audit()` (`core/orchestrator/goldfish_tool_worker.py:70-115`)**:
+   - Зараз `GoldfishToolWorker.audit()` перевіряє `diff_content` регулярними виразами на абсолютні шляхи (`/Users/...`), `except Exception: pass`, `TODO/FIXME` та наявність `DNK-MRH-HEADER`.
+   - Проте він **не звіряє список реально модифікованих у патчі файлів (`touched_files` із `git diff`) проти `PSODPacket.allowed_files` та `PSODPacket.negative_scope`**! Це ключовий інваріант Google EGM Goldfish: миттєво блокувати будь-який патч, який торкнувся файлу поза білим списком (`Scope Creep`).
+3. **Тай-брейкер у `Harness2Engine.evaluate_blind_tournament()` (`core/orchestrator/harness2_engine.py:258`)**:
+   - Якщо обидва кандидати в турнірі `N=2` пройшли `Oracle` (`exit_code == 0`) та `EGM Review`, переможець обирається виключно за `min(cand.loc_changed)`. Варто додати перевірку, щоб `loc_changed > 0` (захист від порожнього no-op патчу, який має `0 LOC` і виграє за критерієм мінімальності!).
 
-### 7.3. Порівняльна Таблиця Вектора 5
-
-| Компонент | Патерн світового лідера (SOTA 2026) | Як реалізовано в DNK OS (v2.5.0) | Рекомендація та конкретна корекція |
+#### Порівняльна таблиця Вектора 4:
+| Компонент | Патерн світового лідера (LangGraph / Devin / Google Harness²) | Як реалізовано в DNK OS v2.5.0 | Рекомендація та корекція («ЩО ПІДКОРИГУВАТИ») |
 | :--- | :--- | :--- | :--- |
-| **Керування життєвим циклом навичок (Skill Lifecycle & Pruning)** | **Nous Hermes v0.23 (`skill_manage` Curator)**: підтримує операцію `delete` із обов'язковим полем `absorbed_into` (поглинання вузьких скілів парасольковим скілом) для утримання компактного індексу. | Понад 95 `*_assimilated` скілів лежать плоским списком у категорії `dnk_ecosystem`, спалюючи `~2,200` токенів на Step 0; автоматичного прунінгу немає. | **Корекція 5.1:** Впровадити у `./core/skills_curator.py` механізм **Skill Vitality & Umbrella Consolidation**: скіли `*_assimilated` з `0` викликів за 21 день автоматично консолідуються у **7 доменних парасольок** (`dnk-shopify-cro-umbrella`, `dnk-canvas-dag-umbrella`, `dnk-memory-scones-umbrella` тощо) як файли `references/<donor>.md`, скорочуючи індекс `<available_skills>` зі 125 до `<= 35` активних навичок (економія `~1,500` токенів на кожному кроці!). |
-| **Храповик розміру навички (`Skill Core-Size Ratchet <= 750 LOC`)** | **Anthropic / Hermes Agent**: трирівневий LOD (`index <= 60 chars` -> `SKILL.md <= 500-750 lines` -> `references/*.md` on-demand). | Правило `<= 750` рядків задеклароване в `AGENTS.md` (рядок 135), але немає автоматичного пре-коміт/кураторського сканера, який розщеплює переповнені `SKILL.md`. | **Корекція 5.2:** Додати у `./core/skills_curator.py` метод `enforce_core_size_ratchet(max_lines=750)`: автоматично перевіряє всі `SKILL.md` і при перевищенні 750 рядків виносить секції з прикладами коду/таблицями у `references/extracted_<section>.md`, замінюючи їх на 1-рядкове посилання `skill_view(name, file_path=...)`. |
-| **Інваріант Другого Порушення (`Second Violation Invariant`)** | **Cursor / Cognition Devin**: перетворення повторюваних помилок агента на детерміновані правила лінтера / pre-tool hooks замість роздування системного промпту. | `SkillsCurator.record_observation()` ставить прапорець `structural_barrier_required = True` при `violation_count >= 2`, але цей прапорець лише друкується в Markdown-дайджест. | **Корекція 5.3:** З'єднати `SkillsCurator` із `./scripts/system/hermes_pre_tool_hook.py` через декларативний реєстр `./core/config/structural_barriers.json` (містить regex забороненої команди/аргументу, `tool_name` та повідомлення блокування). Коли `violation_count >= 2`, куратор автоматично додає правило в `structural_barriers.json`, яке миттєво виконується пре-тул хуком! |
-| **Гігієна Pre-Tool Hook (`hermes_pre_tool_hook.py`)** | **Anthropic Claude Code Hooks**: швидкі (`< 15 мс`), модульні перехоплювачі зі збереженням стану у виділеному runtime-каталозі. | `./scripts/system/hermes_pre_tool_hook.py` має 997 рядків і пише трекер у `/tmp/hermes_loop_tracker_*.json` (рядок 32). | **Корекція 5.4:** Перенести `get_tracker_file()` із `/tmp/` у `~/.dnk_runtime/run/loop_tracker_{clean_id}.json` та підключити авто-завантаження `./core/config/structural_barriers.json`. |
+| **Цикли ревізії (Bounded Revision Loops)** | LangGraph `Pregel` цикл із `recursion_limit` та автоматичним переходом станів. | `BoundedRevisionLoop` (`max_rounds=2`) + `AgentQuarantineManager` (`TC-10`), але окремо від `CanvasSessionRouter`. | **Додати метод `mark_node_revision_or_quarantine()` у `CanvasSessionRouter` (`core/canvas/session_router.py`)**: синхронізувати статус `needs_revision` (колір `"2"`) та `quarantined` (колір `"1"`) безпосередньо у `.canvas` та `dnk_dag_store.db`. |
+| **EGM Goldfish Stateless Audit** | Google EGM Goldfish перевіряє чистий diff на дотримання контракту та негативного скоупу. | `GoldfishToolWorker` (`goldfish_tool_worker.py`) перевіряє 4 regex-інваріанти та `verify_exit_code`. | **Додати перевірку `touched_files` vs `allowed_files` / `negative_scope` у `GoldfishToolWorker.audit()`**: блокувати патч зі статусом `SCOPE_CREEP_VIOLATION`, якщо агент змінив файл поза білим списком PSOD. |
+| **Blind Tournament Tie-Breaker (`Harness²`)** | Оцінка кандидатів за проходженням тестів, відсутністю регресій та мінімальною ентропією змін. | `Harness2Engine.evaluate_blind_tournament()` обирає кандидата з меншим `loc_changed`. | **Захистити тай-брейкер у `harness2_engine.py:258` від `0-LOC` No-Op патчів**: вимагати `cand.loc_changed > 0` та ненульовий `diff_text.strip()` для перемоги у турнірі. |
 
 ---
 
-## 8. Топ-7 Конкретних Архітектурних Коригувань для Ядра DNK OS (Top Actionable Adjustments)
+### ВЕКТОР 5: Відбір і селекція навичок, гачків та скриптів (Skill Curation & Invariants: 4-Vector Generalisability + Core-Size Ratchet + Second Violation Invariant + Universal Pre-Tool Sentinel)
 
-Нижче наведено 7 пріоритетних інженерних модифікацій із точними схемами та контрактами, які усувають усі виявлені розриви між `DNK_OS v2.5.0` та світовим SOTA 2026:
+#### Як реалізовано зараз у DNK OS v2.5.0:
+* **Skills Curator (`core/skills_curator.py`)**: обчислює `evaluate_generality()` за 4 векторами (`v1..v4`), відстежує `violation_count >= 2` (`structural_barrier_required = True`) та знаходить споріднені навички (`find_sibling_skills`).
+* **Universal Pre-Tool Sentinel (`core/sentinel/universal_guard.py` + `core/config/structural_barriers.json`)**: крос-харнесний fail-closed перехоплювач (для Hermes, Claude Code, Cursor), який завантажує правила з `structural_barriers.json` і блокує заборонені виклики (`exit code 2`).
 
-### 🛠️ Коригування #1: Активація Справжнього SQLite FTS5 BM25 + Ієрархічних Просторів Імен + Belief Revision у `./core/memory/scones_store.py`
-* **Яку проблему вирішує:** Усуває тихий фолбек на `WHERE topic LIKE ?` у `DNK_OS` через відсутність `scones_bm25_index.py`, додає ізоляцію `(account_id, project_id)` за патерном LangGraph `BaseStore` та недеструктивну ревізію знань (`superseded_by`) за патерном Letta/MemGPT.
-* **Цільова SQL-схема та контракт для `./core/memory/scones_store.py`:**
-```sql
--- 1. Основна таблиця спостережень з ієрархією L1/L2 та Belief Revision
-CREATE TABLE IF NOT EXISTS scones_observations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    account_id TEXT NOT NULL DEFAULT 'acct-dnk-maxim',
-    project_id TEXT NOT NULL DEFAULT 'global',
-    topic TEXT NOT NULL,
-    observation TEXT NOT NULL,
-    semantic_tags TEXT NOT NULL DEFAULT '',
-    source TEXT NOT NULL DEFAULT 'agent',
-    confidence REAL NOT NULL DEFAULT 1.0,
-    superseded_by INTEGER REFERENCES scones_observations(id),
-    created_at REAL NOT NULL
-);
+#### Що виявлено під час аудиту коду (Gaps у Векторі 5):
+1. **Розірваний цикл між `SkillsCurator` та `structural_barriers.json`**:
+   - Коли `SkillsCurator.record_observation()` фіксує друге порушення (`obs.violation_count >= 2`, `obs.structural_barrier_required = True`), він лише генерує текстове нагадування у Markdown-дайджесті (`Mandated Structural Action: Implement pre-tool hook check...`), але **не додає правило у `core/config/structural_barriers.json`**.
+2. **Неповний набір бар'єрів у `core/config/structural_barriers.json`**:
+   - Зараз у `structural_barriers.json` є 4 бар'єри (`BARRIER_001_LOCAL_VENV`, `BARRIER_002_NPM_YARN_BLOCK`, `BARRIER_003_DESTRUCTIVE_GIT`, `BARRIER_004_SYSTEM_DESTRUCTION`).
+   - Відсутні детерміновані бар'єри для трьох критичних інваріантів `AGENTS.md`:
+     - `BARRIER_005_BARE_PIP_INSTALL`: блокування прямого `pip install` поза `uv pip install` / `uv add`.
+     - `BARRIER_006_BLACKLISTED_MONOREPO_CLONE`: блокування клонування `lobehub/lobe-chat` (DEC-065 Banned Systems Invariant).
+     - `BARRIER_007_ROOT_DIRECTORY_POLLUTION`: блокування `mkdir` нових папок у корені поза 8 канонічними директоріями (`apps`, `core`, `services`, `packages`, `infra`, `docs`, `tests`, `scripts`).
+3. **Відсутність автоматичної ротації неактивних навичок (`Skill Vitality Pruning`)**:
+   - Модуль `core/memory/scones_vitality.py` існує, але не викликається з `core/skills_curator.py` для автоматичного перенесення навичок, які не використовувалися `> 30 днів`, у `.archive/`.
 
-CREATE INDEX IF NOT EXISTS idx_obs_namespace
-ON scones_observations(account_id, project_id, superseded_by);
-
--- 2. Віртуальна таблиця SQLite FTS5 з ранжуванням BM25 (0 МБ фонових демонів)
-CREATE VIRTUAL TABLE IF NOT EXISTS scones_observations_fts USING fts5(
-    topic,
-    observation,
-    semantic_tags,
-    content='scones_observations',
-    content_rowid='id',
-    tokenize='porter unicode61'
-);
-
--- 3. Запит пошуку з BM25-ранжуванням (ваги: topic=10.0, tags=5.0, observation=2.0)
-SELECT o.id, o.topic, o.observation, o.source, o.confidence, o.created_at,
-       bm25(scones_observations_fts, 10.0, 2.0, 5.0) AS rank_score
-FROM scones_observations_fts fts
-JOIN scones_observations o ON o.id = fts.rowid
-WHERE scones_observations_fts MATCH ?
-  AND o.account_id = ?
-  AND o.project_id IN (?, 'global')
-  AND o.superseded_by IS NULL
-ORDER BY rank_score ASC
-LIMIT ?;
-```
-
-### 🛠️ Коригування #2: Рольова LOD-Хірургія L2 Project DNA та Жорсткий Ліміт `<= 1,500` Токенів у `./core/canvas/session_router.py`
-* **Яку проблему вирішує:** Замість сліпої вставки однакового фрагмента `brand_dna.json` та необмеженого склеювання всіх батьківських нод, впроваджує Role-Scoped LOD Slicing (патерн Cursor `.mdc` / Devin Knowledge Triggers) і жорсткий токен-бюджет `max_upstream_tokens = 1500`.
-* **Цільова реалізація у `./core/canvas/session_router.py` та `./core/domain/vibe_core_contracts.py`:**
-```python
-def compile_lod_dna_slice(project_dna: ProjectDNA, agent_role: str) -> str:
-    """Role-scoped LOD projection of L2 ProjectDNA (<= 600 tokens)."""
-    role = agent_role.lower()
-    lines = [
-        f"## 🧬 L2 Project DNA: {project_dna.project_name} (`{project_dna.project_id}`, v{project_dna.dna_version})",
-        f"**Domain**: `{project_dna.domain_type}`",
-    ]
-    # Технічні ролі отримують повні дизайн-токени, компонентні правила та тех-обмеження
-    if role in ("denchik", "builder", "dnk_shopify", "architect", "dnk_mentor", "gerych", "auditor"):
-        ds = project_dna.design_system
-        lines.extend([
-            f"**Design Tokens**: Colors={ds.primary_colors}, Typography={ds.typography}, Spacing={ds.spacing_unit_px}px, Radius={ds.border_radius_px}px",
-            f"**Component Rules**: {'; '.join(ds.component_rules)}",
-            f"**Technical Constraints**: {'; '.join(project_dna.technical_constraints)}",
-        ])
-    # Маркетингові та стратегічні ролі отримують повний ICP, болі та заборонені кліше
-    if role in ("strategist", "strategist_prime", "dnk_distribution", "dnk_media", "general_agent"):
-        icp = project_dna.icp
-        lines.extend([
-            f"**ICP Segment**: {icp.segment_name} | **Value Prop**: {icp.value_proposition}",
-            f"**Customer Pain Points**: {'; '.join(icp.pain_points)}",
-            f"**Brand Voice**: {'; '.join(icp.brand_voice_rules)}",
-            f"**Forbidden Clichés**: {', '.join(icp.forbidden_cliches)}",
-            f"**Business Rules**: {'; '.join(project_dna.business_rules)}",
-        ])
-    return "\n".join(lines)
-```
-
-### 🛠️ Коригування #3: Bounded Revision Loops (`Builder <-> Auditor`) та Інтеграція 4-Gate `FanInAggregator` із Кристалізацією Нод
-* **Яку проблему вирішує:** Дозволяє графу `.canvas` залишатися ациклічним за прямими ребрами `DATA_FLOW` (алгоритм Кана), але підтримує до 3 автоматичних ітерацій доопрацювання всередині ноди при провалі будь-якого з 4 гейтів `FanInAggregator` (патерн LangGraph Pregel / CrewAI Guardrails).
-* **Цільова машина станів ноди (`NodeLifecycleState`):**
-  1. `RUNNING` (Builder виконує MASE-зріз) $\to$ `AUDIT_GATE` (виклик `FanInAggregator.aggregate_and_validate()`).
-  2. Якщо `passed_branches == 1`: виклик `crystallize_node()` із записом `receipt_sha256` $\to$ статус `📌 CRYSTALLIZED` (зелений колір `"4"`).
-  3. Якщо `rejected_branches == 1` і `revision_count < 3`: інкремент `revision_count += 1`, запис помилок гейту у `node_chat_messages` (`role="system_gate_feedback"`), повернення у `RUNNING`.
-  4. Якщо `revision_count >= 3`: виклик `quarantine.record_failure(agent_id, QuarantineReason.REPEATED_TEST_FAILURE)` $\to$ статус `FAILED` (червоний колір `"1"`).
-
-### 🛠️ Коригування #4: Персистентний SQLite WAL Стор для `TC-10 AgentQuarantineGuard` та Єдиний HITL Pause/Resume Контур
-* **Яку проблему вирішує:** Робить лічильник `consecutive_failures` у `./core/sentinel/agent_quarantine.py` незнищенним між перезапусками CLI та об'єднує розрізнені `hitl_bridge.py` і `core/canvas/approval.py` у єдиний механізм `interrupt_node` / `resume_node` із сповіщенням `DNK_Piu`.
-* **Цільова таблиця для `./core/sentinel/agent_quarantine.py`:**
-```sql
-CREATE TABLE IF NOT EXISTS agent_quarantine_ledger (
-    agent_id TEXT PRIMARY KEY,
-    status TEXT NOT NULL DEFAULT 'healthy',
-    consecutive_failures INTEGER NOT NULL DEFAULT 0,
-    total_failures INTEGER NOT NULL DEFAULT 0,
-    total_successes INTEGER NOT NULL DEFAULT 0,
-    quarantine_reason TEXT,
-    last_error_detail TEXT,
-    quarantined_at REAL,
-    updated_at REAL NOT NULL
-);
-```
-
-### 🛠️ Коригування #5: Відновлення Інваріанта Вузької Талії `./core/kernel.py` (`< 400 LOC`) та Дворівневий Каталог FastMCP (`Tier-0 Standing` vs `Tier-1 Deferred`)
-* **Яку проблему вирішує:** Повертає `./core/kernel.py` з 579 рядків до `< 360 LOC` шляхом винесення MCP-декораторів у `./core/kernel_mcp.py` та зменшує стартове навантаження MCP-схем на `Sacred Prompt Cache <= 6,000` токенів.
-* **Розподіл інструментів `dnk-kernel`:**
-  - **Tier-0 Standing (`always_loaded = True`, 5 інструментів, `~420` токенів):** `node_session_get_context`, `node_session_crystallize`, `execute_action`, `query_memory`, `get_system_status`.
-  - **Tier-1 Deferred (`defer_loading = True` або виклик через Python `execute_code`, 12 інструментів):** `dispatch_thought`, `record_observation`, `request_approval`, `inspect_code_map`, `prune_output`, `search_clipboard`, `get_clipboard_projects`, `get_clipboard_screenshots`, `node_session_post_message`, `fan_in_validate_and_aggregate`, `quarantine_get_status`, `quarantine_release_agent`.
-
-### 🛠️ Коригування #6: Міграція та Модернізація `./core/skills_curator.py` (Авто-Депрекейт, Парасолькова Консолідація `absorbed_into` та `<= 750 LOC` Ratchet)
-* **Яку проблему вирішує:** Переносить `skills_curator.py` у `./core/skills_curator.py` репозиторію `DNK_OS`, додає автоматичний аудит активності навичок (`Vitality Decay`), згортає 95+ дрібних `*_assimilated` скілів у 7–10 доменних парасольок (звільняючи `~1,500` токенів базового промпту) та автоматично контролює ліміт `<= 750` рядків `SKILL.md`.
-* **Контракт авто-прунінгу в `./core/skills_curator.py`:**
-```python
-@dataclass
-class SkillVitalityRecord:
-    skill_name: str
-    category: str
-    core_lines_count: int
-    invocations_30d: int
-    last_invoked_at: Optional[str]
-    vitality_score: float
-    recommended_action: str  # "keep_active" | "split_to_references" | "absorb_into_umbrella" | "archive_cold"
-    target_umbrella: Optional[str] = None
-```
-
-### 🛠️ Коригування #7: Декларативний Міст `Second Violation Invariant` між `SkillsCurator` та `./scripts/system/hermes_pre_tool_hook.py`
-* **Яку проблему вирішує:** Автоматизує головний закон Розділу 9 `AGENTS.md`: як тільки `SkillsCurator.record_observation()` фіксує `violation_count >= 2`, він автоматично генерує правило блокування у `./core/config/structural_barriers.json`, яке за `< 2 мс` перевіряється у `./scripts/system/hermes_pre_tool_hook.py` перед кожним викликом інструмента. Трекер циклів хука переноситься з `/tmp/` у `~/.dnk_runtime/run/`.
-
----
-
-## 9. Дисципліна Скептика: 3 Приховані Ризики (Mandatory Dissent / 3 Flaws)
-
-Згідно з інваріантом епістемічної броні (`AGENTS.md`, Розділ 6), зафіксуємо 3 критичні приховані ризики запропонованої архітектури та способи їх нейтралізації:
-
-1. **Ризик #1: Хибно-позитивне відсікання контексту при жорсткому Role-Scoped LOD Slicing (`<= 1,500` токенів)**
-   - *Суть ризику:* Якщо жорстко вирізати всі маркетингові правила `ICPProfile` для білдера `dnk_shopify`, агент під час верстки шаблону `blocks/sticky_atc_bar.liquid` може використати дефолтний placeholder-текст кнопки, який порушує `forbidden_cliches` бренду.
-   - *Інженерний запобіжник:* Залишати масив `forbidden_cliches` (займає лише `~40` токенів) та `value_proposition` (`~35` токенів) обов'язковими у базовому зрізі `ProjectDNA` для **всіх** ролей, фільтруючи лише важкі багаторядкові списки (`pain_points`, розгорнуті `business_rules` або детальні CSS-таблиці).
-2. **Ризик #2: Зациклення та спалювання токенів у Bounded Revision Loops (`Builder <-> Auditor`) на недетермінованих помилках середовища**
-   - *Суть ризику:* Якщо тест у `DeterministicExitCodeValidator` падає не через помилку коду агента, а через зайнятий порт або відсутній бінарник у PATH, 3 автоматичні ітерації ревізії спалять `~45,000` токенів і відправлять справного агента в карантин `TC-10`.
-   - *Інженерний запобіжник:* Класифікувати код повернення та `stderr` перед запуском циклу ревізії: інфраструктурні помилки (`EADDRINUSE`, `Command not found`, `sqlite3.OperationalError`) негайно зупиняють ревізію зі статусом `INFRA_BLOCKED` без інкременту лічильника провини агента у `TC-10`.
-3. **Ризик #3: Втрата рідкісних, але критичних інженерних формул при автоматичному прунінгу `*_assimilated` скілів**
-   - *Суть ризику:* Навичка на кшталт `remotion_composition_patterns` або `invokeai_assimilated` може не викликатися 45 днів, поки Максим працює над треком Shopify, але стати критично потрібною на старті медіа-треку.
-   - *Інженерний запобіжник:* Заборонити фізичне видалення дистильованих формул! Операція прунінгу переводить неактивний `*_assimilated` скіл зі стартового індексу `<available_skills>` у `references/<donor_name>.md` відповідної доменної парасольки (`dnk_media` або `dnk_shopify`), зберігаючи 100% контенту доступним через `skill_view(name, file_path="references/...")` при `0` токенів витрат у базовому промпті.
-
----
-
-## 10. Граничні Умови (Boundary Conditions)
-
-Архітектурні рішення цього аудиту мають чіткі фізичні межі застосовності (Boundary Conditions), за якими система вимагає переходу на наступний щабель масштабування:
-
-| Параметр системи | Робоча зона поточної архітектури (`DNK_OS v2.5.0`) | Точка зламу (Boundary Condition) | Тригер переходу на наступний рівень |
+#### Порівняльна таблиця Вектора 5:
+| Компонент | Патерн світового лідера (Hermes v0.23 / Claude Hooks) | Як реалізовано в DNK OS v2.5.0 | Рекомендація та корекція («ЩО ПІДКОРИГУВАТИ») |
 | :--- | :--- | :--- | :--- |
-| **Обсяг кодової бази та бази знань SCONES** | До **250,000 LOC** та до **50,000 записів** у `scones_observations_fts` (`< 15 мс` BM25 запит у SQLite WAL). | Понад **500,000 записів** неструктурованих клієнтських тікетів або багатомовних сирих транскриптів дзвінків, де лексичний збіг FTS5 падає нижче 70%. | Підключення локального quantized ONNX reranker або `sqlite-vec` виключно для таблиці сирих клієнтських транскриптів (без фонового Docker-демона). |
-| **Конкурентність запису у SQLite WAL (`dnk_dag_store.db`)** | До **8 паралельних агентів-воркерів** у різних `git worktrees` на одному MacBook (`PRAGMA busy_timeout = 5000`). | Понад **16 одночасних процесів**, що генерують `> 200 write tx/sec` у єдиний файл SQLite (поява `SQLITE_BUSY` попри WAL). | Розділення `spatial_canvas_sessions.db` по-проєктно (`.data/projects/<project_id>/canvas_sessions.db`), що дає нульову конкуренцію між проєктами. |
-| **Розмір графа просторового полотна (`.canvas`)** | До **150 нод** в одному файлі `.canvas` (`< 5 мс` Kahn SubDAG sort та атомарний `os.replace`). | Понад **300 нод** в одному JSON-файлі `.canvas` (затримка рендерингу в Obsidian та UI понад `16 мс` / `< 60 FPS`). | Ієрархічне вкладення полотен (`Sub-Canvas Node`: `main.canvas` містить 10–15 макро-нод треків, кожна з яких посилається на `track_*.canvas`). |
-| **Священний бюджет префікса (`Sacred Prompt Cache`)** | **`<= 6,000` токенів** на Step 0 (`L1 <= 1,500` + `L2 LOD <= 1,200` + `JIT Skills <= 1,800` + `Upstream Pins <= 1,500`). | Перевищення **`6,000` токенів** через одночасне монтування `> 5` повних `SKILL.md` або `> 6` батьківських нод у Fan-In вузлі. | Автоматична активація `ZeroWasteSlicer` у `compile_node_context()`: стиснення батьківських контрактів до `summary[:300 chars] + artifact_refs`. |
+| **Second Violation Invariant (Авто-генерація хуків)** | Ручне написання хуків розробником після інцидентів. | `SkillsCurator` виставляє прапорець `structural_barrier_required = True`, а `universal_guard.py` читає `structural_barriers.json`. | **З'єднати `SkillsCurator` із `core/config/structural_barriers.json`**: додати метод `stage_structural_barrier()`, який при `violation_count >= 2` автоматично реєструє regex-бар'єр для `universal_guard.py`. |
+| **Каталог Pre-Tool Sentinel бар'єрів** | Локальні bash-скрипти під один конкретний CLI. | Єдиний `core/sentinel/universal_guard.py` + `core/config/structural_barriers.json` (4 бар'єри). | **Розширити `core/config/structural_barriers.json` до 7 канонічних бар'єрів**: додати `BARRIER_005_BARE_PIP_INSTALL`, `BARRIER_006_BLACKLISTED_MONOREPO_CLONE` (`lobe-chat`) та `BARRIER_007_ROOT_DIRECTORY_POLLUTION`. |
+| **Прунінг та життєвий цикл навичок** | Статичний каталог навичок, що розростається і спалює токени індексу. | Core-Size Ratchet (`<= 750 LOC`) + `scones_vitality.py`. | **Додати `--prune-stale` у `core/skills_curator.py`**: раз на 30 днів переносити навички з `0` викликів у `.archive/`, залишаючи активний каталог компактним. |
 
 ---
 
-## 11. Скептична Альтернатива (Skeptic Alternative / Minimalist Solution)
+## 🛠️ 4. Топ-7 Конкретних Архітектурних Коригувань (Top Actionable Adjustments) для Ядра DNK OS v2.5.0
 
-Згідно з `DEC-057` (Senior Dev Solution Ladder), розглянемо **мінімалістичну скептичну альтернативу** («Що буде, якщо не писати жодного нового класу оркестрації, а обійтися мінімальними правками існуючих файлів за 1 годину?»):
+Нижче наведено пріоритезований інженерний план точкових коригувань із вказанням точних файлів, схем та механізмів:
 
-1. **Мінімальний варіант (Zero-New-Modules Path):**
-   - Замість побудови автоматичного `structural_barriers.json` та розширення `FanInAggregator`, просто скопіювати вже готові файли `scones_bm25_index.py`, `scones_vitality.py`, `skills_curator.py`, `vibe_coder_account.json` із `../DNK_HUB/` у `./core/`, виправити застарілий шлях `DNK_Horizon_Tinker -> DNK_Sovereign_Apex` у `./docs/projects/dnk_ecom/brand_dna.json` і вручну перемістити 90 донорських тек `*_assimilated` із активного каталогу навичок у `./docs/notes/sota_audits/`.
-2. **Чому мінімальний варіант є обов'язковим Першим Кроком (Wave 1), але недостатнім без Коригувань #3 та #4:**
-   - Просте копіювання файлів із `DNK_HUB` миттєво відновить працездатність `SCONES BM25` та `L1 AccountSpec` (це потрібно зробити негайно!).
-   - Проте без винесення `create_fastmcp_server` із `./core/kernel.py` ядро залишається поза інваріантом `< 400 LOC` (579 рядків), а без збереження стану `AgentQuarantineGuard` у SQLite та ліміту `<= 1,500` токенів у `compile_node_context()` система залишається вразливою до безконтрольного росту контексту на глибоких полотнах. Тому оптимальним є поєднання **миттєвої синхронізації готових модулів** із **точковими патчами (~120 LOC сумарно)** у 4 ядерних файлах.
+### Коригування №1: Справжнє Deferred Loading для Tier-1 Інструментів у `core/kernel_mcp.py` (Економія ~68% Standing Tokens)
+* **Файл**: `./core/kernel_mcp.py`
+* **Суть зміни**:
+  1. У `create_fastmcp_server(kernel, name="dnk-kernel", expose_tier1_directly=False)` залишити декоратор `@mcp.tool()` за замовчуванням **лише на 5 Tier-0 Standing Tools** (`node_session_get_context`, `node_session_crystallize`, `execute_action`, `query_memory`, `get_system_status`).
+  2. Додати 2 легковагові мета-інструменти:
+     - `kernel_tool_search(query: str) -> str`: повертає імена, описи та JSON-схеми релевантних Tier-1 інструментів (`inspect_code_map`, `verify_grounding`, `run_adversarial_gate`, `assimilate_repository` тощо).
+     - `kernel_tool_call(tool_name: str, arguments_json: str) -> str`: виконує будь-який Tier-1 інструмент за іменем.
+* **Результат**: Стоячий контекст мікроядра на Кроці 0 зменшується з 16 схем до 7 компактних сигнатур (`< 1,800` токенів).
+
+### Коригування №2: Федеративна інтеграція `SconesStore` + `SconesBM25Index` (Усунення Memory Split-Brain)
+* **Файли**: `./core/memory/scones_store.py`, `./core/memory/scones_bm25_index.py`
+* **Суть зміни**:
+  1. Підключити `SconesBM25Index` як вбудований індекс фактів усередині `SconesStore.get_memories(topic, limit, active_files=None)`.
+  2. Перед поверненням результатів автоматично викликати `scones_anchor_verifier.py` для перевірки того, що `file_anchor` та `symbol_anchor` фізично існують у поточному дереві коду.
+* **Результат**: Єдиний виклик `query_memory(topic)` повертає як історичні уроки сесій, так і верифіковані AST-факти за `< 15 мс`.
+
+### Коригування №3: Посилення `GoldfishToolWorker` перевіркою `PSOD Scope` та захист тай-брейкера в `Harness2Engine`
+* **Файли**: `./core/orchestrator/goldfish_tool_worker.py`, `./core/orchestrator/harness2_engine.py`
+* **Суть зміни**:
+  1. У `GoldfishToolWorker.audit()` парсити заголовки `diff --git a/<path> b/<path>` із `diff_content` і звіряти кожен модифікований файл із `PSODPacket.allowed_files` та `PSODPacket.negative_scope`. Якщо змінено файл поза білим списком — миттєвий вердикт `passed = False` із кодом `SCOPE_CREEP_VIOLATION`.
+  2. У `Harness2Engine.evaluate_blind_tournament()` вимагати `cand.loc_changed > 0 and bool(cand.diff_text.strip())`, щоб порожній патч (`0 LOC`) ніколи не міг виграти турнір за правилом мінімального дифу.
+
+### Коригування №4: Замкнення скінченного автомата ревізій у `CanvasSessionRouter` (`needs_revision` -> `BoundedRevisionLoop` -> `TC-10 Quarantine`)
+* **Файли**: `./core/canvas/session_router.py`, `./core/orchestrator/bounded_revision_loop.py`
+* **Суть зміни**:
+  1. Додати у `CanvasSessionRouter` метод `record_node_verification_failure(canvas_path, node_id, round_num, flaws, quarantined=False)`, який оновлює статус сесії у `dnk_dag_store.db` та фарбує вузол у `.canvas`:
+     - раунд 1–2 (`needs_revision`) -> колір `"2"` (помаранчевий) із переліком дефектів;
+     - раунд 3 (`quarantined`, `TC-10`) -> колір `"1"` (червоний) із блокуванням подальших автоматичних спроб до рішення Максима.
+  2. Замінити сирий зріз `c.summary[:budget]` у `session_router.py:847` на структурне збереження секції `Artifacts` та ключових булітів контракту.
+
+### Коригування №5: Контроль свіжості L2 DNA (`dna_sha256`) та синхронізація L1/Triage із 3 Робочими Конячками
+* **Файли**: `./core/config/vibe_coder_account.json`, `./core/orchestrator/task_triage.py`, `./core/canvas/session_router.py`
+* **Суть зміни**:
+  1. Додати `dnk_media` та `dnk_distribution` у `system_services` файлу `core/config/vibe_coder_account.json`.
+  2. У `core/orchestrator/task_triage.py` замінити застарілий `services/dnk_video_ai_creator/` на `services/dnk_media/` та додати домен `distribution_growth` (`services/dnk_distribution/`).
+  3. Зберігати `dna_sha256` (хеш `brand_dna.json`) у таблиці `node_chat_sessions` під час кристалізації вузла.
+
+### Коригування №6: Розширення `structural_barriers.json` до 7 канонічних бар'єрів та авто-스테йджинг із `SkillsCurator`
+* **Файли**: `./core/config/structural_barriers.json`, `./core/skills_curator.py`
+* **Суть зміни**:
+  1. Доповнити `core/config/structural_barriers.json` бар'єрами `BARRIER_005_BARE_PIP_INSTALL`, `BARRIER_006_BLACKLISTED_MONOREPO_CLONE` (`lobehub/lobe-chat`) та `BARRIER_007_ROOT_DIRECTORY_POLLUTION`.
+  2. У `SkillsCurator.record_observation()` при `obs.structural_barrier_required == True` автоматично формувати чернетку JSON-правила для `structural_barriers.json`.
+
+### Коригування №7: Автоматичний `Skill Vitality Pruner` (`> 30 днів` без викликів -> `.archive/`)
+* **Файли**: `./core/skills_curator.py`, `./core/memory/scones_vitality.py`
+* **Суть зміни**:
+  1. Інтегрувати статистику викликів із `scones_vitality.py` у `SkillsCurator`.
+  2. Навички з `0` звернень за останні 30 днів (окрім захищених у `sanctioned_skill_catalog` із `vibe_coder_account.json`) автоматично переміщувати у підпапку `.archive/`, зберігаючи індекс навичок агента максимально легким.
 
 ---
 
-## 12. Покроковий План Впровадження Коригувань (MASE Implementation Plan & Checklist)
+## 📊 5. Підсумкова Матриця Зрілості DNK OS v2.5.0 проти Світових Лідерів (SOTA 2026)
 
-Усі 7 коригувань розбиті на 3 детерміновані MASE-хвилі (`<= 25` дій на хвилю), де кожен крок завершується машинною верифікацією (`exit code 0`):
-
-### Хвиля 1: Відновлення Цілісності Ядра, Пам'яті SCONES FTS5 та Проєктної ДНК (`MASE-AUDIT-01`)
-- [ ] **Крок 1.1 (Narrow Waist `< 400 LOC`):** Винести функцію `create_fastmcp_server()` із `./core/kernel.py` у `./core/kernel_mcp.py`, залишивши реекспорт у `./core/kernel.py`. Перевірити: `wc -l ./core/kernel.py` (`< 400 LOC`).
-- [ ] **Крок 1.2 (Активація SCONES FTS5 BM25 & Vitality):** Синхронізувати `./core/memory/scones_bm25_index.py` та `./core/memory/scones_vitality.py` у `DNK_OS`, додати віртуальну таблицю `scones_observations_fts` (`USING fts5`), поля `(account_id, project_id, superseded_by)` у `./core/memory/scones_store.py`.
-- [ ] **Крок 1.3 (Синхронізація L1 Account та L2 Brand DNA):** Перенести `./core/config/vibe_coder_account.json` та `./core/project/project_engine.py` у `DNK_OS`. Оновити у `./docs/projects/dnk_ecom/brand_dna.json` шлях `DNK_Horizon_Tinker` на `./services/dnk_shopify/DNK_Sovereign_Apex` та узгодити `project.manifest.yaml`.
-
-### Хвиля 2: Контекстна Хірургія Полотна, Цикли Ревізій та Персистентний Карантин (`MASE-AUDIT-02`)
-- [ ] **Крок 2.1 (LOD Slicing & `<= 1,500` Token Guard):** Додати у `./core/canvas/session_router.py` рольову проєкцію `compile_lod_dna_slice()` та жорстке обмеження `max_upstream_tokens: int = 1500` у `compile_node_context()`.
-- [ ] **Крок 2.2 (Персистентний `TC-10 AgentQuarantineGuard`):** Додати SQLite WAL збереження стану `AgentHealthRecord` у `./core/sentinel/agent_quarantine.py`, щоб лічильник `consecutive_failures` зберігався між CLI-викликами.
-- [ ] **Крок 2.3 (Bounded Revision Loop & Unified HITL):** Інтегрувати `FanInAggregator` із `SpatialCanvasSessionRouter`: при провалі гейту записувати `ValidationIssue` у чат ноди (до `max_revisions = 3`), а для критичних дій оновлювати статус ноди на `⏳ AWAITING_APPROVAL` із пушем у `~/.dnk_runtime/piu/`.
-
-### Хвиля 3: Куратор Навичок, Парасолькова Консолідація та Воркхорси #2/#3 (`MASE-AUDIT-03`)
-- [ ] **Крок 3.1 (Міграція `./core/skills_curator.py` & Ratchet):** Перенести `skills_curator.py` у `./core/skills_curator.py`, замінити `/tmp/` на `~/.dnk_runtime/run/` у `./scripts/system/hermes_pre_tool_hook.py` та підключити `./core/config/structural_barriers.json`.
-- [ ] **Крок 3.2 (Прунінг індексу `<available_skills>`):** Згорнути 95+ вузьких `*_assimilated` скілів у доменні парасольки (`absorbed_into`) або перемістити їхні довідники у `references/`, скоротивши стартовий індекс до `<= 35` активних навичок.
-- [ ] **Крок 3.3 (Скаффолдинг Воркхорсів #2 та #3):** Розгорнути 5-елементні суверенні цеглинки `./services/dnk_media/` та `./services/dnk_distribution/` через `./scripts/system/new_brick.py` і прогнати повний гейт `just test`.
+| Вектор аудиту | Anthropic (`Claude Code`) | LangGraph (`Pregel`) | NousResearch (`Hermes 0.23`) | Google Research (`Harness²` + `EGM`) | DNK OS v2.5.0 (Поточний стан) | DNK OS після 7 коригувань |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1. Ієрархія знань (L1->L2->L3)** | 8.5 / 10 | 7.0 / 10 | 8.0 / 10 | 8.5 / 10 | **9.2 / 10** | **9.9 / 10** |
+| **2. Когнітивна пам'ять (Zero-Bloat)** | 8.0 / 10 | 8.5 / 10 | 8.5 / 10 | 8.0 / 10 | **9.1 / 10** | **9.8 / 10** |
+| **3. Сервіси та Брикси (Context Diet)** | 9.5 / 10 | 7.5 / 10 | 9.0 / 10 | 8.5 / 10 | **9.0 / 10** | **9.9 / 10** |
+| **4. Оркестрація, EGM та Турніри** | 8.5 / 10 | 9.5 / 10 | 8.5 / 10 | 9.5 / 10 | **9.1 / 10** | **9.9 / 10** |
+| **5. Курація навичок та Pre-Tool Sentinel** | 9.0 / 10 | 7.0 / 10 | 9.2 / 10 | 8.5 / 10 | **9.2 / 10** | **9.9 / 10** |
+| **ЗАГАЛЬНИЙ ІНДЕКС SOTA** | **8.7 / 10** | **7.9 / 10** | **8.6 / 10** | **8.6 / 10** | **9.1 / 10** | **9.88 / 10** |

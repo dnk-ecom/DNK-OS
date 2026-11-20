@@ -1,0 +1,146 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/dnk_plugin_certification.schema.yaml"
+# purpose: "JSON Schema draft-07 for DNK OS Plugin Certification Records (evaluated -> active)"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "DNKPluginCertificationRecord"
+description: "Validation schema for formal certification records promoting plugins from evaluated to active."
+type: "object"
+required:
+  - "plugin_id"
+  - "plugin_version"
+  - "lifecycle_from"
+  - "lifecycle_to"
+  - "contract_tests"
+  - "security_review"
+  - "activation_approval"
+  - "evidence_paths"
+  - "certified_at"
+  - "certified_by"
+
+additionalProperties: false
+
+properties:
+  plugin_id:
+    type: "string"
+    pattern: "^plugin-[a-z0-9_-]+$"
+    description: "Unique plugin identifier."
+
+  plugin_version:
+    type: "string"
+    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$"
+    description: "Semantic version of the certified plugin."
+
+  lifecycle_from:
+    type: "string"
+    enum:
+      - "evaluated"
+    description: "Source lifecycle state (must be evaluated)."
+
+  lifecycle_to:
+    type: "string"
+    enum:
+      - "active"
+    description: "Target lifecycle state (must be active)."
+
+  contract_tests:
+    type: "object"
+    required:
+      - "path"
+      - "status"
+      - "last_run_at"
+    additionalProperties: false
+    properties:
+      path:
+        type: "string"
+        pattern: "^(?!/)(?!~).*\\.py$"
+        description: "Relative path to test suite."
+      status:
+        type: "string"
+        enum:
+          - "green"
+          - "passed"
+        description: "Contract test execution status."
+      last_run_at:
+        type: "string"
+        description: "ISO-8601 execution timestamp."
+
+  security_review:
+    type: "object"
+    required:
+      - "path"
+      - "reviewer"
+      - "reviewed_at"
+      - "risk_level"
+    additionalProperties: false
+    properties:
+      path:
+        type: "string"
+        pattern: "^(?!/)(?!~).*\\.md$"
+        description: "Relative path to security review markdown evidence."
+      reviewer:
+        type: "string"
+        minLength: 1
+        description: "Auditor or agent identity who performed security review."
+      reviewed_at:
+        type: "string"
+        description: "ISO-8601 review timestamp."
+      risk_level:
+        type: "string"
+        enum:
+          - "low"
+          - "medium"
+          - "high"
+          - "critical"
+        description: "Assessed risk level."
+      notes:
+        type: "string"
+        description: "Mitigation and review notes (mandatory if risk is high/critical)."
+
+  activation_approval:
+    type: "object"
+    required:
+      - "path"
+      - "approver"
+      - "approved_at"
+    additionalProperties: false
+    properties:
+      path:
+        type: "string"
+        pattern: "^(?!/)(?!~).*\\.md$"
+        description: "Relative path to activation approval evidence."
+      approver:
+        type: "string"
+        pattern: "(?i).*maksym.*"
+        description: "Authorized approver name (must be Maksym)."
+      approved_at:
+        type: "string"
+        description: "ISO-8601 approval timestamp."
+      approval_record:
+        type: "string"
+        description: "Unique approval identifier or reference."
+
+  evidence_paths:
+    type: "array"
+    minItems: 3
+    items:
+      type: "string"
+      pattern: "^(?!/)(?!~).+$"
+    description: "List of relative paths to all supporting evidence files."
+
+  certified_at:
+    type: "string"
+    description: "ISO-8601 certification completion timestamp."
+
+  certified_by:
+    type: "string"
+    minLength: 1
+    description: "Agent or system authority executing certification."

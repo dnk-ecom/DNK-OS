@@ -1,0 +1,17 @@
+# DNK OS Client Portal & Sovereign Shopify Architecture
+> Authentic, Agent-Ready living documentation and commercial workspace for bespoke Shopify engineering.
+
+## Overview
+This portal provides the complete technical audit, commercial proposal, and interactive prototypes for the client project.
+
+## Documents
+- [Main Workspace](index.html): Executive project brief, key deliverables, and scope overview.
+- [Technical Audit](audit.html): Core Web Vitals (LCP, CLS, INP) audit, Liquid theme diagnostics, and third-party app weight breakdown.
+- [Commercial Proposal](proposal.html): Implementation phases, deliverables, investment tiers, and warranty terms.
+- [Interactive Demo](demo.html): Live prototypes of custom Shopify CRO Theme Blocks, ROI calculator, and Before/After slider.
+
+## Design System & Stack
+- Architecture: Shopify Online Store 2.0 (Theme Blocks v2, zero external app bloat)
+- Design Tokens: W3C DTCG-2025.10 Specification
+- Edge Runtime: Cloudflare Pages with Edge Password Gate
+- In-Context Feedback: dnk-sensor.js with Area Marquee & Pinning

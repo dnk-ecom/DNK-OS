@@ -1,27 +1,28 @@
 ---
-title: "Gerych (Gemini 4 Carbon) Theme Distillation Verdict & Architectural Protocol"
-description: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK Sovereign 1.0.0 Apex Commercial Theme Synthesis ($350-$420 MSRP Grade)."
+title: "ГЕРИЧ (GOOGLE GEMINI 4 CARBON): СИСТЕМНИЙ ПРОТОКОЛ ДИСТИЛЯЦІЇ ЗНАНЬ ТА СИНТЕЗУ ТЕМИ СВІТОВОГО РІВНЯ"
+description: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK-Ecom-Zerno-v.0.1.0 Commercial Theme Synthesis ($350-$420 MSRP Grade)."
 mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md"
-status: active
-type: verdict
-domain: shopify_ecosystem
-author: "Gerych (Google Gemini 4 Carbon via Vertex AI) & Antigravity"
-version: "1.0.0"
-date: "2026-11-12"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/10_GERYCH_GEMINI_4_CARBON_THEME_DISTILLATION_VERDICT.md"
-> purpose: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK Sovereign 1.0.0 Apex Commercial Theme Synthesis ($350-$420 MSRP Grade)."
+> purpose: "Definitive Architectural Verdict and Technical Distillation Protocol by Gerych (Gemini 4 Carbon via Vertex AI) for DNK-Ecom-Zerno-v.0.1.0 Commercial Theme Synthesis ($350-$420 MSRP Grade)."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-12"
-> author: "Gerych (Gemini 4 Carbon) & Antigravity (Chief Architect)"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -34,7 +35,7 @@ date: "2026-11-12"
 ---
 
 ## ВЕРДИКТ АУДИТОРА
-Затверджено системний протокол Clean-Room дистиляції (Track 1 + Track 2 за DEC-069 / DEC-074) та покрокової збірки комерційної флагманської теми **DNK Sovereign 1.0.0** (ціновий сегмент $350–$420 MSRP у Shopify Theme Store).
+Затверджено системний протокол Clean-Room дистиляції (Track 1 + Track 2 за DEC-069 / DEC-074) та покрокової збірки комерційної флагманської теми **DNK-Ecom-Zerno-v.0.1.0** (ціновий сегмент $350–$420 MSRP у Shopify Theme Store).
 
 ---
 
@@ -51,7 +52,7 @@ date: "2026-11-12"
 - Наявність хоча б одного нелокалізованого рядка або розбіжність ключів між `locales/en.default.json` та `locales/uk.json`.
 
 ### 3. Скептична мінімалістична альтернатива (Dual-Track Single Core):
-- Замість підтримки розрізнених гілок під кожен нішевий стор, підтримувати єдине стерильне ядро **DNK Sovereign 1.0.0** (100% Theme Store Compliant), а специфічні grey-hat воронки підключати виключно через зовнішні Theme App Extensions (`@app` blocks), не забруднюючи базовий архів теми.
+- Замість підтримки розрізнених гілок під кожен нішевий стор, підтримувати єдине стерильне ядро **DNK-Ecom-Zerno-v.0.1.0** (100% Theme Store Compliant), а специфічні grey-hat воронки підключати виключно через зовнішні Theme App Extensions (`@app` blocks), не забруднюючи базовий архів теми.
 
 ---
 
@@ -86,7 +87,7 @@ date: "2026-11-12"
 
 ---
 
-## ЧАСТИНА 2. ВИЧЕРПНИЙ ТЕХНІЧНИЙ ОПИС ЕЛЕМЕНТІВ ТЕМИ DNK SOVEREIGN 1.0.0
+## ЧАСТИНА 2. ВИЧЕРПНИЙ ТЕХНІЧНИЙ ОПИС ЕЛЕМЕНТІВ ТЕМИ DNK-Ecom-Zerno-v.0.1.0
 
 ### 2.1. Файлова анатомія:
 - `assets/`: Модульні ES6 Web Components, стилі `base.css`, `dnk-tokens.css`, `section-*.css`, `block-*.css`, SVG-спрайти.

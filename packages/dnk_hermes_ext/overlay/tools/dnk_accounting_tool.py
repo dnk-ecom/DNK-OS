@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_accounting_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_accounting_tool.py"
 # purpose: "Native Hermes tool for retrieving financial, token spending, and execution duration telemetry per workspace."
 # canonical_source: true
 # alters_files: []

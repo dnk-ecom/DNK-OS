@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md"
-# purpose: "Standardized Task Specification Template for Hermes Agent Gerych to Audit Any Donor Branch"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.0.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Бойове технічне завдання для Gerych23: Автономний аудит гілки-донора"
+description: "Standardized Task Specification Template for Hermes Agent Gerych to Audit Any Donor Branch"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/01_AUTONOMOUS_HERYCH_TASK_TEMPLATE.md"
+> purpose: "Standardized Task Specification Template for Hermes Agent Gerych to Audit Any Donor Branch"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🤖 Бойове технічне завдання для Gerych23: Автономний аудит гілки-донора
 

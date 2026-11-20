@@ -1,24 +1,28 @@
 ---
-title: "Readme"
-status: draft
-type: note
-domain: core
-author: "DNK-e.com Maksym"
-version: "1.0.0"
+title: "Hermes Worker Queue Service"
+description: "Worker queue service documentation for Hermes Agent."
+mrh_id: "packages/dnk_hermes_ext/overlay/services/worker/README.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - hermes
+  - worker
+  - queue
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "core/hermes_agent/services/worker/README.md"
-> purpose: "Document: Readme"
+> mrh_id: "packages/dnk_hermes_ext/overlay/services/worker/README.md"
+> purpose: "Worker queue service documentation for Hermes Agent."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Draft"
-> version: "1.0.0"
-> updated_at: "2026-09-24"
-> author: "DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

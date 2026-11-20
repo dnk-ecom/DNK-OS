@@ -1,10 +1,15 @@
 ---
-title: "DNK OS Foundation & Session Handoff (DEC-110 / DEC-117)"
-status: "Active"
-type: "plan"
-domain: "core"
-author: "DNK-e.com"
-version: "1.0.0"
+title: "DNK OS Foundation & Session Handoff Bridge"
+description: "Canonical Session Handoff & Continuity Bridge: Architecture, Invariants, Dependencies, and Active Backlog for DNK_OS."
+mrh_id: "docs/plans/SESSION_HANDOFF_DNK_OS_FOUNDATION.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.8.0"
+updated: 2026-11-20
+tags:
+  - dnk-os
+  - architecture
+  - handoff
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -16,42 +21,107 @@ version: "1.0.0"
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "DNK-e.com"
+> version: "2.8.0"
+> updated_at: "2026-11-20"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
 # 🌉 DNK OS Foundation & Session Handoff Bridge
 
-> **Призначення**: Цей документ є єдиним канонічним містком безперервності (Continuity Bridge) між сесією проєктування в інкубаторі `DNK_HUB` та суверенним бойовим воркспейсом **`DNK_OS`** (`/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS`).
-> Всі рішення зафіксовані в режимі `[🔒 LOCKED]` і не підлягають амнезії чи повторним обговоренням з нуля.
+> **Призначення**: Цей документ є єдиним канонічним містком безперервності (Continuity Bridge) між сесіями проєктування.
+> Всі рішення (DEC-110 .. DEC-163) зафіксовані в режимі `[🔒 LOCKED]` у [DECISION_REGISTRY_ADHD.md](../architecture/DECISION_REGISTRY_ADHD.md) і не підлягають амнезії чи повторним обговоренням з нуля.
 
 ---
 
-## 1. 🏛️ Статус переходу та рольовий розподіл (DEC-110, DEC-117)
+## 1. 🏛️ Статус репозиторіїв та синхронізація
 
 1. **Суверенний воркспейс `DNK_OS`**:
    - `DNK_OS` є єдиним чистим бойовим репозиторієм DNK OS MVP.
    - Структура відповідає **Canonical 8-Root Directory Invariant**: `apps/`, `core/`, `services/`, `packages/`, `infra/`, `docs/`, `tests/`, `scripts/`.
-   - `DNK_HUB` назавжди переведений у статус **Read-Only архіву R&D знань** (`DEC-117`). Жодна нова розробка в `DNK_HUB` не ведеться.
-
-2. **Розподіл ролей агентів**:
-   - **Antigravity (Mentor / Architect)**: Архітектурний нагляд, контроль інваріантів, якісні шлюзи, рев'ю PR.
-   - **Denchik (Денчік — Sovereign Master Developer)**: Фізичне будівництво модулів, ліквідація дефектів, робота через FastMCP In-Memory Code Mode всередині `DNK_OS`.
-   - **Gerych (Герич — Cold Knowledge Archivist)**: Тільки читання історичних логів та холодна ретроспектива (DEC-054).
+   - `DNK_HUB` назавжди переведений у статус **Read-Only архіву R&D знань** (`DEC-117 [🔒 LOCKED]`).
+2. **Суверенний macOS клієнт `DNK_Piu`**:
+   - Суверенний Swift / SwiftUI клієнт диктування на Mac (`../DNK_Piu`).
+   - Синхронізований з GitHub (`main` branch up to date).
+   - Включає суб-700ms ASR на базі Gemini 3.5 Flash Transcribe, апаратне AAC кодування, динамичний DNA floating pill та Solar Duotone мікрофон (DEC-166 .. DEC-169).
 
 ---
 
-## 2. 🔒 Зафіксовані архітектурні рішення (DEC-110 .. DEC-117)
+## 2. 🔒 Зафіксовані ключові архітектурні рішення (DEC-110 .. DEC-163)
 
 | Рішення | Назва | Суть та статус |
 | :--- | :--- | :--- |
-| **DEC-110** | **Clean Foundation & Standalone Release** | Відокремлення бойового ядра `DNK_OS` від експериментального хабу `DNK_HUB`. Повна автономність без зовнішніх симлінків на код. `[🔒 LOCKED]` |
-| **DEC-115** | **Apex 1.0.0 CRO Architecture & Theme Blocks 2.0** | Workhorse #1 (`services/dnk_shopify`): SaaP Dual-Ready блоки (Tinker 4.2.0 + Liquid AST), 7-gate валідація, Zero-App-Bloat. `[🔒 LOCKED]` |
-| **DEC-116** | **Dynamic Client Proposal Engine** | Генератор комерційних пропозицій та клієнтський портал (`proposal_client_portal.html`) з ін'єкцією Brand DNA та матрицею цінності. `[🔒 LOCKED]` |
-| **DEC-117** | **Sovereign Unified Microkernel v2.5.0** | Єдине ядро `core/kernel.py`, що нативно об'єднує 4 SOTA підсистеми: Spatial Canvas Router, Fan-In Aggregator, Quarantine Sentinel, SCONES FTS5 Memory. `[🔒 LOCKED]` |
-| **DEC-118** | **Node Session Lifecycle & Competitor Theme Extraction** | Narrow-Waist CLI (`core/kernel_cli.py`, `Justfile`), Graph Context Surgery ($\le 1500$ tok), досьє Sugar Theme (`docs/notes/sota_audits/SUGAR_THEME_AUDIT.md`), кристалізація `node_t3_sugar_theme_audit` та передача контракту в `node_t1_dual_ready_blocks`. 42/42 tests pass. `[🔒 LOCKED]` |
+| **DEC-110** | **Clean Foundation & Standalone Release** | Відокремлення бойового ядра `DNK_OS` від експериментального хабу `DNK_HUB`. `[🔒 LOCKED]` |
+| **DEC-117** | **Sovereign Unified Microkernel v2.5.0** | Єдине ядро `core/kernel.py`: Spatial Canvas Router, Fan-In Aggregator, Quarantine Sentinel, SCONES FTS5 Memory. `[🔒 LOCKED]` |
+| **DEC-126** | **Turnkey Shopify Dev Squad** | Workhorse #1 (`services/dnk_shopify`): 5 спеціалізованих агентів + Pipeline Runner. 75/75 тестів пройшли. `[🔒 LOCKED]` |
+| **DEC-128** | **Dual-Surface Action Registry** | Двосторонній Action Bus між Next.js Living Canvas та FastMCP бекендом. `[🔒 LOCKED]` |
+| **DEC-153** | **Unified 9:16 Video Composition Pipeline** | Workhorse #2 (`services/dnk_media`): чиста збірка відеокомпозицій, субтитри, аудіо-дизайн. `[🔒 LOCKED]` |
+| **DEC-159** | **Sovereign GEO llms.txt & Merchant Feed** | Нативна підтримка Generative Engine Optimization (GEO) та XML-фідів Google Merchant. `[🔒 LOCKED]` |
+| **DEC-160** | **C2PA Media Provenance & Theme Renaming** | Повна криптографічна фіксація автентичності контенту (C2PA) та закріплення назви теми `DNK Ecom` (Зерно / v0.1.0). `[🔒 LOCKED]` |
+| **DEC-162** | **Sovereign Social Media Scanner** | Workhorse #3 (`services/dnk_distribution`): автономний сканер TikTok, Reddit, YouTube та асиміляція правил агентів. `[🔒 LOCKED]` |
+| **DEC-163** | **Sovereign AI Brand Kit & Theme Distiller** | Генерація `DESIGN.md` (Google Labs), `BRAND.md` (Zero-Hallucination Quotes), `SKILL.md` (Every Time Guard) та Edge Showcase на Cloudflare Pages. `[🔒 LOCKED]` |
+
+---
+
+## 3. 🐴 Статус трьох головних робочих конячок (3 Core Workhorses)
+
+1. **Workhorse #1: `services/dnk_shopify` (`DNK_Ecom` v0.1.0 "Зерно")**:
+   - Повна відповідність стандартам Shopify Theme Store: 7 клієнтських шаблонів (`templates/customers/*`), секції `main-customers-*`, SaaP Dual-Ready блоки.
+   - `shopify theme check` = 0 помилок на 280+ файлах. Готовий релізний zip-архів: `services/dnk_shopify/release/DNK-Ecom-Zerno-v.0.1.0.zip`.
+2. **Workhorse #2: `services/dnk_media`**:
+   - Суверенний пайплайн генерації вертикальних 9:16 відео, C2PA provenance водяні знаки, ліквідація тиші, кінетичні субтитри.
+3. **Workhorse #3: `services/dnk_distribution`**:
+   - Автономний збирач та аналізатор вірусного соцмережевого контенту, адаптер каналів, черга публікації через outbox daemon.
+
+---
+
+## 4. ⚙️ Рантайм, залежності та команди `just`
+
+Всі залежності налаштовані за принципом **Zero-Waste APFS Hardlink Store**:
+- **Python**: Керується `uv`, venv знаходиться у `~/.dnk_runtime/venv` та підключений через симлінк `DNK_OS/.venv`.
+- **Node.js**: Керується `pnpm`, глобальний стор `~/.dnk_runtime/pnpm-store/v10`.
+- **Командний центр**: `Justfile`.
+
+```bash
+# 1. Запуск усіх тестів ядра
+just test
+
+# 2. Запуск тестів Shopify Workhorse #1
+just test-shopify
+
+# 3. Перевірка статусу системи
+just status
+
+# 4. Запуск FastAPI сервера (порт 8000)
+just api
+
+# 5. Запуск повного детермінованого аудиту
+bash scripts/verify_all.sh
+```
+
+---
+
+## 5. 📋 Активний беклог задач для нової сесії
+
+### Пріоритет 1: Shopify Theme Store публікація та дистиляція нових CRO-блоків
+- [ ] Запустити фінальну валідацію `services/dnk_shopify/DNK_Ecom` через live Shopify CLI Storefront.
+- [ ] Інтегрувати дистильовані дизайн-токени з `docs/projects/dnk_ecom/distillations/pergolux/` у живий прев'ю-стенд.
+
+### Пріоритет 2: DNK OS Living Canvas & Cockpit UI
+- [ ] Перевірити роботу живого канвасу (`apps/web/app/workspace/agent/page.tsx`) з реальними WebSocket/SSE подіями від Action Bus.
+- [ ] Протестувати двосторонню синхронізацію нод канвасу з Taskboard SQLite (`test_taskboard_canvas_sync.py`).
+
+### Пріоритет 3: DNK_Piu інтеграція з DNK_OS
+- [ ] Підключити локальний сокет/HTTP міст між macOS застосунком `DNK_Piu` та ядром `DNK_OS` (`apps/api/routers/kernel_router.py`) для передачі розпізнаного голосового контексту безпосередньо у `dispatch_thought`.
+
+---
+
+## 6. 🚀 Інструкція: Як стартувати з чистого листа
+
+1. **Очистити контекст / Відкрити нову сесію**.
+2. **Перший промпт у новій сесії**:
+   > *"Продовжуємо роботу по беклогу з `docs/plans/SESSION_HANDOFF_DNK_OS_FOUNDATION.md`. Поточні архітектурні рішення зафіксовані в `docs/architecture/DECISION_REGISTRY_ADHD.md` (DEC-110 .. DEC-163). Приступаємо до Пріоритету 1 (або конкретної підзадачі)."*
+3. Агент з 0 токенами на старті зчитує лише цей файл і одразу працює на 100% швидкості без протиріч.
 
 ---
 
@@ -151,6 +221,8 @@ just mcp-stdio
 - [ ] Витягти найкращі CRO UI-паттерни в бібліотеку компонентів Apex (наступні донори: Story, Shrine, Ella).
 
 ### Трек 1: Shopify Apex CRO Theme (Workhorse #1)
+- [x] Pre-Setup Architecture & 32-Point Theme Store Acceptance Checklist (DEC-127, [13_SHOPIFY_THEME_STORE_PRE_SETUP_AND_ACCEPTANCE_CHECKLIST.md](../../../DNKEcom/Audit_Shopify_Themes_Sell_WF/_Shopify_Theme_DEV_Workflow/13_SHOPIFY_THEME_STORE_PRE_SETUP_AND_ACCEPTANCE_CHECKLIST.md)) `[🔒 LOCKED]`
+- [ ] Додати відсутні обов'язкові клієнтські шаблони `templates/customers/*` (`account`, `login`, `addresses`, `order`, etc.) у цільове ядро `dnk-sovereign-apex` для 100% проходження шлюзу Theme Store.
 - [ ] Фізичний синтез SaaP Dual-Ready v2.0 блоків у `services/dnk_shopify/DNK_Sovereign_Apex/blocks/` (`node_t1_dual_ready_blocks`):
   - `sticky_atc_bar.liquid` + `dnk-cart-bus.js` (на основі Sugar)
   - `tiered_discount_table.liquid`
@@ -170,7 +242,7 @@ just mcp-stdio
 
 1. **В IDE Antigravity / Cursor / VS Code**:
    - Натисніть `File -> Open Folder...` (або `Cmd + O` на Mac).
-   - Оберіть директорію: `/Users/kuzmenko.top/Kuzmenko/MY_LIFE_WORK/DNK_OS`.
+   - Оберіть директорію: `../DNK_OS`.
    - (Або відкрийте `DNK_OS.code-workspace`).
 2. **Перевірте наявність інструментів FastMCP**:
    - Файл `.agents/mcp_config.json` автоматично підключає сервер `dnk-core` з 17 інструментами.

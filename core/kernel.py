@@ -6,8 +6,8 @@
 # triggers_tasks: []
 # status: "Active"
 # version: "2.5.0"
-# updated_at: "2026-11-16"
-# author: "DNK-e.com"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym & Denchik (Builder)"
 # --- END DNK-MRH-HEADER ---
 
 """
@@ -22,17 +22,6 @@ import os
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-
-# Legacy engine fallbacks and dispatchers (isolated in core/kernel_legacy.py)
-from core.kernel_legacy import (  # noqa: E402
-    AccountingEngine, CanvasEngine, HermesRuntime, LegacyToolDispatcher,
-    MaksymAuthEngine, SwarmOrchestrator, local_telemetry
-)
-
-try:
-    from core.kernel_cli import run_cli_command
-except ImportError:
-    async def run_cli_command(*a, **k): return 0  # type: ignore
 
 # Core v2.0 Microkernel components
 from core.action_bus.artifact_store import ArtifactStore
@@ -65,9 +54,9 @@ def uuid_hex() -> str:
 
 class FastMCPKernel:
     """
-    Unified FastMCP Microkernel Host v2.0 for DNK OS.
-    Integrates decoupled asynchronous execution, spatial canvas event broadcasting,
-    strict deterministic safety gates, and legacy v1.0 tool-routing compatibility.
+    Unified FastMCP Microkernel Host v2.5.0 for DNK OS.
+    Coordinates decoupled asynchronous execution, spatial canvas event broadcasting,
+    strict deterministic safety gates, SCONES memory, and Fan-In aggregation.
     """
 
     def __init__(
@@ -85,21 +74,7 @@ class FastMCPKernel:
         except Exception:
             pass
 
-        # 1. Backward-compatible session & log paths
-        if session_store_path in ("sessions/session_registry.json", "core/data/sessions/session_registry.json"):
-            session_store_path = ".data/sessions/session_registry.json"
-        if log_path == "telemetry/accounting_log.json" and not os.path.exists("telemetry/accounting_log.json"):
-            log_path = "core/telemetry/accounting_log.json"
-
-        # 2. Legacy Engine Adapters (100% Backward Compatibility for existing tests and routes)
-        self.auth = MaksymAuthEngine(session_store_path=session_store_path)
-        self.canvas = CanvasEngine()
-        self.runtime = HermesRuntime(auth_engine=self.auth)
-        self.orchestrator = SwarmOrchestrator()
-        self.accounting = AccountingEngine(log_path=log_path)
-        self.telemetry = local_telemetry
-
-        # 3. Core v2.0 Microkernel Substrate
+        # 1. Action Bus and Substrate Persistence
         self.workspace_id = workspace_id
         self.persistence = ActionBusPersistence(db_path=db_path)
         self.broadcaster = EventBroadcaster()
@@ -115,6 +90,7 @@ class FastMCPKernel:
         )
         self.hitl_bridge.bus = self.bus
 
+        # 2. Epistemic Engines and Cognitive Memory
         self.slicer = ZeroWasteSlicer()
         self.task_dna = TaskDNALifecycleEngine()
         self.user_soul = user_soul
@@ -123,7 +99,7 @@ class FastMCPKernel:
         memory_path = os.path.join(mem_dir, "scones_memory.db")
         self.memory = SconesMemoryStore(db_path=memory_path)
 
-        # 4. SOTA Assimilated Subsystems (DEC-110, DEC-115, DEC-116)
+        # 3. SOTA Assimilated Subsystems (DEC-110, DEC-115, DEC-116, DEC-134)
         self.session_router = SpatialCanvasSessionRouter()
         self.fan_in = FanInAggregator()
         self.quarantine = AgentQuarantineGuard()
@@ -133,18 +109,7 @@ class FastMCPKernel:
         self._running = True
 
     # -------------------------------------------------------------------------
-    # Legacy Call Tool Gateway (Backward Compatibility Facade)
-    # -------------------------------------------------------------------------
-    def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Standardized FastMCP tool call entrypoint router.
-        Bridges API requests directly to both legacy engines and v2 microkernel capabilities.
-        Delegated to LegacyToolDispatcher to maintain the Narrow Waist invariant (<400 LOC).
-        """
-        return LegacyToolDispatcher.dispatch(self, tool_name, arguments)
-
-    # -------------------------------------------------------------------------
-    # SCONES Cognitive Memory Operations (v2.0)
+    # SCONES Cognitive Memory Operations (v2.5)
     # -------------------------------------------------------------------------
     async def query_memory(self, topic: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Queries SCONES cognitive memory for past observations and solutions."""
@@ -159,12 +124,10 @@ class FastMCPKernel:
         )
 
     # -------------------------------------------------------------------------
-    # Spatial ThoughtDAG & Flow Operations (Deer-Flow / Canvas Paradigm v2.0)
+    # Spatial ThoughtDAG & Flow Operations (Deer-Flow / Canvas Paradigm v2.5)
     # -------------------------------------------------------------------------
     def parse_thoughts(self, dsl_text: str, graph_id: str = "graph_default") -> Dict[str, Any]:
-        """
-        Parses ThoughtDSL into a validated, cycle-checked ThoughtDAG graph.
-        """
+        """Parses ThoughtDSL into a validated, cycle-checked ThoughtDAG graph."""
         result = parse_thought_dsl(dsl_text)
         if result.has_cycles:
             logger.warning(f"Cycles detected in ThoughtDSL: {result.cycle_nodes}")
@@ -187,9 +150,7 @@ class FastMCPKernel:
     def compile_node_context_wire(
         self, graph_id: str, target_node_id: str, max_tokens: int = 1500
     ) -> Dict[str, Any]:
-        """
-        Extracts upstream context strictly along wires (Context-as-Wires) to enforce Context Diet.
-        """
+        """Extracts upstream context strictly along wires (Context-as-Wires) to enforce Context Diet."""
         graph = self._active_graphs.get(graph_id)
         if not graph:
             return {"success": False, "error": f"Graph {graph_id} not found."}
@@ -204,17 +165,15 @@ class FastMCPKernel:
         }
 
     # -------------------------------------------------------------------------
-    # FastMCP Tool Router & Dispatcher (v2.0)
+    # Action Bus & HITL Dispatcher
     # -------------------------------------------------------------------------
     async def dispatch_action(
         self, action_type: str, payload: Dict[str, Any], requester: str = "vibe_coder"
     ) -> Dict[str, Any]:
-        """
-        Central Action Dispatcher. Routes execution through the Action Bus,
-        enforcing HITL approval on critical mutations.
-        """
+        """Central Action Dispatcher routing execution through the Action Bus with HITL gating."""
         task_id = f"task_{uuid_hex()}"
-        # 0. Circuit Breaker Check: Reject action if requester is quarantined
+
+        # 0. Circuit Breaker Check
         try:
             self.quarantine.assert_can_execute(requester)
         except AgentQuarantinedError as q_err:
@@ -227,7 +186,6 @@ class FastMCPKernel:
             }
 
         is_crit = self.hitl_bridge.is_critical(action_type, payload)
-
         task = ActionTask(
             task_id=task_id,
             action_type=action_type,
@@ -263,7 +221,6 @@ class FastMCPKernel:
                 "result": {"output": data, "handled_by": "dnk_clipboard_adapter"},
             }
 
-        # Non-critical tasks proceed through dispatch_task
         res = await self.bus.dispatch_task(task)
         return {
             "task_id": task_id,
@@ -320,10 +277,7 @@ class FastMCPKernel:
     def aggregate_branch_results(
         self, outputs: List[Dict[str, Any]], context: Optional[Dict[str, Any]] = None, synthesis_instructions: str = ""
     ) -> Dict[str, Any]:
-        """
-        Aggregates outputs from parallel subagents with pre-synthesis validation chain
-        (SyntaxAST, BoundaryScope, DeterministicExitCode, Grounding).
-        """
+        """Aggregates outputs from parallel subagents with pre-synthesis validation chain."""
         typed_outputs = [
             AgentOutput(
                 agent_id=o.get("agent_id", "subagent"),
@@ -363,6 +317,7 @@ class FastMCPKernel:
                 "fan_in_aggregator": "ACTIVE",
                 "agent_quarantine_guard": "ACTIVE",
                 "scones_memory_fts5": "ACTIVE",
+                "agentic_video_intelligence": "ACTIVE",
             },
         }
 
@@ -370,15 +325,18 @@ class FastMCPKernel:
 # FastMCP Server delegation (Narrow-Waist Invariant: protocol serialization in core/kernel_mcp.py)
 from core.kernel_mcp import create_fastmcp_server  # noqa: E402
 
+try:
+    from core.kernel_cli import run_cli_command
+except ImportError:
+    async def run_cli_command(*a, **k): return 0  # type: ignore
+
 
 if __name__ == "__main__":
     import sys
     kernel = FastMCPKernel()
     if "--cli" in sys.argv:
         sys.exit(asyncio.run(run_cli_command(kernel, [a for a in sys.argv[1:] if a != "--cli"])))
-    mcp_server = create_fastmcp_server(kernel)
-    if mcp_server is not None:
-        mcp_server.run(transport="stdio")
-    else:
-        print("FastMCP package not installed, running CLI status instead:")
-        asyncio.run(run_cli_command(kernel, ["status"]))
+    from core.kernel_mcp import create_fastmcp_server
+    server = create_fastmcp_server(kernel)
+    if server is not None:
+        server.run()

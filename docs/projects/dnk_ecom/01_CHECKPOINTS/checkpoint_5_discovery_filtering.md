@@ -2,28 +2,25 @@
 title: "Checkpoint 5: Catalog Discovery, Section Rendering Facets & Quick View"
 description: "Живий лог та специфікація Checkpoint 5: Сітка каталогу, Section Rendering API фільтрація та картка товару."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_5_discovery_filtering.md"
-status: passed
-type: checkpoint_log
-gate_id: 5
-theme_branch: mvp
-date: 2026-11-18
-verified_by: "just shopify-checkpoint 5"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_5_discovery_filtering.md"
 > purpose: "Живий лог та специфікація Checkpoint 5: Сітка каталогу, Section Rendering API фільтрація та картка товару."
 > canonical_source: true
-> alters_files:
->   - "mvp/assets/dnk-facets.js"
->   - "mvp/sections/featured-collection.liquid"
->   - "mvp/sections/main-collection.liquid"
->   - "mvp/snippets/product-card.liquid"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

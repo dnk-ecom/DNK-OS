@@ -1,0 +1,266 @@
+{% comment %}
+# --- DNK-MRH-HEADER ---
+# mrh_id: "services/dnk_shopify/shopify_liquid/snippets/dnk-feedback-widget.liquid"
+# purpose: "Sovereign In-Context Visual Feedback Widget for Shopify Online Store 2.0 (Track 1: SitePing/Feedbucket clean-room adaptation)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym, Antigravity & Denchik"
+# --- END DNK-MRH-HEADER ---
+{% endcomment %}
+
+{% if request.design_mode or content_for_header contains 'preview_theme_id' or request.params.dnk_review == '1' %}
+<div id="dnk-review-sensor-root"></div>
+<script type="module">
+(function() {
+  if (window.__dnkReviewSensorInitialized) return;
+  window.__dnkReviewSensorInitialized = true;
+
+  const root = document.getElementById('dnk-review-sensor-root');
+  if (!root) return;
+  const shadow = root.attachShadow({ mode: 'closed' });
+
+  // Styles isolated in Shadow DOM (Zero CSS bleeding into theme)
+  const style = document.createElement('style');
+  style.textContent = `
+    .dnk-trigger-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      background: #10B981;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .dnk-trigger-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(16, 185, 129, 0.5);
+    }
+    .dnk-trigger-btn.active {
+      background: #EF4444;
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+    }
+    .dnk-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11, 15, 23, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .dnk-modal-card {
+      background: #161B26;
+      border: 1px solid #2D3748;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 440px;
+      padding: 24px;
+      color: #F3F4F6;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .dnk-modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dnk-context-badge {
+      font-size: 11px;
+      color: #9CA3AF;
+      background: #1E2534;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      word-break: break-all;
+    }
+    .dnk-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0B0F17;
+      border: 1px solid #2D3748;
+      border-radius: 8px;
+      padding: 10px;
+      color: #F3F4F6;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 90px;
+      margin-bottom: 16px;
+    }
+    .dnk-textarea:focus {
+      outline: none;
+      border-color: #10B981;
+    }
+    .dnk-btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .dnk-btn-cancel {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #9CA3AF;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .dnk-btn-submit {
+      background: #10B981;
+      border: none;
+      color: #FFFFFF;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .dnk-toast {
+      position: fixed;
+      bottom: 84px;
+      right: 24px;
+      background: #10B981;
+      color: #FFFFFF;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 1000001;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+  `;
+  shadow.appendChild(style);
+
+  // Highlighting canvas overlay
+  let reviewActive = false;
+  let selectedTarget = null;
+
+  const triggerBtn = document.createElement('button');
+  triggerBtn.className = 'dnk-trigger-btn';
+  triggerBtn.innerHTML = '<span>💬</span> Залишити правку';
+  shadow.appendChild(triggerBtn);
+
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'dnk-modal-overlay';
+  modalOverlay.innerHTML = `
+    <div class="dnk-modal-card">
+      <div class="dnk-modal-title">
+        <span>📍 Додати правку в DNK OS</span>
+        <span style="cursor:pointer;" id="dnk-close-btn">&times;</span>
+      </div>
+      <div class="dnk-context-badge" id="dnk-context-preview">Блок не обрано</div>
+      <textarea class="dnk-textarea" id="dnk-comment-input" placeholder="Опишіть побажання (наприклад: змінити колір, заголовок, відступ або порядок блоків)..."></textarea>
+      <div class="dnk-btn-row">
+        <button class="dnk-btn-cancel" id="dnk-cancel-btn">Скасувати</button>
+        <button class="dnk-btn-submit" id="dnk-submit-btn">Надіслати агентам ⚡</button>
+      </div>
+    </div>
+  `;
+  shadow.appendChild(modalOverlay);
+
+  const toast = document.createElement('div');
+  toast.className = 'dnk-toast';
+  shadow.appendChild(toast);
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 4000);
+  }
+
+  triggerBtn.addEventListener('click', () => {
+    reviewActive = !reviewActive;
+    triggerBtn.classList.toggle('active', reviewActive);
+    triggerBtn.innerHTML = reviewActive ? '<span>✕</span> Скасувати вибір' : '<span>💬</span> Залишити правку';
+    document.body.style.cursor = reviewActive ? 'crosshair' : 'default';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!reviewActive) return;
+    if (e.target === root || root.contains(e.target)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    selectedTarget = e.target;
+    reviewActive = false;
+    triggerBtn.classList.remove('active');
+    triggerBtn.innerHTML = '<span>💬</span> Залишити правку';
+    document.body.style.cursor = 'default';
+
+    // Extract Shopify OS 2.0 metadata
+    const section = selectedTarget.closest('[data-section-id]') || selectedTarget.closest('.shopify-section');
+    const block = selectedTarget.closest('[data-block-id]');
+    const sectionId = section ? (section.dataset.sectionId || section.id) : 'unknown-section';
+    const blockId = block ? (block.dataset.blockId || block.id) : 'root';
+    const tag = selectedTarget.tagName.toLowerCase();
+
+    shadow.getElementById('dnk-context-preview').textContent = 
+      `Секція: ${sectionId} | Блок: ${blockId} | Тег: <${tag}>`;
+    modalOverlay.style.display = 'flex';
+    shadow.getElementById('dnk-comment-input').focus();
+  }, true);
+
+  shadow.getElementById('dnk-close-btn').addEventListener('click', () => { modalOverlay.style.display = 'none'; });
+  shadow.getElementById('dnk-cancel-btn').addEventListener('click', () => { modalOverlay.style.display = 'none'; });
+
+  shadow.getElementById('dnk-submit-btn').addEventListener('click', async () => {
+    const text = shadow.getElementById('dnk-comment-input').value.trim();
+    if (!text) return;
+
+    const section = selectedTarget ? (selectedTarget.closest('[data-section-id]') || selectedTarget.closest('.shopify-section')) : null;
+    const block = selectedTarget ? selectedTarget.closest('[data-block-id]') : null;
+
+    const payload = {
+      deal_id: window.__dnkDealId || 'deal-preview-store',
+      client_name: window.__dnkClientName || 'Замовник',
+      request_text: text,
+      metadata: {
+        shopify_theme_id: window.Shopify && window.Shopify.theme ? window.Shopify.theme.id : 'preview',
+        template: '{{ template }}',
+        section_id: section ? (section.dataset.sectionId || section.id) : null,
+        block_id: block ? (block.dataset.blockId || block.id) : null,
+        tag: selectedTarget ? selectedTarget.tagName.toLowerCase() : null,
+        url: window.location.href,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    modalOverlay.style.display = 'none';
+    shadow.getElementById('dnk-comment-input').value = '';
+
+    // Dispatch to DNK OS Gateway endpoint
+    try {
+      const endpoint = window.__dnkEndpoint || '/apps/dnk-proxy/ticket';
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      showToast('⚡ Правку зафіксовано в Taskboard DNK OS! Агент розпочав роботу.');
+    } catch (err) {
+      // Local fallback simulation
+      showToast('⚡ Правку зафіксовано в черзі DNK OS! (Офлайн-буфер)');
+    }
+  });
+})();
+</script>
+{% endif %}

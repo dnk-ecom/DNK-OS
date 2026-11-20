@@ -1,0 +1,318 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/dnk_aab.schema.yaml"
+# purpose: "JSON Schema (Draft-07 compatible) for DNK-AAB Atomic Assimilation Blocks v0.1"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "0.1.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://dnk-os.org/schemas/dnk-aab-v0.1.json"
+title: "DNK Atomic Assimilation Block (AAB) Schema v0.1"
+description: "Defines the specification and validation rules for Git-backed atomic assimilation blocks."
+type: "object"
+required:
+  - "schema_version"
+  - "id"
+  - "title"
+  - "source"
+  - "classification"
+  - "evidence"
+  - "compatibility"
+  - "composition"
+  - "proposal"
+additionalProperties: false
+
+properties:
+  schema_version:
+    type: "string"
+    const: "dnk-aab/v0.1"
+
+  id:
+    type: "string"
+    pattern: "^AAB-[A-Z0-9]+-[0-9]{3,}$"
+    description: "Unique AAB identifier, e.g. AAB-EXAMPLE-001 or AAB-CAGAN-001."
+
+  title:
+    type: "string"
+    minLength: 3
+    maxLength: 256
+    description: "Human-readable concise title of the atomic block."
+
+  source:
+    type: "object"
+    required:
+      - "repository_id"
+      - "source_path"
+      - "license_spdx"
+      - "assimilation_track"
+    additionalProperties: false
+    properties:
+      repository_id:
+        type: "string"
+        description: "GitHub slug 'owner/repo' or 'dnk-internal'."
+      repository_url:
+        type: ["string", "null"]
+        description: "Upstream repository URL or null if internal."
+      commit_sha:
+        type: ["string", "null"]
+        pattern: "^[0-9a-fA-F]{7,40}$"
+        description: "Exact Git commit SHA or null."
+      source_path:
+        type: "string"
+        pattern: "^(?!/)(?!~).*$"
+        description: "Repository-relative path to upstream or local source file."
+      license_spdx:
+        type: "string"
+        description: "SPDX license expression or 'UNKNOWN'."
+      assimilation_track:
+        type: "string"
+        enum:
+          - "permissive"
+          - "clean-room"
+          - "internal"
+
+  classification:
+    type: "object"
+    required:
+      - "type"
+      - "target_domain"
+      - "target_interface"
+      - "leverage_score"
+      - "complexity"
+      - "status"
+    additionalProperties: false
+    properties:
+      type:
+        type: "string"
+        enum:
+          - "gate"
+          - "runtime"
+          - "canvas_node"
+          - "role"
+          - "prompt_lens"
+          - "rule"
+          - "workflow"
+          - "tool"
+          - "memory"
+      target_domain:
+        type: "string"
+        description: "Target domain or subsystem (e.g. taskdna, canvas, swarm, shopify)."
+      target_interface:
+        type: "string"
+        description: "Specific integration interface or extension point."
+      leverage_score:
+        type: "number"
+        minimum: 0.0
+        maximum: 10.0
+        description: "Impact/leverage score between 0.0 and 10.0."
+      complexity:
+        type: "string"
+        enum:
+          - "low"
+          - "medium"
+          - "high"
+      status:
+        type: "string"
+        enum:
+          - "candidate"
+          - "evaluated"
+          - "approved"
+          - "implemented"
+          - "rejected"
+
+  evidence:
+    type: "object"
+    required:
+      - "validation"
+      - "linked_note"
+      - "linked_skill"
+      - "linked_evidence"
+    additionalProperties: false
+    properties:
+      validation:
+        type: "string"
+        enum:
+          - "proven"
+          - "tested"
+          - "documented_only"
+          - "hypothesis"
+      linked_note:
+        type: "string"
+        pattern: "^(?!/)(?!~).*$"
+        description: "Relative path to documentation or Obsidian note."
+      linked_skill:
+        type: ["string", "null"]
+        pattern: "^(?!/)(?!~).*$"
+        description: "Relative path to associated skill or null."
+      linked_evidence:
+        type: "array"
+        items:
+          type: "string"
+          pattern: "^(?!/)(?!~).*$"
+        description: "List of relative paths to evidence/audit files."
+
+  compatibility:
+    type: "object"
+    required:
+      - "required_capabilities"
+      - "conflicts_with"
+      - "license_status"
+    additionalProperties: false
+    properties:
+      required_capabilities:
+        type: "array"
+        items:
+          type: "string"
+      conflicts_with:
+        type: "array"
+        items:
+          type: "string"
+      license_status:
+        type: "string"
+        enum:
+          - "permissive"
+          - "clean_room_required"
+          - "internal"
+          - "unknown"
+
+  composition:
+    type: "object"
+    required:
+      - "compatible_with"
+      - "produces"
+    additionalProperties: false
+    properties:
+      compatible_with:
+        type: "array"
+        items:
+          type: "string"
+      produces:
+        type: "array"
+        items:
+          type: "string"
+
+  proposal:
+    type: "object"
+    required:
+      - "problem"
+      - "solution"
+      - "task_slice_prompt"
+    additionalProperties: false
+    properties:
+      problem:
+        type: "string"
+      solution:
+        type: "string"
+      task_slice_prompt:
+        type: "string"
+
+allOf:
+  # Rule: repository_url can be null ONLY if repository_id is "dnk-internal"
+  - if:
+      properties:
+        source:
+          properties:
+            repository_id:
+              const: "dnk-internal"
+    then: {}
+    else:
+      properties:
+        source:
+          properties:
+            repository_url:
+              type: "string"
+              minLength: 1
+
+  # Rule: clean-room track requires license_status: clean_room_required
+  - if:
+      properties:
+        source:
+          properties:
+            assimilation_track:
+              const: "clean-room"
+    then:
+      properties:
+        compatibility:
+          properties:
+            license_status:
+              const: "clean_room_required"
+
+  # Rule: implemented status requires at least one linked_evidence
+  - if:
+      properties:
+        classification:
+          properties:
+            status:
+              const: "implemented"
+    then:
+      properties:
+        evidence:
+          properties:
+            linked_evidence:
+              minItems: 1
+
+  # Rule: approved or implemented cannot have validation: hypothesis
+  - if:
+      properties:
+        classification:
+          properties:
+            status:
+              enum:
+                - "approved"
+                - "implemented"
+    then:
+      properties:
+        evidence:
+          properties:
+            validation:
+              not:
+                const: "hypothesis"
+
+  # Rule: internal implemented block must have license_spdx: DNK-INTERNAL, license_status: internal, assimilation_track: internal, repository_url: null
+  - if:
+      properties:
+        source:
+          properties:
+            repository_id:
+              const: "dnk-internal"
+        classification:
+          properties:
+            status:
+              const: "implemented"
+    then:
+      properties:
+        source:
+          properties:
+            assimilation_track:
+              const: "internal"
+            license_spdx:
+              const: "DNK-INTERNAL"
+            repository_url:
+              type: "null"
+        compatibility:
+          properties:
+            license_status:
+              const: "internal"
+
+  # Rule: external AAB with UNKNOWN license cannot be implemented
+  - if:
+      properties:
+        source:
+          properties:
+            license_spdx:
+              const: "UNKNOWN"
+            repository_id:
+              not:
+                const: "dnk-internal"
+    then:
+      properties:
+        classification:
+          properties:
+            status:
+              not:
+                const: "implemented"

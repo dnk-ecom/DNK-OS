@@ -1,0 +1,201 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/service_card.schema.yaml"
+# purpose: "Canonical JSONSchema/YAML definition for DNK Service Card (service_manifest.yaml)."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-07"
+# author: "DNK-e.com Maksym, DNK Mentor & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "DNKServiceCard"
+description: "Universal Service Manifest and Capability Passport schema for DNK OS autonomous services."
+type: "object"
+required:
+  - "apiVersion"
+  - "kind"
+  - "metadata"
+  - "spec"
+
+properties:
+  apiVersion:
+    type: "string"
+    enum: ["dnk.os/v1alpha1", "dnk.os/v1"]
+    description: "API version of the DNK Service Card specification."
+
+  kind:
+    type: "string"
+    enum: ["ServiceCard"]
+    description: "Resource kind identifier."
+
+  metadata:
+    type: "object"
+    required:
+      - "service_id"
+      - "name"
+      - "version"
+      - "owner"
+      - "tier"
+      - "lifecycle"
+    properties:
+      service_id:
+        type: "string"
+        pattern: "^[a-z0-9_]+$"
+        description: "Unique snake_case identifier of the service."
+      name:
+        type: "string"
+        description: "Human-readable display name of the service."
+      description:
+        type: "string"
+        description: "Concise summary of domain capabilities and scope."
+      version:
+        type: "string"
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+.*$"
+        description: "Semantic versioning (SemVer) of the service."
+      owner:
+        type: "string"
+        pattern: "^(agent|team|person):[a-z0-9_\\-\\.]+$"
+        description: "Owner identifier (e.g. 'agent:dnk_shopify' or 'team:platform')."
+      tier:
+        type: "string"
+        enum: ["tier-1-core", "tier-2-satellite", "tier-3-community"]
+        description: "System criticality tier."
+      lifecycle:
+        type: "string"
+        enum: ["experimental", "incubating", "production", "deprecated"]
+        description: "Service development and operational lifecycle stage."
+
+  spec:
+    type: "object"
+    required:
+      - "domain"
+      - "entrypoint"
+      - "docs_path"
+      - "protocol"
+      - "operations"
+    properties:
+      domain:
+        type: "string"
+        description: "High-level domain category (e.g. ecommerce, media, crm, analytics)."
+      entrypoint:
+        type: "string"
+        description: "Python module import path to FastAPI router or entrypoint callable."
+      docs_path:
+        type: "string"
+        description: "Relative path to local domain SPECIFICATION.md."
+      
+      protocol:
+        type: "object"
+        required:
+          - "task_api"
+        properties:
+          task_api:
+            type: "object"
+            required:
+              - "standard"
+              - "version"
+              - "compatibility"
+            properties:
+              standard:
+                type: "string"
+                enum: ["agent-protocol", "custom-fastapi", "mcp-only"]
+                description: "Underlying task protocol standard."
+              version:
+                type: "string"
+                description: "Declared version of the external standard (e.g. 'v1', 'v1.0.0')."
+              compatibility:
+                type: "string"
+                enum: ["native", "adapter", "partial"]
+                description: "Integration maturity level with declared protocol standard."
+
+      depends_on:
+        type: "object"
+        properties:
+          capabilities:
+            type: "array"
+            items:
+              type: "string"
+            description: "Logical capabilities provided by other core or peer services."
+          resources:
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                secret_ref:
+                  type: "string"
+                  description: "Vault secret reference key (never raw secrets)."
+                resource_id:
+                  type: "string"
+                  description: "Logical ID of persistent database, bucket, or queue."
+            description: "Required runtime secrets or storage references."
+
+      provides_apis:
+        type: "object"
+        properties:
+          agent_protocol:
+            type: "string"
+            description: "Relative HTTP path prefix for Agent Protocol endpoints."
+          mcp_tools:
+            type: "array"
+            items:
+              type: "object"
+              required:
+                - "name"
+                - "description"
+              properties:
+                name:
+                  type: "string"
+                  description: "Unique tool identifier exposed to Swarm router."
+                description:
+                  type: "string"
+                  description: "Clear LLM-targeted purpose of the tool."
+            description: "List of Model Context Protocol tools published to Swarm Core."
+
+      consumes_apis:
+        type: "array"
+        items:
+          type: "object"
+          required:
+            - "name"
+          properties:
+            name:
+              type: "string"
+            version:
+              type: "string"
+            type:
+              type: "string"
+              enum: ["rest", "graphql", "grpc", "mcp"]
+        description: "Upstream external platform APIs consumed by this domain service."
+
+      operations:
+        type: "object"
+        required:
+          - "health_endpoint"
+          - "spend_guard"
+        properties:
+          health_endpoint:
+            type: "string"
+            description: "HTTP endpoint path for liveness/readiness probes (returns HTTP 200)."
+          port:
+            type: "integer"
+            description: "Optional TCP port for local dev/mesh execution."
+          metrics_endpoint:
+            type: "string"
+            description: "HTTP endpoint for operational telemetry."
+          spend_guard:
+            type: "object"
+            required:
+              - "max_tokens_per_task"
+              - "max_cost_usd_per_run"
+            properties:
+              max_tokens_per_task:
+                type: "integer"
+                minimum: 1000
+                description: "Upper token budget limit per single task execution."
+              max_cost_usd_per_run:
+                type: "number"
+                minimum: 0.001
+                description: "Hard stop cost ceiling in USD per execution run."

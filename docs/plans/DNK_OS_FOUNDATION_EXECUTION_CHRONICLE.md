@@ -1,25 +1,28 @@
 ---
-title: "DNK OS Foundation Execution Chronicle (Living Engineering Log)"
-status: active
-type: sop-runbook
-domain: core
-author: "DNK-e.com"
-version: "1.0.0"
-updated: "2026-11-15"
+title: "Бортовий Журнал Розбудови Фундаменту DNK_OS (Foundation Execution Chronicle)"
+description: "Living Engineering Execution Chronicle and Historical Audit Ledger tracking every architectural decision, component extraction from DNK_HUB archive into clean DNK_OS, test verification receipt, and rationale ("
+mrh_id: "docs/plans/DNK_OS_FOUNDATION_EXECUTION_CHRONICLE.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/plans/DNK_OS_FOUNDATION_EXECUTION_CHRONICLE.md"
-> purpose: "Living Engineering Execution Chronicle and Historical Audit Ledger tracking every architectural decision, component extraction from DNK_HUB archive into clean DNK_OS, test verification receipt, and rationale ('Why it is built this way')."
+> purpose: "Living Engineering Execution Chronicle and Historical Audit Ledger tracking every architectural decision, component extraction from DNK_HUB archive into clean DNK_OS, test verification receipt, and rationale ("
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-15"
-> author: "DNK-e.com"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -58,7 +61,7 @@ updated: "2026-11-15"
 | **FOUND-02** | Вузьке Мікроядро та Контракти (`Narrow Waist < 400 LOC`) | `./core/kernel/contracts.py`, `./core/sdk/dnk.py` | `../DNK_OS/core/kernel/` + `../DNK_OS/core/bricks/registry.py` | Обсяг ядра `< 400 LOC` (389 рядків), 0 бізнес-імпортів, `Sacred Prompt Cache <= 6,000` токенів | **ВИКОНАНО (389 LOC)** |
 | **FOUND-03** | Когнітивна Пам'ять SCONES SQLite WAL + AST Overlay | `./core/memory/scones_store.py`, `./core/memory/scones_mcp_server.py` | `../DNK_OS/core/bricks/brick_02_scones_memory/` | `PRAGMA journal_mode=WAL; busy_timeout=5000`, FTS5 BM25 `< 15 мс`, `ast-grep` правила | **ВЕРИФІКОВАНО В ЯДРІ** |
 | **FOUND-04** | Просторове Ядро (Dual-State Spatial Canvas + Per-Node Chat) | `./core/canvas/node_canvas_core.py`, `dag_store.py`, `graph_occ_merge.py`, `jit_skill_mounter.py` | `../DNK_OS/core/bricks/brick_03_spatial_canvas/` + `apps/canvas/` | JSON Canvas 1.0 паритет, сесії `node:{canvas_id}:{node_id}`, Kahn Cycle Guard, Artifact-Only Wires | **ВПРОВАДЖЕНО (VERIFIED)** |
-| **FOUND-05** | Воркхорс #1: `dnk_shopify` (`DNK Sovereign 1.0.0 Apex` & 7-Gate Integrity) | `https://github.com/DNKShopify/DNK-e.com` (`DNK-Ecom_git_mirrow/main`) | `../DNK_OS/services/dnk_shopify/` (`DNK_Sovereign_Apex`) | 5-елементний Sovereign Brick, Dual-Mount, 7-Gate Theme Integrity, 100% Theme Blocks 2.0 | **СЕРТИФІКОВАНО (SSOT ЗАТВЕРДЖЕНО)** |
+| **FOUND-05** | Воркхорс #1: `dnk_shopify` (`DNK-Ecom-Zerno-v.0.1.0` & 7-Gate Integrity) | `https://github.com/DNKShopify/DNK-e.com` (`DNK-Ecom_git_mirrow/main`) | `../DNK_OS/services/dnk_shopify/` (`DNK_Ecom`) | 5-елементний Sovereign Brick, Dual-Mount, 7-Gate Theme Integrity, 100% Theme Blocks 2.0 | **СЕРТИФІКОВАНО (SSOT ЗАТВЕРДЖЕНО)** |
 | **FOUND-06** | Воркхорс #2: `dnk_media` (Clean-Room Video & Vertex AI Studio) | `./services/dnk_media/` (M2 Protocol, Chirp3-HD TTS, FFmpeg 9) | `../DNK_OS/services/dnk_media/` (`brick_05_video_ai`) | 100% AGPL-імунітет, Dual-Mount, рендеринг 9:16 та скляних плашок за 1 виклик | **В ПРОЦЕСІ ДИСТИЛЯЦІЇ** |
 | **FOUND-07** | Воркхорс #3: `dnk_distribution` (Omnichannel & CRO Funnels) | `./services/dnk_distribution/` | `../DNK_OS/services/dnk_distribution/` | Контракт Суверенної Цеглинки, ізольовані тести `< 1 с` | **ЗАПЛАНОВАНО** |
 | **FOUND-08** | Ring-0 Sentinel & Pre-Commit Censor | `./scripts/system/hermes_pre_tool_hook.py`, `anti_tautology_guard.py`, `markdown_schema_gate.py` | `../DNK_OS/scripts/` + `./Justfile` | 100% блокування `/Users/...`, тавтологій у тестах та несанкціонованих кореневих тек | **АКТИВНО / НА ВАРТІ** |
@@ -237,12 +240,12 @@ updated: "2026-11-15"
   - Повний набір тестів полотна та раннера у `../DNK_OS`: `15 passed in 0.39s` (`exit code 0`).
   - Лінійність ядра: `wc -l core/kernel.py` -> `389` рядків (`PASS: < 400 LOC`).
 
-### 🟢 Запис #008 — 2026-11-16: Повна Автономна Сертифікація Воркхорса #1 (dnk_shopify, DNK Sovereign 1.0.0 Apex, 7-Gate Theme Integrity & Theme Blocks 2.0)
+### 🟢 Запис #008 — 2026-11-16: Повна Автономна Сертифікація Воркхорса #1 (dnk_shopify, DNK-Ecom-Zerno-v.0.1.0, 7-Gate Theme Integrity & Theme Blocks 2.0)
 
-* **Фаза / Хвиля:** Wave 3 — Autonomous Certification of Workhorse #1 (`FOUND-05`), 5-Element Sovereign Brick & DNK Sovereign 1.0.0 Apex SSOT
+* **Фаза / Хвиля:** Wave 3 — Autonomous Certification of Workhorse #1 (`FOUND-05`), 5-Element Sovereign Brick & DNK-Ecom-Zerno-v.0.1.0 SSOT
 * **Виконавець:** Antigravity (Sovereign Architect) & Gerych-root (Cold Knowledge Archivist & Auditor) за завданням Максима
 * **Контекст кроку:**
-  Згідно з конституційним замком `DEC-110`, архітектурними сесіями `Shopify Theme Architect Companion` (`1b2fc125`) та `Shopify DNK Theme Dev Workflow` (`b7054b92`), канонічним фундаментом теми є **`DNK Sovereign 1.0.0 Apex`** (віддалений репозиторій `https://github.com/DNKShopify/DNK-e.com`, локальне дзеркало Git Worktrees `DNK-Ecom_git_mirrow/main`), орієнтований на стандарти Shopify Theme Store ($350–$420 MSRP). Старий Tinker 4.4.0 було переведено в архів (`tag: legacy/tinker-4.4.0`, гілка `backup/tinker-main-nov10`).
+  Згідно з конституційним замком `DEC-110`, архітектурними сесіями `Shopify Theme Architect Companion` (`1b2fc125`) та `Shopify DNK Theme Dev Workflow` (`b7054b92`), канонічним фундаментом теми є **`DNK-Ecom-Zerno-v.0.1.0`** (віддалений репозиторій `https://github.com/DNKShopify/DNK-e.com`, локальне дзеркало Git Worktrees `DNK-Ecom_git_mirrow/main`), орієнтований на стандарти Shopify Theme Store ($350–$420 MSRP). Старий Tinker 4.4.0 було переведено в архів (`tag: legacy/tinker-4.4.0`, гілка `backup/tinker-main-nov10`).
   
   Перший комерційний воркхорс ядра `services/dnk_shopify` переведено на стандарт **Sovereign Brick (DEC-073)** із повним набором із 6 компонентів:
   1. `brick.manifest.yaml` — декларативний маніфест воркхорса з точками входу In-RAM, CLI та FastMCP.
@@ -252,9 +255,9 @@ updated: "2026-11-15"
   5. `mcp_server.py` — FastMCP Dual-Mount сервер (In-RAM 0 мс + stdio для зовнішніх IDE з тулом `shopify_verify_7gates`).
   6. `tests/test_brick.py` — набір із 10 юніт-тестів із часом виконання `< 6.5 с` (включно з прогоном усіх 7 гейтів цілісності теми).
 * **Виконані інженерні дії:**
-  1. Синхронізовано чисту робочу копію теми `DNK Sovereign 1.0.0 Apex` (4.3 MB, без `.git`) у `services/dnk_shopify/DNK_Sovereign_Apex/`.
-  2. Оновлено `services/dnk_shopify/src/service.py`: додано метод `run_7gate_integrity()`, автоматичне визначення теми за пріоритетом (`DNK_Sovereign_Apex` / `DNK-Ecom_git_mirrow/main`), оновлено канонічні вимоги CRO під авторські органи Apex (Dual Quantity Breaks v2, High-CRO Cart Drawer, Buy Buttons, Rating, Trust Badges, Free Shipping Rewards).
-  3. Повністю синхронізовано `services/dnk_shopify/` та тему `DNK_Sovereign_Apex` у чистий контур `../DNK_OS/services/dnk_shopify/`, видалено легасі-каталог Tinker.
+  1. Синхронізовано чисту робочу копію теми `DNK-Ecom-Zerno-v.0.1.0` у `services/dnk_shopify/DNK_Ecom/`.
+  2. Оновлено `services/dnk_shopify/src/service.py`: додано метод `run_7gate_integrity()`, автоматичне визначення теми за пріоритетом (`DNK_Ecom` / `DNK-Ecom_git_mirrow/main`), оновлено канонічні вимоги CRO під авторські органи (Dual Quantity Breaks v2, High-CRO Cart Drawer, Buy Buttons, Rating, Trust Badges, Free Shipping Rewards).
+  3. Повністю синхронізовано `services/dnk_shopify/` та тему `DNK-Ecom-Zerno-v.0.1.0` у чистий контур `../DNK_OS/services/dnk_shopify/`, видалено легасі-каталог Tinker.
 * **Детермінована верифікація (Machine Proof):**
   - Тести `DNK_HUB`: `uv run pytest services/dnk_shopify/tests -v` -> `10 passed in 6.41s` (`exit code 0`).
   - Тести `DNK_OS`: `uv run pytest ../DNK_OS/services/dnk_shopify/tests -v` -> `10 passed in 6.10s` (`exit code 0`).

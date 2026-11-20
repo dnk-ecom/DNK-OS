@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/plugins/memory/scones/__init__.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/plugins/memory/scones/__init__.py"
 # purpose: "Native SCONES Cognitive Memory Provider plugin for Hermes Agent runtime."
 # canonical_source: true
 # alters_files: []

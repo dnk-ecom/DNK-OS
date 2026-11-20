@@ -1,0 +1,123 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/design_system/templates/dnk_dtc_social_ecommerce_spec.yaml"
+# purpose: "Canonical W3C DTCG Design System Specification for High-Conversion DTC E-Commerce & Social Media Motion."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym, Antigravity & Denchik"
+# --- END DNK-MRH-HEADER ---
+
+schema_version: "dtcg-2025.10"
+design_md_standard: "google-design-md-1.0"
+
+meta:
+  brand_name: "DNK DTC Sovereign Ecom"
+  archetype: "dtc_luxury_lifestyle"
+  reference_donor: "Sugar DTC & Maestrooo Prestige / Impact (Horizon Blocks 2.0)"
+  cro_allocation_rule: "60-30-10"
+  typography_ratio_name: "Major Third"
+  typography_ratio: 1.25
+  base_font_size_px: 16
+  spacing_grid_base_px: 8
+
+primitives:
+  color:
+    neutral:
+      "0":
+        $value: "#FFFFFF"
+        $type: "color"
+      "50":
+        $value: "#F8FAFC"
+        $type: "color"
+      "100":
+        $value: "#F1F5F9"
+        $type: "color"
+      "200":
+        $value: "#E2E8F0"
+        $type: "color"
+      "400":
+        $value: "#94A3B8"
+        $type: "color"
+      "600":
+        $value: "#475569"
+        $type: "color"
+      "900":
+        $value: "#0F172A"
+        $type: "color"
+    teal:
+      "50":
+        $value: "#F0FDFA"
+        $type: "color"
+      "500":
+        $value: "#14B8A6"
+        $type: "color"
+      "700":
+        $value: "#0F766E"
+        $type: "color"
+      "900":
+        $value: "#134E4A"
+        $type: "color"
+
+semantic:
+  color:
+    # 60% Canvas & Surface
+    surface-primary:
+      $value: "#FFFFFF"
+      $type: "color"
+      $description: "Main page canvas & card backgrounds"
+    surface-secondary:
+      $value: "#F8FAFC"
+      $type: "color"
+      $description: "Table headers, drawer surfaces, and footer"
+
+    # 30% Structure & Text
+    text-primary:
+      $value: "#0F172A"
+      $type: "color"
+      $description: "Primary readable copy (15.4:1 contrast AAA)"
+    text-secondary:
+      $value: "#475569"
+      $type: "color"
+      $description: "Subdued captions and SKU metadata (6.8:1 contrast AA)"
+    border-subtle:
+      $value: "#E2E8F0"
+      $type: "color"
+      $description: "1px hairline container borders"
+
+    # 10% Focal CRO Accent (CTA)
+    action-primary:
+      $value: "#0F766E"
+      $type: "color"
+      $description: "High-CRO focal conversion accent (Add to Cart, Checkout, 9:16 Hook)"
+    action-primary-text:
+      $value: "#FFFFFF"
+      $type: "color"
+      $description: "Text on CTA button (4.8:1 contrast AA)"
+    action-secondary:
+      $value: "#14B8A6"
+      $type: "color"
+      $description: "Secondary pill badges, Free shipping progress fill"
+
+spacing:
+  xs: 4
+  sm: 8
+  md: 16
+  lg: 24
+  xl: 32
+  "2xl": 48
+  "3xl": 64
+
+motion:
+  dur_fast_ms: 150
+  dur_base_ms: 250
+  dur_slow_ms: 400
+  ease_default: "cubic-bezier(0.16, 1, 0.3, 1)"
+  ease_spring: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+
+elevation:
+  shadow_sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+  shadow_md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+  shadow_lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"

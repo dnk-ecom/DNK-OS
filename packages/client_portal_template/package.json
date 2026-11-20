@@ -1,0 +1,10 @@
+{
+  "name": "dnk-client-portal-template",
+  "version": "1.0.0",
+  "description": "DNK Ecom SOTA Multi-Page Client Portal Template for Cloudflare Pages with Edge Password Gate",
+  "private": true,
+  "scripts": {
+    "dev": "npx wrangler pages dev .",
+    "deploy": "npx wrangler pages deploy ."
+  }
+}

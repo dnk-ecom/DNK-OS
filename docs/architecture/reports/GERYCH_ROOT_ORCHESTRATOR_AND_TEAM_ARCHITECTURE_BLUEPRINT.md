@@ -1,26 +1,28 @@
 ---
-title: "Gerych Root: Sovereign Orchestrator, Agent Team & System-Inside-System Architecture Blueprint"
-status: active
-type: sota-audit
+title: "GERYCH-ROOT MASTER BLUEPRINT: Архітектура Суверенного Ядра, Оркестратора, Команди Агентів та Конвеєра «Система Всередині Системи» (DNK OS v1.0)"
+description: "Sovereign Brick Manifest for DNK Shopify Workhorse."
+mrh_id: "docs/architecture/reports/GERYCH_ROOT_ORCHESTRATOR_AND_TEAM_ARCHITECTURE_BLUEPRINT.md"
+status: Active
 archetype: SOTA_AUDIT
-domain: core
-author: "Gerych (Cold Knowledge Archivist & System Auditor) & Antigravity & DNK-e.com Maksym"
-version: "1.0.0"
-updated: "2026-11-15"
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/architecture/reports/GERYCH_ROOT_ORCHESTRATOR_AND_TEAM_ARCHITECTURE_BLUEPRINT.md"
-> purpose: "Canonical Senior-Grade Master Architectural Blueprint answering the 8 Foundational Questions for DNK OS Sovereign Core: Narrow-Waist Microkernel (<400 LOC), Hermes v0.23.0-dnk Agent Team, 3-Tier SCONES SQLite WAL + AST Memory, Spatial Canvas Interaction Topology, TaskForest/DAG Project Engine, Shopify Theme Factory vs Store Builder System-inside-System, 5-Element Sovereign Brick Dual-Mount Standard, and Golden Traces Compounding Reuse."
+> purpose: "Sovereign Brick Manifest for DNK Shopify Workhorse."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-15"
-> author: "Gerych (Cold Knowledge Archivist & System Auditor) & Antigravity & DNK-e.com Maksym"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

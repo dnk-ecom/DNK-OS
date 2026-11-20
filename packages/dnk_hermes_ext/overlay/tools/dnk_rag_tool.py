@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_rag_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_rag_tool.py"
 # purpose: "Native Hermes tool bridging Swarm Agents with HKUDS RAG-Anything Multimodal & Dual-Level Knowledge Graph."
 # canonical_source: true
 # alters_files: []

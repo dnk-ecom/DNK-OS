@@ -1,0 +1,254 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/dnk_execution_task.schema.yaml"
+# purpose: "JSON Schema definition for DNK Execution Task Contract v0.1"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "0.1.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "DNK Execution Task Contract Schema"
+description: "Validation schema for immutable, governance-approved execution task contracts ready for manual dispatch"
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - task_id
+  - status
+  - created_at
+  - created_by
+  - source
+  - intent
+  - ownership
+  - scope
+  - requirements
+  - verification
+  - rollback
+  - traceability
+
+properties:
+  schema_version:
+    type: string
+    const: "dnk-execution-task/v0.1"
+
+  task_id:
+    type: string
+    pattern: "^DNK-EXEC-[0-9]{8}-[a-z0-9_-]+$"
+
+  status:
+    type: string
+    enum:
+      - ready_for_manual_dispatch
+      - dispatched
+      - completed
+      - blocked
+      - cancelled
+
+  created_at:
+    type: string
+    format: date-time
+
+  created_by:
+    type: string
+
+  source:
+    type: object
+    additionalProperties: false
+    required:
+      - proposal_id
+      - proposal_path
+      - approval_review_id
+      - approval_review_path
+      - proposal_sha256
+    properties:
+      proposal_id:
+        type: string
+      proposal_path:
+        type: string
+      approval_review_id:
+        type: string
+      approval_review_path:
+        type: string
+      proposal_sha256:
+        type: string
+        pattern: "^[a-fA-F0-9]{64}$"
+
+  intent:
+    type: object
+    additionalProperties: false
+    required:
+      - title
+      - problem
+      - expected_outcome
+      - target_domain
+      - target_interface
+    properties:
+      title:
+        type: string
+        minLength: 1
+      problem:
+        type: string
+        minLength: 1
+      expected_outcome:
+        type: string
+        minLength: 1
+      target_domain:
+        type: string
+        minLength: 1
+      target_interface:
+        type: string
+        minLength: 1
+
+  ownership:
+    type: object
+    additionalProperties: false
+    required:
+      - requested_by
+      - suggested_executor
+      - suggested_mode
+      - human_approval_required_before_dispatch
+    properties:
+      requested_by:
+        type: string
+        minLength: 1
+      suggested_executor:
+        type: string
+        minLength: 1
+      suggested_mode:
+        type: string
+        enum:
+          - SOLO
+          - SWARM_PARALLEL
+          - SWARM_SEQUENTIAL
+      human_approval_required_before_dispatch:
+        type: boolean
+        const: true
+
+  scope:
+    type: object
+    additionalProperties: false
+    required:
+      - allowed_paths
+      - forbidden_paths
+      - allowed_actions
+      - prohibited_actions
+    properties:
+      allowed_paths:
+        type: array
+        items:
+          type: string
+      forbidden_paths:
+        type: array
+        items:
+          type: string
+      allowed_actions:
+        type: array
+        items:
+          type: string
+      prohibited_actions:
+        type: array
+        items:
+          type: string
+
+  requirements:
+    type: object
+    additionalProperties: false
+    required:
+      - source_aab_ids
+      - required_capabilities
+      - license_obligations
+      - constraints
+      - conditions_before_execution
+      - risks_accepted
+    properties:
+      source_aab_ids:
+        type: array
+        items:
+          type: string
+      required_capabilities:
+        type: array
+        items:
+          type: string
+      license_obligations:
+        type: array
+        items:
+          type: string
+      constraints:
+        type: array
+        items:
+          type: string
+      conditions_before_execution:
+        type: array
+        items:
+          type: string
+      risks_accepted:
+        type: array
+        items:
+          type: string
+
+  verification:
+    type: object
+    additionalProperties: false
+    required:
+      - acceptance_criteria
+      - verification_commands
+      - evidence_required
+      - required_report_format
+    properties:
+      acceptance_criteria:
+        type: array
+        items:
+          type: string
+      verification_commands:
+        type: array
+        items:
+          type: string
+      evidence_required:
+        type: boolean
+      required_report_format:
+        type: string
+        enum:
+          - yaml
+          - json
+
+  rollback:
+    type: object
+    additionalProperties: false
+    required:
+      - plan
+      - git_strategy
+      - pre_change_snapshot_required
+    properties:
+      plan:
+        type: string
+        minLength: 1
+      git_strategy:
+        type: string
+        minLength: 1
+      pre_change_snapshot_required:
+        type: boolean
+
+  traceability:
+    type: object
+    additionalProperties: false
+    required:
+      - linked_notes
+      - linked_evidence
+      - generated_by_commit
+    properties:
+      linked_notes:
+        type: array
+        items:
+          type: string
+      linked_evidence:
+        type: array
+        items:
+          type: string
+      generated_by_commit:
+        type:
+          - string
+          - "null"

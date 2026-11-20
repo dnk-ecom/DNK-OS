@@ -1,28 +1,26 @@
 ---
-title: "Внутрішня Система «DNK-Ecom-Zerno-v.0.1.0» («Зерно») MVP Summary"
+title: "Внутрішня Система «DNK-Ecom-Zerno-v.0.1.0» («Зерно») Summary"
 description: "Підсумковий живий лог та технічний паспорт готовності внутрішньої системи DNK-Ecom-Zerno-v.0.1.0."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_summary_mvp_v010.md"
-status: passed
-type: release_summary
-version: "0.1.0"
-date: 2026-11-18
-verified_by: "shopify theme check && just shopify-checkpoints"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_summary_mvp_v010.md"
 > purpose: "Підсумковий живий лог та технічний паспорт готовності внутрішньої системи DNK-Ecom-Zerno-v.0.1.0."
 > canonical_source: true
-> alters_files:
->   - "main/*"
->   - "pre-release/*"
->   - "mvp/*"
->   - "DNK-Ecom-Zerno-v.0.1.0.zip"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "0.1.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

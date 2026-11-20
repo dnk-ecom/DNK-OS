@@ -17,6 +17,7 @@ from services.dnk_distribution.src.service import (
     generate_llms_bundle,
     generate_merchant_feed,
     process_data,
+    scan_social_content,
 )
 from services.dnk_distribution.src.social_feedback import SocialMetrics
 from services.dnk_distribution.src.theme_miner import CommentItem
@@ -124,6 +125,17 @@ def main():
             print(f"  Saved to: {res.output_path}")
         print("\n--- Feed Preview ---")
         print("\n".join(res.xml_content.splitlines()[:16]))
+    elif cmd == "scan-social":
+        target_url = sys.argv[2] if len(sys.argv) > 2 else "https://vt.tiktok.com/ZSpvdyVRv/"
+        res = scan_social_content(target_url)
+        print(f"=== Social Content Intelligence: {res.platform.value.upper()} ===")
+        print(f"Author: {res.author}")
+        print(f"Title: {res.title}")
+        print(f"Type: {res.content_type} | Media items: {res.media_count}")
+        print(f"Suggested Action: {res.suggested_action}")
+        print("--- Extracted Diamonds ---")
+        for d in res.diamonds:
+            print(f" * [{d.category}] {d.headline}: {d.actionable_directive}")
     else:
         query = sys.argv[2] if len(sys.argv) > 2 else "default"
         print(process_data(query))

@@ -107,25 +107,20 @@ class DNKShopifyService:
         if default_theme_path:
             self.default_theme_path = Path(default_theme_path)
         else:
-            # 1. Local self-contained working copy of DNK Ecom Flagship Theme
-            local_ecom = Path(__file__).resolve().parent.parent / "DNK_Ecom"
-            local_apex_legacy = Path(__file__).resolve().parent.parent / "DNK_Sovereign_Apex"
-            # 2. Canonical Git Bare Mirror worktree
-            git_mirrow_main = (
-                Path(__file__).resolve().parent.parent.parent.parent.parent
+            # 1. Local self-contained working copy of DNK-Ecom-Zerno-v.0.1.0
+            local_zerno = (
+                Path(__file__).resolve().parent.parent.parent.parent
                 / "DNKEcom"
                 / "DNK-Ecom_git_mirrow"
                 / "main"
             )
+            # 2. Canonical Git Bare Mirror worktree
+            git_mirrow_main = local_zerno
             # Prioritize local self-contained sovereign copy
-            if local_ecom.exists():
-                self.default_theme_path = local_ecom
-            elif local_apex_legacy.exists():
-                self.default_theme_path = local_apex_legacy
-            elif git_mirrow_main.exists():
+            if git_mirrow_main.exists():
                 self.default_theme_path = git_mirrow_main
             else:
-                self.default_theme_path = local_ecom
+                self.default_theme_path = Path(__file__).resolve().parent.parent / "DNK_Ecom"
 
     def validate_liquid(self, code: str) -> LiquidValidationResult:
         """
@@ -396,7 +391,7 @@ class DNKShopifyService:
     def run_7gate_integrity(self, theme_path: Optional[Path] = None) -> Dict[str, Any]:
         """
         Executes the mandatory 7-Gate Anti-Regression Theme Integrity Gate
-        (tools/verify_theme_integrity.py) of DNK Sovereign 1.0.0 Apex.
+        (tools/verify_theme_integrity.py) of DNK-Ecom-Zerno-v.0.1.0.
         """
         target_dir = theme_path or self.default_theme_path
         script_path = target_dir / "tools" / "verify_theme_integrity.py"
@@ -404,17 +399,10 @@ class DNKShopifyService:
         if not script_path.exists():
             script_path = (
                 Path(__file__).resolve().parent.parent
-                / "DNK_Ecom"
+                / "dnk_apex_theme"
                 / "tools"
                 / "verify_theme_integrity.py"
             )
-            if not script_path.exists():
-                script_path = (
-                    Path(__file__).resolve().parent.parent
-                    / "DNK_Sovereign_Apex"
-                    / "tools"
-                    / "verify_theme_integrity.py"
-                )
 
         if not script_path.exists():
             return {
@@ -460,7 +448,7 @@ class DNKShopifyService:
         prepayment_30 = round(total_investment * 0.30, 2)
         completion_70 = round(total_investment - prepayment_30, 2)
 
-        # Native DNK Sovereign Apex blocks replace paid third-party Shopify subscriptions:
+        # Native DNK-Ecom-Zerno-v.0.1.0 blocks replace paid third-party Shopify subscriptions:
         # Launch ($1200): Cart Drawer Upsell ($39/mo) + Sticky ATC & Trust ($19/mo)
         #   + Free Shipping Bar ($15/mo) + Reviews Layout ($29/mo) + Delivery Estimator ($24/mo) = $126/mo ($1512/yr)
         # Scale ($1500): adds Quantity Breaks v2 Bundles ($39/mo) + Multi-Currency/Geo ($29/mo)
@@ -554,7 +542,7 @@ class DNKShopifyService:
             "custom_dtc": [
                 {
                     "insight": "Повільне завантаження шаблонів та конфлікти сторонніх аппок у кошику",
-                    "dnk_molecule": "DNK Sovereign Apex Core + CartMutationQueue (AsyncMutex FIFO)",
+                    "dnk_molecule": "DNK-Ecom-Zerno-v.0.1.0 Core + CartMutationQueue (AsyncMutex FIFO)",
                     "expected_kpi_lift": "95+ Mobile PageSpeed, 0% втрачених транзакцій",
                 },
                 {
@@ -700,7 +688,7 @@ class DNKShopifyService:
             ClientStageSpec(
                 stage_number=4,
                 stage_id="stage_04_molecular_liquid_assembly",
-                title_uk="Етап 4. Збірка блоків DNK Sovereign Apex та каталогу товарів",
+                title_uk="Етап 4. Збірка блоків DNK-Ecom-Zerno-v.0.1.0 та каталогу товарів",
                 canvas_node_id="node_liquid_blocks",
                 assigned_agent="dnk_shopify",
                 status="pending",
@@ -777,6 +765,7 @@ class DNKShopifyService:
         req: ClientTicketRequest,
         persist_to_canvas_session: bool = False,
         canvas_path: Optional[Path] = None,
+        persist_to_taskboard: bool = False,
     ) -> ClientTicketTriageResult:
         """
         Deterministic Scope Guard and Spatial Canvas Router for client questions and revisions.
@@ -920,6 +909,25 @@ class DNKShopifyService:
                     "audit_hash": audit_hash,
                 },
             )
+
+        if persist_to_taskboard:
+            import sqlite3
+            db_path = Path(".agents/taskboard/tasks.sqlite")
+            if db_path.exists():
+                try:
+                    conn = sqlite3.connect(str(db_path))
+                    cur = conn.cursor()
+                    cur.execute(
+                        """
+                        INSERT OR REPLACE INTO agent_tasks (id, title, status, priority, subagent_role, created_at, updated_at)
+                        VALUES (?, ?, 'todo', 'high', ?, datetime('now'), datetime('now'))
+                        """,
+                        (ticket_id, f"Client Ticket: {req.request_text[:60]}", assigned_agent),
+                    )
+                    conn.commit()
+                    conn.close()
+                except Exception:
+                    pass
 
         return ClientTicketTriageResult(
             ticket_id=ticket_id,

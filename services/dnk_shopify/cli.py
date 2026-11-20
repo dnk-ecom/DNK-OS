@@ -22,18 +22,18 @@ if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
 from services.dnk_shopify.src.service import DNKShopifyService
-from services.dnk_shopify.runtime.local_storefront import LocalStorefrontManager
 from services.dnk_shopify.contracts.schemas import (
     CartMutation,
     CartMutationQueueSpec,
     ProposalConfigSpec,
     ClientTicketRequest,
 )
+from services.dnk_shopify.engine.checkpoints import CheckpointEngine
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="DNK Shopify 3.0 Headless Sovereign Brick CLI (DNK Sovereign 1.0.0 Apex & Theme Blocks 2.0)"
+        description="DNK Shopify 3.0 Headless Sovereign Brick CLI (DNK-Ecom-Zerno-v.0.1.0 & Theme Blocks 2.0)"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -81,43 +81,20 @@ def main() -> None:
     prop_p.add_argument("--json", action="store_true", help="Output JSON")
 
     # 8. triage-ticket
-    tkt_p = subparsers.add_parser("triage-ticket", help="Triage client task/revision and route to Spatial Canvas node")
+    tkt_p = subparsers.add_parser("triage-ticket", help="Triage client task/revision and route to Taskboard & Canvas")
     tkt_p.add_argument("--deal-id", required=True, help="Deal ID")
     tkt_p.add_argument("--client", required=True, help="Client name")
     tkt_p.add_argument("--text", required=True, help="Client question or revision text")
     tkt_p.add_argument("--used-revisions", type=int, default=0, help="Already used revisions")
     tkt_p.add_argument("--max-revisions", type=int, default=3, help="Max included revisions")
-    tkt_p.add_argument("--persist", action="store_true", help="Persist ticket directly into SpatialCanvasSessionRouter")
+    tkt_p.add_argument("--persist", action="store_true", help="Persist ticket directly into Taskboard and Canvas")
     tkt_p.add_argument("--json", action="store_true", help="Output JSON")
 
-    # 9. lsf-status
-    lsf_stat_p = subparsers.add_parser("lsf-status", help="Query local-storefront daemon status")
-    lsf_stat_p.add_argument("--port", type=int, default=9292, help="Port of running lsf daemon")
-    lsf_stat_p.add_argument("--json", action="store_true", help="Output JSON")
-
-    # 10. lsf-check
-    lsf_chk_p = subparsers.add_parser("lsf-check", help="Run strict Liquid check via local-storefront")
-    lsf_chk_p.add_argument("--theme", default=None, help="Path to theme directory")
-    lsf_chk_p.add_argument("--fix", action="store_true", help="Rewrite markup with fixes")
-    lsf_chk_p.add_argument("--json", action="store_true", help="Output JSON")
-
-    # 11. lsf-profile
-    lsf_prof_p = subparsers.add_parser("lsf-profile", help="Profile theme rendering times via local-storefront")
-    lsf_prof_p.add_argument("--theme", default=None, help="Path to theme directory")
-    lsf_prof_p.add_argument("--path", default="/", help="URL route to profile")
-    lsf_prof_p.add_argument("--json", action="store_true", help="Output JSON")
-
-    # 12. lsf-serve
-    lsf_srv_p = subparsers.add_parser("lsf-serve", help="Start local-storefront HTTP daemon")
-    lsf_srv_p.add_argument("--theme", default=None, help="Path to theme directory")
-    lsf_srv_p.add_argument("--port", type=int, default=9292, help="Port to listen on")
-    lsf_srv_p.add_argument("--no-live-reload", action="store_true", help="Disable WebSocket live-reload")
-    lsf_srv_p.add_argument("--json", action="store_true", help="Output JSON")
-
-    # 13. lsf-reload
-    lsf_rel_p = subparsers.add_parser("lsf-reload", help="Hot-reload local-storefront data fixtures")
-    lsf_rel_p.add_argument("--port", type=int, default=9292, help="Port of running lsf daemon")
-    lsf_rel_p.add_argument("--json", action="store_true", help="Output JSON")
+    # 9. checkpoint
+    cp_p = subparsers.add_parser("checkpoint", help="Run 7-Gate Theme Checkpoint Audit or verify specific checkpoint (0-6)")
+    cp_p.add_argument("--theme", default=None, help="Path to theme root")
+    cp_p.add_argument("--id", type=int, default=None, choices=range(7), help="Specific Checkpoint ID (0-6)")
+    cp_p.add_argument("--json", action="store_true", help="Output JSON")
 
     args = parser.parse_args()
     service = DNKShopifyService()
@@ -225,8 +202,8 @@ def main() -> None:
         spec = ProposalConfigSpec(
             client_name=args.client,
             brand_name=args.brand,
-            niche=args.niche,  # type: ignore[arg-type]
-            package_tier=args.tier,  # type: ignore[arg-type]
+            niche=args.niche,
+            package_tier=args.tier,
             extra_products_batches=args.extra_batches,
             include_gmc_setup=args.gmc,
             include_seo_semantics=args.seo,
@@ -255,7 +232,11 @@ def main() -> None:
             used_revisions_count=args.used_revisions,
             max_free_revisions=args.max_revisions,
         )
-        res = service.triage_client_ticket(req, persist_to_canvas_session=args.persist)
+        res = service.triage_client_ticket(
+            req,
+            persist_to_canvas_session=args.persist,
+            persist_to_taskboard=args.persist,
+        )
         if args.json:
             print(res.model_dump_json(indent=2))
         else:
@@ -263,61 +244,36 @@ def main() -> None:
             print(res.action_summary_uk)
         sys.exit(0)
 
-    elif args.command == "lsf-status":
-        manager = LocalStorefrontManager(default_port=args.port)
-        status = manager.get_status()
-        if args.json:
-            print(json.dumps(status, indent=2))
-        else:
-            active = status.get("active")
-            print(f"LSF Daemon Status: {'🟢 ACTIVE' if active else '🔴 INACTIVE'} (Port {args.port})")
-            if active and status.get("status"):
-                st = status["status"]
-                print(f"Theme: {st.get('theme')}")
-                print(f"Templates: {', '.join(st.get('templates', []))}")
-        sys.exit(0 if status.get("active") else 1)
+    elif args.command == "checkpoint":
+        engine = CheckpointEngine()
+        theme_p = Path(args.theme) if args.theme else service.default_theme_path
 
-    elif args.command == "lsf-check":
-        theme_dir = args.theme or str(service.default_theme_path)
-        manager = LocalStorefrontManager()
-        res = manager.run_check(theme_dir, fix=args.fix)
-        if args.json:
-            print(json.dumps(res, indent=2))
-        else:
-            print(res.get("stdout") or res.get("stderr"))
-        sys.exit(0 if res.get("success") else 1)
-
-    elif args.command == "lsf-profile":
-        theme_dir = args.theme or str(service.default_theme_path)
-        manager = LocalStorefrontManager()
-        res = manager.run_profile(theme_dir, path=args.path)
-        if args.json:
-            print(json.dumps(res, indent=2))
-        else:
-            print(res.get("output"))
-        sys.exit(0 if res.get("success") else 1)
-
-    elif args.command == "lsf-serve":
-        theme_dir = args.theme or str(service.default_theme_path)
-        manager = LocalStorefrontManager(default_port=args.port)
-        res = manager.start_daemon(theme_dir, live_reload=not args.no_live_reload, port=args.port)
-        if args.json:
-            print(json.dumps(res, indent=2))
-        else:
-            if res.get("success"):
-                print(f"🟢 LSF Daemon started successfully at {res.get('url', f'http://127.0.0.1:{args.port}')}")
+        if args.id is not None:
+            res = engine.verify_checkpoint(theme_p, args.id)
+            if args.json:
+                print(json.dumps(res, default=str, indent=2))
             else:
-                print(f"🔴 Failed to start LSF Daemon: {res.get('error')}")
-        sys.exit(0 if res.get("success") else 1)
-
-    elif args.command == "lsf-reload":
-        manager = LocalStorefrontManager(default_port=args.port)
-        res = manager.reload_data()
-        if args.json:
-            print(json.dumps(res, indent=2))
+                status_icon = "✅ PASSED" if res["passed"] else "❌ FAILED"
+                print(f"Gate Checkpoint {res['checkpoint_id']}: {res['title']} -> {status_icon}")
+                for d in res["details"]:
+                    icon = "  ✓" if d["passed"] else "  ✗"
+                    print(f"{icon} {d['check']}: {d['message']}")
+            sys.exit(0 if res["passed"] else 1)
         else:
-            print("🟢 Data reloaded successfully" if res.get("success") else f"🔴 Reload failed: {res.get('error')}")
-        sys.exit(0 if res.get("success") else 1)
+            audit = engine.audit_theme(theme_p)
+            if args.json:
+                print(json.dumps(audit, default=str, indent=2))
+            else:
+                print(f"=== 🏛️ DNK Theme 7-Gate Checkpoint Audit: {theme_p.name} ===")
+                print(f"Consecutive Gates Passed: {audit['highest_consecutive_passed'] + 1}/{audit['total_checkpoints']}")
+                for cp in audit["checkpoints"]:
+                    icon = "✅" if cp["passed"] else "❌"
+                    print(f"[{icon}] Gate {cp['checkpoint_id']}: {cp['title']}")
+                    for d in cp["details"]:
+                        sub_icon = "  ✓" if d["passed"] else "  ✗"
+                        print(f"{sub_icon} {d['check']}: {d['message']}")
+                print("==================================================================")
+            sys.exit(0 if audit["overall_passed"] else 1)
 
 
 if __name__ == "__main__":

@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/audits/AUDIT_DESIGN_SYSTEM_KNOWLEDGE_AND_REPOS.md"
-# purpose: "Comprehensive Engineering Audit of Knowledge Base and Repositories to Supercharge Shopify and Social Media Design Systems."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-17"
-# author: "DNK-e.com Maksym (Founder), Antigravity (Architect) & Denchik (Builder)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Підсумковий інженерний аудит: База знань та репозиторії для Дизайн-Системи нового покоління (Shopify E-Commerce + Social Media Motion)"
+description: "Comprehensive Engineering Audit of Knowledge Base and Repositories to Supercharge Shopify and Social Media Design Systems."
+mrh_id: "docs/projects/dnk_ecom/audits/AUDIT_DESIGN_SYSTEM_KNOWLEDGE_AND_REPOS.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/audits/AUDIT_DESIGN_SYSTEM_KNOWLEDGE_AND_REPOS.md"
+> purpose: "Comprehensive Engineering Audit of Knowledge Base and Repositories to Supercharge Shopify and Social Media Design Systems."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🧬 Підсумковий інженерний аудит: База знань та репозиторії для Дизайн-Системи нового покоління (Shopify E-Commerce + Social Media Motion)
 

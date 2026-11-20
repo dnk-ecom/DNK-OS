@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "identity": "d4cedc4946638f1332b4c27f9c9996ce72bf25cf",
+  "bootstrappedAt": "2026-11-18T17:49:57+0200",
+  "results": {
+    "adopt_blessed_checkout": {
+      "ok": true,
+      "skipped": "not-a-blessed-root"
+    },
+    "migrate_config": {
+      "ok": true,
+      "skipped": "up-to-date"
+    },
+    "state_db_guard": {
+      "ok": true
+    },
+    "drop_live_plugin_catalog": {
+      "ok": true
+    },
+    "expose_cli": {
+      "ok": true,
+      "skipped": "no-store-python"
+    }
+  }
+}

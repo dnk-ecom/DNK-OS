@@ -1,0 +1,338 @@
+{
+  "schema_version": "dtcg-2025.10",
+  "meta": {
+    "brand_name": "Pergolux",
+    "archetype": "ecommerce_conversion",
+    "cro_allocation_rule": "60-30-10",
+    "typography_ratio_name": "Major Third",
+    "typography_ratio": 1.25,
+    "base_font_size_px": 16,
+    "spacing_grid_base_px": 8,
+    "font_family_display": null,
+    "font_family_body": null,
+    "brand_tagline": null,
+    "extracted_quotes": [
+      "Black Friday Early Access is live.",
+      "The best deals of the year are now live!",
+      "Your free heater, one sign-up away.",
+      "Custom Design Pergola S4",
+      "150,000+ Happy Customers",
+      "Premium Quality Pergolas",
+      "Designed for All Weather Conditions",
+      "The aluminum louvred roof protects you from sun, snow and rain. Open the louvres whenever you want to enjoy the sun. Optional walls available.",
+      "S4 Models up to 40% OFF S3 Models up to 50% OFF MotorizedLED lights Awnings Starting at $1,259 $1,799 30% off Save up to 50% on pergola models and up to 30% on our new awnings!",
+      "Now up to 30%Sun protection that disappears when you don’t need it.",
+      "Optional motorizationLED lights Pergolas Starting at $3,380 $6,760 50% off Save up to 50% on pergola models and up to 30% on our new awnings!",
+      "Easier assembly. Enhanced durability."
+    ]
+  },
+  "primitives": {},
+  "semantic": {
+    "color": {
+      "tw-ring-offset-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "tw-ring-color": {
+        "$value": "#1f5a33",
+        "$type": "color"
+      },
+      "tw-ring-offset-shadow": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "tw-ring-shadow": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "tw-shadow": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "tw-shadow-colored": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "tw-contain-style": {
+        "$value": "#030411",
+        "$type": "color"
+      },
+      "animation-timing": {
+        "$value": "#000100",
+        "$type": "color"
+      },
+      "neutral-100": {
+        "$value": "#f5f5f7",
+        "$type": "color"
+      },
+      "bg-primary": {
+        "$value": "#f5f5f7",
+        "$type": "color"
+      },
+      "bg-belin": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "bg-page": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "ease-out-slow": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "tw-bg-opacity": {
+        "$value": "1",
+        "$type": "color"
+      },
+      "tw-text-opacity": {
+        "$value": "#01d6d6",
+        "$type": "color"
+      },
+      "tw-translate-x": {
+        "$value": "#00195a",
+        "$type": "color"
+      },
+      "tw-border-opacity": {
+        "$value": "#000228",
+        "$type": "color"
+      },
+      "tw-gradient-from": {
+        "$value": "#000 var(--tw-gradient-from-position)",
+        "$type": "color"
+      },
+      "tw-gradient-to": {
+        "$value": "#fff0 var(--tw-gradient-to-position)",
+        "$type": "color"
+      },
+      "tw-gradient-stops": {
+        "$value": "#141428",
+        "$type": "color"
+      },
+      "tw-blur": {
+        "$value": "#080101",
+        "$type": "color"
+      },
+      "tw-backdrop-blur": {
+        "$value": "#022b02",
+        "$type": "color"
+      },
+      "tw-drop-shadow": {
+        "$value": "#000019",
+        "$type": "color"
+      },
+      "lab-video-play-bg": {
+        "$value": "#01a339",
+        "$type": "color"
+      },
+      "lab-video-play-color": {
+        "$value": "#fff}@property --promo-wave-x1{syntax:\"<percentage>\"",
+        "$type": "color"
+      },
+      "promo-wave-size1": {
+        "$value": "#aa0200",
+        "$type": "color"
+      },
+      "promo-wave-size2": {
+        "$value": "#230264",
+        "$type": "color"
+      },
+      "tw-translate-y": {
+        "$value": "#001902",
+        "$type": "color"
+      },
+      "tw-scale-y": {
+        "$value": "#010501",
+        "$type": "color"
+      },
+      "tw-brightness": {
+        "$value": "#000064",
+        "$type": "color"
+      },
+      "timer-icon-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-background-color": {
+        "$value": "#c33142",
+        "$type": "color"
+      },
+      "timer-text-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-border-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "background": {
+        "$value": "#0e1c1f",
+        "$type": "color"
+      },
+      "surface-primary": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "foreground": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "text-primary": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "primary-button": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "background-primary-button": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "secondary-button": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "action-secondary": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "background-secondary-button": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "border-secondary-button": {
+        "$value": "#121212",
+        "$type": "color"
+      },
+      "timer-icon-custom-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-text-custom-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-custom-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "timer-background-custom-color": {
+        "$value": "#7c9bb0",
+        "$type": "color"
+      },
+      "timer-border-custom-color": {
+        "$value": "#fbceb1",
+        "$type": "color"
+      },
+      "jdgm-primary-color": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "jdgm-secondary-color": {
+        "$value": "#eef1f0",
+        "$type": "color"
+      },
+      "jdgm-star-color": {
+        "$value": "#facc0e",
+        "$type": "color"
+      },
+      "jdgm-write-review-text-color": {
+        "$value": "white",
+        "$type": "color"
+      },
+      "jdgm-write-review-bg-color": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "jdgm-paginate-color": {
+        "$value": "#0e0e0e",
+        "$type": "color"
+      },
+      "jdgm-reviewer-name-color": {
+        "$value": "#000000}.jdgm-histogram__bar-content{background-color:#faf700}.jdgm-rev[data-verified-buyer=true] .jdgm-rev__icon.jdgm-rev__icon:after,.jdgm-rev__buyer-badge.jdgm-rev__buyer-badge{color:white",
+        "$type": "color"
+      },
+      "jdgm-snippet-card-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "jdgm-snippet-text-color": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "jdgm-snippet-lighter-text-color": {
+        "$value": "#7b7b7b",
+        "$type": "color"
+      },
+      "jdgm-snippet-star-color": {
+        "$value": "#fae729",
+        "$type": "color"
+      },
+      "jdgm-snippet-arrows-bg-color": {
+        "$value": "#ffffff",
+        "$type": "color"
+      },
+      "jdgm-snippet-arrows-color": {
+        "$value": "#000}.jdgm-review-snippet-widget .jdgm-rev-snippet-widget__cards-container .jdgm-rev-snippet-card{border-radius:8px",
+        "$type": "color"
+      },
+      "on": {
+        "$value": "#000102",
+        "$type": "color"
+      },
+      "overlay-color": {
+        "$value": "#000000",
+        "$type": "color"
+      },
+      "overlay-mask": {
+        "$value": "#b40000",
+        "$type": "color"
+      },
+      "loading": {
+        "$value": "#10000a",
+        "$type": "color"
+      },
+      "with-placeholder": {
+        "$value": "#0007a0",
+        "$type": "color"
+      },
+      "action-primary": {
+        "$value": "#0F766E",
+        "$type": "color"
+      },
+      "action-primary-text": {
+        "$value": "#FFFFFF",
+        "$type": "color"
+      }
+    }
+  },
+  "typography": {},
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 48,
+    "3xl": 64
+  },
+  "motion": {
+    "dur_fast_ms": 150,
+    "dur_base_ms": 250,
+    "dur_slow_ms": 400,
+    "ease_default": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "ease_spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "ease_in_out": "cubic-bezier(0.65, 0, 0.35, 1)"
+  },
+  "elevation": {
+    "shadow_xs": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "shadow_sm": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+    "shadow_md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+    "shadow_lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+  }
+}

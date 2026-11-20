@@ -1,24 +1,28 @@
 ---
-title: "Dnk-Video-Audit-And-Plan"
-status: draft
-type: note
-domain: core
-author: "DNK-e.com Maksym"
-version: "1.0.0"
+title: "DNK Video Librarian — Audit & Implementation Plan"
+description: "DNK Video Librarian Audit and Implementation Plan."
+mrh_id: "packages/dnk_hermes_ext/overlay/DNK-VIDEO-AUDIT-AND-PLAN.md"
+status: Active
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - video
+  - audit
+  - hermes
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "core/hermes_agent/DNK-VIDEO-AUDIT-AND-PLAN.md"
-> purpose: "Document: Dnk-Video-Audit-And-Plan"
+> mrh_id: "packages/dnk_hermes_ext/overlay/DNK-VIDEO-AUDIT-AND-PLAN.md"
+> purpose: "DNK Video Librarian Audit and Implementation Plan."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Draft"
-> version: "1.0.0"
-> updated_at: "2026-09-24"
-> author: "DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

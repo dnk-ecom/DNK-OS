@@ -1,5 +1,5 @@
 // --- DNK-MRH-HEADER ---
-// mrh_id: "docs/projects/dnk_ecom/proposals/noku_white/dnk_sensor.js"
+// mrh_id: "docs/projects/dnk_ecom/shopify_sensor/dnk-sensor.js"
 // purpose: "DNK Sovereign SOTA In-Context Client Review Sensor with DNK OS Polaris-Spatial HUD & Slide-over Cockpit Drawer (DEC-157)."
 // canonical_source: true
 // alters_files: []

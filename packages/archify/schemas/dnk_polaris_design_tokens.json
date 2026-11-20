@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dnk.os/schemas/dnk_polaris_design_tokens.json",
+  "title": "DNK Polaris-Spatial Design Tokens",
+  "description": "Canonical design token registry uniting Shopify Polaris 13+ with Dark Teal Infinite Spatial Canvas.",
+  "type": "object",
+  "required": ["version", "colors", "typography", "spacing", "elevation", "motion"],
+  "properties": {
+    "version": { "type": "string", "default": "1.0.0" },
+    "colors": {
+      "type": "object",
+      "required": ["spatial_canvas", "shopify_polaris"],
+      "properties": {
+        "spatial_canvas": {
+          "type": "object",
+          "properties": {
+            "bg_abyss": { "type": "string", "default": "#091114" },
+            "surface_card": { "type": "string", "default": "#0f1d22" },
+            "surface_elevated": { "type": "string", "default": "#152830" },
+            "border_subtle": { "type": "string", "default": "#1e3842" },
+            "border_focus": { "type": "string", "default": "#14b8a6" },
+            "accent_cyan": { "type": "string", "default": "#38bdf8" },
+            "accent_emerald": { "type": "string", "default": "#10b981" },
+            "accent_amber": { "type": "string", "default": "#f59e0b" },
+            "accent_rose": { "type": "string", "default": "#f43f5e" },
+            "text_primary": { "type": "string", "default": "#f8fafc" },
+            "text_secondary": { "type": "string", "default": "#94a3b8" },
+            "text_muted": { "type": "string", "default": "#64748b" }
+          }
+        },
+        "shopify_polaris": {
+          "type": "object",
+          "properties": {
+            "surface_page": { "type": "string", "default": "#f6f6f7" },
+            "surface_card": { "type": "string", "default": "#ffffff" },
+            "border_subdued": { "type": "string", "default": "#e1e3e5" },
+            "border_hover": { "type": "string", "default": "#8c9196" },
+            "interactive_primary": { "type": "string", "default": "#008060" },
+            "interactive_hover": { "type": "string", "default": "#006e52" },
+            "interactive_critical": { "type": "string", "default": "#d82c0d" },
+            "text_default": { "type": "string", "default": "#202223" },
+            "text_subdued": { "type": "string", "default": "#6d7175" }
+          }
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "font_family_sans": { "type": "string", "default": "Inter, -apple-system, BlinkMacSystemFont, sans-serif" },
+        "font_family_mono": { "type": "string", "default": "'JetBrains Mono', 'Fira Code', monospace" },
+        "font_family_display": { "type": "string", "default": "Manrope, sans-serif" }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "properties": {
+        "xs": { "type": "string", "default": "4px" },
+        "sm": { "type": "string", "default": "8px" },
+        "md": { "type": "string", "default": "16px" },
+        "lg": { "type": "string", "default": "24px" },
+        "xl": { "type": "string", "default": "32px" },
+        "2xl": { "type": "string", "default": "48px" }
+      }
+    },
+    "elevation": {
+      "type": "object",
+      "properties": {
+        "canvas_node": { "type": "string", "default": "0 4px 14px 0 rgba(0, 0, 0, 0.45)" },
+        "canvas_node_selected": { "type": "string", "default": "0 0 0 2px #14b8a6, 0 8px 24px 0 rgba(20, 184, 166, 0.35)" },
+        "drawer_flyout": { "type": "string", "default": "-8px 0 32px 0 rgba(0, 0, 0, 0.65)" }
+      }
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "transition_fast": { "type": "string", "default": "150ms cubic-bezier(0.4, 0, 0.2, 1)" },
+        "transition_spring": { "type": "string", "default": "300ms cubic-bezier(0.16, 1, 0.3, 1)" }
+      }
+    }
+  }
+}

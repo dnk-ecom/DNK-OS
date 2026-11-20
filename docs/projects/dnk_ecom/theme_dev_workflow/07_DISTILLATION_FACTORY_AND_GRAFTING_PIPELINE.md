@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md"
-# purpose: "Step-by-Step Distillation Factory, Grafting Pipeline & Gerych Terminal Pairing Protocol for Assembling DNK Sovereign Theme."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity (Chief Architect)"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "ФАБРИКА ДИСТИЛЯЦІЇ ТА ГРАФТИНГУ: ПОКРОКОВЕ СКЛАДАННЯ ТЕМИ"
+description: "Step-by-Step Distillation Factory, Grafting Pipeline & Gerych Terminal Pairing Protocol for Assembling DNK Sovereign Theme."
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/07_DISTILLATION_FACTORY_AND_GRAFTING_PIPELINE.md"
+> purpose: "Step-by-Step Distillation Factory, Grafting Pipeline & Gerych Terminal Pairing Protocol for Assembling DNK Sovereign Theme."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🏭 ФАБРИКА ДИСТИЛЯЦІЇ ТА ГРАФТИНГУ: ПОКРОКОВЕ СКЛАДАННЯ ТЕМИ
 ## Тандем Antigravity (Chief Architect) + Gerych-root (Gemini 4 Carbon)

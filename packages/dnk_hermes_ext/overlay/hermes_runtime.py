@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/hermes_runtime.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/hermes_runtime.py"
 # purpose: "Safe Execution Runtime with Dry-Run, 2-Stage Auth & Rollback (hermes-agent donor)."
 # canonical_source: true
 # alters_files: []

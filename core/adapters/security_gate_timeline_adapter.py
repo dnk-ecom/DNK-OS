@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_security_gate_timeline_adapter"
+# mrh_id: "core/adapters/security_gate_timeline_adapter.py"
 # purpose: "Security Gate Timeline Adapter to record audit trails of security gate evaluations safely with exception isolation"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

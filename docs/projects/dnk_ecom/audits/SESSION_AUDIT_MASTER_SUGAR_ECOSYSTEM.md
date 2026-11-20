@@ -1,12 +1,14 @@
 ---
-title: "Канонічний майстер-аудит сесії Sugar Theme Ecosystem Audit (DNK-ThemeCraft Core)"
+title: "КАНОНІЧНИЙ МАЙСТЕР-АУДИТ СЕСІЇ SUGAR THEME ECOSYSTEM AUDIT"
 description: "Повний майстер-аудит сесії Sugar Theme Ecosystem Audit: деконструкція механіки, формул інтерполяції, структур даних, Theme Blocks 2.0, Web Components, No-App мега-блоків та синтез у суверенне ядро DNK Sovereign Theme Core."
 mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
-status: approved
-type: report
-domain: shopify
-author: "Antigravity (Mentor & Chief Architect) & Gerych-root (Prime Auditor) & DNK-e.com Maksym"
-version: "2.5.0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -15,14 +17,12 @@ version: "2.5.0"
 > mrh_id: "docs/projects/dnk_ecom/audits/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
 > purpose: "Повний майстер-аудит сесії Sugar Theme Ecosystem Audit: деконструкція механіки, формул інтерполяції, структур даних, Theme Blocks 2.0, Web Components, No-App мега-блоків та синтез у суверенне ядро DNK Sovereign Theme Core."
 > canonical_source: true
-> alters_files:
->   - "Audit_Shopify_Themes_Sell_WF/Sugar_Theme_Ecosystem_Audit/SESSION_AUDIT_MASTER_SUGAR_ECOSYSTEM.md"
->   - "_Shopify_Theme_DEV_Workflow/companion/audits/01_SUGAR_SESSION_AUDIT.md"
+> alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "2.5.0"
-> updated_at: "2026-11-12"
-> author: "Antigravity (Mentor) & Gerych-root (Auditor) & DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
@@ -62,7 +62,7 @@ flowchart TD
 
 | Параметр | Показник донора Sugar Theme | Стандарт DNK Sovereign Theme Core |
 |---|---|---|
-| **Версія донора** | v2.3.9 Cleanroom + v2.3.10 DNK Update | DNK Sovereign 1.0.0 Apex |
+| **Версія донора** | v2.3.9 Cleanroom + v2.3.10 DNK Update | DNK-Ecom-Zerno-v.0.1.0 |
 | **Theme Blocks 2.0** | 296 блоків (13-57 контейнерів з `content_for 'blocks'`) | 100% нативна модульна підтримка блоків |
 | **LCP Оптимізація** | `media-sizes-scope.liquid` (динамічний поділ колонок) | `dnk-media-sizes.liquid` + Eager/High hints (< 1.5s) |
 | **CSSOM Дедуплікація** | `stylesheet-once.liquid` (видалення дублікатів `<link>`) | `dnk-stylesheet-once.liquid` + Section Swap Safe |

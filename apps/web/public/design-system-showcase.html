@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛍️ DNK OS Polaris Core Design System Studio | Shopify Merchant Parity</title>
+  <style>
+    /* ─── 0. CANONICAL W3C DTCG / SHOPIFY POLARIS 2.0 TOKENS (INLINE EMBEDDED) ─── */
+    :root {
+      /* Spatial Geometry & Radius */
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-full: 9999px;
+
+      /* Typography Stack (Apple SF Pro / Inter / System) */
+      --font-family-sans: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+      /* Transitions & Springs */
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-spring: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* 8pt / 4pt Spatial Grid */
+      --space-050: 2px;
+      --space-100: 4px;
+      --space-150: 6px;
+      --space-200: 8px;
+      --space-300: 12px;
+      --space-400: 16px;
+      --space-500: 20px;
+      --space-600: 24px;
+      --space-800: 32px;
+      --space-1200: 48px;
+      --space-1600: 64px;
+    }
+
+    /* LIGHT THEME: Shopify Polaris Snow Canvas (Merchant Center) */
+    :root[data-theme="light"],
+    :root:not([data-theme="dark"]) {
+      --bg-app: #f1f2f4;
+      --bg-surface: #ffffff;
+      --bg-surface-secondary: #f6f6f7;
+      --bg-surface-hover: #edeeef;
+      --bg-surface-active: #e3e5e8;
+      
+      --border-subtle: #e3e5e8;
+      --border-base: #c9cccf;
+      --border-strong: #8c9196;
+      
+      --text-primary: #202223;
+      --text-secondary: #6d7175;
+      --text-subdued: #8c9196;
+      --text-on-accent: #ffffff;
+      
+      /* Primary Shopify Emerald Accent */
+      --color-accent: #008060;
+      --color-accent-hover: #006e52;
+      --color-accent-active: #004e3a;
+      --color-accent-subtle: #e3f1df;
+      --color-accent-rgb: 0, 128, 96;
+
+      /* Feedback Colors */
+      --color-success: #008060;
+      --color-success-subtle: #e3f1df;
+      --color-warning: #b98900;
+      --color-warning-subtle: #fff5ea;
+      --color-critical: #d82c0d;
+      --color-critical-subtle: #fbeae5;
+      --color-info: #2c6ecb;
+      --color-info-subtle: #ebf5fa;
+      
+      --grid-dot: rgba(0, 0, 0, 0.07);
+      --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border-subtle);
+      --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-subtle);
+      --shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border-subtle);
+
+      --badge-bg-neutral: #e4e5e7;
+      --badge-text-neutral: #4a4d52;
+    }
+
+    /* DARK THEME: Helix Matte Obsidian (Autonomous Agent Cockpit) */
+    :root[data-theme="dark"] {
+      --bg-app: #0d0e10;
+      --bg-surface: #16181b;
+      --bg-surface-secondary: #1d2024;
+      --bg-surface-hover: #25282d;
+      --bg-surface-active: #2e3238;
+      
+      --border-subtle: #26292e;
+      --border-base: #33383f;
+      --border-strong: #4a515a;
+      
+      --text-primary: #f0f2f5;
+      --text-secondary: #9da3ae;
+      --text-subdued: #636b78;
+      --text-on-accent: #000000;
+      
+      /* High-Visibility Neon Emerald for Obsidian Cockpits */
+      --color-accent: #30cd90;
+      --color-accent-hover: #28b880;
+      --color-accent-active: #1fa06d;
+      --color-accent-subtle: rgba(48, 205, 144, 0.15);
+      --color-accent-rgb: 48, 205, 144;
+
+      /* Feedback Colors (Dark Tinted) */
+      --color-success: #30cd90;
+      --color-success-subtle: rgba(48, 205, 144, 0.15);
+      --color-warning: #f59e0b;
+      --color-warning-subtle: rgba(245, 158, 11, 0.15);
+      --color-critical: #ef4444;
+      --color-critical-subtle: rgba(239, 68, 68, 0.15);
+      --color-info: #38bdf8;
+      --color-info-subtle: rgba(56, 189, 248, 0.15);
+      
+      --grid-dot: rgba(255, 255, 255, 0.06);
+      --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-subtle);
+      --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
+      --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-subtle);
+
+      --badge-bg-neutral: #282c34;
+      --badge-text-neutral: #b0b6c2;
+    }
+
+    /* ─── BASE RESET ─── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family-sans);
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      transition: background-color var(--transition-base), color var(--transition-base);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* ─── 1. TOP GLOBAL APP BAR (Shopify Merchant Shell) ─── */
+    .topbar {
+      height: 54px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-xs);
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .shopify-bag-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--color-accent);
+      color: var(--text-on-accent);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(var(--color-accent-rgb), 0.25);
+      transition: transform var(--transition-fast);
+      cursor: pointer;
+    }
+    .shopify-bag-logo:hover {
+      transform: scale(1.04);
+    }
+
+    .store-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: background-color var(--transition-fast);
+    }
+    .store-selector:hover {
+      background-color: var(--bg-surface-hover);
+    }
+
+    .live-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-success-subtle);
+      color: var(--color-success);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .live-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--color-success);
+    }
+
+    /* Omnibox Global Search */
+    .topbar-search {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 24px;
+      position: relative;
+    }
+    .topbar-search input {
+      width: 100%;
+      height: 34px;
+      background-color: var(--bg-surface-secondary);
+      border: 1px solid var(--border-base);
+      border-radius: var(--radius-sm);
+      padding: 0 40px 0 34px;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .topbar-search input:focus {
+      background-color: var(--bg-surface);
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 1px var(--color-accent);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subdued);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .search-shortcut {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-family: var(--font-family-mono);
+      color: var(--text-subdued);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 5px;
+      border-radius: var(--radius-xs);
+    }
+
+    /* Topbar Right Actions */
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-pill-selector {
+      display: flex;
+      background-color: var(--bg-surface-secondary);
+      border: 1px solid var(--border-base);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      gap: 2px;
+    }
+    .theme-pill-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .theme-pill-btn.active {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-xs);
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+    .icon-btn:hover {
+      background-color: var(--bg-surface-hover);
+      color: var(--text-primary);
+    }
+    .notification-dot {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--color-critical);
+      border: 1.5px solid var(--bg-surface);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: var(--text-on-accent);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ─── 2. MAIN APP LAYOUT (SIDEBAR + WORKSPACE) ─── */
+    .app-layout {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 240px;
+      background-color: var(--bg-surface-secondary);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 8px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+
+    .nav-section {
+      margin-bottom: 16px;
+    }
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-subdued);
+      letter-spacing: 0.5px;
+      padding: 6px 10px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+    .nav-item:hover {
+      background-color: var(--bg-surface-hover);
+    }
+    .nav-item.active {
+      background-color: var(--bg-surface-active);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .nav-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+      background-color: var(--badge-bg-neutral);
+      color: var(--badge-text-neutral);
+      font-weight: 600;
+    }
+
+    /* Main Workspace */
+    .main-workspace {
+      flex: 1;
+      overflow-y: auto;
+      background-color: var(--bg-app);
+      display: flex;
+      flex-direction: column;
+      transition: background-color var(--transition-base);
+    }
+
+    /* Sub-header / Page Title Bar */
+    .page-header {
+      padding: 24px 32px 16px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+    .breadcrumbs {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .page-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+    }
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Polaris Segmented Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      gap: 4px;
+      padding: 0 32px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .tab-btn.active {
+      color: var(--text-primary);
+      font-weight: 600;
+      border-bottom-color: var(--color-accent);
+    }
+
+    /* Workspace Body */
+    .workspace-body {
+      padding: 24px 32px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+      animation: fadeIn 200ms ease-out;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── 3. POLARIS CARDS & KPI GRID ─── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .polaris-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 18px 20px;
+      position: relative;
+      transition: background-color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+    }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+      color: var(--text-primary);
+      margin-top: 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .kpi-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-success);
+      background-color: var(--color-success-subtle);
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+    }
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--text-subdued);
+      margin-top: 6px;
+    }
+
+    /* Sparkline SVG container */
+    .sparkline-svg {
+      width: 70px;
+      height: 28px;
+    }
+
+    /* ─── 4. POLARIS INDEX TABLE (Products List) ─── */
+    .table-container {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+    .table-toolbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .filter-pill {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-base);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .filter-pill:hover {
+      background-color: var(--bg-surface-hover);
+    }
+    .filter-pill.active {
+      background-color: var(--bg-surface-secondary);
+      border-color: var(--border-strong);
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    thead {
+      background-color: var(--bg-surface-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    th {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      user-select: none;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color var(--transition-fast);
+    }
+    tbody tr:hover {
+      background-color: var(--bg-surface-hover);
+    }
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+    td {
+      padding: 14px 16px;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .product-col {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .product-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-surface-secondary);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .product-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .product-sku {
+      font-size: 11px;
+      color: var(--text-subdued);
+      margin-top: 2px;
+    }
+
+    /* Polaris Status Pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .pill-active {
+      background-color: var(--color-success-subtle);
+      color: var(--color-success);
+    }
+    .pill-draft {
+      background-color: var(--badge-bg-neutral);
+      color: var(--badge-text-neutral);
+    }
+    .pill-low {
+      background-color: var(--color-warning-subtle);
+      color: var(--color-warning);
+    }
+    .pill-critical {
+      background-color: var(--color-critical-subtle);
+      color: var(--color-critical);
+    }
+
+    /* ─── 5. POLARIS BUTTONS & ACTIONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--color-accent);
+      color: var(--text-on-accent);
+      border-color: var(--color-accent);
+      box-shadow: 0 1px 2px rgba(var(--color-accent-rgb), 0.2);
+    }
+    .btn-primary:hover {
+      background-color: var(--color-accent-hover);
+      border-color: var(--color-accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-base);
+      box-shadow: var(--shadow-xs);
+    }
+    .btn-secondary:hover {
+      background-color: var(--bg-surface-hover);
+      border-color: var(--border-strong);
+    }
+
+    .btn-destructive {
+      background-color: var(--color-critical);
+      color: #ffffff;
+      border-color: var(--color-critical);
+    }
+    .btn-destructive:hover {
+      background-color: #b82309;
+      border-color: #b82309;
+    }
+
+    .btn-plain {
+      background: transparent;
+      color: var(--color-accent);
+      border: none;
+      padding: 4px 8px;
+    }
+    .btn-plain:hover {
+      background-color: var(--color-accent-subtle);
+    }
+
+    /* ─── 6. POLARIS CALLOUT BANNERS ─── */
+    .banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      line-height: 1.4;
+      border-left: 4px solid;
+      box-shadow: var(--shadow-xs);
+    }
+    .banner-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .banner-success {
+      background-color: var(--color-success-subtle);
+      border-left-color: var(--color-success);
+      color: var(--text-primary);
+    }
+    .banner-warning {
+      background-color: var(--color-warning-subtle);
+      border-left-color: var(--color-warning);
+      color: var(--text-primary);
+    }
+    .banner-critical {
+      background-color: var(--color-critical-subtle);
+      border-left-color: var(--color-critical);
+      color: var(--text-primary);
+    }
+    .banner-info {
+      background-color: var(--color-info-subtle);
+      border-left-color: var(--color-info);
+      color: var(--text-primary);
+    }
+
+    /* ─── 7. TOKEN GRID & CONTRAST LAB ─── */
+    .token-grid-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .token-item-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 12px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .token-item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-elevated);
+      border-color: var(--color-accent);
+    }
+    .swatch-box {
+      height: 56px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 6px;
+    }
+    .token-meta-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .token-meta-var {
+      font-family: var(--font-family-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .token-meta-wcag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background-color: var(--bg-surface-secondary);
+      color: var(--text-secondary);
+      align-self: flex-start;
+    }
+
+    /* ─── 8. FORM CONTROLS & INPUTS ─── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .form-helper {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .form-input {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-base);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .form-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 1px var(--color-accent);
+    }
+    .form-input-affix {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-base);
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-surface);
+      overflow: hidden;
+    }
+    .form-input-affix:focus-within {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 1px var(--color-accent);
+    }
+    .affix-prefix {
+      padding: 0 10px;
+      font-size: 13px;
+      color: var(--text-subdued);
+      background-color: var(--bg-surface-secondary);
+      border-right: 1px solid var(--border-subtle);
+      height: 34px;
+      display: flex;
+      align-items: center;
+    }
+    .form-input-affix input {
+      flex: 1;
+      height: 34px;
+      border: none;
+      outline: none;
+      padding: 0 10px;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    /* Toggle Switch */
+    .switch-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .switch-slider {
+      width: 38px;
+      height: 22px;
+      border-radius: 12px;
+      background-color: var(--border-base);
+      position: relative;
+      transition: background-color var(--transition-fast);
+    }
+    .switch-slider::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      top: 2px;
+      left: 2px;
+      transition: transform var(--transition-fast);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input[type="checkbox"]:checked + .switch-slider {
+      background-color: var(--color-accent);
+    }
+    input[type="checkbox"]:checked + .switch-slider::after {
+      transform: translateX(16px);
+    }
+
+    /* ─── 9. LIVING CANVAS & AGENT NODES ─── */
+    .canvas-box {
+      min-height: 440px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      position: relative;
+      background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+      background-size: 20px 20px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .swarm-node {
+      width: 290px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-elevated);
+      padding: 16px;
+      position: relative;
+      transition: all var(--transition-base);
+    }
+    .swarm-node:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-modal);
+    }
+    .swarm-node.active-node {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.25), var(--shadow-elevated);
+    }
+    .node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .node-role-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ─── 10. CODE EXPORT VIEWER ─── */
+    .code-box {
+      background-color: #0d0e10;
+      color: #38bdf8;
+      border: 1px solid #26292e;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: var(--font-family-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+      max-height: 380px;
+    }
+
+    /* ─── TOAST NOTIFICATION ─── */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: var(--text-primary);
+      color: var(--bg-surface);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-modal);
+      display: none;
+      z-index: 1000;
+      animation: toastSlide 200ms ease-out;
+    }
+    @keyframes toastSlide {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── 1. TOP GLOBAL APP BAR (Shopify Merchant Shell) ─── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="shopify-bag-logo" title="Shopify Polaris Parity">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12z"/>
+        </svg>
+      </div>
+
+      <div class="store-selector">
+        <span>DNK Sovereign Store</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+
+      <span class="live-badge">Online / Sovereign Live</span>
+    </div>
+
+    <!-- Search Omnibox -->
+    <div class="topbar-search">
+      <span class="search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="text" id="omni-search" placeholder="Пошук продуктів, замовлень, клієнтів або дизайн-токенів..." onkeyup="filterProducts(this.value)">
+      <span class="search-shortcut">⌘K</span>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="topbar-right">
+      <!-- Theme Switcher Pill -->
+      <div class="theme-pill-selector">
+        <button id="btn-theme-light" class="theme-pill-btn active" onclick="setGlobalTheme('light')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          Polaris Snow
+        </button>
+        <button id="btn-theme-dark" class="theme-pill-btn" onclick="setGlobalTheme('dark')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Matte Obsidian
+        </button>
+      </div>
+
+      <!-- Notification Bell -->
+      <button class="icon-btn" title="Сповіщення" onclick="triggerToast('12 нових замовлень оброблено автономами')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notification-dot"></span>
+      </button>
+
+      <!-- User Avatar -->
+      <div class="user-avatar" title="Maksym K. (DNK Sovereign Lead)" onclick="triggerToast('Профіль: Maksym K. (Owner)')">
+        MK
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── 2. MAIN APP LAYOUT (SIDEBAR + WORKSPACE) ─── -->
+  <div class="app-layout">
+
+    <!-- Left Shopify Admin Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="nav-section">
+          <a class="nav-item" onclick="switchTab(0)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Home</span>
+            </div>
+          </a>
+
+          <a class="nav-item" onclick="switchTab(0)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span>Orders</span>
+            </div>
+            <span class="nav-badge">12</span>
+          </a>
+
+          <a class="nav-item active" onclick="switchTab(0)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              <span>Products</span>
+            </div>
+          </a>
+
+          <a class="nav-item" onclick="triggerToast('Розділ Customers: 1,420 активних покупців')">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Customers</span>
+            </div>
+          </a>
+
+          <a class="nav-item" onclick="switchTab(0)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Analytics</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">DNK OS Sovereign Core</div>
+
+          <a class="nav-item" onclick="switchTab(1)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 10 10 0 0 0 0-20"/></svg>
+              <span>Token Matrix & WCAG</span>
+            </div>
+            <span class="status-pill pill-active" style="font-size: 10px;">AA Cert</span>
+          </a>
+
+          <a class="nav-item" onclick="switchTab(2)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span>UI Components</span>
+            </div>
+          </a>
+
+          <a class="nav-item" onclick="switchTab(3)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 9l6 6"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/></svg>
+              <span>Living Canvas & Swarm</span>
+            </div>
+            <span class="status-pill pill-active" style="font-size: 10px;">4 Online</span>
+          </a>
+
+          <a class="nav-item" onclick="switchTab(4)">
+            <div class="nav-item-left">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Code Export</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <a class="nav-item" onclick="triggerToast('Settings: W3C DTCG Token Registry v2.5.0')">
+          <div class="nav-item-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </div>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="breadcrumbs">
+          <span>DNK OS Core</span>
+          <span>/</span>
+          <span>Design Systems</span>
+          <span>/</span>
+          <strong style="color: var(--text-primary);">Polaris Core Studio (DEC-139)</strong>
+        </div>
+
+        <div class="page-title-row">
+          <div>
+            <h1 class="page-title">Shopify Polaris 2.0 Design System & Merchant Shell</h1>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+              Автентична палітра Shopify Emerald (#008060) та Helix Matte Obsidian (#30CD90). Повна відповідність W3C DTCG 2025.10.
+            </p>
+          </div>
+
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="switchTab(4)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Tokens
+            </button>
+            <button class="btn btn-primary" onclick="triggerToast('✓ Токени синхронізовано з Sovereign Apex та Web Core!')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Deploy to Core & Apex
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Polaris Segmented Tabs -->
+      <nav class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab(0)">🛍️ Store & Products (IndexTable)</button>
+        <button class="tab-btn" onclick="switchTab(1)">🎨 Color Tokens & WCAG Matrix</button>
+        <button class="tab-btn" onclick="switchTab(2)">🧩 Polaris UI Components</button>
+        <button class="tab-btn" onclick="switchTab(3)">🧬 Living Canvas & Swarm HUD</button>
+        <button class="tab-btn" onclick="switchTab(4)">💻 Multi-Target Code Export</button>
+      </nav>
+
+      <!-- Workspace Body -->
+      <div class="workspace-body">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB 0: STORE & PRODUCTS SIMULATOR (IndexTable)               -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div class="tab-content active" id="tab-0">
+
+          <!-- Polaris Info Banner -->
+          <div class="banner banner-info">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <div>
+              <div class="banner-title">Polaris 2.0 Merchant Familiarity Certified</div>
+              <div>Всі елементи, шрифти (16px підлога), радіуси (4px/8px) та палітра Shopify Emerald (#008060) працюють 1:1 з офіційною адмінкою Shopify.com.</div>
+            </div>
+          </div>
+
+          <!-- 4 KPI Metrics Cards with Real Sparklines -->
+          <div class="kpi-grid">
+            <div class="polaris-card">
+              <div class="kpi-label">
+                <span>TOTAL SALES</span>
+                <span class="kpi-delta">▲ +14.2%</span>
+              </div>
+              <div class="kpi-value">
+                <span>$142,850.00</span>
+                <!-- SVG Sparkline -->
+                <svg class="sparkline-svg" viewBox="0 0 100 40">
+                  <path d="M 0 35 Q 25 15, 50 25 T 100 5" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="kpi-subtext">vs. $125,050.00 минулий місяць</div>
+            </div>
+
+            <div class="polaris-card">
+              <div class="kpi-label">
+                <span>CONVERSION RATE (CVR)</span>
+                <span class="kpi-delta">▲ +0.42%</span>
+              </div>
+              <div class="kpi-value">
+                <span>3.84%</span>
+                <svg class="sparkline-svg" viewBox="0 0 100 40">
+                  <path d="M 0 30 Q 30 35, 60 15 T 100 8" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="kpi-subtext">60-30-10 CRO активне</div>
+            </div>
+
+            <div class="polaris-card">
+              <div class="kpi-label">
+                <span>AVERAGE ORDER VALUE</span>
+                <span class="kpi-delta">▲ +$12.30</span>
+              </div>
+              <div class="kpi-value">
+                <span>$94.20</span>
+                <svg class="sparkline-svg" viewBox="0 0 100 40">
+                  <path d="M 0 28 Q 20 10, 50 20 T 100 12" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="kpi-subtext">Sovereign Apex Cart Drawer</div>
+            </div>
+
+            <div class="polaris-card">
+              <div class="kpi-label">
+                <span>AUTONOMOUS SWARM</span>
+                <span class="status-pill pill-active">106 Tests Pass</span>
+              </div>
+              <div class="kpi-value">
+                <span>4/4 Online</span>
+                <svg class="sparkline-svg" viewBox="0 0 100 40">
+                  <path d="M 0 20 L 30 20 L 50 10 L 70 20 L 100 10" fill="none" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="kpi-subtext">Denchik • Gerych • Antigravity</div>
+            </div>
+          </div>
+
+          <!-- Polaris Products Index Table -->
+          <div class="table-container">
+            <div class="table-toolbar">
+              <div class="filter-pills">
+                <button class="filter-pill active" onclick="filterByTab(this, 'all')">All (240)</button>
+                <button class="filter-pill" onclick="filterByTab(this, 'active')">Active (180)</button>
+                <button class="filter-pill" onclick="filterByTab(this, 'draft')">Draft (42)</button>
+                <button class="filter-pill" onclick="filterByTab(this, 'low')">Low Stock (18)</button>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary" onclick="triggerToast('Фільтри: за ціною, категорією та наявністю')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                  Filter
+                </button>
+                <button class="btn btn-secondary" onclick="triggerToast('Сортування: за назвою, датою або продажами')">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+                  Sort
+                </button>
+              </div>
+            </div>
+
+            <table id="products-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"><input type="checkbox" onchange="toggleSelectAll(this)" /></th>
+                  <th>Product</th>
+                  <th>Status</th>
+                  <th>Inventory</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-status="active">
+                  <td><input type="checkbox" class="row-checkbox" /></td>
+                  <td>
+                    <div class="product-col">
+                      <div class="product-thumb">🥋</div>
+                      <div>
+                        <div class="product-title">DNK Sovereign Silk Kimono Robe</div>
+                        <div class="product-sku">SKU: DNK-KIM-001 • Midnight Emerald</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill pill-active">● Active</span></td>
+                  <td><strong style="color: var(--color-success);">24 in stock</strong> for 3 variants</td>
+                  <td>Apparel & Accessories</td>
+                  <td><strong>$189.00</strong></td>
+                  <td style="text-align: right;"><button class="btn btn-plain" onclick="triggerToast('Редагування DNK Sovereign Silk Kimono')">Edit</button></td>
+                </tr>
+
+                <tr data-status="low">
+                  <td><input type="checkbox" class="row-checkbox" /></td>
+                  <td>
+                    <div class="product-col">
+                      <div class="product-thumb">🧴</div>
+                      <div>
+                        <div class="product-title">Aura Botanical Peptide Glow Serum</div>
+                        <div class="product-sku">SKU: AURA-SRM-042 • 50ml Glass Bottle</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill pill-low">● Low Stock</span></td>
+                  <td><strong style="color: var(--color-warning);">3 left</strong> (Re-order suggested)</td>
+                  <td>Beauty & Skincare</td>
+                  <td><strong>$64.00</strong></td>
+                  <td style="text-align: right;"><button class="btn btn-plain" onclick="triggerToast('Редагування Aura Peptide Serum')">Edit</button></td>
+                </tr>
+
+                <tr data-status="draft">
+                  <td><input type="checkbox" class="row-checkbox" /></td>
+                  <td>
+                    <div class="product-col">
+                      <div class="product-thumb">🕯️</div>
+                      <div>
+                        <div class="product-title">Obsidian Minimal Aromatherapy Candle</div>
+                        <div class="product-sku">SKU: OBS-CND-012 • Smoked Cedar</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill pill-draft">Draft</span></td>
+                  <td>0 in stock</td>
+                  <td>Home & Living</td>
+                  <td><strong>$42.00</strong></td>
+                  <td style="text-align: right;"><button class="btn btn-plain" onclick="triggerToast('Редагування Obsidian Candle')">Edit</button></td>
+                </tr>
+
+                <tr data-status="active">
+                  <td><input type="checkbox" class="row-checkbox" /></td>
+                  <td>
+                    <div class="product-col">
+                      <div class="product-thumb">⚡</div>
+                      <div>
+                        <div class="product-title">DNK Sovereign Apex High-CRO Theme v1.0.0</div>
+                        <div class="product-sku">BUNDLE: SOV-APEX-THEME • Instant Download</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="status-pill pill-active">● Active</span></td>
+                  <td>∞ Digital Fulfillment</td>
+                  <td>Shopify Themes</td>
+                  <td><strong>$380.00</strong></td>
+                  <td style="text-align: right;"><button class="btn btn-plain" onclick="triggerToast('Редагування Sovereign Apex Theme')">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB 1: COLOR TOKEN MATRIX & WCAG LAB                         -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-1">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
+                W3C DTCG Token Palette & WCAG 2.2 AA Contrast Matrix
+              </h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                Клікніть на будь-яку картку токена, щоб скопіювати CSS-змінну <code>var(...)</code> у буфер обміну.
+              </p>
+            </div>
+            <span class="status-pill pill-active">WCAG 2.2 AA Pass Certified</span>
+          </div>
+
+          <div class="token-grid-showcase">
+            <div class="token-item-card" onclick="copyTokenValue('--bg-app')">
+              <div class="swatch-box" style="background-color: var(--bg-app);"></div>
+              <div class="token-meta-title">App Canvas</div>
+              <div class="token-meta-var">--bg-app</div>
+              <span class="token-meta-wcag">Base Surface</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--bg-surface')">
+              <div class="swatch-box" style="background-color: var(--bg-surface);"></div>
+              <div class="token-meta-title">Card Surface</div>
+              <div class="token-meta-var">--bg-surface</div>
+              <span class="token-meta-wcag">Container Base</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--bg-surface-secondary')">
+              <div class="swatch-box" style="background-color: var(--bg-surface-secondary);"></div>
+              <div class="token-meta-title">Secondary Surface</div>
+              <div class="token-meta-var">--bg-surface-secondary</div>
+              <span class="token-meta-wcag">Table Header / Sidebar</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--color-accent')">
+              <div class="swatch-box" style="background-color: var(--color-accent); color: var(--text-on-accent);">
+                <span style="font-size: 10px; font-weight: 700;">CTA</span>
+              </div>
+              <div class="token-meta-title">Shopify Emerald</div>
+              <div class="token-meta-var">--color-accent</div>
+              <span class="token-meta-wcag" style="background-color: var(--color-accent); color: var(--text-on-accent);">4.5:1 AA Primary</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--text-primary')">
+              <div class="swatch-box" style="background-color: var(--text-primary); color: var(--bg-surface);">
+                <span style="font-size: 10px; font-weight: 700;">Aa</span>
+              </div>
+              <div class="token-meta-title">Text Primary</div>
+              <div class="token-meta-var">--text-primary</div>
+              <span class="token-meta-wcag">12.4:1 AAA</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--text-secondary')">
+              <div class="swatch-box" style="background-color: var(--text-secondary); color: var(--bg-surface);">
+                <span style="font-size: 10px; font-weight: 700;">Aa</span>
+              </div>
+              <div class="token-meta-title">Text Subdued</div>
+              <div class="token-meta-var">--text-secondary</div>
+              <span class="token-meta-wcag">4.8:1 AA</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--border-subtle')">
+              <div class="swatch-box" style="background-color: var(--border-subtle);"></div>
+              <div class="token-meta-title">Subtle Border</div>
+              <div class="token-meta-var">--border-subtle</div>
+              <span class="token-meta-wcag">1px Hairline</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--color-success')">
+              <div class="swatch-box" style="background-color: var(--color-success); color: #fff;">
+                <span style="font-size: 10px; font-weight: 700;">✓</span>
+              </div>
+              <div class="token-meta-title">Success Feedback</div>
+              <div class="token-meta-var">--color-success</div>
+              <span class="token-meta-wcag">Pass AA</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--color-warning')">
+              <div class="swatch-box" style="background-color: var(--color-warning); color: #fff;">
+                <span style="font-size: 10px; font-weight: 700;">!</span>
+              </div>
+              <div class="token-meta-title">Warning Amber</div>
+              <div class="token-meta-var">--color-warning</div>
+              <span class="token-meta-wcag">Pass AA</span>
+            </div>
+
+            <div class="token-item-card" onclick="copyTokenValue('--color-critical')">
+              <div class="swatch-box" style="background-color: var(--color-critical); color: #fff;">
+                <span style="font-size: 10px; font-weight: 700;">✕</span>
+              </div>
+              <div class="token-meta-title">Critical Crimson</div>
+              <div class="token-meta-var">--color-critical</div>
+              <span class="token-meta-wcag">Pass AA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB 2: POLARIS UI COMPONENTS & FORM CONTROLS                 -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-2">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+
+            <!-- Button Showcase -->
+            <div class="polaris-card">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Polaris Action Buttons (60-30-10)</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="btn btn-primary" onclick="triggerToast('Primary action executed')">Save & Publish</button>
+                  <button class="btn btn-secondary" onclick="triggerToast('Secondary action')">Discard Changes</button>
+                  <button class="btn btn-destructive" onclick="triggerToast('Destructive action confirmed')">Delete Product</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button class="btn btn-plain" onclick="triggerToast('Plain link')">Learn more about DTCG</button>
+                  <button class="btn btn-secondary" id="btn-loader" onclick="simulateLoading(this)">
+                    <span id="btn-loader-text">Simulate Loading</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polaris Banners -->
+            <div class="polaris-card">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Polaris Callout Banners</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="banner banner-success">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <div>
+                    <div class="banner-title">Storefront Deployed Successfully</div>
+                    <div>Всі 280 файлів скомпільовано без жодної помилки.</div>
+                  </div>
+                </div>
+
+                <div class="banner banner-warning">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <div>
+                    <div class="banner-title">Inventory Low on 3 Products</div>
+                    <div>Рекомендуємо замовити нову партію сироватки Aura.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Controls -->
+            <div class="polaris-card">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Form Controls & Affixes</h3>
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="form-group">
+                  <label class="form-label">Store Domain</label>
+                  <div class="form-input-affix">
+                    <span class="affix-prefix">https://</span>
+                    <input type="text" value="dnk-sovereign.store" />
+                  </div>
+                  <span class="form-helper">Головний домен для клієнтського трафіку</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Price & Currency</label>
+                  <div class="form-input-affix">
+                    <span class="affix-prefix">$</span>
+                    <input type="text" value="189.00" />
+                  </div>
+                </div>
+
+                <div style="margin-top: 6px;">
+                  <label class="switch-label">
+                    <input type="checkbox" checked style="display: none;" onchange="triggerToast('Автоматичне масштабування: ' + (this.checked ? 'ВКЛ' : 'ВИКЛ'))" />
+                    <div class="switch-slider"></div>
+                    <span>Автономне A/B тестування CRO (The Ultimate CRO)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typography Ladder -->
+            <div class="polaris-card">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Fluid Typography (Major Third 1.25)</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                  <span style="font-size: 11px; color: var(--text-subdued); display: block;">Display (clamp 32px–48px)</span>
+                  <div style="font-size: 28px; font-weight: 700; line-height: 1.2;">Sovereign Brand Head</div>
+                </div>
+                <div>
+                  <span style="font-size: 11px; color: var(--text-subdued); display: block;">H1 Section (22px)</span>
+                  <div style="font-size: 20px; font-weight: 600;">High-Performance Catalog</div>
+                </div>
+                <div>
+                  <span style="font-size: 11px; color: var(--text-subdued); display: block;">Body Floor (16px — No iOS zoom)</span>
+                  <div style="font-size: 16px; color: var(--text-primary);">Підлога 16px захищає мобільний LCP та запобігає авто-зуму Safari iOS.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB 3: LIVING CANVAS & AGENT SWARM HUD                       -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-3">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
+                DNK OS Living Canvas Spatial Node Architecture
+              </h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                Всі агентні ноди використовують уніфіковані дизайн-токени Polaris 2.0 (DEC-139).
+              </p>
+            </div>
+            <span class="status-pill pill-active">WebSocket Mesh Active</span>
+          </div>
+
+          <div class="canvas-box">
+            <!-- Node 1: Antigravity -->
+            <div class="swarm-node">
+              <div class="node-header">
+                <span style="font-size: 13px; font-weight: 700;">Node #01: System Architect</span>
+                <span class="node-role-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Antigravity 🧭</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+                DEC-139 Polaris Architecture Guard locked. 100% Invariant alignment.
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subdued);">
+                <span>Role: Orchestration</span>
+                <span style="color: var(--color-success); font-weight: 600;">Active ⚡</span>
+              </div>
+            </div>
+
+            <!-- Connected Node 2: Denchik (Active) -->
+            <div class="swarm-node active-node">
+              <div class="node-header">
+                <span style="font-size: 13px; font-weight: 700;">Node #02: Theme Craftsman</span>
+                <span class="node-role-badge" style="background: var(--color-accent-subtle); color: var(--color-accent);">Denchik 🛠️</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+                Фізична генерація Liquid CSS, токенів кастомайзера та Tailwind v4 спеки.
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subdued);">
+                <span>FastMCP Code Mode</span>
+                <span style="color: var(--color-accent); font-weight: 600;">Exit Code 0 ✓</span>
+              </div>
+            </div>
+
+            <!-- Node 3: Gerych -->
+            <div class="swarm-node">
+              <div class="node-header">
+                <span style="font-size: 13px; font-weight: 700;">Node #03: Quality Gatekeeper</span>
+                <span class="node-role-badge" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">Gerych 🛡️</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+                Детермінована перевірка WCAG 2.2 AA (100% pass) та 106 unit-тестів.
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-subdued);">
+                <span>scripts/verify_all.sh</span>
+                <span style="color: #a855f7; font-weight: 600;">Certified 🔒</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- TAB 4: MULTI-TARGET CODE EXPORT                              -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <div class="tab-content" id="tab-4">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div>
+              <h2 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
+                Multi-Target Production Code Artifacts
+              </h2>
+              <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                Скомпільовані артефакти для Shopify Liquid теми, Tailwind v4 та W3C DTCG Token JSON.
+              </p>
+            </div>
+            <button class="btn btn-secondary" onclick="copyCodeBlock()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copy Code
+            </button>
+          </div>
+
+          <div class="code-box" id="code-display">/* === Shopify Liquid Theme CSS (services/dnk_shopify/assets/dnk-tokens.css) === */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif;
+  --space-200: 8px;
+  --space-400: 16px;
+  --space-800: 32px;
+}
+
+:root[data-theme="light"], :root:not([data-theme="dark"]) {
+  --bg-app: #f1f2f4;
+  --bg-surface: #ffffff;
+  --bg-surface-secondary: #f6f6f7;
+  --color-accent: #008060;
+  --color-accent-subtle: #e3f1df;
+  --text-primary: #202223;
+  --text-secondary: #6d7175;
+  --border-subtle: #e3e5e8;
+  --border-base: #c9cccf;
+}
+
+:root[data-theme="dark"] {
+  --bg-app: #0d0e10;
+  --bg-surface: #16181b;
+  --bg-surface-secondary: #1d2024;
+  --color-accent: #30cd90;
+  --color-accent-subtle: rgba(48, 205, 144, 0.15);
+  --text-primary: #f0f2f5;
+  --text-secondary: #9da3ae;
+  --border-subtle: #26292e;
+  --border-base: #33383f;
+}</div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-msg"></div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    function setGlobalTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      document.getElementById('btn-theme-light').classList.toggle('active', t === 'light');
+      document.getElementById('btn-theme-dark').classList.toggle('active', t === 'dark');
+      triggerToast('Активовано тему: ' + (t === 'light' ? 'Polaris Snow Canvas (Light)' : 'Matte Obsidian Cockpit (Dark)'));
+    }
+
+    function switchTab(idx) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+      contents.forEach((c, i) => c.classList.toggle('active', i === idx));
+    }
+
+    function triggerToast(msg) {
+      const el = document.getElementById('toast');
+      el.innerText = msg;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2400);
+    }
+
+    function copyTokenValue(v) {
+      navigator.clipboard.writeText('var(' + v + ')');
+      triggerToast('Скопійовано var(' + v + ') в буфер обміну!');
+    }
+
+    function copyCodeBlock() {
+      const text = document.getElementById('code-display').innerText;
+      navigator.clipboard.writeText(text);
+      triggerToast('Скопійовано скомпільований код у буфер обміну!');
+    }
+
+    function toggleSelectAll(master) {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+      triggerToast(master.checked ? 'Вибрано всі 4 продукти' : 'Знято виділення');
+    }
+
+    function filterByTab(btn, status) {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const rows = document.querySelectorAll('#products-table tbody tr');
+      rows.forEach(r => {
+        if (status === 'all' || r.getAttribute('data-status') === status) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    function filterProducts(query) {
+      const q = query.toLowerCase();
+      const rows = document.querySelectorAll('#products-table tbody tr');
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    function simulateLoading(btn) {
+      const textSpan = document.getElementById('btn-loader-text');
+      const originalText = textSpan.innerText;
+      textSpan.innerText = 'Синхронізація... ⌛';
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        textSpan.innerText = 'Успішно синхронізовано ✓';
+        btn.style.opacity = '1';
+        setTimeout(() => { textSpan.innerText = originalText; }, 1800);
+      }, 1200);
+    }
+  </script>
+</body>
+</html>

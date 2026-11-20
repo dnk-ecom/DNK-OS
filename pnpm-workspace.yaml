@@ -1,0 +1,15 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "pnpm-workspace.yaml"
+# purpose: "Canonical PNPM Monorepo Workspace definition linking apps and packages."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-10-30"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+packages:
+  - 'apps/*'
+  - 'packages/*'

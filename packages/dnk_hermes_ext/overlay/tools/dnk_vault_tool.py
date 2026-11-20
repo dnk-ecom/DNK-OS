@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_vault_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_vault_tool.py"
 # purpose: "Native Hermes tool for secure encrypted Secret Vault operations with workspace isolation."
 # canonical_source: true
 # alters_files: []

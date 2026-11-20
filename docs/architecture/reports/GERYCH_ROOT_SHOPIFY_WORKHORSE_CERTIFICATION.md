@@ -1,3 +1,31 @@
+---
+title: "ОФІЦІЙНА СЕРТИФІКАЦІЯ ВОРКХОРСА #1: `services/dnk_shopify` (Sovereign Brick v1.0.0 & Tinker 4.2.0)"
+description: "Official Technical Audit and Sovereign Brick Certification Report for Workhorse #1 (services/dnk_shopify & Tinker 4.2.0)."
+mrh_id: "docs/architecture/reports/GERYCH_ROOT_SHOPIFY_WORKHORSE_CERTIFICATION.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/architecture/reports/GERYCH_ROOT_SHOPIFY_WORKHORSE_CERTIFICATION.md"
+> purpose: "Official Technical Audit and Sovereign Brick Certification Report for Workhorse #1 (services/dnk_shopify & Tinker 4.2.0)."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
+
 <!-- --- DNK-MRH-HEADER ---
 mrh_id: "docs/architecture/reports/GERYCH_ROOT_SHOPIFY_WORKHORSE_CERTIFICATION.md"
 purpose: "Official Technical Audit and Sovereign Brick Certification Report for Workhorse #1 (services/dnk_shopify & Tinker 4.2.0)."

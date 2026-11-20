@@ -1,14 +1,17 @@
 ---
-title: "Чекліст 100% Проходження Shopify Theme Store ($350–$420 MSRP)"
+title: "Критерії 100% Проходження Модерації Shopify Theme Store"
 description: "Суворий перевірочний список усіх вимог модерації Shopify Theme Store."
 mrh_id: "docs/projects/dnk_ecom/03_STORE_REQUIREMENTS/shopify_theme_store_gate.md"
-status: approved
-type: requirements_gate
-domain: shopify_theme_store
-date: 2026-11-18
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/03_STORE_REQUIREMENTS/shopify_theme_store_gate.md"
@@ -16,8 +19,8 @@ date: 2026-11-18
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

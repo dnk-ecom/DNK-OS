@@ -1,32 +1,26 @@
 ---
-title: "Checkpoint 6: Content Blocks, Customer Accounts & Shopify Theme Store Readiness"
+title: "Checkpoint 6: Store Readiness & Shopify Theme Store Certification"
 description: "Живий лог та специфікація Checkpoint 6: 100% покриття шаблонів, клієнтські кабінети, локалі та Theme Store сертифікація."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_6_store_readiness.md"
-status: passed
-type: checkpoint_log
-gate_id: 6
-theme_branch: mvp
-date: 2026-11-18
-verified_by: "just shopify-checkpoint 6"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_6_store_readiness.md"
 > purpose: "Живий лог та специфікація Checkpoint 6: 100% покриття шаблонів, клієнтські кабінети, локалі та Theme Store сертифікація."
 > canonical_source: true
-> alters_files:
->   - "mvp/config/settings_schema.json"
->   - "mvp/config/settings_data.json"
->   - "mvp/locales/en.default.json"
->   - "mvp/locales/uk.json"
->   - "mvp/sections/hero-banner.liquid"
->   - "mvp/templates/*.json"
->   - "mvp/templates/customers/*.json"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

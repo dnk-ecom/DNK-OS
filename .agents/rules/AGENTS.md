@@ -1,38 +1,31 @@
 ---
-title: "Agents"
-status: draft
-type: note
-domain: core
-author: "DNK-e.com Maksym"
-version: "1.0.0"
+title: "DNK OS MVP Unified Architecture & Execution Rules"
+description: "Unified Governance Rules & Zero-Waste High-Velocity Protocol for DNK OS MVP."
+mrh_id: ".agents/rules/AGENTS.md"
+status: Active
+version: "2.8.0"
+updated: 2026-11-18
+tags:
+  - governance
+  - rules
+  - agents
+  - dnk-os
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
-> mrh_id: "AGENTS.md"
-> purpose: "Document: Agents"
+> mrh_id: ".agents/rules/AGENTS.md"
+> purpose: "Unified Governance Rules & Zero-Waste High-Velocity Protocol for DNK OS MVP."
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Draft"
-> version: "1.0.0"
-> updated_at: "2026-09-24"
-> author: "DNK-e.com Maksym"
+> status: "Active"
+> version: "2.8.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
-
-<!-- --- DNK-MRH-HEADER ---
-mrh_id: "AGENTS.md"
-purpose: "Unified Governance Rules & Zero-Waste High-Velocity Protocol for DNK OS MVP."
-canonical_source: true
-alters_files: []
-triggers_tasks: []
-status: "Active"
-version: "2.8.0"
-updated_at: "2026-10-24"
-author: "DNK-e.com Maksym & Antigravity"
---- END DNK-MRH-HEADER --- -->
 
 # 🛡️ DNK OS MVP Unified Architecture & Execution Rules
 

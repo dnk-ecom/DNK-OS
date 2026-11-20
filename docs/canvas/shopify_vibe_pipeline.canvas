@@ -1,88 +1,15 @@
 {
-  "nodes": [
-    {
-      "id": "node_competitors",
-      "type": "text",
-      "text": "### 1. База конкурентів & ДНК ринку\n**Agent**: `gerych_researcher`\n**Status**: `ready`\n**Skills**: `social_media_research_skills_assimilated, webtwin_assimilated`\n\n**Задача ноди**:\n- Автоматичний парсинг 7 direct-to-consumer конкурентів у ніші замовника.\n- Аналіз структури офферів, цінової політики, AOV та системних бандлів.\n- Формування підсумкового артефакту `artifacts/shopify/competitor_matrix.json`.",
-      "x": -800,
-      "y": 0,
-      "width": 360,
-      "height": 280,
-      "color": "5"
-    },
-    {
-      "id": "node_cro_audit",
-      "type": "text",
-      "text": "### 2. CRO-аудит & Архітектура воронки\n**Agent**: `dnk_shopify`\n**Status**: `waiting_upstream`\n**Skills**: `the_ultimate_cro_app_assimilated, shopify_cro_blocks`\n\n**Задача ноди**:\n- Проектування конверсійної воронки магазину на основі конкурентного аналізу.\n- Інтеграція Sticky ATC, Free Shipping Tier Meter, Trust Badges та Cart Upsells.\n- Формування специфікації блоків `artifacts/shopify/cro_funnel_spec.md`.",
-      "x": -400,
-      "y": 0,
-      "width": 360,
-      "height": 280,
-      "color": "2"
-    },
-    {
-      "id": "node_brand_dna",
-      "type": "text",
-      "text": "### 3. Фірмовий стиль & Дизайн-система\n**Agent**: `gerych_builder`\n**Status**: `waiting_upstream`\n**Skills**: `creator_os_starter_assimilated, runeicons_assimilated`\n\n**Задача ноди**:\n- Синтез дизайн-системи бренду або ін'єкція фірмового гайдлайну клієнта.\n- Формування дизайн-токенів Tailwind/CSS: палітра, шрифти, мікро-інтеракції.\n- Генерація дизайн-токенів у `artifacts/shopify/brand_tokens.json`.",
-      "x": 0,
-      "y": 0,
-      "width": 360,
-      "height": 280,
-      "color": "6"
-    },
-    {
-      "id": "node_liquid_blocks",
-      "type": "text",
-      "text": "### 4. Розробка секцій та блоків Liquid 2.0\n**Agent**: `dnk_shopify`\n**Status**: `waiting_upstream`\n**Skills**: `shopify_theme_builder_assimilated, shopify_dynamic_pdp_playbook_assimilated`\n\n**Задача ноди**:\n- Фізична збірка SaaP Dual-Ready v2.0 CRO Theme Blocks у Shopify Tinker 4.2.0.\n- Реалізація інтерактивного Hero, Delivery Estimator, Feature Comparison Grid.\n- Автоматична перевірка валідності через `shopify theme check`.",
-      "x": 400,
-      "y": 0,
-      "width": 360,
-      "height": 280,
-      "color": "3"
-    },
-    {
-      "id": "node_pdp_copywriting",
-      "type": "text",
-      "text": "### 5. Цільова аудиторія & ICP/PDP копірайтинг\n**Agent**: `strategist_prime`\n**Status**: `waiting_upstream`\n**Skills**: `ukrainian-humanizer, consultant_assimilated`\n\n**Задача ноди**:\n- Глибока сегментація аватарів покупців (ICP) та їхніх психологічних драйверів.\n- Синтез переконливого копірайту для карток товарів (PDP) без AI-slop.\n- Фінальна вичитка згідно з `ukrainian-humanizer` стандартом.",
-      "x": 800,
-      "y": 0,
-      "width": 360,
-      "height": 280,
-      "color": "4"
-    }
-  ],
-  "edges": [
-    {
-      "id": "edge_competitors_to_cro",
-      "fromNode": "node_competitors",
-      "fromSide": "right",
-      "toNode": "node_cro_audit",
-      "toSide": "left",
-      "label": "Competitor Matrix"
-    },
-    {
-      "id": "edge_cro_to_brand",
-      "fromNode": "node_cro_audit",
-      "fromSide": "right",
-      "toNode": "node_brand_dna",
-      "toSide": "left",
-      "label": "Funnel Architecture"
-    },
-    {
-      "id": "edge_brand_to_liquid",
-      "fromNode": "node_brand_dna",
-      "fromSide": "right",
-      "toNode": "node_liquid_blocks",
-      "toSide": "left",
-      "label": "Design Tokens"
-    },
-    {
-      "id": "edge_liquid_to_copy",
-      "fromNode": "node_liquid_blocks",
-      "fromSide": "right",
-      "toNode": "node_pdp_copywriting",
-      "toSide": "left",
-      "label": "Interactive Slots"
-    }
-  ]
+	"nodes":[
+		{"id":"node_competitors","type":"text","text":"### 1. База конкурентів & ДНК ринку\n**Agent**: `gerych_researcher`\n**Status**: `ready`\n**Skills**: `social_media_research_skills_assimilated, webtwin_assimilated`\n\n**Задача ноди**:\n- Автоматичний парсинг 7 direct-to-consumer конкурентів у ніші замовника.\n- Аналіз структури офферів, цінової політики, AOV та системних бандлів.\n- Формування підсумкового артефакту `artifacts/shopify/competitor_matrix.json`.","x":-800,"y":0,"width":360,"height":280,"color":"5"},
+		{"id":"node_cro_audit","type":"text","text":"### 2. CRO-аудит & Архітектура воронки\n**Agent**: `dnk_shopify`\n**Status**: `waiting_upstream`\n**Skills**: `the_ultimate_cro_app_assimilated, shopify_cro_blocks`\n\n**Задача ноди**:\n- Проектування конверсійної воронки магазину на основі конкурентного аналізу.\n- Інтеграція Sticky ATC, Free Shipping Tier Meter, Trust Badges та Cart Upsells.\n- Формування специфікації блоків `artifacts/shopify/cro_funnel_spec.md`.","x":-400,"y":0,"width":360,"height":280,"color":"2"},
+		{"id":"node_brand_dna","type":"text","text":"### 3. Фірмовий стиль & Дизайн-система\n**Agent**: `gerych_builder`\n**Status**: `waiting_upstream`\n**Skills**: `creator_os_starter_assimilated, runeicons_assimilated`\n\n**Задача ноди**:\n- Синтез дизайн-системи бренду або ін'єкція фірмового гайдлайну клієнта.\n- Формування дизайн-токенів Tailwind/CSS: палітра, шрифти, мікро-інтеракції.\n- Генерація дизайн-токенів у `artifacts/shopify/brand_tokens.json`.","x":0,"y":0,"width":360,"height":280,"color":"6"},
+		{"id":"node_liquid_blocks","type":"text","text":"### 4. Розробка секцій та блоків Liquid 2.0\n**Agent**: `dnk_shopify`\n**Status**: `waiting_upstream`\n**Skills**: `shopify_theme_builder_assimilated, shopify_dynamic_pdp_playbook_assimilated`\n\n**Задача ноди**:\n- Фізична збірка SaaP Dual-Ready v2.0 CRO Theme Blocks у Shopify Tinker 4.2.0.\n- Реалізація інтерактивного Hero, Delivery Estimator, Feature Comparison Grid.\n- Автоматична перевірка валідності через `shopify theme check`.","x":400,"y":0,"width":360,"height":280,"color":"3"},
+		{"id":"node_pdp_copywriting","type":"text","text":"### 5. Цільова аудиторія & ICP/PDP копірайтинг\n**Agent**: `strategist_prime`\n**Status**: `waiting_upstream`\n**Skills**: `ukrainian-humanizer, consultant_assimilated`\n\n**Задача ноди**:\n- Глибока сегментація аватарів покупців (ICP) та їхніх психологічних драйверів.\n- Синтез переконливого копірайту для карток товарів (PDP) без AI-slop.\n- Фінальна вичитка згідно з `ukrainian-humanizer` стандартом.","x":800,"y":0,"width":360,"height":280,"color":"4"}
+	],
+	"edges":[
+		{"id":"edge_competitors_to_cro","fromNode":"node_competitors","fromSide":"right","toNode":"node_cro_audit","toSide":"left","label":"Competitor Matrix"},
+		{"id":"edge_cro_to_brand","fromNode":"node_cro_audit","fromSide":"right","toNode":"node_brand_dna","toSide":"left","label":"Funnel Architecture"},
+		{"id":"edge_brand_to_liquid","fromNode":"node_brand_dna","fromSide":"right","toNode":"node_liquid_blocks","toSide":"left","label":"Design Tokens"},
+		{"id":"edge_liquid_to_copy","fromNode":"node_liquid_blocks","fromSide":"right","toNode":"node_pdp_copywriting","toSide":"left","label":"Interactive Slots"}
+	]
 }

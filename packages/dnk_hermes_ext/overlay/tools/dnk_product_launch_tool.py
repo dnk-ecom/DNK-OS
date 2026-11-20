@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_product_launch_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_product_launch_tool.py"
 # purpose: "Native Hermes tool bridge for triggering One-Click Multi-Agent Product Launch flow."
 # canonical_source: true
 # alters_files: []

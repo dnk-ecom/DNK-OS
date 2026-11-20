@@ -1,30 +1,26 @@
 ---
-title: "Checkpoint 2: Global Chrome — theme.liquid, Header & Footer (Theme Blocks 2.0)"
+title: "Checkpoint 2: Global Chrome (Layout, Header & Footer)"
 description: "Живий лог та специфікація Checkpoint 2: Global Chrome, theme.liquid та блоковий Header."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_2_global_chrome.md"
-status: passed
-type: checkpoint_log
-gate_id: 2
-theme_branch: mvp
-date: 2026-11-18
-verified_by: "just shopify-checkpoint 2"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_2_global_chrome.md"
 > purpose: "Живий лог та специфікація Checkpoint 2: Global Chrome, theme.liquid та блоковий Header."
 > canonical_source: true
-> alters_files:
->   - "mvp/layout/theme.liquid"
->   - "mvp/sections/header.liquid"
->   - "mvp/blocks/_header-logo.liquid"
->   - "mvp/blocks/_header-menu.liquid"
->   - "mvp/sections/footer.liquid"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.1.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

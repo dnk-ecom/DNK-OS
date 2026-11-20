@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pergolux — Sovereign AI Brand Kit & Theme Distillation (DNK OS)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Distilled Pergolux Palette (https://pergoluxshop.com/) */
+      --color-surface-primary: #ffffff;
+      --color-surface-secondary: #f4f4f2;
+      --color-text-primary: #121212;
+      --color-text-secondary: #555555;
+      --color-action-primary: #0F766E;
+      --color-action-primary-hover: #0d645e;
+      --color-action-primary-text: #ffffff;
+      --color-action-secondary: #14B8A6;
+      --color-border: #e2e8f0;
+      --color-border-subtle: #f1f5f9;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #0b0f19;
+      color: #f8fafc;
+      line-height: 1.6;
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Hero Header */
+    .header {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .header-left h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: rgba(15, 118, 110, 0.2);
+      color: #2dd4bf;
+      border: 1px solid rgba(45, 212, 191, 0.3);
+    }
+
+    .header-left p {
+      color: #94a3b8;
+      font-size: 15px;
+      max-width: 640px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--color-action-primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover { background: var(--color-action-primary-hover); }
+
+    .btn-secondary {
+      background: #1f2937;
+      color: #e2e8f0;
+      border: 1px solid #374151;
+    }
+    .btn-secondary:hover { background: #374151; color: #ffffff; }
+
+    /* Section Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 860px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #f1f5f9;
+    }
+
+    /* Color Swatches */
+    .palette-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .swatch {
+      border-radius: var(--radius-md);
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100px;
+    }
+
+    .swatch-hex {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .swatch-role {
+      font-size: 11px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* What we would fix first list */
+    .audit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .audit-item {
+      background: #1a2234;
+      border: 1px solid #28354f;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .audit-item .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .audit-item strong {
+      color: #f8fafc;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .audit-item p {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    /* Quotes list */
+    .quotes-box {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-size: 13px;
+      color: #cbd5e1;
+      max-height: 220px;
+      overflow-y: auto;
+      font-style: italic;
+      line-height: 1.8;
+    }
+
+    .quotes-box blockquote {
+      border-left: 2px solid var(--color-action-primary);
+      padding-left: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* Code View Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #1f2937;
+      color: #ffffff;
+    }
+
+    pre.code-block {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      max-height: 300px;
+    }
+
+    /* Deal Room Hook */
+    .cta-card {
+      background: linear-gradient(135deg, #0e1e2d, #0d3834);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .cta-card h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .cta-card p {
+      color: #99f6e4;
+      font-size: 15px;
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1>
+          <span>Pergolux</span>
+          <span class="badge-pill">Sovereign Brand Kit v1.0</span>
+        </h1>
+        <p>
+          Автономна дистиляція з <code>pergoluxshop.com</code> (W3C DTCG 2025.10 / Google Labs DESIGN.md).
+          Готові артефакти для Cursor, Claude Code, Shopify Theme Blocks 2.0 та соцмереж.
+        </p>
+      </div>
+      <div class="header-right">
+        <a href="https://pergoluxshop.com" target="_blank" class="btn btn-secondary">
+          <span>Діючий сайт</span> ↗
+        </a>
+        <a href="#code-viewer" class="btn btn-primary">
+          <span>⚡ Завантажити AI Kit</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Row 1: What We'd Fix First & 60-30-10 Palette -->
+    <div class="grid-2">
+      <!-- What We'd Fix First -->
+      <div class="card">
+        <h2>⚡ What We'd Fix First (Експрес-діагностика)</h2>
+        <ul class="audit-list">
+          <li class="audit-item">
+            <span class="icon">✅</span>
+            <div>
+              <strong>Контрастність WCAG 2.2 AA (18.73:1)</strong>
+              <p>Основний текст <code>#121212</code> на білому тлі має еталонну читабельність для дорослої платоспроможної ЦА.</p>
+            </div>
+          </li>
+          <li class="audit-item">
+            <span class="icon">⚠️</span>
+            <div>
+              <strong>Низький контраст мікро-текстів у діючій темі (2.4:1)</strong>
+              <p>У діючому магазині сірі підписи <code>#717171</code> зливаються зі світлими плашками, що викликає відтік при виборі конфігурацій.</p>
+            </div>
+          </li>
+          <li class="audit-item">
+            <span class="icon">🚀</span>
+            <div>
+              <strong>Ліквідація стороннього CSS-сміття віджетів</strong>
+              <p>Скрипти Klaviyo, Klarna та Judge.me додають довільні кольори. У нашому кіті зафіксовано строгу палітру 60-30-10.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Color Palette -->
+      <div class="card">
+        <h2>🎨 Калібрована Палітра (60-30-10 CRO)</h2>
+        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 12px;">
+          Суворе розділення: 60% чистий фон, 30% чіткий текст, 10% фокусна конверсійна дія (Add to Cart).
+        </p>
+        <div class="palette-row">
+          <div class="swatch" style="background: #ffffff; color: #121212;">
+            <span class="swatch-role">60% Surface</span>
+            <span class="swatch-hex">#FFFFFF</span>
+          </div>
+          <div class="swatch" style="background: #121212; color: #ffffff;">
+            <span class="swatch-role">30% Text</span>
+            <span class="swatch-hex">#121212</span>
+          </div>
+          <div class="swatch" style="background: #0F766E; color: #ffffff;">
+            <span class="swatch-role">10% Focal CTA</span>
+            <span class="swatch-hex">#0F766E</span>
+          </div>
+          <div class="swatch" style="background: #14B8A6; color: #ffffff;">
+            <span class="swatch-role">Secondary</span>
+            <span class="swatch-hex">#14B8A6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Zero-Hallucination Quotes & The 4 Rules -->
+    <div class="grid-2">
+      <!-- Zero-Hallucination Quotes -->
+      <div class="card">
+        <h2>💬 Zero-Hallucination Verified Quotes (SSOT)</h2>
+        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 12px;">
+          Дослівні рядки, вилучені з <code>pergoluxshop.com</code>. AI-агенти зобов'язані спиратися виключно на них.
+        </p>
+        <div class="quotes-box">
+          <blockquote>"The aluminum louvred roof protects you from sun, snow and rain. Open the louvres whenever you want to enjoy the sun."</blockquote>
+          <blockquote>"150,000+ Happy Customers worldwide enjoying premium outdoor spaces."</blockquote>
+          <blockquote>"Custom Design Pergola S4 with motorized LED lights and windproof screens."</blockquote>
+          <blockquote>"Designed for all weather conditions: 100% rustproof aluminum alloy."</blockquote>
+        </div>
+      </div>
+
+      <!-- The 4 Non-Negotiable Rules -->
+      <div class="card">
+        <h2>🛡️ The 4 Non-Negotiable Rules (Every Time Guard)</h2>
+        <ul class="audit-list">
+          <li class="audit-item">
+            <span class="icon">1️⃣</span>
+            <div>
+              <strong>Тільки токенізовані кольори</strong>
+              <p>Заборонено довільні кольори чи дефолтні сині/фіолетові відтінки Tailwind. Тільки <code>#ffffff</code>, <code>#121212</code>, <code>#0F766E</code>.</p>
+            </div>
+          </li>
+          <li class="audit-item">
+            <span class="icon">2️⃣</span>
+            <div>
+              <strong>Мобільний поріг шрифту 16px</strong>
+              <p>Тексти менше 16px суворо заборонені (запобігання автозуму в iOS Safari).</p>
+            </div>
+          </li>
+          <li class="audit-item">
+            <span class="icon">3️⃣</span>
+            <div>
+              <strong>Нативний векторний логотип</strong>
+              <p>Заборонено малювати логотип текстом чи довільним SVG-кодом.</p>
+            </div>
+          </li>
+          <li class="audit-item">
+            <span class="icon">4️⃣</span>
+            <div>
+              <strong>Нуль вигаданих характеристик</strong>
+              <p>Використовувати тільки підтверджені цитати з BRAND.md.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Row 3: Code Viewer Tabs -->
+    <div class="card" id="code-viewer" style="margin-bottom: 32px;">
+      <h2>💻 Згенеровані Файли Дизайн-Системи (Multi-Target Emitters)</h2>
+      
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="showTab('design')">DESIGN.md (Google Labs)</button>
+        <button class="tab-btn" onclick="showTab('brand')">BRAND.md (Voice & Quotes)</button>
+        <button class="tab-btn" onclick="showTab('skill')">SKILL.md (Agent Guard)</button>
+        <button class="tab-btn" onclick="showTab('liquid')">dnk-offer.liquid (Theme Blocks 2.0)</button>
+        <button class="tab-btn" onclick="showTab('tailwind')">tailwind-theme.css</button>
+      </div>
+
+      <div id="tab-design">
+        <pre class="code-block"><code>---
+title: "DESIGN.md: Pergolux"
+description: "Visual Design System and Token Specification for Pergolux (Google Labs Standard)"
+version: "1.0.0"
+brand: "Pergolux"
+archetype: "ecommerce_conversion"
+tokens:
+  color:
+    surface_primary: "#ffffff"
+    text_primary: "#121212"
+    action_primary: "#0F766E"
+    action_primary_text: "#FFFFFF"
+    action_secondary: "#14B8A6"
+  spacing:
+    grid_base_px: 8
+    scale: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 }
+---
+
+# 🎨 Pergolux Design System (DESIGN.md)
+Canonical design tokens for AI coding agents (Cursor, Claude Code, Antigravity).</code></pre>
+      </div>
+
+      <div id="tab-brand" style="display: none;">
+        <pre class="code-block"><code>---
+title: "BRAND.md: Pergolux"
+description: "Brand Voice, Communication Guidelines & Zero-Hallucination Source Quotes"
+brand: "Pergolux"
+---
+
+# 🗣️ Pergolux Brand Voice & Identity Guidelines
+## What We Are vs. What We Aren't
+- Direct & Clear vs. Hyped & Buzzword-Heavy
+- Craftsmanship-Focused vs. Generic AI Slop
+- Grounded & Trustworthy vs. Deceptive / Exaggerated</code></pre>
+      </div>
+
+      <div id="tab-skill" style="display: none;">
+        <pre class="code-block"><code>---
+name: "pergolux-brand-guard"
+description: "Non-negotiable visual, token, and voice guardrails for Pergolux."
+---
+
+# 🛡️ Pergolux Brand Guard Agent Skill
+Enforces strict 4 Non-Negotiable Rules across Cursor, Claude Code, and Antigravity.</code></pre>
+      </div>
+
+      <div id="tab-liquid" style="display: none;">
+        <pre class="code-block"><code>{% comment %}
+  DNK OS Sovereign Theme Block: Pergolux (Polaris 2.0 / Horizon Architecture)
+{% endcomment %}
+
+{{ 'dnk-tokens.css' | asset_url | stylesheet_tag }}
+
+&lt;div class="dnk-theme-block dnk-theme-block--{{ block.id }}" style="
+  --dnk-block-bg: {{ block.settings.bg_color | default: '#ffffff' }};
+  --dnk-block-text: {{ block.settings.text_color | default: '#121212' }};
+  --dnk-block-accent: {{ block.settings.accent_color | default: '#0F766E' }};
+"&gt;
+  &lt;h2&gt;{{ block.settings.heading | escape }}&lt;/h2&gt;
+&lt;/div&gt;
+
+{% schema %}
+{
+  "name": "Pergolux Block",
+  "target": "section",
+  "settings": [...]
+}
+{% endschema %}</code></pre>
+      </div>
+
+      <div id="tab-tailwind" style="display: none;">
+        <pre class="code-block"><code>@theme {
+  --color-surface-primary: #ffffff;
+  --color-text-primary: #121212;
+  --color-action-primary: #0F766E;
+  --color-action-secondary: #14B8A6;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- Commercial Deal Room Hook -->
+    <div class="cta-card">
+      <h2>Бажаєте оновити свій магазин на архітектуру 2026 року?</h2>
+      <p>
+        DNK OS дистилює будь-який бренд у нативні блоки Shopify Theme Blocks 2.0, оптимізує LCP до 0.8с та налаштовує AI-агентів для неруйнівної роботи.
+      </p>
+      <a href="https://t.me/kuzmenko_top" target="_blank" class="btn btn-primary" style="padding: 14px 28px; font-size: 15px;">
+        💬 Обговорити редизайн у Deal Room
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeEl = document.getElementById('tab-' + tabId);
+      if (activeEl) activeEl.style.display = 'block';
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_scones_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_scones_tool.py"
 # purpose: "Native Hermes tool bridging CLI with SCONES Long-Term Cognitive Memory Engine."
 # canonical_source: true
 # alters_files: []

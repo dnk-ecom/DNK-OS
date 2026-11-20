@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_visual_context_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_visual_context_tool.py"
 # purpose: "Native Hermes tool for querying and binding visual canvas contexts and UI selections to agent tasks."
 # canonical_source: true
 # alters_files: []

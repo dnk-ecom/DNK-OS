@@ -40,6 +40,11 @@ from services.dnk_distribution.src.merchant_feed import (
     generate_google_merchant_xml,
     export_merchant_feed,
 )
+from services.dnk_distribution.src.social_scanner import (
+    SocialMediaScanner,
+    SocialScanResult,
+    social_scanner,
+)
 from services.dnk_distribution.contracts.schemas import (
     LlmsTxtRequest,
     LlmsTxtResponse,
@@ -137,3 +142,8 @@ def generate_merchant_feed(request: MerchantFeedRequest) -> MerchantFeedResponse
 def process_data(query: str) -> str:
     """Generic fallback string processor for basic connectivity check."""
     return f"Processed: {query}"
+
+
+def scan_social_content(url: str) -> SocialScanResult:
+    """Scans and distills actionable intelligence from any social media URL without scraper blocks."""
+    return social_scanner.scan(url=url)

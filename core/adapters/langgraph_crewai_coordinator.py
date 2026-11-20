@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_langgraph_crewai_coordinator"
+# mrh_id: "core/adapters/langgraph_crewai_coordinator.py"
 # purpose: "Concrete implementation of AgentCoordinator coordinating LangGraph, crewAI, and TaskQueue with Self-Healing"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

@@ -2,29 +2,25 @@
 title: "Checkpoint 3: Sovereign High-CRO Cart Engine & Drawer"
 description: "Живий лог та специфікація Checkpoint 3: AJAX Cart Drawer, багаторівневий прогрес-бар та 1-click upsell."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_3_cart_drawer.md"
-status: passed
-type: checkpoint_log
-gate_id: 3
-theme_branch: mvp
-date: 2026-11-18
-verified_by: "just shopify-checkpoint 3"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_3_cart_drawer.md"
 > purpose: "Живий лог та специфікація Checkpoint 3: AJAX Cart Drawer, багаторівневий прогрес-бар та 1-click upsell."
 > canonical_source: true
-> alters_files:
->   - "mvp/assets/dnk-cart-drawer.css"
->   - "mvp/assets/dnk-cart-drawer.js"
->   - "mvp/blocks/cart_shipping-bar.liquid"
->   - "mvp/blocks/cart_upsell-item.liquid"
->   - "mvp/sections/cart-drawer.liquid"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

@@ -1,6 +1,11 @@
 ---
+title: "Gerych (Герич) - Cold Knowledge Archivist & Retrospective Auditor"
 name: dnk-auditor
 description: "Gerych (Герич) - Cold Knowledge Archivist, Retrospective Historical Auditor, and Deterministic Quality Gatekeeper. Executes verification suites, AST checks, and fail-closed gates."
+mrh_id: ".agents/agents/dnk-auditor.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
 tools:
   - read_file
   - run_command
@@ -8,6 +13,21 @@ mainAgent: true
 subagent: true
 commandExecutionPolicy: auto
 ---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: ".agents/agents/dnk-auditor.md"
+> purpose: "Gerych (Герич) - Cold Knowledge Archivist, Retrospective Historical Auditor, and Deterministic Quality Gatekeeper."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # Gerych (Герич) - Cold Knowledge Archivist & Retrospective Auditor
 

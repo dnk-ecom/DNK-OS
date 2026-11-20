@@ -1,0 +1,23 @@
+{
+  "content_id": "7706105451372416289",
+  "platform": "tiktok",
+  "url": "https://vt.tiktok.com/ZSpvdyVRv/",
+  "resolved_url": "https://www.tiktok.com/@dide89355/photo/7706105451372416289",
+  "author": "dide (@dide89355)",
+  "title": "#claude #askreddit #xyzcba #fyp #viral",
+  "as_of_date": "2026-11-18",
+  "content_type": "carousel_slides",
+  "slides_count": 13,
+  "triage_verdict": "ADAPT",
+  "winning_synthesis": "The viral post extracts 13 senior-grade agent governance invariants from r/ClaudeCode. Combining Single-Pass Read/Edit, Supervisor-Worker Decoupling, Fact-Check code citations, and Epistemic Mirroring with DNK OS FastMCP In-RAM execution eliminates attention entropy and cuts token waste by 50%.",
+  "action_spec_psod": {
+    "problem": "Autonomous ingestion and distillation of social media content without scraping blocks and brittle captcha failures",
+    "substrate": "services/dnk_distribution/src/social_scanner.py + services/dnk_distribution/cli.py",
+    "oracle": "bash scripts/verify_all.sh returns exit code 0; 16/16 distribution tests pass",
+    "deliverables": [
+      "services/dnk_distribution/src/social_scanner.py",
+      "services/dnk_distribution/tests/test_social_scanner.py",
+      "docs/architecture/reports/video_assimilations/AUDIT_2026_11_18_TIKTOK_CLAUDE_CODE_MD_VIRAL.md"
+    ]
+  }
+}

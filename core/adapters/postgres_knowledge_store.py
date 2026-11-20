@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_postgres_knowledge_store"
+# mrh_id: "core/adapters/postgres_knowledge_store.py"
 # purpose: "PostgreSQL pgvector-based Knowledge Store implementation with HNSW cosine search, JSONB filter containment, and timeline auditing"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

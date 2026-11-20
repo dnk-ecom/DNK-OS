@@ -1,0 +1,24 @@
+{
+  "video_id": "G_56Z18bTRM",
+  "url": "https://www.youtube.com/watch?v=G_56Z18bTRM",
+  "as_of_date": "2026-11-18",
+  "language": "en",
+  "segments_count": 2680,
+  "duration_seconds": 6516.52,
+  "triage_verdict": "ADAPT",
+  "winning_synthesis": "As of 2026-11-18, the optimal architecture combines Matt Pocock's Home Repo entrypoint with Cursor/Devin's dynamic APFS git worktree isolation and Anthropic's progressive AGENTS.md routing. This avoids monolithic repo bloat while guaranteeing multi-agent parallel safety.",
+  "action_spec_psod": {
+    "problem": "Cross-repo agent collision and context pollution during multi-repo tasks (YouTube Intelligence: G_56Z18bTRM)",
+    "substrate": "DNK_OS APFS filesystem + core/kernel.py + core/orchestrator/swarm_orchestrator.py",
+    "oracle": "bash scripts/verify_all.sh returns exit code 0; worktrees cleaned up automatically",
+    "deliverable": [
+      "core/orchestrator/git_worktree_manager.py: atomic create/teardown of agent worktrees",
+      "tests/core/test_git_worktree_manager.py: unit test suite for worktree lifecycle"
+    ],
+    "catalog_prior_art": [
+      "None (None)",
+      "None (None)",
+      "None (None)"
+    ]
+  }
+}

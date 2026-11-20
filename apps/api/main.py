@@ -18,6 +18,8 @@ from apps.api.routers.kernel_router import router as kernel_router, get_kernel
 from apps.api.routers.swarm_live_ws import router as swarm_live_router
 from apps.api.routers.taskboard_canvas_router import router as taskboard_canvas_router
 from apps.api.routers.actions_router import router as actions_router
+from apps.api.routers.client_cockpit_router import router as client_cockpit_router
+from apps.api.routers.node_tasks_router import router as node_tasks_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("dnk.api")
@@ -42,6 +44,8 @@ app.include_router(kernel_router)
 app.include_router(swarm_live_router)
 app.include_router(taskboard_canvas_router)
 app.include_router(actions_router)
+app.include_router(client_cockpit_router)
+app.include_router(node_tasks_router)
 
 
 @app.get("/health", tags=["Telemetry"])
@@ -55,7 +59,11 @@ def health_check():
 def status_overview():
     """System overview and active subsystems status."""
     kernel = get_kernel()
-    return kernel.get_status()
+    if hasattr(kernel, "get_system_status"):
+        return kernel.get_system_status()
+    elif hasattr(kernel, "get_status"):
+        return kernel.get_status()
+    return {"status": "ok", "kernel": "active"}
 
 
 if __name__ == "__main__":

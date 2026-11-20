@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_adapters_postgres_task_queue"
+# mrh_id: "core/adapters/postgres_task_queue.py"
 # purpose: "PostgreSQL-based Task Queue implementation with prioritization, FIFO and SKIP LOCKED concurrency"
 # author: "DNK-e.com Maksym"
 # license: "DNK-INTERNAL"

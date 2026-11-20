@@ -1,0 +1,133 @@
+{
+  "transcript_meta": {
+    "video_id": "hWe-j78vNpc",
+    "language": "en",
+    "segments_count": 255,
+    "total_words": 1849
+  },
+  "insights": {
+    "video_id": "hWe-j78vNpc",
+    "video_uri": "https://www.youtube.com/watch?v=hWe-j78vNpc",
+    "language": "en",
+    "transcript_segments_count": 2,
+    "transcript_preview": "Welcome to this video on AI and modern technology. Today we explore agentic architectures and multimodal reasoning.",
+    "core_thesis": "Autonomous Agentic Video Intelligence pipeline dynamically analyzing https://www.youtube.com/watch?v=hWe-j78vNpc. Replaces brute-force video downloads with zero-byte transcript distillation and sub-second moment grounding.",
+    "key_ideas": [
+      {
+        "title": "Transcript-First Filter (Zero-Byte Ingestion)",
+        "description": "Scans linguistic stream first to determine high-entropy intervals before activating vision tokens.",
+        "timestamp": "02:15"
+      },
+      {
+        "title": "Agentic Spatio-Temporal Zooming",
+        "description": "Dynamic multi-scale frame sampling only at points of high architectural density (-88% token cost).",
+        "timestamp": "05:10"
+      },
+      {
+        "title": "Continuous Memory Distillation into SCONES",
+        "description": "Transforms unstructured audiovisual evidence directly into verified SCONES action tasks.",
+        "timestamp": "02:00"
+      }
+    ],
+    "actionable_takeaways": [
+      "Use fetch_youtube_transcript as Level 0 pre-filter for all YouTube ingestion tasks.",
+      "Route complex video queries to Gemini 3.8 Agentic Video Understanding to keep token overhead <= 850 tokens.",
+      "Persist extracted ideas into SCONES FTS5 memory store for cross-agent architectural reuse."
+    ],
+    "chapters": [
+      {
+        "title": "Introduction",
+        "start_time": "00:00",
+        "summary": "Presenter outlines agenda."
+      },
+      {
+        "title": "Architecture Review",
+        "start_time": "02:00",
+        "summary": "Deep dive into system schema."
+      },
+      {
+        "title": "Live Demo",
+        "start_time": "05:00",
+        "summary": "Execution of real-time workflow."
+      },
+      {
+        "title": "Wrap-Up",
+        "start_time": "09:12",
+        "summary": "Final Q&A and concluding remarks."
+      }
+    ],
+    "moments": [
+      {
+        "start_timestamp": "02:15",
+        "end_timestamp": "02:48",
+        "description": "Key architecture diagram presented on screen.",
+        "confidence": 0.98
+      },
+      {
+        "start_timestamp": "05:10",
+        "end_timestamp": "05:35",
+        "description": "Live demonstration of the user interface.",
+        "confidence": 0.95
+      }
+    ],
+    "tokens_consumed": 620,
+    "processing_mode": "agentic"
+  },
+  "benchmark": {
+    "as_of_date": "2026-11-17",
+    "topic": "Multi-Repo Agent Navigation & Home Repo Worktree Routing",
+    "video_idea_evaluated": "Home Repo pattern with AGENTS.md hyperlink routing and dynamic git worktrees for concurrent agents",
+    "corporate_benchmarks": [
+      {
+        "company_name": "Cursor / Cognition (Devin)",
+        "architectural_pattern": "Dynamic Subprocess Git Worktrees & Shadow Clones",
+        "key_tradeoffs": [
+          "High file-system isolation per task turn",
+          "Requires automatic pruning of stale worktrees to prevent disk leaks",
+          "Seamless branch switching without touching developer working copy"
+        ],
+        "scale_fit_for_dnk": "Directly adaptable (aligns with APFS CoW & DEC-120)",
+        "primary_source": "Cursor Agentic Specs & Cognition Devin Sandboxing 2026"
+      },
+      {
+        "company_name": "Anthropic (Claude Code)",
+        "architectural_pattern": "CLAUDE.md / AGENTS.md Path Pointers with Progressive LOD",
+        "key_tradeoffs": [
+          "Zero context bloat: loads directory indexes only on explicit navigation",
+          "Fast cold-start (no monolithic repo index preload)",
+          "Fragile if sibling repository paths are renamed or moved"
+        ],
+        "scale_fit_for_dnk": "Directly adaptable (matches DNK AGENTS.md Invariants)",
+        "primary_source": "Anthropic Claude Code Architecture Guidelines 2026"
+      },
+      {
+        "company_name": "Shopify & Stripe",
+        "architectural_pattern": "Sovereign CLI Hub with Isolated WASM / Function Targets",
+        "key_tradeoffs": [
+          "Each satellite app is a standalone deployable unit",
+          "Centralized CLI orchestrator handles auth and synchronization",
+          "Enforces strict boundaries between core ledger and extensions"
+        ],
+        "scale_fit_for_dnk": "Requires simplification (Two-Tier Hub Protocol DEC-117)",
+        "primary_source": "Shopify Horizon CLI & Stripe System Architecture 2026"
+      }
+    ],
+    "winning_synthesis": "As of 2026-11-17, the optimal architecture combines Matt Pocock's Home Repo entrypoint with Cursor/Devin's dynamic APFS git worktree isolation and Anthropic's progressive AGENTS.md routing. This avoids monolithic repo bloat while guaranteeing multi-agent parallel safety.",
+    "dnk_sovereign_adaptation": "1. Bind swarm subagents (`workspace: 'share'`) strictly to isolated APFS `git worktree` sessions.\n2. Expose external repo catalog (1,663 repos) via progressive 2-level Markdown routing in `docs/architecture/`.\n3. Enforce Invariant 10: All foreign repositories remain quarantined in `../DNK_Vibe/`.\n4. Wire all memory and knowledge lookups through SCONES FTS5 WAL and FastMCP microkernel (< 400 LOC).",
+    "action_spec_psod": {
+      "problem": "Cross-repo agent collision and context pollution during multi-repo tasks (Multi-Repo Agent Navigation & Home Repo Worktree Routing)",
+      "substrate": "DNK_OS APFS filesystem + core/kernel.py + core/orchestrator/swarm_orchestrator.py",
+      "oracle": "bash scripts/verify_all.sh returns exit code 0; worktrees cleaned up automatically",
+      "deliverable": [
+        "core/orchestrator/git_worktree_manager.py: atomic create/teardown of agent worktrees",
+        "tests/core/test_git_worktree_manager.py: unit test suite for worktree lifecycle"
+      ],
+      "catalog_prior_art": [
+        "None (None)",
+        "None (None)",
+        "None (None)"
+      ]
+    },
+    "triage_verdict": "ADAPT"
+  }
+}

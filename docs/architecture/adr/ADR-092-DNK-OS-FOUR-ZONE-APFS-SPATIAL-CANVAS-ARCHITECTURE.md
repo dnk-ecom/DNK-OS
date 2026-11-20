@@ -1,12 +1,14 @@
 ---
 title: "ADR-092: DNK_OS Four-Zone APFS Topology, Narrow-Waist Dual-Mount Microkernel, and Spatial Canvas Architecture"
-status: active
-type: adr
-domain: core
-archetype: "ADR"
-author: "DNK-e.com"
-version: "1.0.0"
-updated: "2026-11-15"
+description: "Canonical Architecture Decision Record (DEC-110) establishing the clean DNK_OS Sovereign Workstation Topology: 8 Canonical Roots, 4-Zone APFS Runtime, Narrow-Waist Dual-Mount FastMCP Microkernel (<400 LOC), SCONES + AST Memory, and Dual-State Spatial Canvas Orchestration Engine."
+mrh_id: "docs/architecture/adr/ADR-092-DNK-OS-FOUR-ZONE-APFS-SPATIAL-CANVAS-ARCHITECTURE.md"
+status: Active
+archetype: ADR
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - adr
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -15,15 +17,12 @@ updated: "2026-11-15"
 > mrh_id: "docs/architecture/adr/ADR-092-DNK-OS-FOUR-ZONE-APFS-SPATIAL-CANVAS-ARCHITECTURE.md"
 > purpose: "Canonical Architecture Decision Record (DEC-110) establishing the clean DNK_OS Sovereign Workstation Topology: 8 Canonical Roots, 4-Zone APFS Runtime, Narrow-Waist Dual-Mount FastMCP Microkernel (<400 LOC), SCONES + AST Memory, and Dual-State Spatial Canvas Orchestration Engine."
 > canonical_source: true
-> archetype: "ADR"
-> alters_files:
->   - "docs/architecture/DECISION_REGISTRY_ADHD.md"
->   - "docs/plans/DNK_OS_FOUNDATION_EXECUTION_CHRONICLE.md"
+> alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-15"
-> author: "DNK-e.com"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

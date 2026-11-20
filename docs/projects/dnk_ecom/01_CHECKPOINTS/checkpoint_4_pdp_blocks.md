@@ -2,34 +2,25 @@
 title: "Checkpoint 4: Theme Blocks 2.0 Product Detail Engine (PDP)"
 description: "Живий лог та специфікація Checkpoint 4: Theme Blocks 2.0 PDP, 0-CLS галерея, Category Metafield свотчі та Sticky ATC."
 mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_4_pdp_blocks.md"
-status: passed
-type: checkpoint_log
-gate_id: 4
-theme_branch: mvp
-date: 2026-11-18
-verified_by: "just shopify-checkpoint 4"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/01_CHECKPOINTS/checkpoint_4_pdp_blocks.md"
 > purpose: "Живий лог та специфікація Checkpoint 4: Theme Blocks 2.0 PDP, 0-CLS галерея, Category Metafield свотчі та Sticky ATC."
 > canonical_source: true
-> alters_files:
->   - "mvp/assets/dnk-pdp.js"
->   - "mvp/blocks/_group.liquid"
->   - "mvp/blocks/product_buy-buttons.liquid"
->   - "mvp/blocks/product_media-gallery.liquid"
->   - "mvp/blocks/product_quantity-breaks.liquid"
->   - "mvp/blocks/product_sticky-atc.liquid"
->   - "mvp/blocks/product_variant-picker.liquid"
->   - "mvp/sections/main-product.liquid"
->   - "mvp/snippets/icon.liquid"
->   - "mvp/snippets/price.liquid"
+> alters_files: []
 > triggers_tasks: []
-> status: "Passed"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

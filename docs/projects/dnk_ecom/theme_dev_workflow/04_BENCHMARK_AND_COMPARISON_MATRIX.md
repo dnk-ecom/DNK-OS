@@ -1,16 +1,30 @@
-<!--
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/04_BENCHMARK_AND_COMPARISON_MATRIX.md"
-# purpose: "Quantitative Multi-Theme Comparative Benchmark Matrix for Canonical DNK-e.com Branches"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "2.1.0"
-# updated_at: "2026-11-10"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
--->
+---
+title: "Зведена порівняльна матриця канонічних гілок `DNK-e.com`"
+description: "Quantitative Multi-Theme Comparative Benchmark Matrix for Canonical DNK-e.com Branches"
+mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/04_BENCHMARK_AND_COMPARISON_MATRIX.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/04_BENCHMARK_AND_COMPARISON_MATRIX.md"
+> purpose: "Quantitative Multi-Theme Comparative Benchmark Matrix for Canonical DNK-e.com Branches"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 📊 Зведена порівняльна матриця канонічних гілок `DNK-e.com`
 

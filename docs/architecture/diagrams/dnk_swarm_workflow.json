@@ -1,0 +1,295 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "DNK OS Zero-Waste Autonomous Swarm Pipeline",
+    "subtitle": "Live Spatial Signal Flow: Task Inception -> TaskDNA DAG -> Swarm Parallel Execution -> Adversarial Gate -> Clean Commit",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "standard",
+    "views": [
+      {
+        "id": "full-flow",
+        "label": "Full Autonomous Pipeline",
+        "focus": [
+          "user_intent",
+          "triage_eval",
+          "dag_planner",
+          "swarm_dispatch",
+          "worker_builder",
+          "worker_fullstack",
+          "auditor_review",
+          "verify_gate"
+        ],
+        "note": "Complete journey from natural language intent to verified git commit."
+      },
+      {
+        "id": "swarm-parallel",
+        "label": "Swarm Parallel Slices",
+        "focus": [
+          "swarm_dispatch",
+          "worker_builder",
+          "worker_fullstack",
+          "auditor_review"
+        ],
+        "note": "Non-blocking parallel delegation across isolated domain agents."
+      },
+      {
+        "id": "quality-gate",
+        "label": "Adversarial & Master Gate",
+        "focus": [
+          "auditor_review",
+          "verify_gate"
+        ],
+        "note": "2-Agent adversarial audit and fail-closed 100% green verification."
+      }
+    ],
+    "output": "docs/diagrams/dnk_swarm_workflow.html"
+  },
+  "lanes": [
+    {
+      "id": "human",
+      "label": "Maxim & Antigravity (Intent)"
+    },
+    {
+      "id": "prime",
+      "label": "Gerych Prime (Orchestrator)"
+    },
+    {
+      "id": "workers",
+      "label": "Swarm Domain Workers"
+    },
+    {
+      "id": "quality",
+      "label": "Auditor & Master Gate"
+    }
+  ],
+  "phases": [
+    {
+      "id": "phase_inception",
+      "label": "01 Inception",
+      "fromCol": 0,
+      "toCol": 0,
+      "variant": "default"
+    },
+    {
+      "id": "phase_triage",
+      "label": "02 Triage",
+      "fromCol": 1,
+      "toCol": 1,
+      "variant": "emphasis"
+    },
+    {
+      "id": "phase_dag",
+      "label": "03 TaskDNA DAG",
+      "fromCol": 2,
+      "toCol": 2,
+      "variant": "default"
+    },
+    {
+      "id": "phase_dispatch",
+      "label": "04 Parallel Swarm",
+      "fromCol": 3,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "phase_execution",
+      "label": "05 Domain Execution",
+      "fromCol": 4,
+      "toCol": 4,
+      "variant": "dashed"
+    },
+    {
+      "id": "phase_verify",
+      "label": "06 Verification & Lock",
+      "fromCol": 5,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group_triage",
+      "label": "Zero-Waste Prep",
+      "lane": "prime",
+      "fromCol": 1,
+      "toCol": 2,
+      "variant": "emphasis"
+    },
+    {
+      "id": "group_swarm",
+      "label": "Atomic Domain Slices",
+      "lane": "workers",
+      "fromCol": 3,
+      "toCol": 4,
+      "variant": "dashed"
+    },
+    {
+      "id": "group_gate",
+      "label": "Security Gate",
+      "lane": "quality",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "mainPath": [
+    "user_intent",
+    "triage_eval",
+    "dag_planner",
+    "swarm_dispatch",
+    "worker_builder",
+    "worker_fullstack",
+    "auditor_review",
+    "verify_gate"
+  ],
+  "nodes": [
+    {
+      "id": "user_intent",
+      "lane": "human",
+      "col": 0,
+      "type": "external",
+      "label": "Founder Intent",
+      "sublabel": "Socratic prompt & goal",
+      "tag": "Inception v2.5",
+      "width": 140
+    },
+    {
+      "id": "triage_eval",
+      "lane": "prime",
+      "col": 1,
+      "type": "backend",
+      "label": "dnk_triage_task",
+      "sublabel": "Formula C = F+2D+3S",
+      "tag": "Complexity Guard",
+      "width": 140
+    },
+    {
+      "id": "dag_planner",
+      "lane": "prime",
+      "col": 2,
+      "type": "backend",
+      "label": "TaskDNA DAG",
+      "sublabel": "Atomic Slices <=25 tools",
+      "width": 140
+    },
+    {
+      "id": "swarm_dispatch",
+      "lane": "prime",
+      "col": 3,
+      "type": "messagebus",
+      "label": "Swarm Parallel",
+      "sublabel": "dnk_swarm_parallel()",
+      "tag": "Zero Bottleneck",
+      "width": 140
+    },
+    {
+      "id": "worker_builder",
+      "lane": "workers",
+      "col": 3,
+      "type": "frontend",
+      "label": "gerych_builder",
+      "sublabel": "UI, Canvas & Components",
+      "width": 140
+    },
+    {
+      "id": "worker_fullstack",
+      "lane": "workers",
+      "col": 4,
+      "type": "backend",
+      "label": "dnk_dev_fullstack",
+      "sublabel": "FastAPI & ORM routers",
+      "width": 140
+    },
+    {
+      "id": "auditor_review",
+      "lane": "quality",
+      "col": 4,
+      "type": "security",
+      "label": "gerych_auditor",
+      "sublabel": "Red vs Blue Team Audit",
+      "tag": "Adversarial",
+      "width": 140
+    },
+    {
+      "id": "verify_gate",
+      "lane": "quality",
+      "col": 5,
+      "type": "security",
+      "label": "verify_all.sh",
+      "sublabel": "100% Green test suite",
+      "tag": "Master Gate",
+      "width": 140
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_prompt_triage",
+      "from": "user_intent",
+      "to": "triage_eval",
+      "label": "prompt",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e_triage_dag",
+      "from": "triage_eval",
+      "to": "dag_planner",
+      "label": "DAG slices",
+      "variant": "default"
+    },
+    {
+      "id": "e_dag_dispatch",
+      "from": "dag_planner",
+      "to": "swarm_dispatch",
+      "label": "dispatch",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e_dispatch_builder",
+      "from": "swarm_dispatch",
+      "to": "worker_builder",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e_builder_fullstack",
+      "from": "worker_builder",
+      "to": "worker_fullstack",
+      "label": "API contract",
+      "variant": "default"
+    },
+    {
+      "id": "e_fullstack_audit",
+      "from": "worker_fullstack",
+      "to": "auditor_review",
+      "variant": "default"
+    },
+    {
+      "id": "e_audit_verify",
+      "from": "auditor_review",
+      "to": "verify_gate",
+      "label": "audit passed",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "DNK OS Zero-Waste Protocol",
+      "items": [
+        "Step 0 Complexity Triage evaluates C = F + 2D + 3S",
+        "Swarm parallel dispatches prevent 90/90 tool budget exhaustion",
+        "Atomic slices keep context lean and hyper-focused"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Fail-Closed Master Gate",
+      "items": [
+        "Gerych Auditor runs 2-agent competitive security review",
+        "Physical verify_all.sh must be 100% Green before any commit",
+        "CompletionGate locks slice and auto-harvests to Obsidian"
+      ]
+    }
+  ]
+}

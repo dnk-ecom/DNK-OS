@@ -1,0 +1,84 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "docs/architecture/schemas/taskdna_proposal_review.schema.yaml"
+# purpose: "JSON Schema (Draft-07 compatible) for TaskDNA Proposal Review and Approval Records v1.0"
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-09-09"
+# author: "DNK-e.com Maksym & Gerych Prime"
+# --- END DNK-MRH-HEADER ---
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://dnk-os.org/schemas/taskdna-proposal-review-v1.0.json"
+title: "DNK TaskDNA Proposal Review Record Schema v1.0"
+description: "Defines the specification and validation rules for human-in-the-loop review and approval records of TaskDNA proposals."
+type: "object"
+required:
+  - "schema_version"
+  - "review_id"
+  - "proposal_id"
+  - "decision"
+  - "reviewer"
+  - "reviewed_at"
+  - "rationale"
+  - "risks_accepted"
+  - "conditions_before_execution"
+  - "linked_evidence"
+additionalProperties: false
+
+properties:
+  schema_version:
+    type: "string"
+    const: "dnk-taskdna-proposal-review/v1.0"
+
+  review_id:
+    type: "string"
+    pattern: "^TDR-[0-9]{8}-[a-z0-9_-]+$"
+    description: "Unique review record identifier, e.g. TDR-20260909-human-approval."
+
+  proposal_id:
+    type: "string"
+    pattern: "^TDP-[0-9]{8}-[a-z0-9_-]+$"
+    description: "Identifier of the target TaskDNA proposal, e.g. TDP-20260909-workflow-pipeline."
+
+  decision:
+    type: "string"
+    enum:
+      - "reviewed"
+      - "approved"
+      - "rejected"
+    description: "Review outcome. 'approved' requires reviewer == 'maksym'."
+
+  reviewer:
+    type: "string"
+    minLength: 1
+    description: "Identifier of the human reviewer or review agent."
+
+  reviewed_at:
+    type: "string"
+    description: "ISO-8601 UTC timestamp of the review."
+
+  rationale:
+    type: "string"
+    minLength: 1
+    description: "Mandatory justification explaining the technical assessment or approval/rejection decision."
+
+  risks_accepted:
+    type: "array"
+    items:
+      type: "string"
+    description: "List of explicit risks accepted with this decision. Can be empty list if zero risks."
+
+  conditions_before_execution:
+    type: "array"
+    items:
+      type: "string"
+    description: "Preconditions that must be met before this proposal may be translated into a live task."
+
+  linked_evidence:
+    type: "array"
+    items:
+      type: "string"
+    description: "Repo-relative paths to notes, evidence JSONs, or test runs supporting this review."

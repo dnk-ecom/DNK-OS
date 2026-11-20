@@ -1,0 +1,44 @@
+/* 🏛️ DNK Polaris-Spatial Design Tokens (Generated from dnk_polaris_design_tokens.json) */
+:root {
+  /* Spatial Canvas Colors (Dark Teal Neo-Brutalist HUD) */
+  --dnk-canvas-bg-abyss: #091114;
+  --dnk-canvas-surface-card: #0f1d22;
+  --dnk-canvas-surface-elevated: #152830;
+  --dnk-canvas-border-subtle: #1e3842;
+  --dnk-canvas-border-focus: #14b8a6;
+  --dnk-canvas-accent-cyan: #38bdf8;
+  --dnk-canvas-accent-emerald: #10b981;
+  --dnk-canvas-accent-amber: #f59e0b;
+  --dnk-canvas-accent-rose: #f43f5e;
+  --dnk-canvas-text-primary: #f8fafc;
+  --dnk-canvas-text-secondary: #94a3b8;
+  --dnk-canvas-text-muted: #64748b;
+
+  /* Shopify Polaris Parity Colors (High-Contrast E-Commerce) */
+  --dnk-polaris-surface-page: #f6f6f7;
+  --dnk-polaris-surface-card: #ffffff;
+  --dnk-polaris-border-subdued: #e1e3e5;
+  --dnk-polaris-border-hover: #8c9196;
+  --dnk-polaris-interactive-primary: #008060;
+  --dnk-polaris-interactive-hover: #006e52;
+  --dnk-polaris-interactive-critical: #d82c0d;
+  --dnk-polaris-text-default: #202223;
+  --dnk-polaris-text-subdued: #6d7175;
+
+  /* Spatial Spacing Grid */
+  --dnk-space-xs: 4px;
+  --dnk-space-sm: 8px;
+  --dnk-space-md: 16px;
+  --dnk-space-lg: 24px;
+  --dnk-space-xl: 32px;
+  --dnk-space-2xl: 48px;
+
+  /* Elevation & Shadows */
+  --dnk-elevation-canvas-node: 0 4px 14px 0 rgba(0, 0, 0, 0.45);
+  --dnk-elevation-canvas-node-selected: 0 0 0 2px #14b8a6, 0 8px 24px 0 rgba(20, 184, 166, 0.35);
+  --dnk-elevation-drawer-flyout: -8px 0 32px 0 rgba(0, 0, 0, 0.65);
+
+  /* Motion Timings */
+  --dnk-motion-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --dnk-motion-transition-spring: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}

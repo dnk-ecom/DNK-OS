@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "docs/architecture/100_PORTABILITY_STANDARD.md"
-# purpose: "Comprehensive Specification of the 100% Portability Standard for DNK OS."
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-12"
-# author: "DNK-e.com Maksym & Antigravity"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Стандарт 100% Портативності DNK OS (100% Portability Standard)"
+description: "Comprehensive Specification of the 100% Portability Standard for DNK OS."
+mrh_id: "docs/architecture/100_PORTABILITY_STANDARD.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "docs/architecture/100_PORTABILITY_STANDARD.md"
+> purpose: "Comprehensive Specification of the 100% Portability Standard for DNK OS."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🌐 Стандарт 100% Портативності DNK OS (100% Portability Standard)
 

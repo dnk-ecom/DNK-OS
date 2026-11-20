@@ -1,0 +1,17 @@
+{
+  "port": 4040,
+  "host": "127.0.0.1",
+  "logLevel": "warn",
+  "llm": {
+    "fixtures": [],
+    "record": {
+      "enabled": false
+    }
+  },
+  "mcp": {
+    "enabled": true
+  },
+  "agui": {
+    "enabled": true
+  }
+}

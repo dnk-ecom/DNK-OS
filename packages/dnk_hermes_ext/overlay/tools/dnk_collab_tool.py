@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_collab_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_collab_tool.py"
 # purpose: "Native Hermes tool for Multi-Workspace Collaboration, RBAC queries, and OCC 3-way graph merging."
 # canonical_source: true
 # alters_files: []

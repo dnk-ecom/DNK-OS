@@ -65,6 +65,11 @@ while [[ $# -gt 0 ]]; do
             FORCE_FLAG="--force"
             shift
             ;;
+        --bare|--fast)
+            export DNK_BARE_MODE=1
+            export DNK_SOLO_FAST_PATH=1
+            shift
+            ;;
         --provider)
             export HERMES_PROVIDER="$2"
             export ACTIVE_LLM_PROVIDER="$2"

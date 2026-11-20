@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "services_dnk_analytics_telemetry_exporter"
+# mrh_id: "core/telemetry/analytics/telemetry_exporter.py"
 # purpose: "Prometheus text protocol exposition and Visual Shell JSON telemetry exporter for Gemini drift and self-healing"
 # author: "DNK-e.com Maksym & Gerych Prime"
 # license: "DNK-INTERNAL"

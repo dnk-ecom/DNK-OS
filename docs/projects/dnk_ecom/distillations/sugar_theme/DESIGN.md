@@ -1,5 +1,5 @@
 ---
-title: "--- DNK-MRH-HEADER ---"
+title: "Design"
 description: "--- DNK-MRH-HEADER ---"
 mrh_id: "docs/projects/dnk_ecom/distillations/sugar_theme/DESIGN.md"
 status: Active

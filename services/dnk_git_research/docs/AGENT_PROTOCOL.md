@@ -1,14 +1,30 @@
-# --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_git_research/docs/AGENT_PROTOCOL.md"
-# purpose: "One-page protocol any agent with any model follows to audit a repository with the DNK_Researcher workflow"
-# canonical_source: true
-# alters_files: []
-# triggers_tasks: []
-# status: "Active"
-# version: "1.0.0"
-# updated_at: "2026-11-08"
-# author: "DNK-e.com Maksym & Claude"
-# --- END DNK-MRH-HEADER ---
+---
+title: "Протокол аудиту репозиторію (для будь-якого агента)"
+description: "One-page protocol any agent with any model follows to audit a repository with the DNK_Researcher workflow."
+mrh_id: "services/dnk_git_research/docs/AGENT_PROTOCOL.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
+tags:
+  - git-research
+  - protocol
+  - audit
+---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: "services/dnk_git_research/docs/AGENT_PROTOCOL.md"
+> purpose: "One-page protocol any agent with any model follows to audit a repository with the DNK_Researcher workflow"
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # Протокол аудиту репозиторію (для будь-якого агента)
 

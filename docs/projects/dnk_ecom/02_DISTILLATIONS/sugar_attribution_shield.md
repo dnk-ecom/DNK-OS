@@ -1,25 +1,26 @@
 ---
-title: "Анатомія Донора: Sugar Theme — Захист Маркетингової Атрибуції (Cleanroom Fetch & Request Splitting)"
+title: "Анатомія Sugar Theme: Механізм Захисту Атрибуції Пікселів"
 description: "Глибока деконструкція механізму __sugarGiftLinesSplit та його адаптація у dnk-core.js."
 mrh_id: "docs/projects/dnk_ecom/02_DISTILLATIONS/sugar_attribution_shield.md"
-status: approved
-type: donor_distillation
-donor: sugar_theme
-domain: attribution_and_cart
-date: 2026-11-18
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
-> [!metadata]- ⚙️ Системні метадані (MRH Header)
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
 > ```yaml
 > # --- DNK-MRH-HEADER ---
 > mrh_id: "docs/projects/dnk_ecom/02_DISTILLATIONS/sugar_attribution_shield.md"
 > purpose: "Глибока деконструкція механізму __sugarGiftLinesSplit та його адаптація у dnk-core.js."
 > canonical_source: true
-> alters_files:
->   - "mvp/assets/dnk-core.js"
+> alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
+> status: "Active"
+> version: "2.0.0"
 > updated_at: "2026-11-18"
 > author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---

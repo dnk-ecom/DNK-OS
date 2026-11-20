@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "services/dnk_analytics/service_manifest.yaml"
+# mrh_id: "core/telemetry/analytics/service_manifest.yaml"
 # purpose: "SaaP ServicePluginCard specification v1alpha2 for dnk_analytics"
 # canonical_source: true
 # alters_files: []

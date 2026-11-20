@@ -1,11 +1,14 @@
 ---
-title: "Antigravity IDE Sessions Master Distillation Ledger"
-status: "active"
-type: "audit-report"
-domain: "core"
-author: "DNK-e.com"
-version: "1.0.0"
-updated: "2026-11-16"
+title: "Генеральний Реєстр Дистиляції Сесій Antigravity IDE у DNK CORE / DNK OS"
+description: "Comprehensive Distillation Ledger of all 213 Antigravity IDE Sessions into DNK Core / DNK OS with Physical Disk Markers."
+mrh_id: "docs/architecture/reports/ANTIGRAVITY_SESSIONS_DISTILLATION_LEDGER.md"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -17,9 +20,9 @@ updated: "2026-11-16"
 > alters_files: []
 > triggers_tasks: []
 > status: "Active"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "DNK-e.com"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 

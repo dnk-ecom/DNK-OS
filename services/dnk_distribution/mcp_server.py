@@ -18,6 +18,7 @@ from services.dnk_distribution.src.service import (
     generate_llms_bundle,
     generate_merchant_feed,
     process_data,
+    scan_social_content,
 )
 from services.dnk_distribution.src.social_feedback import SocialMetrics
 from services.dnk_distribution.src.theme_miner import CommentItem
@@ -107,6 +108,15 @@ def distribution_generate_merchant_feed(
         output_path=output_path,
     )
     res = generate_merchant_feed(req)
+    return res.model_dump()
+
+
+@mcp.tool()
+def distribution_scan_social_content(
+    url: str
+) -> Dict[str, Any]:
+    """Scan and distill actionable intelligence from any social media URL (TikTok, Reddit, YouTube) without scraping blocks."""
+    res = scan_social_content(url=url)
     return res.model_dump()
 
 

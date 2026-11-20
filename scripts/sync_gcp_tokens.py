@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # --- DNK-MRH-HEADER ---
-# mrh_id: "DNK_OS/scripts/sync_gcp_tokens.py"
+# mrh_id: "scripts/sync_gcp_tokens.py"
 # purpose: "Autonomous Google Cloud OAuth2 token synchronizer & SOTA Workhorse Model Suite for DNK OS."
 # canonical_source: true
 # alters_files: ["~/.zettcode/config.toml", "DNK_OS/config/config.toml", "~/.hermes/vertex_token.txt"]

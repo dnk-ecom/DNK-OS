@@ -162,13 +162,13 @@ class ProposalQuoteResult(BaseModel):
     included_languages_count: int = Field(..., description="Number of storefront languages")
     included_revision_rounds: int = Field(..., description="Hard cap on free revision cycles")
     annual_app_savings_usd: int = Field(
-        ..., description="Annual savings from native DNK Sovereign Apex blocks vs paid Shopify apps"
+        ..., description="Annual savings from native DNK-Ecom-Zerno-v.0.1.0 blocks vs paid Shopify apps"
     )
     estimated_payback_months: float = Field(
         ..., description="Months to recoup total store investment from app savings + CRO lift"
     )
     recommended_molecules: List[str] = Field(
-        default_factory=list, description="Activated DNK Sovereign Apex Theme Blocks 2.0"
+        default_factory=list, description="Activated DNK-Ecom-Zerno-v.0.1.0 Theme Blocks 2.0"
     )
     niche_pain_to_molecule_matrix: List[Dict[str, str]] = Field(
         default_factory=list, description="Traceable mapping: buyer objection -> DNK molecule -> KPI lift"
@@ -216,6 +216,7 @@ class ClientTicketRequest(BaseModel):
     preferred_node_id: Optional[str] = Field(None, description="Optional explicit canvas node target")
     used_revisions_count: int = Field(0, ge=0)
     max_free_revisions: int = Field(3, ge=1)
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Shopify OS 2.0 metadata from in-context widget")
 
 
 class ClientTicketTriageResult(BaseModel):

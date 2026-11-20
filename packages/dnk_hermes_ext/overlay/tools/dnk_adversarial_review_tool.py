@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_adversarial_review_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_adversarial_review_tool.py"
 # purpose: "Native Hermes tool executing 2-Agent Adversarial Review (Red-Team Auditor vs Blue-Team Builder)."
 # canonical_source: true
 # alters_files: []

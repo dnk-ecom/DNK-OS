@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # --- DNK-MRH-HEADER ---
-# mrh_id: "DNK_OS/scripts/start_zett.sh"
+# mrh_id: "scripts/start_zett.sh"
 # purpose: "Launch Zettelekasten with validated Google Cloud OAuth2 token and environment."
 # canonical_source: true
 # alters_files: []

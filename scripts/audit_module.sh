@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # --- DNK-MRH-HEADER ---
-# mrh_id: "DNK_OS/scripts/audit_module.sh"
+# mrh_id: "scripts/audit_module.sh"
 # purpose: "Run focused ZettCode audit against a specific DNK_HUB module without context bloat."
 # canonical_source: true
 # alters_files: []

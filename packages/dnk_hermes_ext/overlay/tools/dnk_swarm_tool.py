@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core/hermes_agent/tools/dnk_swarm_tool.py"
+# mrh_id: "packages/dnk_hermes_ext/overlay/tools/dnk_swarm_tool.py"
 # purpose: "Native Hermes tool suite bridging Gerych Prime with DNK OS SwarmCoordinator, SwarmEngine, and Runtime Events."
 # canonical_source: true
 # alters_files: []

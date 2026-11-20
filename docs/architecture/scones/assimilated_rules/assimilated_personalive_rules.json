@@ -1,0 +1,6 @@
+{
+  "source_repository": "GVCLab/PersonaLive",
+  "activated_at_slice": 1,
+  "target_worker": "dnk_video_ai_creator",
+  "status": "ready"
+}

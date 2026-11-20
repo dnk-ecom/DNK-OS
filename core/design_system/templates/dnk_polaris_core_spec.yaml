@@ -1,0 +1,167 @@
+# --- DNK-MRH-HEADER ---
+# mrh_id: "core/design_system/templates/dnk_polaris_core_spec.yaml"
+# purpose: "Canonical W3C DTCG Design System Specification for DNK OS Core, grounded in Shopify.com & Shopify Polaris 2.0."
+# canonical_source: true
+# alters_files: []
+# triggers_tasks: []
+# status: "Active"
+# version: "1.0.0"
+# updated_at: "2026-11-17"
+# author: "DNK-e.com Maksym & Antigravity"
+# --- END DNK-MRH-HEADER ---
+
+schema_version: "dtcg-2025.10"
+design_md_standard: "google-design-md-1.0"
+
+meta:
+  brand_name: "DNK OS Polaris Core"
+  archetype: "merchant_os_cockpit"
+  reference_donor: "Shopify.com & Shopify Admin (Polaris 2.0)"
+  cro_allocation_rule: "60-30-10"
+  typography_ratio_name: "Major Third"
+  typography_ratio: 1.25
+  base_font_size_px: 16
+  spacing_grid_base_px: 8
+
+primitives:
+  color:
+    neutral:
+      "0":
+        $value: "#FFFFFF"
+        $type: "color"
+      "50":
+        $value: "#F6F6F7"
+        $type: "color"
+      "100":
+        $value: "#F1F2F4"
+        $type: "color"
+      "200":
+        $value: "#E3E5E8"
+        $type: "color"
+      "300":
+        $value: "#C9CCCF"
+        $type: "color"
+      "500":
+        $value: "#8C9196"
+        $type: "color"
+      "600":
+        $value: "#6D7175"
+        $type: "color"
+      "800":
+        $value: "#202223"
+        $type: "color"
+      "900":
+        $value: "#0D0E10"
+        $type: "color"
+    emerald:
+      "50":
+        $value: "#E3F1DF"
+        $type: "color"
+      "500":
+        $value: "#008060"
+        $type: "color"
+      "600":
+        $value: "#006E52"
+        $type: "color"
+      "700":
+        $value: "#004C3F"
+        $type: "color"
+      "neon":
+        $value: "#30CD90"
+        $type: "color"
+    feedback:
+      success:
+        $value: "#008060"
+        $type: "color"
+      warning:
+        $value: "#FFC453"
+        $type: "color"
+      critical:
+        $value: "#D82C0D"
+        $type: "color"
+      info:
+        $value: "#2C6ECB"
+        $type: "color"
+
+semantic:
+  color:
+    surface-primary:
+      $value: "#FFFFFF"
+      $type: "color"
+      $description: "Polaris Surface Card & White Canvas"
+    surface-secondary:
+      $value: "#F6F6F7"
+      $type: "color"
+      $description: "Polaris Secondary Subdued Surface"
+    surface-canvas:
+      $value: "#F1F2F4"
+      $type: "color"
+      $description: "Shopify Merchant Admin Workspace Background"
+    text-primary:
+      $value: "#202223"
+      $type: "color"
+      $description: "Polaris High-Contrast Text (≥ 12:1 against White)"
+    text-secondary:
+      $value: "#6D7175"
+      $type: "color"
+      $description: "Polaris Subdued Meta Text"
+    action-primary:
+      $value: "#008060"
+      $type: "color"
+      $description: "Canonical Shopify Emerald Action Accent (Save, Publish, Buy)"
+    action-primary-hover:
+      $value: "#006E52"
+      $type: "color"
+    action-primary-text:
+      $value: "#FFFFFF"
+      $type: "color"
+    action-secondary:
+      $value: "#F6F6F7"
+      $type: "color"
+    border-subtle:
+      $value: "#E3E5E8"
+      $type: "color"
+    border-base:
+      $value: "#C9CCCF"
+      $type: "color"
+    border-strong:
+      $value: "#8C9196"
+      $type: "color"
+
+typography:
+  families:
+    heading:
+      $value: "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+      $type: "fontFamily"
+    body:
+      $value: "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif"
+      $type: "fontFamily"
+    mono:
+      $value: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
+      $type: "fontFamily"
+
+spacing:
+  "2": 2
+  "4": 4
+  "8": 8
+  "12": 12
+  "16": 16
+  "20": 20
+  "24": 24
+  "32": 32
+  "48": 48
+  "64": 64
+
+motion:
+  dur_fast_ms: 150
+  dur_base_ms: 250
+  dur_slow_ms: 400
+  ease_default: "cubic-bezier(0.4, 0, 0.2, 1)"
+  ease_spring: "cubic-bezier(0.16, 1, 0.3, 1)"
+  ease_in_out: "cubic-bezier(0.65, 0, 0.35, 1)"
+
+elevation:
+  shadow_xs: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+  shadow_sm: "0 1px 3px rgba(0, 0, 0, 0.05), 0 0 0 1px #E3E5E8"
+  shadow_md: "0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)"
+  shadow_lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05)"

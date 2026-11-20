@@ -1,5 +1,5 @@
 # --- DNK-MRH-HEADER ---
-# mrh_id: "core_skills_curator_py"
+# mrh_id: "core/skills_curator.py"
 # purpose: "Autonomous Skill Curator & Observation Ingestion Engine (Assimilated from rebelytics/one-skill-to-rule-them-all)"
 # canonical_source: true
 # alters_files: []
@@ -196,7 +196,7 @@ class SkillsCurator:
         structural_req = [o for o in self.observations if o.structural_barrier_required]
 
         md = f"""# --- DNK-MRH-HEADER ---
-# mrh_id: "docs_notes_skill_curator_digest_md"
+# mrh_id: "core/skills_curator.py"
 # purpose: "{title}"
 # canonical_source: true
 # alters_files: []

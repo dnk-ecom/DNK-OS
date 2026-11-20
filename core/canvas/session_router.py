@@ -38,6 +38,11 @@ import uuid
 from typing import Any, Dict, List, Optional, Set, Tuple
 from pydantic import BaseModel, ConfigDict, Field
 
+try:
+    from core.orchestrator.rlm_compactor import PrimeRLMCompactor
+except ImportError:
+    PrimeRLMCompactor = None  # type: ignore
+
 logger = logging.getLogger("dnk.canvas.session_router")
 
 # Default database location in 4-zone APFS runtime with fallback
@@ -379,6 +384,62 @@ class SpatialCanvasSessionRouter:
                 )
                 for r in rows
             ]
+
+    def compact_thread(
+        self,
+        session_id: str,
+        max_tokens: int = 15000,
+        target_retain_tokens: int = 4000,
+    ) -> Dict[str, Any]:
+        """
+        Dynamically compacts a node's conversation history using Prime Agent RLM.
+        Prunes older turns into an immutable synthesis contract while preserving recent turns.
+        Updates SQLite thread store atomically.
+        """
+        if PrimeRLMCompactor is None:
+            return {"compacted": False, "reason": "rlm_compactor_unavailable"}
+
+        raw_messages = self.get_messages(session_id, limit=500)
+        if not raw_messages:
+            return {"compacted": False, "reason": "empty_thread"}
+
+        dicts = [
+            {
+                "id": m.id,
+                "session_id": m.session_id,
+                "role": m.role,
+                "content": m.content,
+                "meta_json": m.meta_json,
+                "created_at": m.created_at,
+            }
+            for m in raw_messages
+        ]
+
+        compactor = PrimeRLMCompactor(default_max_tokens=max_tokens, target_retain_tokens=target_retain_tokens)
+        compacted_msgs, was_compacted, telemetry = compactor.compact_trajectory(
+            dicts, max_tokens=max_tokens, target_retain_tokens=target_retain_tokens, session_id=session_id
+        )
+
+        if was_compacted:
+            with self._get_connection() as conn:
+                conn.execute("DELETE FROM node_chat_messages WHERE session_id = ?", (session_id,))
+                for msg in compacted_msgs:
+                    conn.execute(
+                        """
+                        INSERT INTO node_chat_messages (id, session_id, role, content, meta_json, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            msg.get("id") or f"msg_{uuid.uuid4().hex[:12]}",
+                            session_id,
+                            msg["role"],
+                            msg["content"],
+                            msg.get("meta_json") or "{}",
+                            msg.get("created_at") or time.strftime("%Y-%m-%d %H:%M:%S"),
+                        ),
+                    )
+
+        return telemetry
 
     def crystallize_node(
         self,

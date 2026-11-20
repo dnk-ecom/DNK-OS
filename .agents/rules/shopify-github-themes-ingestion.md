@@ -1,8 +1,28 @@
 ---
-description: Mandatory Protocol for Ingestion, Audit, Sanitization, and Packaging of Shopify Themes from GitHub
+title: "Shopify GitHub Theme Ingestion Protocol"
+description: "Mandatory Protocol for Ingestion, Audit, Sanitization, and Packaging of Shopify Themes from GitHub."
+mrh_id: ".agents/rules/shopify-github-themes-ingestion.md"
+status: Active
+version: "1.0.0"
+updated: 2026-11-18
 globs: "**/*"
 alwaysApply: true
 ---
+
+> [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
+> ```yaml
+> # --- DNK-MRH-HEADER ---
+> mrh_id: ".agents/rules/shopify-github-themes-ingestion.md"
+> purpose: "Mandatory Protocol for Ingestion, Audit, Sanitization, and Packaging of Shopify Themes from GitHub."
+> canonical_source: true
+> alters_files: []
+> triggers_tasks: []
+> status: "Active"
+> version: "1.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
+> # --- END DNK-MRH-HEADER ---
+> ```
 
 # 🛍️ Standard Protocol: Shopify GitHub Theme Ingestion & Packaging
 

@@ -1,12 +1,14 @@
 ---
-title: "12. Модуль офлайн-рантайму та швидкого прототипування тем: Local-Storefront Engine"
+title: "МОДУЛЬ 12: LOCAL-STOREFRONT ОФЛАЙН-РАНТАЙМ ТА АГЕНТСЬКЕ ПРОТОТИПУВАННЯ"
 description: "Інженерна специфікація офлайн-рантайму local-storefront (lsf) для генерації інтерактивних прототипів магазинів за 30 секунд у DNK Agentic Store OS."
 mrh_id: "docs/projects/dnk_ecom/theme_dev_workflow/12_LOCAL_STOREFRONT_OFFLINE_PROTOTYPING_AND_RUNTIME_ENGINE.md"
-status: approved
-type: specification
-domain: shopify
-author: "Antigravity & Gerych-root & DNK-e.com Maksym"
-version: "1.0.0"
+status: Active
+archetype: GENERAL_DOC
+version: "2.0.0"
+updated: 2026-11-18
+tags:
+  - dnk-os
+  - architecture
 ---
 
 > [!metadata]- ⚙️ Системні метадані та інваріанти (MRH Header)
@@ -17,10 +19,10 @@ version: "1.0.0"
 > canonical_source: true
 > alters_files: []
 > triggers_tasks: []
-> status: "Approved"
-> version: "1.0.0"
-> updated_at: "2026-11-16"
-> author: "Antigravity & Gerych-root & DNK-e.com Maksym"
+> status: "Active"
+> version: "2.0.0"
+> updated_at: "2026-11-18"
+> author: "DNK-e.com Maksym & Antigravity"
 > # --- END DNK-MRH-HEADER ---
 > ```
 
