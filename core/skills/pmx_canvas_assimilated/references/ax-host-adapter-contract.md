@@ -1,0 +1,110 @@
+# AX host-adapter contract
+
+PMX Canvas owns the **AX data layer** — work items, approval gates, steering,
+evidence, review annotations, elicitations, mode requests, the timeline, host
+capabilities, and the tool/prompt policy — over HTTP and MCP. What makes AX
+*interactive* on a given coding harness (GitHub Copilot, Codex, Claude Code, …) is
+a thin **adapter** that wires PMX's neutral surfaces to that harness's lifecycle.
+
+"Agnostic" means a documented interface plus PMX-side behavior that a host-specific
+adapter can use — not a shipped adapter for every harness or zero-adapter magic. The genuinely harness-owned
+acts (waking a turn, per-turn context injection, forwarding native tool hooks,
+native modals) still need a per-harness adapter; PMX owns everything on its side of
+the line (queues, endpoints, schemas, the canvas-surface fallback).
+
+### Amp uses native MCP, not a bundled lifecycle adapter
+
+Amp's portal and agent connection are separate. Configure `amp.mcpServers` in the
+executing workspace's `.amp/settings.json`, align its root/port with the portal service,
+and have the human approve a new workspace command before reloading MCP. See the
+[Amp setup guide](../skills/pmx-canvas/references/installing-pmx-canvas.md#amp-connect-the-agent-separately-from-the-portal).
+An active Amp agent can read pinned context, claim addressed steering, edit, verify the
+visible result and acknowledge. PMX ships no Amp lifecycle adapter that automatically
+injects context, forwards tool hooks, or wakes idle threads. The injection/push behavior
+below requires an adapter implementing it; merely configuring MCP does not provide it.
+
+## The interface
+
+Every adapter implements as much of this as its host allows; PMX provides the
+surface each one binds to.
+
+| Adapter method | PMX surface (owned) | Harness-owned part |
+| --- | --- | --- |
+| `pullContext()` | `GET /api/canvas/ax/context?consumer=<id>` · `canvas://ax-context` — full board **plus** a compact `delivery` lead block | When/where to inject it into the model's turn |
+| `deliverSteer()` | `GET /api/canvas/ax/delivery/pending?consumer=<id>` · `canvas_ax_delivery { action: "claim" }` → act → `POST …/delivery/<id>/mark` · `canvas_ax_delivery { action: "mark" }` | Calling the host's native send/wake |
+| `ingestActivity(event)` | `POST /api/canvas/ax/activity` · `canvas_ingest_activity` — board auto-reacts | Forwarding the host's tool/session hooks |
+| `awaitGate(id)` | `GET /api/canvas/ax/{approval\|elicitation\|mode}/<id>?waitMs=` · `canvas_ax_gate { kind: "approval"\|"elicitation"\|"mode", action: "await" }` | Optionally surfacing a native modal; the agent must await PMX |
+| `mirrorLog(event)` *(optional)* | `GET /api/canvas/ax/timeline` · `canvas://ax-timeline` | Writing AX events into the host's own chat/session log |
+| `presence()` | `POST /api/canvas/ax/presence` · `canvas_ax_state { action: "set-presence" }` — or simply `ingestActivity` with `session-start` / `session-end` / `tool-start` / `tool-result` | Calling it from the host's session and tool hooks. Attach saves a pre-session snapshot; detach emits the `agent-session-ended` receipt — detach on shutdown (bounded, best-effort) so the human gets it promptly. If the host knows the model's token usage, report it as `contextUsage: { used, total }` — the context panel then names how many tokens the agent's whole context holds |
+
+### Presence: the cursor works for every adapter
+
+An adapter does not need per-call labelling for the canvas to show its agent's
+cursor. Attach once (`attached: true`, or a `session-start` activity) and detach
+on exit; from then on every canvas write the agent makes — through MCP, HTTP,
+the CLI or the SDK, under any transport label — is attributed to that session
+while it is the only one attached. The cursor moves to the node each write
+touched and the phase reads `tooling` during work, `waiting-approval` while a
+gate is pending. Report `thinking` from a prompt/turn hook when the host has one
+(the Copilot extension does); name the agent with `PMX_CANVAS_AGENT_SOURCE` on
+the MCP server when the host runs several agents side by side, and pass
+`agentId` for sub-agents that should keep their own cursor.
+
+## Steering is queued first, then pushed by capable adapters (#54)
+
+A board action (e.g. an `ax.steer` emit from a surface button) always enqueues a steering message
+first. A capable adapter can immediately claim it, call the host's native send, and mark it after
+the host accepts the prompt. The GitHub Copilot reference adapter implements this delivery loop.
+
+When a host cannot wake a turn, queued steering reaches the next turn when:
+
+1. **The pin/focus gate is open.** A typical adapter injects `/api/canvas/ax/context`
+   only when something is pinned or focused (`pinned.count > 0 || focus.nodeIds.length > 0`).
+   A steering board must therefore stay pinned, or its button should also emit
+   `ax.focus.set` on the board node, to hold the gate open.
+2. **A human message fires the turn.** A sandbox button click cannot itself create a
+   new agent turn (an app-platform constraint). Any human prompt triggers the injection.
+3. **The agent acts, then acks.** Injected `pendingSteering` / `pendingActivity` is
+   *to-do*, not narration: act on it, then `canvas_ax_delivery { action: "mark" }`
+   the steering (or resolve the work item / gate). Until acked, steering re-injects every gated turn.
+
+The `delivery` lead block (`GET /api/canvas/ax/context?consumer=<id>`) is the
+robustness hedge: it's compact and sits above the full dump, so an adapter can inject
+it un-truncated even on a busy board where the full context is clipped. Its
+`pendingSteering` is **newest-first** (most recent at index 0), capped at 10, so a
+*fresh* steer is always visible even behind a long backlog of old unacked steers
+(report #57); `delivery.totalPending` / `delivery.omittedPending` tell the agent how
+many more are queued so it can drain the FIFO `…/delivery/pending` endpoint when the
+count is non-zero. **Adapters should read `delivery.pendingSteering`** (this compact,
+count-bearing block), not `timeline.pendingSteering`.
+
+### Canvas-origin steering requires an adapter-owned wake (#59)
+
+Recording a browser-origin `ax.steer` (and the `ok:true` ack a surface button gets — report #55)
+means the steer is durably queued on the timeline. PMX deliberately does not import a host SDK, so
+the *wake* is adapter-owned: a cooperating host adapter drains
+`…/delivery/pending?consumer=<id>`, calls its native send, then marks the delivery. The GitHub
+Copilot adapter does this with a long-polling pump and `copilotSession.send`. It establishes a
+baseline at adapter startup, marking older backlog without replaying it so stale instructions from
+prior sessions cannot flood a newly opened chat. Adapters without a native send retain
+next-human-turn delivery.
+
+## The two primitives that close the loop
+
+- **Activity ingestion (bidirectional board).** Before, AX was one-directional
+  (agent → board). With `ingestActivity`, the agent's *real work* flows back: a failed
+  tool becomes a blocked work item + a review finding + evidence without the agent
+  remembering to push it. Reactions are kind-driven and overridable per call.
+- **Blocking gates (gates that actually gate).** Before, an approval gate was inert
+  data the agent had to poll. With `canvas_ax_gate { kind: "approval", action: "await" }`
+  (and the `?waitMs` HTTP long-poll), the agent requests a gate then *blocks* until the
+  human resolves it in the browser — real human-in-the-loop control on any harness.
+
+## What stays harness-owned
+
+Waking a turn, the exact per-turn injection timing, forwarding native tool hooks, and
+native blocking modals are the host's job — PMX defines the neutral interface and owns
+its side. Model/abort control (`setModel`, `abort`) is intentionally out of scope.
+
+See [`docs/http-api.md`](http-api.md) and [`docs/mcp.md`](mcp.md) for the full surface,
+and the per-harness notes under `skills/pmx-canvas/references/`.

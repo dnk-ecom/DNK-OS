@@ -1,0 +1,147 @@
+{
+  "version": "1.0.0",
+  "language": "en",
+  "description": "Canonical English Anti-Slop Lexicon and Structural Tell Registry for DNK OS Humanizer Engine.",
+  "invisible": [
+    {"cp": "U+200B", "name": "ZERO WIDTH SPACE", "action": "delete"},
+    {"cp": "U+200C", "name": "ZERO WIDTH NON-JOINER", "action": "delete"},
+    {"cp": "U+200D", "name": "ZERO WIDTH JOINER", "action": "delete"},
+    {"cp": "U+2060", "name": "WORD JOINER", "action": "delete"},
+    {"cp": "U+FEFF", "name": "ZERO WIDTH NO-BREAK SPACE / BOM", "action": "delete"},
+    {"cp": "U+00AD", "name": "SOFT HYPHEN", "action": "delete"},
+    {"cp": "U+180E", "name": "MONGOLIAN VOWEL SEPARATOR", "action": "delete"},
+    {"cp": "U+061C", "name": "ARABIC LETTER MARK", "action": "delete"},
+    {"cp": "U+200E", "name": "LEFT-TO-RIGHT MARK", "action": "delete"},
+    {"cp": "U+200F", "name": "RIGHT-TO-LEFT MARK", "action": "delete"},
+    {"cp": "U+E0000-U+E007F", "name": "TAG CHARACTERS (ASCII smuggling)", "action": "delete"},
+    {"cp": "U+00A0", "name": "NO-BREAK SPACE", "action": "space"},
+    {"cp": "U+202F", "name": "NARROW NO-BREAK SPACE", "action": "space"},
+    {"cp": "U+2009", "name": "THIN SPACE", "action": "space"},
+    {"cp": "U+2007", "name": "FIGURE SPACE", "action": "space"},
+    {"cp": "U+2003", "name": "EM SPACE", "action": "space"},
+    {"cp": "U+2002", "name": "EN SPACE", "action": "space"}
+  ],
+  "typographic": [
+    {"from": "\u201c", "name": "CURLY LEFT DOUBLE QUOTE", "to": "\""},
+    {"from": "\u201d", "name": "CURLY RIGHT DOUBLE QUOTE", "to": "\""},
+    {"from": "\u2018", "name": "CURLY LEFT SINGLE QUOTE", "to": "'"},
+    {"from": "\u2019", "name": "CURLY RIGHT SINGLE QUOTE", "to": "'"},
+    {"from": "\u2026", "name": "HORIZONTAL ELLIPSIS", "to": "..."}
+  ],
+  "phrases": [
+    {"find": "in today's fast-paced digital world,", "replace": "", "family": "opener_fluff"},
+    {"find": "in today's fast-paced digital world", "replace": "", "family": "opener_fluff"},
+    {"find": "in today's fast-paced world,", "replace": "", "family": "opener_fluff"},
+    {"find": "in today's fast-paced world", "replace": "", "family": "opener_fluff"},
+    {"find": "in today's rapidly evolving landscape,", "replace": "", "family": "opener_fluff"},
+    {"find": "in today's digital age,", "replace": "", "family": "opener_fluff"},
+    {"find": "in an ever-changing world,", "replace": "", "family": "opener_fluff"},
+    {"find": "it is important to note that", "replace": "", "family": "meta_lead_in"},
+    {"find": "it's important to note that", "replace": "", "family": "meta_lead_in"},
+    {"find": "it is worth noting that", "replace": "", "family": "meta_lead_in"},
+    {"find": "it's worth noting that", "replace": "", "family": "meta_lead_in"},
+    {"find": "it goes without saying that", "replace": "", "family": "meta_lead_in"},
+    {"find": "needless to say,", "replace": "", "family": "meta_lead_in"},
+    {"find": "furthermore,", "replace": "also,", "family": "ai_transition"},
+    {"find": "moreover,", "replace": "also,", "family": "ai_transition"},
+    {"find": "additionally,", "replace": "also,", "family": "ai_transition"},
+    {"find": "at the end of the day,", "replace": "ultimately,", "family": "cliche"},
+    {"find": "plays a pivotal role", "replace": "matters", "family": "significance_inflation"},
+    {"find": "plays a crucial role", "replace": "shapes", "family": "significance_inflation"},
+    {"find": "plays a vital role", "replace": "helps", "family": "significance_inflation"},
+    {"find": "serves as a testament to", "replace": "proves", "family": "significance_inflation"},
+    {"find": "is a testament to", "replace": "shows", "family": "significance_inflation"},
+    {"find": "takes it to the next level", "replace": "improves it", "family": "promotional_hype"},
+    {"find": "unlock the full potential", "replace": "use all features", "family": "promotional_hype"},
+    {"find": "unleash the power of", "replace": "use", "family": "promotional_hype"},
+    {"find": "a wide range of", "replace": "many", "family": "promotional_hype"},
+    {"find": "whether you're a beginner or an expert", "replace": "for all skill levels", "family": "cliche"},
+    {"find": "let's delve into", "replace": "let's examine", "family": "delve_slop"},
+    {"find": "let's dive deep into", "replace": "let's look at", "family": "delve_slop"},
+    {"find": "in conclusion,", "replace": "", "family": "closer_fluff"},
+    {"find": "to sum up,", "replace": "", "family": "closer_fluff"},
+    {"find": "in summary,", "replace": "", "family": "closer_fluff"},
+    {"find": "all in all,", "replace": "", "family": "closer_fluff"},
+    {"find": "in order to", "replace": "to", "family": "wordy"},
+    {"find": "due to the fact that", "replace": "because", "family": "wordy"}
+  ],
+  "words": [
+    {"find": "delve", "replace": "explore", "family": "ai_vocabulary"},
+    {"find": "delves", "replace": "explores", "family": "ai_vocabulary"},
+    {"find": "delving", "replace": "exploring", "family": "ai_vocabulary"},
+    {"find": "tapestry", "replace": "mix", "family": "ai_vocabulary"},
+    {"find": "symphony", "replace": "blend", "family": "ai_vocabulary"},
+    {"find": "testament", "replace": "proof", "family": "ai_vocabulary"},
+    {"find": "pivotal", "replace": "key", "family": "ai_vocabulary"},
+    {"find": "multifaceted", "replace": "complex", "family": "ai_vocabulary"},
+    {"find": "underscores", "replace": "shows", "family": "ai_vocabulary"},
+    {"find": "underscore", "replace": "highlight", "family": "ai_vocabulary"},
+    {"find": "fostering", "replace": "building", "family": "ai_vocabulary"},
+    {"find": "foster", "replace": "build", "family": "ai_vocabulary"},
+    {"find": "beacon", "replace": "guide", "family": "ai_vocabulary"},
+    {"find": "realm", "replace": "field", "family": "ai_vocabulary"},
+    {"find": "embark", "replace": "start", "family": "ai_vocabulary"},
+    {"find": "game-changer", "replace": "advantage", "family": "promotional_hype"},
+    {"find": "groundbreaking", "replace": "new", "family": "promotional_hype"},
+    {"find": "revolutionary", "replace": "major", "family": "promotional_hype"},
+    {"find": "unparalleled", "replace": "strong", "family": "promotional_hype"},
+    {"find": "seamless", "replace": "smooth", "family": "buzzword"},
+    {"find": "seamlessly", "replace": "smoothly", "family": "buzzword"},
+    {"find": "leverage", "replace": "use", "family": "buzzword"},
+    {"find": "leveraging", "replace": "using", "family": "buzzword"},
+    {"find": "utilize", "replace": "use", "family": "buzzword"},
+    {"find": "utilizing", "replace": "using", "family": "buzzword"},
+    {"find": "robust", "replace": "reliable", "family": "buzzword"},
+    {"find": "holistic", "replace": "complete", "family": "buzzword"}
+  ],
+  "structures": [
+    {
+      "id": "not-just-en",
+      "regex": "(?i)\\bit(?:'s| is) not just [^.!?,\\n]{2,60}[,—-] it(?:'s| is)\\b",
+      "name": "Negative parallelism ('It's not just X — it's Y')",
+      "fix": "Drop the artificial contrast. State directly what the subject does."
+    },
+    {
+      "id": "not-only-en",
+      "regex": "(?i)\\bnot only [^.!?,\\n]{2,60},? but also\\b",
+      "name": "Correlative 'Not only X, but also Y'",
+      "fix": "Split into two direct facts or connect with 'and'."
+    },
+    {
+      "id": "participle-tail-en",
+      "regex": ",\\s+(?:ensuring|highlighting|underscoring|fostering|showcasing|demonstrating|paving the way for|contributing to)\\b",
+      "name": "Trailing participle clause (', ensuring/highlighting/fostering...')",
+      "fix": "Delete the tacked-on significance tail or start a concrete new sentence."
+    },
+    {
+      "id": "passive-voice-en",
+      "regex": "(?i)\\b(?:was|were|is|are|been)\\s+(?:created|developed|designed|implemented|achieved|established|conducted|utilized|leveraged)\\b",
+      "name": "Impersonal passive voice ('was developed / is utilized')",
+      "fix": "Use active voice with a concrete actor ('our engineers built', 'we tested')."
+    },
+    {
+      "id": "em-dash-overload",
+      "regex": "—",
+      "name": "Excessive em-dashes (—)",
+      "fix": "More than 1 em-dash per paragraph signals LLM syntax. Replace with periods, commas, or colons."
+    },
+    {
+      "id": "rocket-sparkles",
+      "regex": "[\\U0001F680\\U0001F525\\U0001F4A1\\u2728\\U0001F3AF\\U0001F48E\\U0001F31F]",
+      "name": "AI decorative emojis (🚀, 🔥, 💡, ✨, 🎯, 💎, 🌟)",
+      "fix": "Remove stock decorative emojis from headings and bullet lists."
+    },
+    {
+      "id": "colon-bold-bullets",
+      "regex": "(?m)^\\s*[-*•]\\s+\\*\\*[^*:\\n]{2,40}:\\*\\*",
+      "name": "Bold-colon bullet list ('- **Bold header:** explanation')",
+      "fix": "Convert formulaic bold-header bullets into natural prose or varied list items."
+    },
+    {
+      "id": "rhetorical-reveal-en",
+      "regex": "(?im)^\\s*(?:the result|the secret|the best part|the bottom line|the catch)\\?\\s*$",
+      "name": "One-phrase rhetorical reveal ('The result?', 'The best part?')",
+      "fix": "Cut the theatrical pause and state the outcome directly."
+    }
+  ]
+}

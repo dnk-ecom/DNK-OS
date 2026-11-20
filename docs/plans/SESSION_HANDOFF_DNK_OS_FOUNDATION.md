@@ -60,6 +60,7 @@ tags:
 | **DEC-160** | **C2PA Media Provenance & Theme Renaming** | Повна криптографічна фіксація автентичності контенту (C2PA) та закріплення назви теми `DNK Ecom` (Зерно / v0.1.0). `[🔒 LOCKED]` |
 | **DEC-162** | **Sovereign Social Media Scanner** | Workhorse #3 (`services/dnk_distribution`): автономний сканер TikTok, Reddit, YouTube та асиміляція правил агентів. `[🔒 LOCKED]` |
 | **DEC-163** | **Sovereign AI Brand Kit & Theme Distiller** | Генерація `DESIGN.md` (Google Labs), `BRAND.md` (Zero-Hallucination Quotes), `SKILL.md` (Every Time Guard) та Edge Showcase на Cloudflare Pages. `[🔒 LOCKED]` |
+| **DEC-170** | **Sovereign Skills Consolidation & Independence** | Повна міграція колекції 141 навички в `DNK_OS/core/skills/`, нативний лінк `.agents/skills` та репоінт 234 глобальних симлінків з `DNK_HUB` на `DNK_OS`. `[🔒 LOCKED]` |
 
 ---
 
